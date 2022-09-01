@@ -1,27 +1,55 @@
 <template>
   <el-dialog width="800px" :title="title" :visible.sync="dialogFormVisible"
-             @closed="closeDialog">
+             @close="closeDialog('ruleForm')">
     <el-form size="mini" :rules="rules" :disabled="!show" ref="ruleForm" :model="menu">
-      <el-form-item label="菜单名称" prop="title" :label-width="formLabelWidth">
-        <el-input v-model="menu.title" autocomplete="off" clearable></el-input>
+      <el-form-item label="平台" prop="platformId" :label-width="formLabelWidth" style="text-align: left;">
+        <el-select v-model="menu.platformId" placeholder="请选择所属的平台">
+          <el-option
+            v-for="item in platformOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
-
+      <el-form-item label="菜单名称" prop="title" :label-width="formLabelWidth">
+        <el-input v-model="menu.title" autocomplete="off" placeholder="请输入菜单名称" clearable></el-input>
+      </el-form-item>
       <el-form-item label="组件名称" prop="name" :label-width="formLabelWidth">
-        <el-input v-model="menu.name" autocomplete="off" clearable></el-input>
+        <el-input v-model="menu.name" autocomplete="off" placeholder="请输入组件名称" clearable></el-input>
       </el-form-item>
       <el-form-item label="排序" prop="sort" :label-width="formLabelWidth" style="text-align: left;">
         <el-input-number v-model="menu.sort" @change="handleChange" :min="1" :max="10" label="排序"/>
       </el-form-item>
       <el-form-item label="组件名称" prop="icon" :label-width="formLabelWidth">
-        <el-input v-model="menu.icon" autocomplete="off" clearable></el-input>
+        <el-input v-model="menu.icon" autocomplete="off" placeholder="请输入组件名称" clearable></el-input>
       </el-form-item>
       <el-form-item label="父级元素" prop="parentId" :label-width="formLabelWidth">
         <tree-select
-          :options="options"
+          :options="selectTreeOptions"
           :disable-branch-nodes="true"
           :show-count="true"
           placeholder=""
         />
+      </el-form-item>
+      <el-form-item label="权限标识" prop="permission" :label-width="formLabelWidth">
+        <el-input v-model="menu.permission" autocomplete="off" placeholder="请输入权限标识" clearable></el-input>
+      </el-form-item>
+      <el-form-item label="菜单路径" prop="path" :label-width="formLabelWidth">
+        <el-input v-model="menu.path" autocomplete="off" placeholder="请输入菜单路径" clearable></el-input>
+      </el-form-item>
+      <el-form-item label="组件路径" prop="component" :label-width="formLabelWidth">
+        <el-input v-model="menu.component" autocomplete="off" placeholder="请输入组件路径" clearable></el-input>
+      </el-form-item>
+      <el-form-item label="类型" prop="type" :label-width="formLabelWidth" style="text-align: left;">
+        <el-select v-model="menu.type" placeholder="请选择类型">
+          <el-option
+            v-for="item in typeOptions"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
     </el-form>
     <div slot="footer" v-if="show" class="dialog-footer">
@@ -46,7 +74,40 @@ export default {
   },
   data () {
     return {
-      options: [{
+      dialogFormVisible: false,
+      menu: {
+        id: null,
+        name: '',
+        title: '',
+        icon: '',
+        sort: 0,
+        parentId: null,
+        permission: '',
+        component: '',
+        platformId: '',
+        type: 0
+      },
+      typeOptions: [
+        {
+          value: 0,
+          label: '文件夹'
+        },
+        {
+          value: 1,
+          label: '菜单'
+        },
+        {
+          value: 2,
+          label: '按钮'
+        }
+      ],
+      platformOptions: [
+        {
+          value: '1564528653105573889',
+          label: '平台'
+        }
+      ],
+      selectTreeOptions: [{
         id: 'a',
         label: 'a',
         children: [{
@@ -63,36 +124,72 @@ export default {
         id: 'c',
         label: 'c'
       }],
-      dialogFormVisible: false,
-      menu: {
-        id: null,
-        name: '',
-        title: '',
-        icon: '',
-        sort: 0,
-        parentId: null,
-        permission: '',
-        component: '',
-        platformId: '',
-        type: 1
-      },
       // 默认是创建
       dialogStatus: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
       show: true,
       rules: {
+        platformId: [
+          {
+            required: true,
+            message: '请选择平台',
+            trigger: 'change'
+          }
+        ],
         name: [
           {
             required: true,
-            message: '请输入平台名称',
+            message: '请输入菜单名称',
             trigger: 'blur'
           }
         ],
         title: [
           {
             required: true,
-            message: '请输入平台标识',
+            message: '请输入组件名称',
             trigger: 'blur'
+          }
+        ],
+        sort: [
+          {
+            required: true,
+            message: '请设置排序',
+            trigger: 'change'
+          }
+        ],
+        icon: [
+          {
+            required: true,
+            message: '请选择icon图标',
+            trigger: 'blur'
+          }
+        ],
+        permission: [
+          {
+            required: true,
+            message: '请输入权限标识',
+            trigger: 'blur'
+          }
+        ],
+        path: [
+          {
+            required: true,
+            message: '请输入路由路径',
+            trigger: 'blur'
+          }
+        ],
+        component: [
+          {
+            required: true,
+            message: '请输入组件路径',
+            trigger: 'blur'
+          }
+        ],
+        type: [
+          {
+            required: true,
+            message: '请选择组件类型',
+            trigger: 'change'
           }
         ]
       }
@@ -115,12 +212,14 @@ export default {
       add(this.menu).then((rep) => {
         Message.success({ message: rep.message })
         this.dialogFormVisible = false
+        this.$emit('reloadList')
       })
     },
     edit () {
       edit(this.menu).then((rep) => {
         Message.success({ message: rep.message })
         this.dialogFormVisible = false
+        this.$emit('reloadList')
       })
     },
     resetForm (formName) {
@@ -134,22 +233,20 @@ export default {
     showDialogFormVisible (val, dialogStatus) {
       this.dialogFormVisible = true
       if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
-        this.menu.id = val.id
-        this.menu.title = val.title
-        this.menu.name = val.name
+        this.$nextTick(() => {
+          // 赋值
+          Object.assign(this.menu, val)
+        })
       }
       if (dialogStatus === DIALOG_TYPE.SHOW) {
         this.show = false
       }
       this.dialogStatus = dialogStatus
     },
-    closeDialog () {
-      this.menu.name = ''
-      this.menu.title = ''
-      this.menu.id = ''
+    closeDialog (formName) {
+      this.$refs[formName].clearValidate()
+      this.$refs[formName].resetFields()
       this.show = true
-      this.dialogStatus = DIALOG_TYPE.ADD
-      this.$emit('reloadList')
     }
   }
 }
@@ -158,11 +255,11 @@ export default {
 
 <style>
 .vue-treeselect__control {
-  height: 10px !important;
+  height: 9px !important;
 }
 
 .vue-treeselect__input {
-  padding: 5px !important;
+  padding: 2px !important;
 }
 
 .vue-treeselect__input-container {

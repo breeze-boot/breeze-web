@@ -52,7 +52,7 @@ request.interceptors.response.use(
   },
   (error) => {
     console.error(error.response.status)
-    if (error.response.status === 504 || error.response.status === 404) {
+    if (error.response.status === 500 || error.response.status === 404) {
       Message.error({ message: '服务异常' })
     } else if (error.response.status === 401) {
       Message.error({ message: error.response.data.message })
@@ -60,7 +60,7 @@ request.interceptors.response.use(
       if (error.response.data.message) {
         Message.error({ message: error.response.data.message })
       } else {
-        Message.error({ message: '未知错误' })
+        Message.error({ message: '服务异常' })
       }
     }
   }

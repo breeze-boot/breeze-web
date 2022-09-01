@@ -1,6 +1,6 @@
 <template>
   <el-dialog width="800px" :title="title" :visible.sync="dialogFormVisible"
-             @closed="closeDialog">
+             @close="closeDialog('ruleForm')">
     <el-form size="mini" :rules="rules" :disabled="!show" ref="ruleForm" :model="platform">
       <el-form-item label="平台名称" prop="platformName" :label-width="formLabelWidth">
         <el-input v-model="platform.platformName" autocomplete="off" clearable></el-input>
@@ -8,13 +8,13 @@
       <el-form-item label="平台标志" prop="platformCode" :label-width="formLabelWidth">
         <el-input v-model="platform.platformCode" autocomplete="off" clearable></el-input>
       </el-form-item>
-      <el-form-item label="描述" :label-width="formLabelWidth">
+      <el-form-item label="描述" prop="desc" :label-width="formLabelWidth">
         <el-input type="textarea" v-model="platform.desc" autocomplete="off" clearable></el-input>
       </el-form-item>
     </el-form>
     <div slot="footer" v-if="show" class="dialog-footer">
       <el-button @click="resetForm('ruleForm')">取 消</el-button>
-      <el-button @click="submitForm('ruleForm')" type="primary" >确 定</el-button>
+      <el-button @click="submitForm('ruleForm')" type="primary">确 定</el-button>
     </div>
   </el-dialog>
 </template>
@@ -75,12 +75,14 @@ export default {
       add(this.platform).then((rep) => {
         Message.success({ message: rep.message })
         this.dialogFormVisible = false
+        this.$emit('reloadList')
       })
     },
     edit () {
       edit(this.platform).then((rep) => {
         Message.success({ message: rep.message })
         this.dialogFormVisible = false
+        this.$emit('reloadList')
       })
     },
     resetForm (formName) {
@@ -94,24 +96,20 @@ export default {
     showDialogFormVisible (val, dialogStatus) {
       this.dialogFormVisible = true
       if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
-        this.platform.id = val.id
-        this.platform.platformCode = val.platformCode
-        this.platform.platformName = val.platformName
-        this.platform.desc = val.desc
+        this.$nextTick(() => {
+          // 赋值
+          Object.assign(this.platform, val)
+        })
       }
       if (dialogStatus === DIALOG_TYPE.SHOW) {
         this.show = false
       }
       this.dialogStatus = dialogStatus
     },
-    closeDialog () {
-      this.platform.platformName = ''
-      this.platform.platformCode = ''
-      this.platform.id = ''
-      this.platform.desc = ''
+    closeDialog (formName) {
+      this.$refs[formName].resetFields()
+      this.$refs[formName].clearValidate()
       this.show = true
-      this.dialogStatus = DIALOG_TYPE.ADD
-      this.$emit('reloadList')
     }
   }
 }

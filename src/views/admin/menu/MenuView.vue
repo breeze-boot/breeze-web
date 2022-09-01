@@ -71,7 +71,7 @@
         </el-table-column>
         <el-table-column
           prop="icon"
-          label="图表">
+          label="图标">
         </el-table-column>
         <el-table-column
           prop="permission"
@@ -81,11 +81,15 @@
         <el-table-column
           prop="path"
           show-overflow-tooltip
-          label="菜单路径">
+          label="路由路径">
         </el-table-column>
         <el-table-column
           prop="component"
           label="组件路径">
+        </el-table-column>
+        <el-table-column
+          prop="type"
+          label="类型">
         </el-table-column>
         <el-table-column
           fixed="right"

@@ -1,9 +1,10 @@
 <template>
   <el-dialog width="700px" :title="title" :visible.sync="dialogFormVisible"
-             @closed="closeDialog">
+             @close="closeDialog('ruleForm')">
     <el-form size="mini" :rules="rules" :disabled="!show" ref="ruleForm" :model="user" style="padding-right: 15px;">
       <el-form-item>
         <el-upload
+          prop="avatar"
           class="avatar-uploader"
           action="https://jsonplaceholder.typicode.com/posts/"
           :show-file-list="false"
@@ -22,7 +23,7 @@
       <el-form-item v-if="show" label="确认密码" prop="confirmPassword" :label-width="formLabelWidth">
         <el-input type="password" v-model="user.confirmPassword" autocomplete="off" clearable></el-input>
       </el-form-item>
-      <el-form-item label="用户工号" :label-width="formLabelWidth">
+      <el-form-item label="用户工号" prop="userCode" :label-width="formLabelWidth">
         <el-input disabled v-model="user.userCode" autocomplete="off" clearable></el-input>
       </el-form-item>
       <el-form-item label="手机号" prop="phone" :label-width="formLabelWidth">
@@ -64,8 +65,8 @@
       </el-form-item>
     </el-form>
     <div slot="footer" v-if="show" class="dialog-footer">
-      <el-button @click="resetForm('ruleForm')">取 消</el-button>
-      <el-button @click="submitForm('ruleForm')" type="primary">确 定</el-button>
+      <el-button size="mini" @click="resetForm('ruleForm')">取 消</el-button>
+      <el-button size="mini" @click="submitForm('ruleForm')" type="primary">确 定</el-button>
     </div>
   </el-dialog>
 </template>
@@ -96,7 +97,7 @@ export default {
         idCard: '',
         email: '',
         sex: 1,
-        isLock: 1
+        isLock: 0
       },
       options: [{
         value: 1,
@@ -204,12 +205,14 @@ export default {
       add(this.user).then((rep) => {
         Message.success({ message: rep.message })
         this.dialogFormVisible = false
+        this.$emit('reloadList')
       })
     },
     edit () {
       edit(this.user).then((rep) => {
         Message.success({ message: rep.message })
         this.dialogFormVisible = false
+        this.$emit('reloadList')
       })
     },
     resetForm (formName) {
@@ -223,28 +226,20 @@ export default {
     showDialogFormVisible (val, dialogStatus) {
       this.dialogFormVisible = true
       if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
-        this.user = val
+        this.$nextTick(() => {
+          // 赋值
+          Object.assign(this.user, val)
+        })
       }
       if (dialogStatus === DIALOG_TYPE.SHOW) {
         this.show = false
       }
       this.dialogStatus = dialogStatus
     },
-    closeDialog () {
-      this.user.id = ''
-      this.user.username = ''
-      this.user.userCode = ''
-      this.user.password = ''
-      this.user.sex = ''
-      this.user.phone = ''
-      this.user.amountName = ''
-      this.user.avatar = ''
-      this.user.idCard = ''
-      this.user.deptId = ''
-      this.user.email = ''
+    closeDialog (formName) {
+      this.$refs[formName].clearValidate()
+      this.$refs[formName].resetFields()
       this.show = true
-      this.dialogStatus = DIALOG_TYPE.ADD
-      this.$emit('reloadList')
     }
   }
 }

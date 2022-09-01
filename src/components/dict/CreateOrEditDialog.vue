@@ -1,15 +1,15 @@
 <template>
   <el-dialog width="800px" :title="title" :visible.sync="dialogFormVisible"
-             @closed="closeDialog">
-    <el-form size="mini" :rules="rules" :disabled="!show" ref="ruleForm" :model="platform">
-      <el-form-item label="平台名称" prop="platformName" :label-width="formLabelWidth">
-        <el-input v-model="platform.platformName" autocomplete="off" clearable></el-input>
+             @close="closeDialog('ruleForm')">
+    <el-form size="mini" :rules="rules" :disabled="!show" ref="ruleForm" :model="dict">
+      <el-form-item label="平台名称" prop="dictName" :label-width="formLabelWidth">
+        <el-input v-model="dict.dictName" autocomplete="off" clearable></el-input>
       </el-form-item>
-      <el-form-item label="平台标志" prop="platformCode" :label-width="formLabelWidth">
-        <el-input v-model="platform.platformCode" autocomplete="off" clearable></el-input>
+      <el-form-item label="平台标志" prop="dictCode" :label-width="formLabelWidth">
+        <el-input v-model="dict.dictCode" autocomplete="off" clearable></el-input>
       </el-form-item>
       <el-form-item label="描述" :label-width="formLabelWidth">
-        <el-input type="textarea" v-model="platform.desc" autocomplete="off" clearable></el-input>
+        <el-input type="textarea" v-model="dict.desc" autocomplete="off" clearable></el-input>
       </el-form-item>
     </el-form>
     <div slot="footer" v-if="show" class="dialog-footer">
@@ -21,7 +21,7 @@
 
 <script>
 import { DIALOG_TYPE } from '@/utils/constant'
-import { add, edit } from '@/api/platform'
+import { add, edit } from '@/api/dict'
 import { Message } from 'element-ui'
 
 export default {
@@ -32,10 +32,10 @@ export default {
   data () {
     return {
       dialogFormVisible: false,
-      platform: {
+      dict: {
         id: null,
-        platformName: '',
-        platformCode: '',
+        dictName: '',
+        dictCode: '',
         desc: ''
       },
       // 默认是创建
@@ -43,14 +43,14 @@ export default {
       formLabelWidth: '80px',
       show: true,
       rules: {
-        platformName: [
+        dictName: [
           {
             required: true,
             message: '请输入平台名称',
             trigger: 'blur'
           }
         ],
-        platformCode: [
+        dictCode: [
           {
             required: true,
             message: '请输入平台标识',
@@ -72,15 +72,17 @@ export default {
       })
     },
     add () {
-      add(this.platform).then((rep) => {
+      add(this.dict).then((rep) => {
         Message.success({ message: rep.message })
         this.dialogFormVisible = false
+        this.$emit('reloadList')
       })
     },
     edit () {
-      edit(this.platform).then((rep) => {
+      edit(this.dict).then((rep) => {
         Message.success({ message: rep.message })
         this.dialogFormVisible = false
+        this.$emit('reloadList')
       })
     },
     resetForm (formName) {
@@ -94,24 +96,20 @@ export default {
     showDialogFormVisible (val, dialogStatus) {
       this.dialogFormVisible = true
       if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
-        this.platform.id = val.id
-        this.platform.platformCode = val.platformCode
-        this.platform.platformName = val.platformName
-        this.platform.desc = val.desc
+        this.$nextTick(() => {
+          // 赋值
+          Object.assign(this.dict, val)
+        })
       }
       if (dialogStatus === DIALOG_TYPE.SHOW) {
         this.show = false
       }
       this.dialogStatus = dialogStatus
     },
-    closeDialog () {
-      this.platform.platformName = ''
-      this.platform.platformCode = ''
-      this.platform.id = ''
-      this.platform.desc = ''
+    closeDialog (formName) {
+      this.$refs[formName].clearValidate()
+      this.$refs[formName].resetFields()
       this.show = true
-      this.dialogStatus = DIALOG_TYPE.ADD
-      this.$emit('reloadList')
     }
   }
 }
