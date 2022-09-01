@@ -1,26 +1,26 @@
 <template>
   <div>
     <el-form
-      size="small"
-      :rules="rules"
-      :model="userLogin"
       ref="userLogin"
-      class="userLogin">
+      :model="userLogin"
+      :rules="rules"
+      class="userLogin"
+      size="small">
       <h3>登录中心</h3>
       <el-form-item prop="username">
         <el-input
-          type="text"
-          auto-complete="false"
           v-model="userLogin.username"
+          auto-complete="false"
           placeholder="账号"
+          type="text"
         ></el-input>
       </el-form-item>
       <el-form-item prop="password">
         <el-input
-          type="password"
-          auto-complete="false"
           v-model="userLogin.password"
+          auto-complete="false"
           placeholder="密码"
+          type="password"
         ></el-input>
       </el-form-item>
       <el-form-item>
@@ -31,11 +31,11 @@
     </el-form>
 
     <Verify
-      @success="success"
-      :mode="'pop'"
+      ref="verify"
       :captchaType="'blockPuzzle'"
       :imgSize="{ width: '330px', height: '155px' }"
-      ref="verify"
+      :mode="'pop'"
+      @success="success"
     ></Verify>
   </div>
 </template>

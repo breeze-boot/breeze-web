@@ -9,24 +9,24 @@
           <i class="iconfont icon-close"/>
         </span>
       </div>
-      <div class="verifybox-bottom"
-           :style="{ padding: mode === 'pop' ? '15px' : '0' }">
+      <div :style="{ padding: mode === 'pop' ? '15px' : '0' }"
+           class="verifybox-bottom">
         <!-- 验证码容器 -->
         <components
           :is="componentType"
           v-if="componentType"
           ref="instance"
-          :captcha-type="captchaType"
-          :type="verifyType"
-          :figure="figure"
           :arith="arith"
-          :mode="mode"
-          :v-space="vSpace"
-          :explain="explain"
-          :img-size="imgSize"
-          :block-size="blockSize"
           :bar-size="barSize"
+          :block-size="blockSize"
+          :captcha-type="captchaType"
           :default-img="defaultImg"
+          :explain="explain"
+          :figure="figure"
+          :img-size="imgSize"
+          :mode="mode"
+          :type="verifyType"
+          :v-space="vSpace"
         />
       </div>
     </div>

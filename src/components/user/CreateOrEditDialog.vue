@@ -1,41 +1,41 @@
 <template>
-  <el-dialog width="700px" :title="title" :visible.sync="dialogFormVisible"
+  <el-dialog :title="title" :visible.sync="dialogFormVisible" width="700px"
              @close="closeDialog('ruleForm')">
-    <el-form size="mini" :rules="rules" :disabled="!show" ref="ruleForm" :model="user" style="padding-right: 15px;">
+    <el-form ref="ruleForm" :disabled="!show" :model="user" :rules="rules" size="mini" style="padding-right: 15px;">
       <el-form-item>
         <el-upload
-          prop="avatar"
-          class="avatar-uploader"
-          action="https://jsonplaceholder.typicode.com/posts/"
-          :show-file-list="false"
+          :before-upload="beforeAvatarUpload"
           :on-success="handleAvatarSuccess"
-          :before-upload="beforeAvatarUpload">
+          :show-file-list="false"
+          action="https://jsonplaceholder.typicode.com/posts/"
+          class="avatar-uploader"
+          prop="avatar">
           <img v-if="user.avatar" :src="user.avatar" class="avatar">
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
       </el-form-item>
-      <el-form-item label="用户名" prop="username" :label-width="formLabelWidth">
+      <el-form-item :label-width="formLabelWidth" label="用户名" prop="username">
         <el-input v-model="user.username" autocomplete="off" clearable></el-input>
       </el-form-item>
-      <el-form-item label="密码" prop="password" :label-width="formLabelWidth">
-        <el-input type="password" v-model="user.password" autocomplete="off" clearable></el-input>
+      <el-form-item :label-width="formLabelWidth" label="密码" prop="password">
+        <el-input v-model="user.password" autocomplete="off" clearable type="password"></el-input>
       </el-form-item>
-      <el-form-item v-if="show" label="确认密码" prop="confirmPassword" :label-width="formLabelWidth">
-        <el-input type="password" v-model="user.confirmPassword" autocomplete="off" clearable></el-input>
+      <el-form-item v-if="show" :label-width="formLabelWidth" label="确认密码" prop="confirmPassword">
+        <el-input v-model="user.confirmPassword" autocomplete="off" clearable type="password"></el-input>
       </el-form-item>
-      <el-form-item label="用户工号" prop="userCode" :label-width="formLabelWidth">
-        <el-input disabled v-model="user.userCode" autocomplete="off" clearable></el-input>
+      <el-form-item :label-width="formLabelWidth" label="用户工号" prop="userCode">
+        <el-input v-model="user.userCode" autocomplete="off" clearable disabled></el-input>
       </el-form-item>
-      <el-form-item label="手机号" prop="phone" :label-width="formLabelWidth">
-        <el-input type="input" v-model="user.phone" autocomplete="off" clearable></el-input>
+      <el-form-item :label-width="formLabelWidth" label="手机号" prop="phone">
+        <el-input v-model="user.phone" autocomplete="off" clearable type="input"></el-input>
       </el-form-item>
-      <el-form-item label="E-mail" prop="email" :label-width="formLabelWidth">
-        <el-input type="input" v-model="user.email" autocomplete="off" clearable></el-input>
+      <el-form-item :label-width="formLabelWidth" label="E-mail" prop="email">
+        <el-input v-model="user.email" autocomplete="off" clearable type="input"></el-input>
       </el-form-item>
-      <el-form-item label="展示名称" prop="amountName" :label-width="formLabelWidth">
-        <el-input type="input" v-model="user.amountName" autocomplete="off" clearable></el-input>
+      <el-form-item :label-width="formLabelWidth" label="展示名称" prop="amountName">
+        <el-input v-model="user.amountName" autocomplete="off" clearable type="input"></el-input>
       </el-form-item>
-      <el-form-item label="部门" prop="deptId" :label-width="formLabelWidth" style="text-align: left;">
+      <el-form-item :label-width="formLabelWidth" label="部门" prop="deptId" style="text-align: left;">
         <el-select v-model="user.deptId" filterable placeholder="请选择">
           <el-option
             v-for="item in options"
@@ -45,16 +45,16 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="性别" prop="sex" :label-width="formLabelWidth" style="text-align: left">
+      <el-form-item :label-width="formLabelWidth" label="性别" prop="sex" style="text-align: left">
         <el-radio-group v-model="user.sex">
           <el-radio :label="0">女</el-radio>
           <el-radio :label="1">男</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="身份证" prop="idCard" :label-width="formLabelWidth">
-        <el-input type="input" v-model="user.idCard" autocomplete="off" clearable></el-input>
+      <el-form-item :label-width="formLabelWidth" label="身份证" prop="idCard">
+        <el-input v-model="user.idCard" autocomplete="off" clearable type="input"></el-input>
       </el-form-item>
-      <el-form-item label="是否锁定" prop="isLock" :label-width="formLabelWidth" style="text-align: left;">
+      <el-form-item :label-width="formLabelWidth" label="是否锁定" prop="isLock" style="text-align: left;">
         <el-switch
           v-model="user.isLock"
           :active-value="1"
@@ -64,9 +64,9 @@
         </el-switch>
       </el-form-item>
     </el-form>
-    <div slot="footer" v-if="show" class="dialog-footer">
+    <div v-if="show" slot="footer" class="dialog-footer">
       <el-button size="mini" @click="resetForm('ruleForm')">取 消</el-button>
-      <el-button size="mini" @click="submitForm('ruleForm')" type="primary">确 定</el-button>
+      <el-button size="mini" type="primary" @click="submitForm('ruleForm')">确 定</el-button>
     </div>
   </el-dialog>
 </template>

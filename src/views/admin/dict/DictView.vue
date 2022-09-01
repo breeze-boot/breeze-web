@@ -1,14 +1,14 @@
 <template>
   <el-container>
     <el-main>
-      <el-form size="mini" :inline="true" :model="searchForm" class="demo-form-inline">
+      <el-form :inline="true" :model="searchForm" class="demo-form-inline" size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="字典名称">
-              <el-input v-model="searchForm.dictName" placeholder="字典名称" clearable/>
+              <el-input v-model="searchForm.dictName" clearable placeholder="字典名称"/>
             </el-form-item>
             <el-form-item label="字典标志">
-              <el-input v-model="searchForm.dictCode" placeholder="字典标志" clearable/>
+              <el-input v-model="searchForm.dictCode" clearable placeholder="字典标志"/>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search">查询</el-button>
@@ -18,18 +18,18 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button size="mini" type="primary" @click="create" plain>新建</el-button>
-        <el-button size="mini" type="danger" @click="deleteInfo" plain>删除</el-button>
-        <el-button size="mini" type="info" @click="exportInfo" plain>导出</el-button>
-        <el-button size="mini" @click="importInfo" plain>导入</el-button>
+        <el-button plain size="mini" type="primary" @click="create">新建</el-button>
+        <el-button plain size="mini" type="danger" @click="deleteInfo">删除</el-button>
+        <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
+        <el-button plain size="mini" @click="importInfo">导入</el-button>
       </div>
       <el-table
-        border
-        stripe
         ref="multipleTable"
-        size="mini"
         :data="tableData"
+        border
         height="300"
+        size="mini"
+        stripe
         style="width: 100%"
         @selection-change="handleSelectionChange">
         <el-table-column
@@ -37,18 +37,18 @@
           width="55">
         </el-table-column>
         <el-table-column
-          prop="dictCode"
           label="用户编号"
+          prop="dictCode"
           width="180">
         </el-table-column>
         <el-table-column
-          prop="dictName"
           label="用户名"
+          prop="dictName"
           width="180">
         </el-table-column>
         <el-table-column
-          prop="address"
           label="地址"
+          prop="address"
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
@@ -56,20 +56,20 @@
           label="操作"
           width="100">
           <template slot-scope="scope">
-            <el-button size="mini" @click="handleClick(scope.row)" type="text">查看</el-button>
+            <el-button size="mini" type="text" @click="handleClick(scope.row)">查看</el-button>
             <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
           :current-page="searchForm.current"
-          :page-sizes="[10, 20, 50, 100]"
           :page-size="searchForm.size"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="total"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="total">
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange">
         </el-pagination>
       </div>
     </el-main>

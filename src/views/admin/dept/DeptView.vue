@@ -1,14 +1,14 @@
 <template>
   <el-container>
     <el-main>
-      <el-form size="mini" :inline="true" :model="searchForm" class="demo-form-inline">
+      <el-form :inline="true" :model="searchForm" class="demo-form-inline" size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="部门名称">
-              <el-input v-model="searchForm.deptName" placeholder="部门名称" clearable/>
+              <el-input v-model="searchForm.deptName" clearable placeholder="部门名称"/>
             </el-form-item>
             <el-form-item label="部门编号">
-              <el-input v-model="searchForm.deptCode" placeholder="部门编号" clearable/>
+              <el-input v-model="searchForm.deptCode" clearable placeholder="部门编号"/>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search()">查询</el-button>
@@ -18,58 +18,58 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button size="mini" type="primary" @click="add" plain>新建</el-button>
-        <el-button size="mini" type="danger" @click="del" plain>删除</el-button>
-        <el-button size="mini" type="info" @click="exportInfo" plain>导出</el-button>
-        <el-button size="mini" @click="importInfo" plain>导入</el-button>
+        <el-button plain size="mini" type="primary" @click="add">新建</el-button>
+        <el-button plain size="mini" type="danger" @click="del">删除</el-button>
+        <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
+        <el-button plain size="mini" @click="importInfo">导入</el-button>
       </div>
       <el-table
-        border
-        stripe
-        size="mini"
         :data="tableData"
-        height="90%"
-        style="width: 100%"
-        row-key="id"
         :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+        border
+        height="90%"
+        row-key="id"
+        size="mini"
+        stripe
+        style="width: 100%"
         @selection-change="handleSelectionChange">
         <el-table-column
           type="selection"
           width="55">
         </el-table-column>
         <el-table-column
-          prop="id"
           v-if="false"
           label="ID"
+          prop="id"
           width="200">
         </el-table-column>
         <el-table-column
-          prop="name"
-          label="部门名称">
+          label="部门名称"
+          prop="name">
         </el-table-column>
         <el-table-column
-          prop="deptCode"
-          label="部门编码">
+          label="部门编码"
+          prop="deptCode">
         </el-table-column>
         <el-table-column
-          prop="isClose"
-          label="是否停用">
+          label="是否停用"
+          prop="isClose">
         </el-table-column>
         <el-table-column
           fixed="right"
           label="操作"
           width="100">
           <template slot-scope="scope">
-            <el-button size="mini" @click="show(scope.row)" type="text">查看</el-button>
-            <el-button size="mini" @click="edit(scope.row)" type="text">编辑</el-button>
+            <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
+            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-main>
     <create-or-edit-dialog
       ref="createOrEditDialog"
-      @reLocadList="reloadList"
-      :title="title"/>
+      :title="title"
+      @reLocadList="reloadList"/>
   </el-container>
 </template>
 

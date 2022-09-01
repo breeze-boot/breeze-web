@@ -1,14 +1,14 @@
 <template>
   <el-container>
     <el-main>
-      <el-form size="mini" :inline="true" :model="searchForm" class="demo-form-inline">
+      <el-form :inline="true" :model="searchForm" class="demo-form-inline" size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="菜单名称">
-              <el-input v-model="searchForm.title" placeholder="菜单名称" clearable/>
+              <el-input v-model="searchForm.title" clearable placeholder="菜单名称"/>
             </el-form-item>
             <el-form-item label="路由名称">
-              <el-input v-model="searchForm.name" placeholder="路由名称" clearable/>
+              <el-input v-model="searchForm.name" clearable placeholder="路由名称"/>
             </el-form-item>
             <el-form-item label="平台">
               <el-select v-model="searchForm.platformId" placeholder="请选择平台">
@@ -28,84 +28,84 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button size="mini" type="primary" @click="add" plain>新建</el-button>
-        <el-button size="mini" type="danger" @click="del" plain>删除</el-button>
-        <el-button size="mini" type="info" @click="exportInfo" plain>导出</el-button>
-        <el-button size="mini" @click="importInfo" plain>导入</el-button>
+        <el-button plain size="mini" type="primary" @click="add">新建</el-button>
+        <el-button plain size="mini" type="danger" @click="del">删除</el-button>
+        <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
+        <el-button plain size="mini" @click="importInfo">导入</el-button>
       </div>
       <el-table
-        border
-        stripe
-        size="mini"
         :data="tableData"
-        height="90%"
-        style="width: 100%"
-        row-key="id"
         :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+        border
+        height="90%"
+        row-key="id"
+        size="mini"
+        stripe
+        style="width: 100%"
         @selection-change="handleSelectionChange">
         <el-table-column
           type="selection"
           width="55">
         </el-table-column>
         <el-table-column
-          prop="id"
           v-if="false"
           label="ID"
+          prop="id"
           width="200">
         </el-table-column>
         <el-table-column
+          label="菜单名称"
           prop="title"
           show-overflow-tooltip
-          label="菜单名称"
           width="180">
         </el-table-column>
         <el-table-column
+          label="路由名称"
           prop="name"
-          show-overflow-tooltip
-          label="路由名称">
+          show-overflow-tooltip>
         </el-table-column>
         <el-table-column
+          label="排序"
           prop="sort"
-          width="50"
-          label="排序">
+          width="50">
         </el-table-column>
         <el-table-column
-          prop="icon"
-          label="图标">
+          label="图标"
+          prop="icon">
         </el-table-column>
         <el-table-column
+          label="权限标识"
           prop="permission"
-          show-overflow-tooltip
-          label="权限标识">
+          show-overflow-tooltip>
         </el-table-column>
         <el-table-column
+          label="路由路径"
           prop="path"
-          show-overflow-tooltip
-          label="路由路径">
+          show-overflow-tooltip>
         </el-table-column>
         <el-table-column
-          prop="component"
-          label="组件路径">
+          label="组件路径"
+          prop="component">
         </el-table-column>
         <el-table-column
-          prop="type"
-          label="类型">
+          label="类型"
+          prop="type">
         </el-table-column>
         <el-table-column
           fixed="right"
           label="操作"
           width="100">
           <template slot-scope="scope">
-            <el-button size="mini" @click="show(scope.row)" type="text">查看</el-button>
-            <el-button size="mini" @click="edit(scope.row)" type="text">编辑</el-button>
+            <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
+            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-main>
     <create-or-edit-dialog
-      @reloadList="reloadList"
       ref="createOrEditDialog"
-      :title="title"/>
+      :title="title"
+      @reloadList="reloadList"/>
   </el-container>
 </template>
 

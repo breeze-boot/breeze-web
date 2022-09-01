@@ -1,17 +1,17 @@
 <template>
   <el-container>
     <el-main>
-      <el-form size="mini" :inline="true" :model="searchForm" class="demo-form-inline">
+      <el-form :inline="true" :model="searchForm" class="demo-form-inline" size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="用户名称">
-              <el-input v-model="searchForm.username" placeholder="用户名称" clearable/>
+              <el-input v-model="searchForm.username" clearable placeholder="用户名称"/>
             </el-form-item>
             <el-form-item label="手机号">
-              <el-input v-model="searchForm.phone" placeholder="手机号" clearable/>
+              <el-input v-model="searchForm.phone" clearable placeholder="手机号"/>
             </el-form-item>
             <el-form-item label="用户编码">
-              <el-input v-model="searchForm.userCode" placeholder="用户编码" clearable/>
+              <el-input v-model="searchForm.userCode" clearable placeholder="用户编码"/>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search">查询</el-button>
@@ -21,26 +21,26 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button size="mini" type="primary" @click="add" plain>新建</el-button>
-        <el-button size="mini" type="danger" @click="del" plain>删除</el-button>
-        <el-button size="mini" type="info" @click="exportInfo" plain>导出</el-button>
-        <el-button size="mini" @click="importInfo" plain>导入</el-button>
+        <el-button plain size="mini" type="primary" @click="add">新建</el-button>
+        <el-button plain size="mini" type="danger" @click="del">删除</el-button>
+        <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
+        <el-button plain size="mini" @click="importInfo">导入</el-button>
       </div>
       <el-table
-        border
-        stripe
-        size="mini"
         ref="multipleTable"
-        empty-text="无数据"
         :data="tableData"
+        border
+        empty-text="无数据"
         height="500"
         max-height="700"
+        size="mini"
+        stripe
         style="width: 100%"
         @selection-change="handleSelectionChange">
         <el-table-column
-          prop="id"
           v-if="false"
           label="ID"
+          prop="id"
           width="200">
         </el-table-column>
         <el-table-column
@@ -48,67 +48,67 @@
           width="55">
         </el-table-column>
         <el-table-column
+          label="头像"
           prop="avatar"
-          width="90"
-          label="头像">
+          width="90">
           <template slot-scope="scope">
             <img :src="scope.row.avatar" alt="" style="border-radius:100px;width: 50px;height: 50px;">
           </template>
         </el-table-column>
         <el-table-column
+          label="登录名"
           prop="amountName"
-          show-overflow-tooltip
-          label="登录名">
+          show-overflow-tooltip>
         </el-table-column>
         <el-table-column
+          label="用户编号"
           prop="userCode"
           show-overflow-tooltip
-          label="用户编号"
           width="180">
         </el-table-column>
         <el-table-column
+          label="用户名"
           prop="username"
           show-overflow-tooltip
-          label="用户名"
           width="180">
         </el-table-column>
         <el-table-column
+          label="部门"
           prop="deptName"
-          show-overflow-tooltip
-          label="部门">
+          show-overflow-tooltip>
         </el-table-column>
         <el-table-column
+          label="身份证"
           prop="idCard"
-          show-overflow-tooltip
-          label="身份证">
+          show-overflow-tooltip>
         </el-table-column>
         <el-table-column
+          label="用户邮箱"
           prop="email"
-          show-overflow-tooltip
-          label="用户邮箱">
+          show-overflow-tooltip>
         </el-table-column>
         <el-table-column
-          prop="sex"
-          label="性别">
+          label="性别"
+          prop="sex">
           <template slot-scope="scope">
             <el-tag
-              size="mini"
               :type="scope.row.sex === 1 ? 'primary' : 'success'"
-              disable-transitions>{{ scope.row.sex === 1 ? '男' : '女' }}
+              disable-transitions
+              size="mini">{{ scope.row.sex === 1 ? '男' : '女' }}
             </el-tag>
           </template>
         </el-table-column>
         <el-table-column
-          prop="isLock"
-          label="是否锁定">
+          label="是否锁定"
+          prop="isLock">
           <template slot-scope="scope">
             <el-switch
               v-model="scope.row.isLock"
-              size="mini"
               :active-value="1"
               :inactive-value="0"
               active-color="#13ce66"
               inactive-color="#ff4949"
+              size="mini"
               @change="open(scope.$index, scope.row)">
             </el-switch>
           </template>
@@ -118,27 +118,27 @@
           label="操作"
           width="100">
           <template slot-scope="scope">
-            <el-button size="mini" @click="show(scope.row)" type="text">查看</el-button>
-            <el-button size="mini" @click="edit(scope.row)" type="text">编辑</el-button>
+            <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
+            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
           :current-page="searchForm.current"
-          :page-sizes="[10, 20, 50, 100]"
           :page-size="searchForm.size"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="total"
           layout="total, sizes, prev, pager, next, jumper"
-          :total="total">
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange">
         </el-pagination>
       </div>
     </el-main>
     <create-or-edit-dialog
       ref="createOrEditDialog"
-      @reloadList="reloadList"
-      :title="title"/>
+      :title="title"
+      @reloadList="reloadList"/>
   </el-container>
 </template>
 

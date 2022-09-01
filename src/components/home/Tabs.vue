@@ -1,8 +1,8 @@
 <template>
   <el-tabs
     v-model="editableTabsValue"
-    type="card"
     closable
+    type="card"
     @tab-remove="removeTab">
     <el-tab-pane
       v-for="(item, index) in editableTabs"

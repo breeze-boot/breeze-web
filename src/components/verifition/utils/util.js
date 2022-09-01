@@ -38,6 +38,7 @@ export function resetSize (vm) {
     barHeight: barHeight
   }
 }
+
 export const codeChars = [
   1,
   2,

@@ -3,13 +3,13 @@
   <div style="position: relative">
     <div class="verify-img-out">
       <div
-        class="verify-img-panel"
         :style="{
           width: setSize.imgWidth,
           height: setSize.imgHeight,
           'background-size': setSize.imgWidth + ' ' + setSize.imgHeight,
           'margin-bottom': vSpace + 'px',
         }"
+        class="verify-img-panel"
       >
         <div
           v-show="showRefresh"
@@ -17,7 +17,7 @@
           style="z-index: 3"
           @click="refresh"
         >
-          <i class="iconfont icon-refresh" />
+          <i class="iconfont icon-refresh"/>
         </div>
         <img
           ref="canvas"
@@ -34,7 +34,6 @@
         <div
           v-for="(tempPoint, index) in tempPoints"
           :key="index"
-          class="point-area"
           :style="{
             'background-color': '#1abd6c',
             color: '#fff',
@@ -48,6 +47,7 @@
             top: parseInt(tempPoint.y - 10) + 'px',
             left: parseInt(tempPoint.x - 10) + 'px',
           }"
+          class="point-area"
         >
           {{ index + 1 }}
         </div>
@@ -55,13 +55,13 @@
     </div>
     <!-- 'height': this.barSize.height, -->
     <div
-      class="verify-bar-area"
       :style="{
         width: setSize.imgWidth,
         color: this.barAreaColor,
         'border-color': this.barAreaBorderColor,
         'line-height': this.barSize.height,
       }"
+      class="verify-bar-area"
     >
       <span class="verify-msg">{{ text }}</span>
     </div>
@@ -74,7 +74,7 @@
  * */
 import { resetSize } from './../utils/util'
 import { aesEncrypt } from './../utils/ase'
-import { reqGet, reqCheck } from './../api/index'
+import { reqCheck, reqGet } from './../api/index'
 
 export default {
   name: 'VerifyPoints',
@@ -228,7 +228,10 @@ export default {
     getMousePos: function (obj, e) {
       const x = e.offsetX
       const y = e.offsetY
-      return { x, y }
+      return {
+        x,
+        y
+      }
     },
     // 创建坐标点
     createPoint: function (pos) {
@@ -277,7 +280,10 @@ export default {
       const newPointArr = pointArr.map((p) => {
         const x = Math.round((310 * p.x) / parseInt(imgSize.imgWidth))
         const y = Math.round((155 * p.y) / parseInt(imgSize.imgHeight))
-        return { x, y }
+        return {
+          x,
+          y
+        }
       })
       // console.log(newPointArr,"newPointArr");
       return newPointArr

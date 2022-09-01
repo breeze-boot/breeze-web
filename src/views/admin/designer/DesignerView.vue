@@ -1,13 +1,13 @@
 <template>
-    <bpmn-modeler
-      ref="refNode"
-      :xml="xml"
-      :users="users"
-      :groups="groups"
-      :categorys="categorys"
-      :is-view="false"
-      @save="save"
-    />
+  <bpmn-modeler
+    ref="refNode"
+    :categorys="categorys"
+    :groups="groups"
+    :is-view="false"
+    :users="users"
+    :xml="xml"
+    @save="save"
+  />
 </template>
 
 <script>
@@ -96,7 +96,7 @@ export default {
   background-repeat: repeat;
 }
 
-.is-vertical .el-header{
+.is-vertical .el-header {
   background: rgb(253, 253, 253) !important;
 }
 </style>

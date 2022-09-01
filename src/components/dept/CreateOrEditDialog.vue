@@ -1,20 +1,20 @@
 <template>
-  <el-dialog width="800px" :title="title" :visible.sync="dialogFormVisible"
+  <el-dialog :title="title" :visible.sync="dialogFormVisible" width="800px"
              @close="closeDialog('ruleForm')">
-    <el-form size="mini" :rules="rules" :disabled="!show" ref="ruleForm" :model="dept">
-      <el-form-item label="平台名称" prop="deptName" :label-width="formLabelWidth">
+    <el-form ref="ruleForm" :disabled="!show" :model="dept" :rules="rules" size="mini">
+      <el-form-item :label-width="formLabelWidth" label="平台名称" prop="deptName">
         <el-input v-model="dept.deptName" autocomplete="off" clearable></el-input>
       </el-form-item>
-      <el-form-item label="平台标志" prop="deptCode" :label-width="formLabelWidth">
+      <el-form-item :label-width="formLabelWidth" label="平台标志" prop="deptCode">
         <el-input v-model="dept.deptCode" autocomplete="off" clearable></el-input>
       </el-form-item>
-      <el-form-item label="描述" :label-width="formLabelWidth">
-        <el-input type="textarea" v-model="dept.desc" autocomplete="off" clearable></el-input>
+      <el-form-item :label-width="formLabelWidth" label="描述">
+        <el-input v-model="dept.desc" autocomplete="off" clearable type="textarea"></el-input>
       </el-form-item>
     </el-form>
-    <div slot="footer" v-if="show" class="dialog-footer">
+    <div v-if="show" slot="footer" class="dialog-footer">
       <el-button @click="resetForm('ruleForm')">取 消</el-button>
-      <el-button @click="submitForm('ruleForm')" type="primary">确 定</el-button>
+      <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
     </div>
   </el-dialog>
 </template>

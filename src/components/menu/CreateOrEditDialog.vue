@@ -1,8 +1,8 @@
 <template>
-  <el-dialog width="800px" :title="title" :visible.sync="dialogFormVisible"
+  <el-dialog :title="title" :visible.sync="dialogFormVisible" width="800px"
              @close="closeDialog('ruleForm')">
-    <el-form size="mini" :rules="rules" :disabled="!show" ref="ruleForm" :model="menu">
-      <el-form-item label="平台" prop="platformId" :label-width="formLabelWidth" style="text-align: left;">
+    <el-form ref="ruleForm" :disabled="!show" :model="menu" :rules="rules" size="mini">
+      <el-form-item :label-width="formLabelWidth" label="平台" prop="platformId" style="text-align: left;">
         <el-select v-model="menu.platformId" placeholder="请选择所属的平台">
           <el-option
             v-for="item in platformOptions"
@@ -12,36 +12,36 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="菜单名称" prop="title" :label-width="formLabelWidth">
-        <el-input v-model="menu.title" autocomplete="off" placeholder="请输入菜单名称" clearable></el-input>
+      <el-form-item :label-width="formLabelWidth" label="菜单名称" prop="title">
+        <el-input v-model="menu.title" autocomplete="off" clearable placeholder="请输入菜单名称"></el-input>
       </el-form-item>
-      <el-form-item label="组件名称" prop="name" :label-width="formLabelWidth">
-        <el-input v-model="menu.name" autocomplete="off" placeholder="请输入组件名称" clearable></el-input>
+      <el-form-item :label-width="formLabelWidth" label="组件名称" prop="name">
+        <el-input v-model="menu.name" autocomplete="off" clearable placeholder="请输入组件名称"></el-input>
       </el-form-item>
-      <el-form-item label="排序" prop="sort" :label-width="formLabelWidth" style="text-align: left;">
-        <el-input-number v-model="menu.sort" @change="handleChange" :min="1" :max="10" label="排序"/>
+      <el-form-item :label-width="formLabelWidth" label="排序" prop="sort" style="text-align: left;">
+        <el-input-number v-model="menu.sort" :max="10" :min="1" label="排序" @change="handleChange"/>
       </el-form-item>
-      <el-form-item label="组件名称" prop="icon" :label-width="formLabelWidth">
-        <el-input v-model="menu.icon" autocomplete="off" placeholder="请输入组件名称" clearable></el-input>
+      <el-form-item :label-width="formLabelWidth" label="组件名称" prop="icon">
+        <el-input v-model="menu.icon" autocomplete="off" clearable placeholder="请输入组件名称"></el-input>
       </el-form-item>
-      <el-form-item label="父级元素" prop="parentId" :label-width="formLabelWidth">
+      <el-form-item :label-width="formLabelWidth" label="父级元素" prop="parentId">
         <tree-select
-          :options="selectTreeOptions"
           :disable-branch-nodes="true"
+          :options="selectTreeOptions"
           :show-count="true"
           placeholder=""
         />
       </el-form-item>
-      <el-form-item label="权限标识" prop="permission" :label-width="formLabelWidth">
-        <el-input v-model="menu.permission" autocomplete="off" placeholder="请输入权限标识" clearable></el-input>
+      <el-form-item :label-width="formLabelWidth" label="权限标识" prop="permission">
+        <el-input v-model="menu.permission" autocomplete="off" clearable placeholder="请输入权限标识"></el-input>
       </el-form-item>
-      <el-form-item label="菜单路径" prop="path" :label-width="formLabelWidth">
-        <el-input v-model="menu.path" autocomplete="off" placeholder="请输入菜单路径" clearable></el-input>
+      <el-form-item :label-width="formLabelWidth" label="菜单路径" prop="path">
+        <el-input v-model="menu.path" autocomplete="off" clearable placeholder="请输入菜单路径"></el-input>
       </el-form-item>
-      <el-form-item label="组件路径" prop="component" :label-width="formLabelWidth">
-        <el-input v-model="menu.component" autocomplete="off" placeholder="请输入组件路径" clearable></el-input>
+      <el-form-item :label-width="formLabelWidth" label="组件路径" prop="component">
+        <el-input v-model="menu.component" autocomplete="off" clearable placeholder="请输入组件路径"></el-input>
       </el-form-item>
-      <el-form-item label="类型" prop="type" :label-width="formLabelWidth" style="text-align: left;">
+      <el-form-item :label-width="formLabelWidth" label="类型" prop="type" style="text-align: left;">
         <el-select v-model="menu.type" placeholder="请选择类型">
           <el-option
             v-for="item in typeOptions"
@@ -52,9 +52,9 @@
         </el-select>
       </el-form-item>
     </el-form>
-    <div slot="footer" v-if="show" class="dialog-footer">
+    <div v-if="show" slot="footer" class="dialog-footer">
       <el-button @click="resetForm('ruleForm')">取 消</el-button>
-      <el-button @click="submitForm('ruleForm')" type="primary">确 定</el-button>
+      <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
     </div>
   </el-dialog>
 </template>

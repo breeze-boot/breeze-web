@@ -1,6 +1,6 @@
 <template>
   <div class="welcome">
-      欢迎
+    欢迎
   </div>
 </template>
 
@@ -8,7 +8,6 @@
 
 export default {
   name: 'WelcomeView',
-  components: {
-  }
+  components: {}
 }
 </script>
