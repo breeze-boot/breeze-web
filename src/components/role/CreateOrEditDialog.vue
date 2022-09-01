@@ -2,14 +2,11 @@
   <el-dialog :title="title" :visible.sync="dialogFormVisible" width="800px"
              @close="closeDialog('ruleForm')">
     <el-form ref="ruleForm" :disabled="!show" :model="role" :rules="rules" size="mini">
-      <el-form-item :label-width="formLabelWidth" label="平台名称" prop="roleName">
+      <el-form-item :label-width="formLabelWidth" label="角色名称" prop="roleName">
         <el-input v-model="role.roleName" autocomplete="off" clearable></el-input>
       </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="平台标志" prop="roleCode">
+      <el-form-item :label-width="formLabelWidth" label="角色标识" prop="roleCode">
         <el-input v-model="role.roleCode" autocomplete="off" clearable></el-input>
-      </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="描述">
-        <el-input v-model="role.desc" autocomplete="off" clearable type="textarea"></el-input>
       </el-form-item>
     </el-form>
     <div v-if="show" slot="footer" class="dialog-footer">
@@ -33,7 +30,7 @@ export default {
     return {
       dialogFormVisible: false,
       role: {
-        id: null,
+        id: undefined,
         roleName: '',
         roleCode: '',
         desc: ''
@@ -107,6 +104,7 @@ export default {
       this.dialogStatus = dialogStatus
     },
     closeDialog (formName) {
+      this.role.id = undefined
       this.$refs[formName].clearValidate()
       this.$refs[formName].resetFields()
       this.show = true

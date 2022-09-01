@@ -107,6 +107,7 @@ export default {
       this.dialogStatus = dialogStatus
     },
     closeDialog (formName) {
+      this.platform.id = undefined
       this.$refs[formName].resetFields()
       this.$refs[formName].clearValidate()
       this.show = true

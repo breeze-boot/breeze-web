@@ -2,27 +2,13 @@ import request from '@/utils/axios'
 import JSONBigInt from 'json-bigint'
 
 /**
- * 初始化菜单
- *
- * @param data
- * @returns {AxiosPromise}
- */
-export function menuTree () {
-  return request({
-    url: '/admin/sys/menu/menuTree',
-    method: 'get',
-    params: { platformCode: 'managementCenter' }
-  })
-}
-
-/**
  * 列表
  *
  * @returns {AxiosPromise}
  */
 export function list (params) {
   return request({
-    url: '/admin/sys/menu/list',
+    url: '/admin/sys/role/list',
     method: 'post',
     data: params,
     transformResponse: [(data) => {
@@ -37,7 +23,7 @@ export function list (params) {
  */
 export function add (params) {
   return request({
-    url: '/admin/sys/menu/save',
+    url: '/admin/sys/role/save',
     method: 'post',
     data: params
   })
@@ -51,7 +37,7 @@ export function add (params) {
  */
 export function del (params) {
   return request({
-    url: '/admin/sys/menu/delete',
+    url: '/admin/sys/role/delete',
     method: 'delete',
     data: params
   })
@@ -65,7 +51,7 @@ export function del (params) {
  */
 export function edit (params) {
   return request({
-    url: '/admin/sys/menu/update',
+    url: '/admin/sys/role/update',
     method: 'put',
     data: params
   })

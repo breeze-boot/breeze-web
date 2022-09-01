@@ -12,7 +12,7 @@
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="resetForm()">重置</el-button>
+              <el-button type="info" @click="reset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
@@ -20,9 +20,9 @@
       <el-row>
         <el-col :md="19">
           <div style="margin-bottom: 10px; text-align: left;">
-            <el-button plain size="mini" type="primary" @click="create">新建</el-button>
+            <el-button plain size="mini" type="primary" @click="add">新建</el-button>
             <el-button plain size="mini" type="warning " @click="edit">修改</el-button>
-            <el-button plain size="mini" type="danger" @click="deleteInfo">删除</el-button>
+            <el-button plain size="mini" type="danger" @click="del">删除</el-button>
             <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
             <el-button plain size="mini" @click="importInfo">导入</el-button>
           </div>
@@ -41,25 +41,25 @@
               width="55">
             </el-table-column>
             <el-table-column
-              label="日期"
-              prop="date"
-              width="180">
+              v-if="false"
+              label="ID"
+              prop="id"
+              width="200">
             </el-table-column>
             <el-table-column
-              label="姓名"
-              prop="name"
-              width="180">
+              label="角色名称"
+              prop="roleName">
             </el-table-column>
             <el-table-column
-              label="地址"
-              prop="address">
+              label="角色标识"
+              prop="roleCode">
             </el-table-column>
             <el-table-column
               fixed="right"
               label="操作"
               width="100">
               <template slot-scope="scope">
-                <el-button size="mini" type="text" @click="handleClick(scope.row)">查看</el-button>
+                <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
                 <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
               </template>
             </el-table-column>
@@ -78,7 +78,7 @@
           </div>
         </el-col>
         <el-col :md="5">
-          <el-tree :data=" data"
+          <el-tree :data="roleTreeData"
                    :default-checked-keys="[5]"
                    :default-expanded-keys="[2, 3]"
                    :props="defaultProps"
@@ -91,12 +91,15 @@
     </el-main>
     <create-or-edit-dialog
       ref="createOrEditDialog"
+      @reloadList="reloadList"
       :title="title"/>
   </el-container>
 </template>
 
 <script>
 import createOrEditDialog from '@/components/role/CreateOrEditDialog'
+import { del, list } from '@/api/role'
+import { DIALOG_TYPE } from '@/utils/constant'
 
 export default {
   name: 'RoleView',
@@ -104,28 +107,7 @@ export default {
   data: () => ({
     title: '',
     multipleSelection: [],
-    tableData: [{
-      id: 1,
-      date: '2016-05-02',
-      name: '王小虎',
-      address: '上海市普陀区金沙江路 1518 弄'
-    }, {
-      id: 2,
-      date: '2016-05-04',
-      name: '王小虎',
-      address: '上海市普陀区金沙江路 1517 弄'
-    }, {
-      id: 3,
-      date: '2016-05-01',
-      name: '王小虎',
-      address: '上海市普陀区金沙江路 1519 弄',
-      hasChildren: true
-    }, {
-      id: 4,
-      date: '2016-05-03',
-      name: '王小虎',
-      address: '上海市普陀区金沙江路 1516 弄'
-    }],
+    tableData: [],
     searchForm: {
       roleName: '',
       roleCode: '',
@@ -134,7 +116,7 @@ export default {
     },
     total: 0,
 
-    data: [{
+    roleTreeData: [{
       id: 1,
       label: '一级 1',
       children: [{
@@ -264,38 +246,65 @@ export default {
       label: 'label'
     }
   }),
+  created () {
+    this.reloadList()
+  },
   methods: {
-    handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+    reloadList () {
+      list(this.buildParam()).then((rep) => {
+        if (rep) {
+          this.tableData = rep.data.records
+          this.searchForm.size = rep.data.size
+          this.searchForm.current = rep.data.current
+          this.total = rep.data.total
+        }
+      })
     },
-    handleCurrentChange (val) {
-      console.log(`当前页: ${val}`)
+    handleSizeChange (size) {
+      this.searchForm.size = size
+      this.reloadList()
+    },
+    handleCurrentChange (current) {
+      this.searchForm.current = current
+      this.reloadList()
     },
     search () {
+      this.reloadList()
     },
-    resetForm () {
-      this.searchForm.platformName = ''
-      this.searchForm.platformCode = ''
+    buildParam () {
+      this.tableData = []
+      return this.searchForm
     },
-    deleteInfo () {
+    reset () {
+      this.searchForm.roleName = ''
+      this.searchForm.roleCode = ''
+    },
+    del () {
+      const ids = []
+      this.multipleSelection.forEach((x) => {
+        ids.push(x.id)
+      })
+      del(ids)
+      this.reloadList()
     },
     exportInfo () {
     },
     importInfo () {
     },
-    create () {
-      this.title = '创建平台'
-      this.$refs.createOrEditDialog.showDialogFormVisible()
+    add () {
+      this.title = '创建角色'
+      this.$refs.createOrEditDialog.showDialogFormVisible({}, DIALOG_TYPE.ADD)
     },
-    edit () {
-      this.title = '修改平台'
-      this.$refs.createOrEditDialog.showDialogFormVisible()
+    edit (val) {
+      this.title = '修改角色信息'
+      this.$refs.createOrEditDialog.showDialogFormVisible(val, DIALOG_TYPE.EDIT)
     },
     handleSelectionChange (val) {
       this.multipleSelection = val
     },
-    handleClick (val) {
-      alert(JSON.stringify(val))
+    show (val) {
+      this.title = '查看角色信息'
+      this.$refs.createOrEditDialog.showDialogFormVisible(val, DIALOG_TYPE.SHOW)
     }
   }
 }

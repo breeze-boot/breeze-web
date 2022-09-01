@@ -50,6 +50,12 @@
           width="55">
         </el-table-column>
         <el-table-column
+          v-if="false"
+          label="ID"
+          prop="id"
+          width="200">
+        </el-table-column>
+        <el-table-column
           label="日期"
           prop="date"
           width="180">

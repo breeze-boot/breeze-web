@@ -45,7 +45,7 @@
         </el-table-column>
         <el-table-column
           label="部门名称"
-          prop="name">
+          prop="deptName">
         </el-table-column>
         <el-table-column
           label="部门编码"
@@ -69,12 +69,12 @@
     <create-or-edit-dialog
       ref="createOrEditDialog"
       :title="title"
-      @reLocadList="reloadList"/>
+      @reloadList="reloadList"/>
   </el-container>
 </template>
 
 <script>
-import createOrEditDialog from '@/components/dict/CreateOrEditDialog'
+import createOrEditDialog from '@/components/dept/CreateOrEditDialog'
 import { del, list } from '@/api/dept'
 import { DIALOG_TYPE } from '@/utils/constant'
 

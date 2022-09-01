@@ -244,6 +244,7 @@ export default {
       this.dialogStatus = dialogStatus
     },
     closeDialog (formName) {
+      this.menu.id = undefined
       this.$refs[formName].clearValidate()
       this.$refs[formName].resetFields()
       this.show = true

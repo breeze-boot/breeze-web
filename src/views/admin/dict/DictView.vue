@@ -12,14 +12,14 @@
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search">查询</el-button>
-              <el-button type="info" @click="resetForm">重置</el-button>
+              <el-button type="info" @click="rest">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button plain size="mini" type="danger" @click="deleteInfo">删除</el-button>
+        <el-button plain size="mini" type="primary" @click="add">新建</el-button>
+        <el-button plain size="mini" type="danger" @click="del">删除</el-button>
         <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
         <el-button plain size="mini" @click="importInfo">导入</el-button>
       </div>
@@ -37,26 +37,29 @@
           width="55">
         </el-table-column>
         <el-table-column
-          label="用户编号"
-          prop="dictCode"
-          width="180">
+          v-if="false"
+          label="ID"
+          prop="id"
+          width="200">
         </el-table-column>
         <el-table-column
-          label="用户名"
-          prop="dictName"
-          width="180">
+          label="字典名称"
+          prop="dictName">
         </el-table-column>
         <el-table-column
-          label="地址"
-          prop="address"
-          show-overflow-tooltip>
+          label="字典编码"
+          prop="dictCode">
+        </el-table-column>
+        <el-table-column
+          label="是否开启"
+          prop="isOpen">
         </el-table-column>
         <el-table-column
           fixed="right"
           label="操作"
           width="100">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="handleClick(scope.row)">查看</el-button>
+            <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
             <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
           </template>
         </el-table-column>
@@ -123,17 +126,17 @@ export default {
     search () {
       console.log('submit!')
     },
-    resetForm () {
+    rest () {
       this.searchForm.dictName = ''
       this.searchForm.dictCode = ''
     },
-    deleteInfo () {
+    del () {
     },
     exportInfo () {
     },
     importInfo () {
     },
-    create () {
+    add () {
       this.title = '创建用户'
       this.$refs.createOrEditDialog.showDialogFormVisible()
     },
@@ -144,7 +147,7 @@ export default {
     handleSelectionChange (val) {
       this.multipleSelection = val
     },
-    handleClick (val) {
+    show (val) {
       alert(JSON.stringify(val))
     }
   }

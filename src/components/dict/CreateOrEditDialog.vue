@@ -2,14 +2,11 @@
   <el-dialog :title="title" :visible.sync="dialogFormVisible" width="800px"
              @close="closeDialog('ruleForm')">
     <el-form ref="ruleForm" :disabled="!show" :model="dict" :rules="rules" size="mini">
-      <el-form-item :label-width="formLabelWidth" label="平台名称" prop="dictName">
+      <el-form-item :label-width="formLabelWidth" label="字典名称" prop="dictName">
         <el-input v-model="dict.dictName" autocomplete="off" clearable></el-input>
       </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="平台标志" prop="dictCode">
+      <el-form-item :label-width="formLabelWidth" label="字典编码" prop="dictCode">
         <el-input v-model="dict.dictCode" autocomplete="off" clearable></el-input>
-      </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="描述">
-        <el-input v-model="dict.desc" autocomplete="off" clearable type="textarea"></el-input>
       </el-form-item>
     </el-form>
     <div v-if="show" slot="footer" class="dialog-footer">
@@ -35,8 +32,7 @@ export default {
       dict: {
         id: null,
         dictName: '',
-        dictCode: '',
-        desc: ''
+        dictCode: ''
       },
       // 默认是创建
       dialogStatus: DIALOG_TYPE.ADD,
@@ -107,6 +103,7 @@ export default {
       this.dialogStatus = dialogStatus
     },
     closeDialog (formName) {
+      this.dict.id = undefined
       this.$refs[formName].clearValidate()
       this.$refs[formName].resetFields()
       this.show = true
