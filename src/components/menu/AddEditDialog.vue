@@ -25,12 +25,7 @@
         <el-input v-model="menu.icon" autocomplete="off" clearable placeholder="请输入组件名称"></el-input>
       </el-form-item>
       <el-form-item :label-width="formLabelWidth" label="父级元素" prop="parentId">
-        <tree-select
-          :disable-branch-nodes="true"
-          :options="selectTreeOptions"
-          :show-count="true"
-          placeholder=""
-        />
+        123
       </el-form-item>
       <el-form-item :label-width="formLabelWidth" label="权限标识" prop="permission">
         <el-input v-model="menu.permission" autocomplete="off" clearable placeholder="请输入权限标识"></el-input>
@@ -63,12 +58,9 @@
 import { DIALOG_TYPE } from '@/utils/constant'
 import { add, edit } from '@/api/menu'
 import { Message } from 'element-ui'
-import TreeSelect from '@riophae/vue-treeselect'
-import '@riophae/vue-treeselect/dist/vue-treeselect.css'
 
 export default {
-  name: 'CreateOrEditBox',
-  components: { TreeSelect },
+  name: 'AddEditDialog',
   props: {
     title: String
   },
@@ -255,16 +247,4 @@ export default {
 </script>
 
 <style>
-.vue-treeselect__control {
-  height: 9px !important;
-}
-
-.vue-treeselect__input {
-  padding: 2px !important;
-}
-
-.vue-treeselect__input-container {
-  padding: 1px !important;
-}
-
 </style>

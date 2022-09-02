@@ -1,12 +1,12 @@
 <template>
   <el-dialog :title="title" :visible.sync="dialogFormVisible" width="800px"
              @close="closeDialog('ruleForm')">
-    <el-form ref="ruleForm" :disabled="!show" :model="role" :rules="rules" size="mini">
-      <el-form-item :label-width="formLabelWidth" label="角色名称" prop="roleName">
-        <el-input v-model="role.roleName" autocomplete="off" clearable></el-input>
+    <el-form ref="ruleForm" :disabled="!show" :model="dictItem" :rules="rules" size="mini">
+      <el-form-item :label-width="formLabelWidth" label="字典标签" prop="label">
+        <el-input v-model="dictItem.label" autocomplete="off" clearable></el-input>
       </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="角色标识" prop="roleCode">
-        <el-input v-model="role.roleCode" autocomplete="off" clearable></el-input>
+      <el-form-item :label-width="formLabelWidth" label="字典值" prop="value">
+        <el-input v-model="dictItem.value" autocomplete="off" clearable></el-input>
       </el-form-item>
     </el-form>
     <div v-if="show" slot="footer" class="dialog-footer">
@@ -18,36 +18,36 @@
 
 <script>
 import { DIALOG_TYPE } from '@/utils/constant'
-import { add, edit } from '@/api/role'
+import { add, edit } from '@/api/dictItem'
 import { Message } from 'element-ui'
 
 export default {
-  name: 'CreateOrEditBox',
+  name: 'DictItemAddEditDialog',
   props: {
     title: String
   },
   data () {
     return {
       dialogFormVisible: false,
-      role: {
-        id: undefined,
-        roleName: '',
-        roleCode: '',
-        desc: ''
+      dictItem: {
+        id: null,
+        dictId: '',
+        label: '',
+        value: ''
       },
       // 默认是创建
       dialogStatus: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
       show: true,
       rules: {
-        roleName: [
+        label: [
           {
             required: true,
             message: '请输入平台名称',
             trigger: 'blur'
           }
         ],
-        roleCode: [
+        value: [
           {
             required: true,
             message: '请输入平台标识',
@@ -61,6 +61,7 @@ export default {
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          debugger
           this.dialogStatus === DIALOG_TYPE.ADD ? this.add() : this.edit()
         } else {
           console.log('error submit!!')
@@ -69,14 +70,14 @@ export default {
       })
     },
     add () {
-      add(this.role).then((rep) => {
+      add(this.dictItem).then((rep) => {
         Message.success({ message: rep.message })
         this.dialogFormVisible = false
         this.$emit('reloadList')
       })
     },
     edit () {
-      edit(this.role).then((rep) => {
+      edit(this.dictItem).then((rep) => {
         Message.success({ message: rep.message })
         this.dialogFormVisible = false
         this.$emit('reloadList')
@@ -95,16 +96,17 @@ export default {
       if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
         this.$nextTick(() => {
           // 赋值
-          Object.assign(this.role, val)
+          Object.assign(this.dictItem, val)
         })
       }
       if (dialogStatus === DIALOG_TYPE.SHOW) {
         this.show = false
       }
+      this.dictItem.dictId = val.id
       this.dialogStatus = dialogStatus
     },
     closeDialog (formName) {
-      this.role.id = undefined
+      this.dictItem.id = undefined
       this.$refs[formName].clearValidate()
       this.$refs[formName].resetFields()
       this.show = true

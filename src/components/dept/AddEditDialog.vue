@@ -1,15 +1,15 @@
 <template>
   <el-dialog :title="title" :visible.sync="dialogFormVisible" width="800px"
              @close="closeDialog('ruleForm')">
-    <el-form ref="ruleForm" :disabled="!show" :model="platform" :rules="rules" size="mini">
-      <el-form-item :label-width="formLabelWidth" label="平台名称" prop="platformName">
-        <el-input v-model="platform.platformName" autocomplete="off" clearable></el-input>
+    <el-form ref="ruleForm" :disabled="!show" :model="dept" :rules="rules" size="mini">
+      <el-form-item :label-width="formLabelWidth" label="部门名称" prop="deptName">
+        <el-input v-model="dept.deptName" autocomplete="off" clearable></el-input>
       </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="平台标志" prop="platformCode">
-        <el-input v-model="platform.platformCode" autocomplete="off" clearable></el-input>
+      <el-form-item :label-width="formLabelWidth" label="部门编码" prop="deptCode">
+        <el-input v-model="dept.deptCode" autocomplete="off" clearable></el-input>
       </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="描述" prop="desc">
-        <el-input v-model="platform.desc" autocomplete="off" clearable type="textarea"></el-input>
+      <el-form-item :label-width="formLabelWidth" label="描述" prop="isOpen">
+        <el-input v-model="dept.isOpen" autocomplete="off" clearable type="input"></el-input>
       </el-form-item>
     </el-form>
     <div v-if="show" slot="footer" class="dialog-footer">
@@ -21,39 +21,39 @@
 
 <script>
 import { DIALOG_TYPE } from '@/utils/constant'
-import { add, edit } from '@/api/platform'
+import { add, edit } from '@/api/dept'
 import { Message } from 'element-ui'
 
 export default {
-  name: 'CreateOrEditBox',
+  name: 'AddEditDialog',
   props: {
     title: String
   },
   data () {
     return {
       dialogFormVisible: false,
-      platform: {
+      dept: {
         id: null,
-        platformName: '',
-        platformCode: '',
-        desc: ''
+        deptName: '',
+        deptCode: '',
+        isOpen: ''
       },
       // 默认是创建
       dialogStatus: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
       show: true,
       rules: {
-        platformName: [
+        deptName: [
           {
             required: true,
-            message: '请输入平台名称',
+            message: '请输入部门名称',
             trigger: 'blur'
           }
         ],
-        platformCode: [
+        deptCode: [
           {
             required: true,
-            message: '请输入平台标识',
+            message: '请输入部门编码',
             trigger: 'blur'
           }
         ]
@@ -72,14 +72,14 @@ export default {
       })
     },
     add () {
-      add(this.platform).then((rep) => {
+      add(this.dept).then((rep) => {
         Message.success({ message: rep.message })
         this.dialogFormVisible = false
         this.$emit('reloadList')
       })
     },
     edit () {
-      edit(this.platform).then((rep) => {
+      edit(this.dept).then((rep) => {
         Message.success({ message: rep.message })
         this.dialogFormVisible = false
         this.$emit('reloadList')
@@ -98,7 +98,7 @@ export default {
       if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
         this.$nextTick(() => {
           // 赋值
-          Object.assign(this.platform, val)
+          Object.assign(this.dept, val)
         })
       }
       if (dialogStatus === DIALOG_TYPE.SHOW) {
@@ -107,9 +107,9 @@ export default {
       this.dialogStatus = dialogStatus
     },
     closeDialog (formName) {
-      this.platform.id = undefined
-      this.$refs[formName].resetFields()
+      this.dept.id = undefined
       this.$refs[formName].clearValidate()
+      this.$refs[formName].resetFields()
       this.show = true
     }
   }

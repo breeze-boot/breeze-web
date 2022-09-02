@@ -2,29 +2,15 @@ import request from '@/utils/axios'
 import JSONBigInt from 'json-bigint'
 
 /**
- * 初始化菜单
- *
- * @param data
- * @returns {AxiosPromise}
- */
-export function menuTree () {
-  return request({
-    url: '/admin/sys/menu/menuTree',
-    method: 'get',
-    params: { platformCode: 'managementCenter' }
-  })
-}
-
-/**
  * 列表
  *
  * @returns {AxiosPromise}
  */
-export function list (params) {
+export function list (data) {
   return request({
-    url: '/admin/sys/menu/list',
+    url: '/admin/sys/dict/list',
     method: 'post',
-    data: params,
+    data: data,
     transformResponse: [(data) => {
       return JSONBigInt.parse(data)
     }]
@@ -33,13 +19,15 @@ export function list (params) {
 
 /**
  * 添加
+ *
+ * @param data
  * @returns {AxiosPromise}
  */
-export function add (params) {
+export function add (data) {
   return request({
-    url: '/admin/sys/menu/save',
+    url: '/admin/sys/dict/save',
     method: 'post',
-    data: params
+    data: data
   })
 }
 
@@ -49,11 +37,11 @@ export function add (params) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function del (params) {
+export function del (data) {
   return request({
-    url: '/admin/sys/menu/delete',
+    url: '/admin/sys/dict/delete',
     method: 'delete',
-    data: params
+    data: data
   })
 }
 
@@ -63,10 +51,22 @@ export function del (params) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function edit (params) {
+export function edit (data) {
   return request({
-    url: '/admin/sys/menu/update',
+    url: '/admin/sys/dict/update',
     method: 'put',
-    data: params
+    data: data
+  })
+}
+
+/**
+ * 开关
+ * @returns {AxiosPromise}
+ */
+export function open (data) {
+  return request({
+    url: '/admin/sys/dict/open',
+    method: 'put',
+    data: data
   })
 }

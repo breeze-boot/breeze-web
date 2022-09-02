@@ -135,22 +135,22 @@
         </el-pagination>
       </div>
     </el-main>
-    <create-or-edit-dialog
-      ref="createOrEditDialog"
+    <add-edit-dialog
+      ref="addEditDialog"
       :title="title"
       @reloadList="reloadList"/>
   </el-container>
 </template>
 
 <script>
-import createOrEditDialog from '@/components/user/CreateOrEditDialog'
+import AddEditDialog from '@/components/user/AddEditDialog'
 import { del, list, open } from '@/api/user'
 import { DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
 
 export default {
   name: 'UserView',
-  components: { createOrEditDialog },
+  components: { AddEditDialog },
   data: () => ({
     title: '',
     multipleSelection: [],
@@ -180,7 +180,7 @@ export default {
     },
     open (index, row) {
       open({
-        userId: row.id,
+        id: row.id,
         isLock: row.isLock
       }).then((rep) => {
         Message.success({ message: rep.message })
@@ -220,18 +220,18 @@ export default {
     },
     add () {
       this.title = '创建用户'
-      this.$refs.createOrEditDialog.showDialogFormVisible({}, DIALOG_TYPE.ADD)
+      this.$refs.addEditDialog.showDialogFormVisible({}, DIALOG_TYPE.ADD)
     },
     edit (val) {
       this.title = '修改用户'
-      this.$refs.createOrEditDialog.showDialogFormVisible(val, DIALOG_TYPE.EDIT)
+      this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.EDIT)
     },
     handleSelectionChange (val) {
       this.multipleSelection = val
     },
     show (val) {
       this.title = '查看信息'
-      this.$refs.createOrEditDialog.showDialogFormVisible(val, DIALOG_TYPE.SHOW)
+      this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.SHOW)
     }
   }
 }

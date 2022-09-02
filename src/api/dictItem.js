@@ -8,7 +8,7 @@ import JSONBigInt from 'json-bigint'
  */
 export function list (data) {
   return request({
-    url: '/admin/sys/role/list',
+    url: '/admin/sys/dictItem/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -19,11 +19,13 @@ export function list (data) {
 
 /**
  * 添加
+ *
+ * @param data
  * @returns {AxiosPromise}
  */
 export function add (data) {
   return request({
-    url: '/admin/sys/role/save',
+    url: '/admin/sys/dictItem/save',
     method: 'post',
     data: data
   })
@@ -37,7 +39,7 @@ export function add (data) {
  */
 export function del (data) {
   return request({
-    url: '/admin/sys/role/delete',
+    url: '/admin/sys/dictItem/delete',
     method: 'delete',
     data: data
   })
@@ -51,7 +53,7 @@ export function del (data) {
  */
 export function edit (data) {
   return request({
-    url: '/admin/sys/role/update',
+    url: '/admin/sys/dictItem/update',
     method: 'put',
     data: data
   })

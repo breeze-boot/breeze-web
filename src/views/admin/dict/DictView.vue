@@ -12,7 +12,7 @@
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search">查询</el-button>
-              <el-button type="info" @click="rest">重置</el-button>
+              <el-button type="info" @click="reset">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
@@ -53,14 +53,28 @@
         <el-table-column
           label="是否开启"
           prop="isOpen">
+          <template slot-scope="scope">
+            <el-switch
+              v-model="scope.row.isOpen"
+              :active-value="1"
+              :inactive-value="0"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+              size="mini"
+              @change="open(scope.$index, scope.row)">
+            </el-switch>
+          </template>
         </el-table-column>
         <el-table-column
           fixed="right"
           label="操作"
-          width="100">
+          width="200">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
             <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click.native.prevent="deleteRow(scope.$index, tableData,scope.row)">删除
+            </el-button>
+            <el-button size="mini" type="text" @click="showDictDetail(scope.row)">查看字典</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -76,38 +90,32 @@
         </el-pagination>
       </div>
     </el-main>
-    <create-or-edit-dialog
-      ref="createOrEditDialog"
-      :title="title"/>
+    <add-edit-dialog
+      ref="addEditDialog"
+      :title="title"
+      @reloadList="reloadList"/>
+    <dict-item-dialog
+      ref="dictItemDialog"/>
   </el-container>
 </template>
 
 <script>
-import createOrEditDialog from '@/components/platform/CreateOrEditDialog'
+import AddEditDialog from '@/components/dict/AddEditDialog'
+import DictItemDialog from '@/components/dict/DictItemDialog'
+import { del, list, open } from '@/api/dict'
+import { DIALOG_TYPE } from '@/utils/constant'
+import { Message } from 'element-ui'
 
 export default {
   name: 'DictView',
-  components: { createOrEditDialog },
+  components: {
+    AddEditDialog,
+    DictItemDialog
+  },
   data: () => ({
     title: '',
     multipleSelection: [],
-    tableData: [{
-      dictCode: '2016-05-02',
-      dictName: '用户1',
-      address: '上海市普陀区金沙江路 1518 弄'
-    }, {
-      dictCode: '2016-05-04',
-      dictName: '用户1',
-      address: '上海市普陀区金沙江路 1517 弄'
-    }, {
-      dictCode: '2016-05-01',
-      dictName: '用户1',
-      address: '上海市普陀区金沙江路 1519 弄'
-    }, {
-      dictCode: '2016-05-03',
-      dictName: '用户1',
-      address: '上海市普陀区金沙江路 1516 弄'
-    }],
+    tableData: [],
     searchForm: {
       dictName: '',
       dictCode: '',
@@ -116,39 +124,83 @@ export default {
     },
     total: 0
   }),
+  created () {
+    this.reloadList()
+  },
   methods: {
-    handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+    reloadList () {
+      list(this.buildParam()).then((rep) => {
+        if (rep) {
+          this.tableData = rep.data.records
+          this.searchForm.size = rep.data.size
+          this.searchForm.current = rep.data.current
+          this.total = rep.data.total
+        }
+      })
     },
-    handleCurrentChange (val) {
-      console.log(`当前页: ${val}`)
+    open (index, row) {
+      open({
+        id: row.id,
+        isOpen: row.isOpen
+      }).then((rep) => {
+        Message.success({ message: rep.message })
+      })
+    },
+    handleSizeChange (size) {
+      this.searchForm.size = size
+      this.reloadList()
+    },
+    handleCurrentChange (current) {
+      this.searchForm.current = current
+      this.reloadList()
     },
     search () {
-      console.log('submit!')
+      this.reloadList()
     },
-    rest () {
-      this.searchForm.dictName = ''
-      this.searchForm.dictCode = ''
+    buildParam () {
+      this.tableData = []
+      return this.searchForm
+    },
+    reset () {
+      this.searchForm.platformName = ''
+      this.searchForm.platformCode = ''
     },
     del () {
+      const ids = []
+      this.multipleSelection.forEach((x) => {
+        ids.push(x.id)
+      })
+      del(ids)
+      this.reloadList()
+    },
+    deleteRow (index, rows, row) {
+      const ids = []
+      ids.push(row.id)
+      del(ids)
+      rows.splice(index, 1)
     },
     exportInfo () {
     },
     importInfo () {
     },
     add () {
-      this.title = '创建用户'
-      this.$refs.createOrEditDialog.showDialogFormVisible()
+      this.title = '创建平台'
+      this.$refs.addEditDialog.showDialogFormVisible({}, DIALOG_TYPE.ADD)
     },
-    edit () {
-      this.title = '修改用户'
-      this.$refs.createOrEditDialog.showDialogFormVisible()
+    edit (val) {
+      this.title = '修改平台'
+      this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.EDIT)
     },
     handleSelectionChange (val) {
       this.multipleSelection = val
     },
     show (val) {
-      alert(JSON.stringify(val))
+      this.title = '查看信息'
+      this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.SHOW)
+    },
+    showDictDetail (val) {
+      this.title = '查看字典详情信息'
+      this.$refs.dictItemDialog.showDialogTableVisible(val)
     }
   }
 }

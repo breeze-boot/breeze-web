@@ -89,21 +89,21 @@
         </el-col>
       </el-row>
     </el-main>
-    <create-or-edit-dialog
-      ref="createOrEditDialog"
-      @reloadList="reloadList"
-      :title="title"/>
+    <add-edit-dialog
+      ref="addEditDialog"
+      :title="title"
+      @reloadList="reloadList"/>
   </el-container>
 </template>
 
 <script>
-import createOrEditDialog from '@/components/role/CreateOrEditDialog'
+import AddEditDialog from '@/components/role/AddEditDialog'
 import { del, list } from '@/api/role'
 import { DIALOG_TYPE } from '@/utils/constant'
 
 export default {
   name: 'RoleView',
-  components: { createOrEditDialog },
+  components: { AddEditDialog },
   data: () => ({
     title: '',
     multipleSelection: [],
@@ -293,18 +293,18 @@ export default {
     },
     add () {
       this.title = '创建角色'
-      this.$refs.createOrEditDialog.showDialogFormVisible({}, DIALOG_TYPE.ADD)
+      this.$refs.addEditDialog.showDialogFormVisible({}, DIALOG_TYPE.ADD)
     },
     edit (val) {
       this.title = '修改角色信息'
-      this.$refs.createOrEditDialog.showDialogFormVisible(val, DIALOG_TYPE.EDIT)
+      this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.EDIT)
     },
     handleSelectionChange (val) {
       this.multipleSelection = val
     },
     show (val) {
       this.title = '查看角色信息'
-      this.$refs.createOrEditDialog.showDialogFormVisible(val, DIALOG_TYPE.SHOW)
+      this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.SHOW)
     }
   }
 }

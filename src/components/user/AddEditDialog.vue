@@ -77,7 +77,7 @@ import { add, edit } from '@/api/user'
 import { Message } from 'element-ui'
 
 export default {
-  name: 'CreateOrEditBox',
+  name: 'AddEditDialog',
   props: {
     title: String
   },

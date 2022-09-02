@@ -4,37 +4,61 @@
       <el-form :inline="true" :model="searchForm" class="demo-form-inline" size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
-            <el-form-item label="操作人员">
-              <el-input v-model="searchForm.operator" clearable placeholder="操作人员"/>
+            <el-form-item label="系统模块" prop="systemModule">
+              <el-input v-model="searchForm.systemModule" clearable placeholder="系统模块"/>
             </el-form-item>
-            <el-form-item label="功能模块">
-              <el-input v-model="searchForm.module" clearable placeholder="功能模块"/>
+            <el-form-item label="操作类型" prop="doType">
+              <el-select v-model="searchForm.doType" placeholder="请选择">
+                <el-option
+                  v-for="item in doTypeOption"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
             </el-form-item>
-            <el-form-item label="操作类型">
-              <el-input v-model="searchForm.type" clearable placeholder="操作类型"/>
+            <el-form-item label="日志类型" prop="logType">
+              <el-select v-model="searchForm.doType" placeholder="请选择">
+                <el-option
+                  v-for="item in doTypeOption"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
             </el-form-item>
-            <el-form-item label="结果">
-              <el-input v-model="searchForm.result" clearable placeholder="结果"/>
+            <el-form-item label="结果" prop="result">
+              <el-select v-model="searchForm.result" placeholder="请选择">
+                <el-option
+                  v-for="item in resultOption"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
             </el-form-item>
-            <el-form-item label="操作时间">
-              <el-date-picker
-                v-model="searchForm.date"
-                end-placeholder="结束日期"
-                range-separator="至"
-                start-placeholder="开始日期"
-                type="daterange">
-              </el-date-picker>
+            <el-form-item label="操作人员" prop="createBy">
+              <el-input v-model="searchForm.createBy" clearable placeholder="操作人员"/>
             </el-form-item>
+
+            <el-date-picker
+              v-model="value1"
+              type="daterange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期">
+            </el-date-picker>
+
             <el-form-item>
               <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="resetForm()">重置</el-button>
+              <el-button type="info" @click="reset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
         <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
-        <el-button plain size="mini" type="danger" @click="deleteInfo()">删除</el-button>
+        <el-button plain size="mini" type="danger" @click="del()">删除</el-button>
       </div>
       <el-table
         ref="multipleTable"
@@ -56,25 +80,41 @@
           width="200">
         </el-table-column>
         <el-table-column
-          label="日期"
-          prop="date"
+          label="系统模块"
+          prop="systemModule"
           width="180">
         </el-table-column>
         <el-table-column
-          label="姓名"
-          prop="name"
+          label="日志标题"
+          prop="logTitle"
           width="180">
         </el-table-column>
         <el-table-column
-          label="地址"
-          prop="address">
+          label="日志类型"
+          prop="logType">
+        </el-table-column>
+        <el-table-column
+          label="操作类型"
+          prop="doType">
+        </el-table-column>
+        <el-table-column
+          label="请求类型"
+          prop="requestType">
+        </el-table-column>
+        <el-table-column
+          label="执行结果"
+          prop="result">
+        </el-table-column>
+        <el-table-column
+          label="操作人"
+          prop="createBy">
         </el-table-column>
         <el-table-column
           fixed="right"
           label="操作"
           width="100">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="handleClick(scope.row)">查看</el-button>
+            <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -94,73 +134,98 @@
 </template>
 
 <script>
+import { del, list } from '@/api/log'
+import { Message } from 'element-ui'
+
 export default {
   name: 'LogView',
   data: () => ({
+    value1: [],
     title: '',
     multipleSelection: [],
-    tableData: [{
-      id: 1,
-      date: '2016-05-02',
-      name: '王小虎',
-      address: '上海市普陀区金沙江路 1518 弄'
+    tableData: [],
+    doTypeOption: [{
+      value: '1',
+      label: '黄金糕'
     }, {
-      id: 2,
-      date: '2016-05-04',
-      name: '王小虎',
-      address: '上海市普陀区金沙江路 1517 弄'
+      value: '2',
+      label: '双皮奶'
+    }],
+    logTypeOption: [{
+      value: '11',
+      label: '黄金糕'
     }, {
-      id: 3,
-      date: '2016-05-01',
-      name: '王小虎',
-      address: '上海市普陀区金沙江路 1519 弄',
-      hasChildren: true
+      value: '22',
+      label: '双皮奶'
+    }],
+    resultOption: [{
+      value: '12',
+      label: '黄金糕'
     }, {
-      id: 4,
-      date: '2016-05-03',
-      name: '王小虎',
-      address: '上海市普陀区金沙江路 1516 弄'
+      value: '23',
+      label: '双皮奶'
     }],
     searchForm: {
-      operator: '',
-      module: '',
-      date: '',
+      systemModule: '',
+      doType: '',
       result: '',
-      error: '',
+      createBy: '',
+      logType: '',
       current: 1,
       size: 10
     },
     total: 0
   }),
+  created () {
+    this.reloadList()
+  },
   methods: {
-    handleSizeChange (val) {
-      console.log(`每页 ${val} 条`)
+    reloadList () {
+      list(this.buildParam()).then((rep) => {
+        if (rep) {
+          this.tableData = rep.data.records
+          this.searchForm.size = rep.data.size
+          this.searchForm.current = rep.data.current
+          this.total = rep.data.total
+        }
+      })
     },
-    handleCurrentChange (val) {
-      console.log(`当前页: ${val}`)
+    handleSizeChange (size) {
+      this.searchForm.size = size
+      this.reloadList()
+    },
+    handleCurrentChange (current) {
+      this.searchForm.current = current
+      this.reloadList()
     },
     search () {
+      this.reloadList()
     },
-    deleteInfo () {
+    buildParam () {
+      this.tableData = []
+      return this.searchForm
     },
-    resetForm () {
-      this.searchForm.operator = ''
-      this.searchForm.module = ''
-      this.searchForm.operator = ''
-      this.searchForm.module = ''
-      this.searchForm.date = ''
+    reset () {
+      this.searchForm.logType = ''
       this.searchForm.result = ''
-      this.searchForm.error = ''
+      this.searchForm.doType = ''
+      this.searchForm.createBy = ''
+    },
+    del () {
+      const ids = []
+      this.multipleSelection.forEach((x) => {
+        ids.push(x.id)
+      })
+      del(ids)
+      this.reloadList()
     },
     exportInfo () {
-    },
-    importInfo () {
     },
     handleSelectionChange (val) {
       this.multipleSelection = val
     },
-    handleClick (val) {
-      alert(JSON.stringify(val))
+    show (val) {
+      Message.success({ message: JSON.stringify(val) })
     }
   }
 }

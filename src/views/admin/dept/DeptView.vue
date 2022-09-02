@@ -66,21 +66,21 @@
         </el-table-column>
       </el-table>
     </el-main>
-    <create-or-edit-dialog
-      ref="createOrEditDialog"
+    <add-edit-dialog
+      ref="addEditDialog"
       :title="title"
       @reloadList="reloadList"/>
   </el-container>
 </template>
 
 <script>
-import createOrEditDialog from '@/components/dept/CreateOrEditDialog'
+import AddEditDialog from '@/components/dept/AddEditDialog'
 import { del, list } from '@/api/dept'
 import { DIALOG_TYPE } from '@/utils/constant'
 
 export default {
   name: 'DeptView',
-  components: { createOrEditDialog },
+  components: { AddEditDialog },
   data: () => ({
     title: '',
     multipleSelection: [],
@@ -126,18 +126,18 @@ export default {
     },
     add () {
       this.title = '创建部门'
-      this.$refs.createOrEditDialog.showDialogFormVisible({}, DIALOG_TYPE.ADD)
+      this.$refs.addEditDialog.showDialogFormVisible({}, DIALOG_TYPE.ADD)
     },
     edit (val) {
       this.title = '修改部门信息'
-      this.$refs.createOrEditDialog.showDialogFormVisible(val, DIALOG_TYPE.EDIT)
+      this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.EDIT)
     },
     handleSelectionChange (val) {
       this.multipleSelection = val
     },
     show (val) {
       this.title = '查看部门信息'
-      this.$refs.createOrEditDialog.showDialogFormVisible(val, DIALOG_TYPE.SHOW)
+      this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.SHOW)
     }
   }
 }

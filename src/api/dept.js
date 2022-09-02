@@ -7,11 +7,11 @@ import JSONBigInt from 'json-bigint'
  * @param data
  * @returns {AxiosPromise}
  */
-export function list (params) {
+export function list (data) {
   return request({
     url: '/admin/sys/dept/list',
     method: 'post',
-    data: params,
+    data: data,
     transformResponse: [(data) => {
       return JSONBigInt.parse(data)
     }]
@@ -22,11 +22,11 @@ export function list (params) {
  * 添加
  * @returns {AxiosPromise}
  */
-export function add (params) {
+export function add (data) {
   return request({
     url: '/admin/sys/dept/save',
     method: 'post',
-    data: params
+    data: data
   })
 }
 
@@ -36,11 +36,11 @@ export function add (params) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function del (params) {
+export function del (data) {
   return request({
     url: '/admin/sys/dept/delete',
     method: 'delete',
-    data: params
+    data: data
   })
 }
 
@@ -50,10 +50,10 @@ export function del (params) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function edit (params) {
+export function edit (data) {
   return request({
     url: '/admin/sys/dept/update',
     method: 'put',
-    data: params
+    data: data
   })
 }

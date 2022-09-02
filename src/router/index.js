@@ -42,6 +42,9 @@ export const loadRoute = () => {
     store.commit('setMenus', response.data)
     // 动态绑定路由
     response.data.forEach(menu => {
+      if (!menu.children) {
+        return
+      }
       getMenu(menu.children)
     })
   })

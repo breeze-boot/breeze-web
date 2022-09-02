@@ -86,21 +86,21 @@
         </el-pagination>
       </div>
     </el-main>
-    <create-or-edit-dialog
-      ref="createOrEditDialog"
+    <add-edit-dialog
+      ref="addEditDialog"
       :title="title"
       @reloadList="reloadList"/>
   </el-container>
 </template>
 
 <script>
-import createOrEditDialog from '@/components/platform/CreateOrEditDialog'
+import AddEditDialog from '@/components/platform/AddEditDialog'
 import { del, list } from '@/api/platform'
 import { DIALOG_TYPE } from '@/utils/constant'
 
 export default {
   name: 'PlatformView',
-  components: { createOrEditDialog },
+  components: { AddEditDialog },
   data: () => ({
     title: '',
     platformValue: {},
@@ -161,18 +161,18 @@ export default {
     },
     add () {
       this.title = '创建平台'
-      this.$refs.createOrEditDialog.showDialogFormVisible({}, DIALOG_TYPE.ADD)
+      this.$refs.addEditDialog.showDialogFormVisible({}, DIALOG_TYPE.ADD)
     },
     edit (val) {
       this.title = '修改平台'
-      this.$refs.createOrEditDialog.showDialogFormVisible(val, DIALOG_TYPE.EDIT)
+      this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.EDIT)
     },
     handleSelectionChange (val) {
       this.multipleSelection = val
     },
     show (val) {
       this.title = '查看信息'
-      this.$refs.createOrEditDialog.showDialogFormVisible(val, DIALOG_TYPE.SHOW)
+      this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.SHOW)
     }
   }
 }
