@@ -18,6 +18,34 @@ export function list (data) {
 }
 
 /**
+ * 角色权限获取
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function listRolesPermission (roleId) {
+  return request({
+    url: '/admin/sys/role/listRolesPermission',
+    method: 'get',
+    params: { roleId: roleId }
+  })
+}
+
+/**
+ * 角色权限获取
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function editPermission (data) {
+  return request({
+    url: '/admin/sys/role/editPermission',
+    method: 'put',
+    data: data
+  })
+}
+
+/**
  * 添加
  * @returns {AxiosPromise}
  */

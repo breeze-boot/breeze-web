@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from '../store'
-import { menuTree } from '@/api/menu'
+import { listTreeMenu } from '@/api/menu'
 
 Vue.use(VueRouter)
 const originalPush = VueRouter.prototype.push
@@ -35,7 +35,10 @@ const router = new VueRouter({
 })
 
 export const loadRoute = () => {
-  menuTree().then((response) => {
+  const params = {
+    platformCode: 'managementCenter'
+  }
+  listTreeMenu(params).then((response) => {
     if (!response.data) {
       return
     }

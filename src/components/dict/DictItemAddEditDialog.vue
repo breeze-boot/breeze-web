@@ -61,7 +61,6 @@ export default {
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          debugger
           this.dialogStatus === DIALOG_TYPE.ADD ? this.add() : this.edit()
         } else {
           console.log('error submit!!')

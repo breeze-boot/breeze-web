@@ -1,7 +1,7 @@
 <template>
-  <el-dialog :title="title" :visible.sync="dialogFormVisible" width="700px"
+  <el-dialog :title="title" :visible.sync="dialogFormVisible" width="800px"
              @close="closeDialog('ruleForm')">
-    <el-form ref="ruleForm" :disabled="!show" :model="user" :rules="rules" size="mini" style="padding-right: 15px;">
+    <el-form v-show="!show" ref="ruleForm" :model="user" :rules="rules" size="mini" style="padding-right: 15px;">
       <el-form-item>
         <el-upload
           :before-upload="beforeAvatarUpload"
@@ -17,17 +17,17 @@
       <el-form-item :label-width="formLabelWidth" label="用户名" prop="username">
         <el-input v-model="user.username" autocomplete="off" clearable></el-input>
       </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="密码" prop="password">
+      <el-form-item v-if="!isEdit" :label-width="formLabelWidth" label="密码" prop="password">
         <el-input v-model="user.password" autocomplete="off" clearable type="password"></el-input>
       </el-form-item>
-      <el-form-item v-if="show" :label-width="formLabelWidth" label="确认密码" prop="confirmPassword">
+      <el-form-item v-if="!isEdit" :label-width="formLabelWidth" label="确认密码" prop="confirmPassword">
         <el-input v-model="user.confirmPassword" autocomplete="off" clearable type="password"></el-input>
       </el-form-item>
       <el-form-item :label-width="formLabelWidth" label="用户工号" prop="userCode">
         <el-input v-model="user.userCode" autocomplete="off" clearable disabled></el-input>
       </el-form-item>
       <el-form-item :label-width="formLabelWidth" label="手机号" prop="phone">
-        <el-input v-model="user.phone" autocomplete="off" clearable type="input"></el-input>
+        <el-input v-model="user.phone" autocomplete="off" clearable></el-input>
       </el-form-item>
       <el-form-item :label-width="formLabelWidth" label="E-mail" prop="email">
         <el-input v-model="user.email" autocomplete="off" clearable type="input"></el-input>
@@ -38,7 +38,7 @@
       <el-form-item :label-width="formLabelWidth" label="部门" prop="deptId" style="text-align: left;">
         <el-select v-model="user.deptId" filterable placeholder="请选择">
           <el-option
-            v-for="item in options"
+            v-for="item in deptOption"
             :key="item.value"
             :label="item.label"
             :value="item.value">
@@ -64,10 +64,88 @@
         </el-switch>
       </el-form-item>
     </el-form>
-    <div v-if="show" slot="footer" class="dialog-footer">
+    <div v-show="!show" slot="footer" class="dialog-footer">
       <el-button size="mini" @click="resetForm('ruleForm')">取 消</el-button>
       <el-button size="mini" type="primary" @click="submitForm('ruleForm')">确 定</el-button>
     </div>
+
+    <el-descriptions v-show="show" :column="2" border size="mini">
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-user"></i>
+          用户名
+        </template>
+        {{ user.username }}
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-tickets"></i>
+          用户工号
+        </template>
+        <el-tag size="small">{{ user.userCode }}</el-tag>
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-mobile-phone"></i>
+          手机号
+        </template>
+        {{ user.phone }}
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-chat-round"></i>
+          E-mail
+        </template>
+        {{ user.email }}
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-tickets"></i>
+          展示名称
+        </template>
+        {{ user.amountName }}
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-tickets"></i>
+          部门
+        </template>
+        <el-select v-model="user.deptId" :disabled="true" size="mini">
+          <el-option
+            v-for="item in deptOption"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-tickets"></i>
+          性别
+        </template>
+        <el-tag :type="user.sex === 1 ? 'primary' : 'success'">
+          {{ user.sex === 1 ? '男' : '女' }}
+        </el-tag>
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-user-solid"></i>
+          身份证
+        </template>
+        <el-tag> {{ user.idCard }}</el-tag>
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-unlock"></i>
+          是否锁定
+        </template>
+        <el-tag
+          :type="user.isLock === 1 ? 'primary' : 'danger'"
+          disable-transitions> {{ user.isLock === 1 ? '锁定' : '未锁定' }}
+        </el-tag>
+      </el-descriptions-item>
+    </el-descriptions>
   </el-dialog>
 </template>
 
@@ -90,6 +168,7 @@ export default {
         avatar: '',
         amountName: '',
         password: '',
+        phone: '',
         confirmPassword: '',
         userCode: '',
         username: '',
@@ -99,15 +178,17 @@ export default {
         sex: 1,
         isLock: 0
       },
-      options: [{
-        value: 1,
-        label: 'CEO'
-      }],
-      value: '',
+      deptOption: [
+        {
+          value: 1,
+          label: 'CEO'
+        }
+      ],
       // 默认是创建
       dialogStatus: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
-      show: true,
+      show: false,
+      isEdit: false,
       rules: {
         username: [
           {
@@ -133,14 +214,33 @@ export default {
         password: [
           {
             required: true,
-            message: '请输入密码',
+            validator: (rule, value, callback) => {
+              debugger
+              if (value === '') {
+                callback(new Error('请输入密码'))
+              } else {
+                if (this.user.confirmPassword !== '') {
+                  this.$refs.ruleForm.validateField('confirmPassword')
+                }
+                callback()
+              }
+            },
             trigger: 'blur'
           }
         ],
         confirmPassword: [
           {
             required: true,
-            message: '请确认密码',
+            validator: (rule, value, callback) => {
+              debugger
+              if (value === '') {
+                callback(new Error('请再次输入密码'))
+              } else if (value !== this.user.password) {
+                callback(new Error('两次输入密码不一致!'))
+              } else {
+                callback()
+              }
+            },
             trigger: 'blur'
           }
         ],
@@ -177,12 +277,11 @@ export default {
   },
   methods: {
     handleAvatarSuccess (res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw)
+      this.user.avatar = URL.createObjectURL(file.raw)
     },
     beforeAvatarUpload (file) {
       const isJPG = file.type === 'image/jpeg'
       const isLt2M = file.size / 1024 / 1024 < 2
-
       if (!isJPG) {
         this.$message.error('上传头像图片只能是 JPG 格式!')
       }
@@ -229,18 +328,22 @@ export default {
         this.$nextTick(() => {
           // 赋值
           Object.assign(this.user, val)
+          this.isEdit = true
         })
       }
       if (dialogStatus === DIALOG_TYPE.SHOW) {
-        this.show = false
+        this.show = true
       }
       this.dialogStatus = dialogStatus
     },
     closeDialog (formName) {
-      this.user.id = undefined
-      this.$refs[formName].clearValidate()
-      this.$refs[formName].resetFields()
-      this.show = true
+      if (this.dialogStatus !== DIALOG_TYPE.SHOW) {
+        this.user.id = undefined
+        this.$refs[formName].clearValidate()
+        this.$refs[formName].resetFields()
+      }
+      this.show = false
+      this.isEdit = false
     }
   }
 }

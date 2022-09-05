@@ -17,7 +17,7 @@
           </el-col>
         </el-row>
       </el-form>
-      <el-row>
+      <el-row :gutter="24">
         <el-col :md="19">
           <div style="margin-bottom: 10px; text-align: left;">
             <el-button plain size="mini" type="primary" @click="add">新建</el-button>
@@ -31,10 +31,10 @@
             :data="tableData"
             border
             height="600"
-            row-key="id"
             size="mini"
             stripe
             style="width: 100%"
+            @row-click="rowClick"
             @selection-change="handleSelectionChange">
             <el-table-column
               type="selection"
@@ -57,10 +57,12 @@
             <el-table-column
               fixed="right"
               label="操作"
-              width="100">
+              width="150">
               <template slot-scope="scope">
                 <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
                 <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+                <el-button size="mini" type="text" @click.native.prevent="delItem(scope.$index, tableData,scope.row)">删除
+                </el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -78,14 +80,18 @@
           </div>
         </el-col>
         <el-col :md="5">
-          <el-tree :data="roleTreeData"
-                   :default-checked-keys="[5]"
+          <el-tree ref="roleTree"
+                   :data="roleTreeData"
                    :default-expanded-keys="[2, 3]"
                    :props="defaultProps"
                    node-key="id"
                    show-checkbox
-                   style="height: 600px; overflow-y:scroll;border: #e1e1e1 1px solid;margin:37px;">
+                   style="height: 560px; overflow-y:scroll; border: #e1e1e1 1px solid; margin-top:37px;">
           </el-tree>
+          <div style="margin-top: 10px; text-align: center; padding: 0px 30px;">
+            <el-button plain size="mini" type="primary" @click="submitPermission">提交</el-button>
+            <el-button :disabled="disabled" plain size="mini" type="info" @click="resetPermission">重置</el-button>
+          </div>
         </el-col>
       </el-row>
     </el-main>
@@ -98,7 +104,8 @@
 
 <script>
 import AddEditDialog from '@/components/role/AddEditDialog'
-import { del, list } from '@/api/role'
+import { del, editPermission, list, listRolesPermission } from '@/api/role'
+import { listTreePermission } from '@/api/menu'
 import { DIALOG_TYPE } from '@/utils/constant'
 
 export default {
@@ -106,6 +113,7 @@ export default {
   components: { AddEditDialog },
   data: () => ({
     title: '',
+    disabled: true,
     multipleSelection: [],
     tableData: [],
     searchForm: {
@@ -115,141 +123,44 @@ export default {
       size: 10
     },
     total: 0,
-
-    roleTreeData: [{
-      id: 1,
-      label: '一级 1',
-      children: [{
-        id: 4,
-        label: '二级 1-1',
-        children: [{
-          id: 9,
-          label: '三级 1-1-1'
-        }, {
-          id: 10,
-          label: '三级 1-1-2'
-        }]
-      }]
-    }, {
-      id: 2,
-      label: '一级 2',
-      children: [{
-        id: 5,
-        label: '二级 2-1'
-      }, {
-        id: 6,
-        label: '二级 2-2'
-      }]
-    }, {
-      id: 3,
-      label: '一级 3',
-      children: [{
-        id: 7,
-        label: '二级 3-1'
-      }, {
-        id: 8,
-        label: '二级 3-2'
-      }]
-    }, {
-      id: 4,
-      label: '一级 3',
-      children: [{
-        id: 7,
-        label: '二级 3-1'
-      }, {
-        id: 8,
-        label: '二级 3-2'
-      }]
-    }, {
-      id: 5,
-      label: '一级 3',
-      children: [{
-        id: 7,
-        label: '二级 3-1'
-      }, {
-        id: 8,
-        label: '二级 3-2'
-      }]
-    }, {
-      id: 6,
-      label: '一级 3',
-      children: [{
-        id: 7,
-        label: '二级 3-1'
-      }, {
-        id: 8,
-        label: '二级 3-2'
-      }]
-    }, {
-      id: 7,
-      label: '一级 3',
-      children: [{
-        id: 7,
-        label: '二级 3-1'
-      }, {
-        id: 8,
-        label: '二级 3-2'
-      }]
-    }, {
-      id: 8,
-      label: '一级 3',
-      children: [{
-        id: 7,
-        label: '二级 3-1'
-      }, {
-        id: 8,
-        label: '二级 3-2'
-      }]
-    }, {
-      id: 9,
-      label: '一级 3',
-      children: [{
-        id: 7,
-        label: '二级 3-1'
-      }, {
-        id: 8,
-        label: '二级 3-2'
-      }]
-    }, {
-      id: 10,
-      label: '一级 3',
-      children: [{
-        id: 7,
-        label: '二级 3-1'
-      }, {
-        id: 8,
-        label: '二级 3-2'
-      }]
-    }, {
-      id: 11,
-      label: '一级 3',
-      children: [{
-        id: 7,
-        label: '二级 3-1'
-      }, {
-        id: 8,
-        label: '二级 3-2'
-      }]
-    }, {
-      id: 12,
-      label: '一级 3',
-      children: [{
-        id: 7,
-        label: '二级 3-1'
-      }, {
-        id: 8,
-        label: '二级 3-2'
-      }]
-    }],
+    roleTreeData: [],
     defaultProps: {
       children: 'children',
-      label: 'label'
-    }
+      label: 'title'
+    },
+    roleId: undefined
   }),
   created () {
     this.reloadList()
+    this.reloadListTreeMenu()
   },
   methods: {
+    submitPermission () {
+      const checkedKeys = this.$refs.roleTree.getCheckedKeys()
+      if (checkedKeys.length <= 0) {
+        this.$message.warning('请选择角色权限')
+        return
+      }
+      if (this.roleId === undefined) {
+        this.$message.warning('请先点击角色')
+        return
+      }
+      editPermission({
+        roleId: this.roleId,
+        permissionIds: checkedKeys
+      }).then(rep => {
+      })
+    },
+    resetPermission () {
+      this.listSelectedTreeData(this.roleId)
+    },
+    reloadListTreeMenu () {
+      listTreePermission().then((rep) => {
+        if (rep) {
+          this.roleTreeData = rep.data
+        }
+      })
+    },
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep) {
@@ -257,6 +168,18 @@ export default {
           this.searchForm.size = rep.data.size
           this.searchForm.current = rep.data.current
           this.total = rep.data.total
+        }
+      })
+    },
+    listSelectedTreeData (roleId) {
+      listRolesPermission(roleId).then((rep) => {
+        if (rep) {
+          const selectTreeData = []
+          rep.data.forEach(roleData => {
+            selectTreeData.push(roleData.menuId)
+          })
+          this.$refs.roleTree.setCheckedKeys(selectTreeData)
+          this.disabled = false
         }
       })
     },
@@ -270,22 +193,43 @@ export default {
     },
     search () {
       this.reloadList()
+      this.reloadListTreeMenu()
+    },
+    rowClick (row, column, event) {
+      this.roleId = row.id.toString()
+      this.listSelectedTreeData(row.id.toString())
     },
     buildParam () {
-      this.tableData = []
       return this.searchForm
     },
     reset () {
       this.searchForm.roleName = ''
       this.searchForm.roleCode = ''
     },
+    /**
+     * 批量删除
+     */
     del () {
       const ids = []
       this.multipleSelection.forEach((x) => {
         ids.push(x.id)
       })
-      del(ids)
-      this.reloadList()
+      del(ids).then((rep) => {
+        this.$message.success('删除成功')
+        this.reloadList()
+      })
+    },
+    /**
+     * 删除行
+     *
+     * @param rows
+     */
+    delItem (index, rows, row) {
+      const ids = []
+      ids.push(row.id)
+      del(ids).then(rep => {
+        rows.splice(index, 1)
+      })
     },
     exportInfo () {
     },

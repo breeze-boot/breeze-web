@@ -7,11 +7,30 @@ import JSONBigInt from 'json-bigint'
  * @param data
  * @returns {AxiosPromise}
  */
-export function menuTree () {
+export function listTreeMenu (params) {
   return request({
-    url: '/admin/sys/menu/menuTree',
+    url: '/admin/sys/menu/listTreeMenu',
     method: 'get',
-    params: { platformCode: 'managementCenter' }
+    params: params,
+    transformResponse: [(data) => {
+      return JSONBigInt.parse(data)
+    }]
+  })
+}
+
+/**
+ * 权限列表
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function listTreePermission () {
+  return request({
+    url: '/admin/sys/menu/listTreePermission',
+    method: 'get',
+    transformResponse: [(data) => {
+      return JSONBigInt.parse(data)
+    }]
   })
 }
 

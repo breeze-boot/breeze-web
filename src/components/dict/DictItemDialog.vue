@@ -88,7 +88,6 @@ export default {
       this.dialogTableVisible = true
       this.$nextTick(() => {
         // 赋值
-        debugger
         Object.assign(this.rowData, val)
         this.reloadList()
       })

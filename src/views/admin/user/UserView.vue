@@ -48,6 +48,7 @@
           width="55">
         </el-table-column>
         <el-table-column
+          v-if="false"
           label="头像"
           prop="avatar"
           width="90">
@@ -56,7 +57,7 @@
           </template>
         </el-table-column>
         <el-table-column
-          label="登录名"
+          label="展示名称"
           prop="amountName"
           show-overflow-tooltip>
         </el-table-column>
@@ -116,10 +117,13 @@
         <el-table-column
           fixed="right"
           label="操作"
-          width="100">
+          width="200">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
             <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click.native.prevent="delItem(scope.$index, tableData,scope.row)">删除
+            </el-button>
+            <el-button size="mini" type="text" @click="restPass(scope.row)">重置密码</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -206,13 +210,30 @@ export default {
       this.searchForm.userCode = ''
       this.searchForm.phone = ''
     },
+    /**
+     * 批量删除
+     */
     del () {
       const ids = []
       this.multipleSelection.forEach((x) => {
         ids.push(x.id)
       })
-      del(ids)
-      this.reloadList()
+      del(ids).then((rep) => {
+        this.$message.success('删除成功')
+        this.reloadList()
+      })
+    },
+    /**
+     * 删除行
+     *
+     * @param rows
+     */
+    delItem (index, rows, row) {
+      const ids = []
+      ids.push(row.id)
+      del(ids).then(rep => {
+        rows.splice(index, 1)
+      })
     },
     exportInfo () {
     },
@@ -232,6 +253,9 @@ export default {
     show (val) {
       this.title = '查看信息'
       this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.SHOW)
+    },
+    restPass (row) {
+      // todo
     }
   }
 }

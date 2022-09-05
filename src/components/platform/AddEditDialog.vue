@@ -1,7 +1,7 @@
 <template>
   <el-dialog :title="title" :visible.sync="dialogFormVisible" width="800px"
              @close="closeDialog('ruleForm')">
-    <el-form ref="ruleForm" :disabled="!show" :model="platform" :rules="rules" size="mini">
+    <el-form v-show="!show" ref="ruleForm" :model="platform" :rules="rules" size="mini">
       <el-form-item :label-width="formLabelWidth" label="平台名称" prop="platformName">
         <el-input v-model="platform.platformName" autocomplete="off" clearable></el-input>
       </el-form-item>
@@ -12,10 +12,34 @@
         <el-input v-model="platform.description" autocomplete="off" clearable type="textarea"></el-input>
       </el-form-item>
     </el-form>
-    <div v-if="show" slot="footer" class="dialog-footer">
-      <el-button @click="resetForm('ruleForm')">取 消</el-button>
-      <el-button type="primary" @click="submitForm('ruleForm')">确 定</el-button>
+    <div v-show="!show" slot="footer" class="dialog-footer">
+      <el-button size="mini" @click="resetForm('ruleForm')">取 消</el-button>
+      <el-button size="mini" type="primary" @click="submitForm('ruleForm')">确 定</el-button>
     </div>
+
+    <el-descriptions v-show="show" :column="2" border size="mini">
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-user"></i>
+          平台名称
+        </template>
+        {{ platform.platformName }}
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-tickets"></i>
+          平台标识
+        </template>
+        <el-tag size="small">{{ platform.platformCode }}</el-tag>
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-office-building"></i>
+          描述
+        </template>
+        {{ platform.description }}
+      </el-descriptions-item>
+    </el-descriptions>
   </el-dialog>
 </template>
 
@@ -41,7 +65,7 @@ export default {
       // 默认是创建
       dialogStatus: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
-      show: true,
+      show: false,
       rules: {
         platformName: [
           {
@@ -102,15 +126,17 @@ export default {
         })
       }
       if (dialogStatus === DIALOG_TYPE.SHOW) {
-        this.show = false
+        this.show = true
       }
       this.dialogStatus = dialogStatus
     },
     closeDialog (formName) {
-      this.platform.id = undefined
-      this.$refs[formName].resetFields()
-      this.$refs[formName].clearValidate()
-      this.show = true
+      if (this.dialogStatus !== DIALOG_TYPE.SHOW) {
+        this.platform.id = undefined
+        this.$refs[formName].resetFields()
+        this.$refs[formName].clearValidate()
+      }
+      this.show = false
     }
   }
 }

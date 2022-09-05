@@ -5,7 +5,7 @@ let loadingInstance = {}
 
 // 创建的实例返回一个对象,实例对象
 const request = axios.create({
-  // 请求路径，基础接口路径 请求9999时经过/dev-api相当于请求
+  // 请求路径，基础接口路径 请求 9000 时经过/dev-api相当于请求
   // http://localhost:9000
   baseURL: process.env.VUE_APP_BASE_API,
   timeout: 100000 // 请求超时时间
@@ -43,11 +43,14 @@ request.interceptors.response.use(
     /**
      * 判断业务逻辑错误
      */
-    if (success.status && success.status === 200) {
+    if (success.status && success.status !== 200) {
       if (success.data.message) {
-        loadingInstance.close()
+        Message.error({ message: success.data.message })
+      } else {
+        Message.error({ message: '系统异常' })
       }
     }
+    loadingInstance.close()
     return success.data
   },
   (error) => {

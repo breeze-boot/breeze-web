@@ -58,10 +58,12 @@
         <el-table-column
           fixed="right"
           label="操作"
-          width="100">
+          width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
             <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click.native.prevent="delItem(scope.$index, tableData,scope.row)">删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -102,7 +104,6 @@ export default {
       })
     },
     buildParam () {
-      this.tableData = []
       return this.searchForm
     },
     search () {
@@ -112,13 +113,30 @@ export default {
       this.searchForm.deptName = ''
       this.searchForm.deptCode = ''
     },
+    /**
+     * 批量删除
+     */
     del () {
       const ids = []
       this.multipleSelection.forEach((x) => {
         ids.push(x.id)
       })
-      del(ids)
-      this.reloadList()
+      del(ids).then((rep) => {
+        this.$message.success('删除成功')
+        this.reloadList()
+      })
+    },
+    /**
+     * 删除行
+     *
+     * @param rows
+     */
+    delItem (index, rows, row) {
+      const ids = []
+      ids.push(row.id)
+      del(ids).then(rep => {
+        rows.splice(index, 1)
+      })
     },
     exportInfo () {
     },

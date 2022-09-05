@@ -85,7 +85,6 @@ export default {
 </script>
 
 <style lang="less" scoped>
-
 .el-header {
   padding: 0;
 }
@@ -115,7 +114,7 @@ export default {
   span {
     width: 5vw;
     margin-left: 15px;
-    font-size: 1.2rem;
+    font-size: 1rem;
     transition: width 0.01s;
     color: #ffffff;
     -webkit-transition: width 0.01s;
