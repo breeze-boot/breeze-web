@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="title" :visible.sync="dialogFormVisible" width="800px"
+  <el-dialog :title="title" :visible.sync="dialogVisible" width="800px"
              @close="closeDialog('ruleForm')">
     <el-form v-show="!show" ref="ruleForm" :model="user" :rules="rules" size="mini" style="padding-right: 15px;">
       <el-form-item>
@@ -161,7 +161,7 @@ export default {
   },
   data () {
     return {
-      dialogFormVisible: false,
+      dialogVisible: false,
       user: {
         id: '',
         // 头像的图片路径
@@ -215,7 +215,6 @@ export default {
           {
             required: true,
             validator: (rule, value, callback) => {
-              debugger
               if (value === '') {
                 callback(new Error('请输入密码'))
               } else {
@@ -232,7 +231,6 @@ export default {
           {
             required: true,
             validator: (rule, value, callback) => {
-              debugger
               if (value === '') {
                 callback(new Error('请再次输入密码'))
               } else if (value !== this.user.password) {
@@ -303,27 +301,27 @@ export default {
     add () {
       add(this.user).then((rep) => {
         Message.success({ message: rep.message })
-        this.dialogFormVisible = false
+        this.dialogVisible = false
         this.$emit('reloadList')
       })
     },
     edit () {
       edit(this.user).then((rep) => {
         Message.success({ message: rep.message })
-        this.dialogFormVisible = false
+        this.dialogVisible = false
         this.$emit('reloadList')
       })
     },
     resetForm (formName) {
       this.$refs[formName].resetFields()
-      this.dialogFormVisible = false
+      this.dialogVisible = false
     },
     /*
      * val: 参数值
      * flag 0 创建 1 修改 2 显示
      */
-    showDialogFormVisible (val, dialogStatus) {
-      this.dialogFormVisible = true
+    showDialogVisible (val, dialogStatus) {
+      this.dialogVisible = true
       if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
         this.$nextTick(() => {
           // 赋值
@@ -337,11 +335,9 @@ export default {
       this.dialogStatus = dialogStatus
     },
     closeDialog (formName) {
-      if (this.dialogStatus !== DIALOG_TYPE.SHOW) {
-        this.user.id = undefined
-        this.$refs[formName].clearValidate()
-        this.$refs[formName].resetFields()
-      }
+      this.user.id = undefined
+      this.$refs[formName].clearValidate()
+      this.$refs[formName].resetFields()
       this.show = false
       this.isEdit = false
     }

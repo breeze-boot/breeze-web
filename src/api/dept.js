@@ -1,6 +1,8 @@
 import request from '@/utils/axios'
 import JSONBigInt from 'json-bigint'
 
+const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
+
 /**
  * 列表
  *
@@ -13,7 +15,7 @@ export function list (data) {
     method: 'post',
     data: data,
     transformResponse: [(data) => {
-      return JSONBigInt.parse(data)
+      return JSONBigInt2Str.parse(data)
     }]
   })
 }
@@ -36,11 +38,11 @@ export function add (data) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function del (data) {
+export function del (id) {
   return request({
     url: '/admin/sys/dept/delete',
     method: 'delete',
-    data: data
+    params: { id: id }
   })
 }
 

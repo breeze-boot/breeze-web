@@ -11,6 +11,22 @@ const request = axios.create({
   timeout: 100000 // 请求超时时间
 })
 
+export const showErrorMsg = (success, msg) => {
+  if (success.data.message) {
+    Message.error({ message: success.data.message })
+  } else {
+    Message.error({ message: msg })
+  }
+}
+
+export const showWaringMsg = (success, msg) => {
+  if (success.data.message) {
+    Message.warning({ message: success.data.message })
+  } else {
+    Message.warning({ message: msg })
+  }
+}
+
 /**
  * 请求拦截器
  */
@@ -43,15 +59,20 @@ request.interceptors.response.use(
     /**
      * 判断业务逻辑错误
      */
-    if (success.status && success.status !== 200) {
-      if (success.data.message) {
-        Message.error({ message: success.data.message })
-      } else {
-        Message.error({ message: '系统异常' })
+    if (success.status && success.status === 200) {
+      if (success.data.code === 2 && success.data.message) {
+        // 警告
+        showWaringMsg(success, '请求不合法')
       }
+      if (success.data.code === 0 && success.data.message) {
+        // 错误
+        showErrorMsg(success, '系统异常')
+      } else if (success.status && success.status !== 200) {
+        showErrorMsg(success, '系统异常')
+      }
+      loadingInstance.close()
+      return success.data
     }
-    loadingInstance.close()
-    return success.data
   },
   (error) => {
     console.error(error.response.status)

@@ -1,6 +1,6 @@
 <template>
   <el-container>
-    <el-dialog :title="title" :visible.sync="dialogTableVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="dialogTableVisible" width="900px"
                @close="closeDialog('ruleForm')">
       <div style="margin-bottom: 10px; text-align: left;">
         <el-button plain size="mini" type="primary" @click="add">新建</el-button>
@@ -15,7 +15,7 @@
         <el-table-column fixed="right" label="操作" width="100">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
-            <el-button size="mini" type="text" @click.native.prevent="deleteRow(scope.$index, tableData,scope.row)">删除
+            <el-button size="mini" type="text" @click.native.prevent="delItem(scope.$index, gridData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
@@ -30,7 +30,7 @@
 
 <script>
 import DictItemAddEditDialog from '@/components/dict/DictItemAddEditDialog'
-import { DIALOG_TYPE } from '@/utils/constant'
+import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { del, list } from '@/api/dictItem'
 
 export default {
@@ -50,7 +50,7 @@ export default {
   methods: {
     reloadList () {
       list(this.rowData).then((rep) => {
-        if (rep) {
+        if (rep.code === 1) {
           this.gridData = rep.data
           this.total = rep.data.total
         }
@@ -61,25 +61,37 @@ export default {
     },
     add () {
       this.title = '创建字典项'
-      this.$refs.addEditDialog.showDialogFormVisible(this.rowData, DIALOG_TYPE.ADD)
+      this.$refs.addEditDialog.showDialogVisible(this.rowData, DIALOG_TYPE.ADD)
     },
     edit (val) {
       this.title = '修改字典项'
-      this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.EDIT)
+      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.EDIT)
     },
     del () {
-      const ids = []
-      this.multipleSelection.forEach((x) => {
-        ids.push(x.id)
+      confirmAlert(() => {
+        const ids = []
+        this.multipleSelection.forEach((x) => {
+          ids.push(x.id)
+        })
+        del(ids).then(rep => {
+          if (rep.code === 1) {
+            this.reloadList()
+            this.$message.success('删除成功')
+          }
+        })
       })
-      del(ids)
-      this.reloadList()
     },
-    deleteRow (index, rows, row) {
-      const ids = []
-      ids.push(row.id)
-      del(ids)
-      rows.splice(index, 1)
+    delItem (index, rows, row) {
+      confirmAlert(() => {
+        const ids = []
+        ids.push(row.id)
+        del(ids).then(rep => {
+          if (rep.code === 1) {
+            rows.splice(index, 1)
+            this.$message.success('删除成功')
+          }
+        })
+      })
     },
     close () {
       this.dialogTableVisible = false

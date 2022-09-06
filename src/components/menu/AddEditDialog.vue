@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="title" :visible.sync="dialogFormVisible" width="800px"
+  <el-dialog :title="title" :visible.sync="dialogVisible" width="800px"
              @close="closeDialog('ruleForm')">
     <el-form v-show="!show" ref="ruleForm" :model="menu" :rules="rules" size="mini">
       <el-form-item :label-width="formLabelWidth" label="平台" prop="platformId" style="text-align: left;">
@@ -154,7 +154,7 @@ export default {
   },
   data () {
     return {
-      dialogFormVisible: false,
+      dialogVisible: false,
       menu: {
         id: null,
         name: '',
@@ -278,28 +278,27 @@ export default {
     add () {
       add(this.menu).then((rep) => {
         Message.success({ message: rep.message })
-        this.dialogFormVisible = false
+        this.dialogVisible = false
         this.$emit('reloadList')
       })
     },
     edit () {
       edit(this.menu).then((rep) => {
         Message.success({ message: rep.message })
-        this.dialogFormVisible = false
+        this.dialogVisible = false
         this.$emit('reloadList')
       })
     },
     resetForm (formName) {
       this.$refs[formName].resetFields()
-      this.dialogFormVisible = false
+      this.dialogVisible = false
     },
     /*
      * val: 参数值
      * flag 0 创建 1 修改 2 显示
      */
-    showDialogFormVisible (val, dialogStatus) {
-      debugger
-      this.dialogFormVisible = true
+    showDialogVisible (val, dialogStatus) {
+      this.dialogVisible = true
       if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
         this.$nextTick(() => {
           // 赋值
@@ -312,11 +311,9 @@ export default {
       this.dialogStatus = dialogStatus
     },
     closeDialog (formName) {
-      if (this.dialogStatus !== DIALOG_TYPE.SHOW) {
-        this.menu.id = undefined
-        this.$refs[formName].clearValidate()
-        this.$refs[formName].resetFields()
-      }
+      this.menu.id = undefined
+      this.$refs[formName].clearValidate()
+      this.$refs[formName].resetFields()
       this.show = false
     }
   }

@@ -143,18 +143,25 @@
       ref="addEditDialog"
       :title="title"
       @reloadList="reloadList"/>
+    <reset-pass-dialog
+      ref="resetPassDialog"
+      :title="title"/>
   </el-container>
 </template>
 
 <script>
 import AddEditDialog from '@/components/user/AddEditDialog'
+import ResetPassDialog from '@/components/user/ResetPassDialog'
 import { del, list, open } from '@/api/user'
-import { DIALOG_TYPE } from '@/utils/constant'
+import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
 
 export default {
   name: 'UserView',
-  components: { AddEditDialog },
+  components: {
+    AddEditDialog,
+    ResetPassDialog
+  },
   data: () => ({
     title: '',
     multipleSelection: [],
@@ -174,7 +181,7 @@ export default {
   methods: {
     reloadList () {
       list(this.buildParam()).then((rep) => {
-        if (rep) {
+        if (rep.code === 1) {
           this.tableData = rep.data.records
           this.searchForm.size = rep.data.size
           this.searchForm.current = rep.data.current
@@ -214,13 +221,17 @@ export default {
      * 批量删除
      */
     del () {
-      const ids = []
-      this.multipleSelection.forEach((x) => {
-        ids.push(x.id)
-      })
-      del(ids).then((rep) => {
-        this.$message.success('删除成功')
-        this.reloadList()
+      confirmAlert(() => {
+        const ids = []
+        this.multipleSelection.forEach((x) => {
+          ids.push(x.id)
+        })
+        del(ids).then((rep) => {
+          if (rep.code === 1) {
+            this.reloadList()
+            this.$message.success('删除成功')
+          }
+        })
       })
     },
     /**
@@ -229,10 +240,15 @@ export default {
      * @param rows
      */
     delItem (index, rows, row) {
-      const ids = []
-      ids.push(row.id)
-      del(ids).then(rep => {
-        rows.splice(index, 1)
+      confirmAlert(() => {
+        const ids = []
+        ids.push(row.id)
+        del(ids).then(rep => {
+          if (rep.code === 1) {
+            rows.splice(index, 1)
+            this.$message.success('删除成功')
+          }
+        })
       })
     },
     exportInfo () {
@@ -241,21 +257,21 @@ export default {
     },
     add () {
       this.title = '创建用户'
-      this.$refs.addEditDialog.showDialogFormVisible({}, DIALOG_TYPE.ADD)
+      this.$refs.addEditDialog.showDialogVisible({}, DIALOG_TYPE.ADD)
     },
     edit (val) {
       this.title = '修改用户'
-      this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.EDIT)
+      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.EDIT)
     },
     handleSelectionChange (val) {
       this.multipleSelection = val
     },
     show (val) {
       this.title = '查看信息'
-      this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.SHOW)
+      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.SHOW)
     },
     restPass (row) {
-      // todo
+      this.$refs.resetPassDialog.showDialogVisible(row)
     }
   }
 }

@@ -1,6 +1,8 @@
 import request from '@/utils/axios'
 import JSONBigInt from 'json-bigint'
 
+const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
+
 /**
  * 初始化菜单
  *
@@ -13,7 +15,7 @@ export function listTreeMenu (params) {
     method: 'get',
     params: params,
     transformResponse: [(data) => {
-      return JSONBigInt.parse(data)
+      return JSONBigInt2Str.parse(data)
     }]
   })
 }
@@ -68,11 +70,11 @@ export function add (data) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function del (data) {
+export function del (id) {
   return request({
     url: '/admin/sys/menu/delete',
     method: 'delete',
-    data: data
+    params: { id: id }
   })
 }
 

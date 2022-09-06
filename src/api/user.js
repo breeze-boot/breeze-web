@@ -57,6 +57,19 @@ export function edit (data) {
 }
 
 /**
+ * 修改
+ *
+ * @returns {AxiosPromise}
+ */
+export function resetPass (data) {
+  return request({
+    url: '/admin/sys/user/resetPass',
+    method: 'put',
+    data: data
+  })
+}
+
+/**
  * 开关
  * @returns {AxiosPromise}
  */

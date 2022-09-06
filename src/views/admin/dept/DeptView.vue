@@ -19,7 +19,6 @@
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
         <el-button plain size="mini" type="primary" @click="add">新建</el-button>
-        <el-button plain size="mini" type="danger" @click="del">删除</el-button>
         <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
         <el-button plain size="mini" @click="importInfo">导入</el-button>
       </div>
@@ -34,13 +33,9 @@
         style="width: 100%"
         @selection-change="handleSelectionChange">
         <el-table-column
-          type="selection"
-          width="55">
-        </el-table-column>
-        <el-table-column
-          v-if="false"
           label="ID"
           prop="id"
+          v-if="false"
           width="200">
         </el-table-column>
         <el-table-column
@@ -62,7 +57,7 @@
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
             <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
-            <el-button size="mini" type="text" @click.native.prevent="delItem(scope.$index, tableData,scope.row)">删除
+            <el-button size="mini" type="text" @click.native.prevent="delItem(scope.$index, tableData, scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
@@ -78,13 +73,14 @@
 <script>
 import AddEditDialog from '@/components/dept/AddEditDialog'
 import { del, list } from '@/api/dept'
-import { DIALOG_TYPE } from '@/utils/constant'
+import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 
 export default {
   name: 'DeptView',
   components: { AddEditDialog },
   data: () => ({
     title: '',
+    rowIndex: 0,
     multipleSelection: [],
     tableData: [],
     searchForm: {
@@ -98,7 +94,7 @@ export default {
   methods: {
     reloadList () {
       list(this.buildParam()).then((rep) => {
-        if (rep) {
+        if (rep.code === 1) {
           this.tableData = rep.data
         }
       })
@@ -114,29 +110,33 @@ export default {
       this.searchForm.deptCode = ''
     },
     /**
-     * 批量删除
-     */
-    del () {
-      const ids = []
-      this.multipleSelection.forEach((x) => {
-        ids.push(x.id)
-      })
-      del(ids).then((rep) => {
-        this.$message.success('删除成功')
-        this.reloadList()
-      })
-    },
-    /**
      * 删除行
      *
      * @param rows
      */
     delItem (index, rows, row) {
-      const ids = []
-      ids.push(row.id)
-      del(ids).then(rep => {
-        rows.splice(index, 1)
+      confirmAlert(() => {
+        del(row.id.toString()).then(rep => {
+          if (rep.code === 1) {
+            this.deleteTreeTableData(rows, index)
+            this.$message.success('删除成功')
+          }
+        })
       })
+    },
+    deleteTreeTableData (rows, index) {
+      debugger
+      for (let i = 0; i < rows.length; i++) {
+        if (this.rowIndex === index) {
+          rows.splice(i, 1)
+          return
+        }
+        this.rowIndex++
+        const tempTable = rows[i]
+        if (tempTable.children && tempTable.children.length > 0) {
+          this.deleteTreeTableData(tempTable.children, index)
+        }
+      }
     },
     exportInfo () {
     },
@@ -144,18 +144,18 @@ export default {
     },
     add () {
       this.title = '创建部门'
-      this.$refs.addEditDialog.showDialogFormVisible({}, DIALOG_TYPE.ADD)
+      this.$refs.addEditDialog.showDialogVisible({}, DIALOG_TYPE.ADD)
     },
     edit (val) {
       this.title = '修改部门信息'
-      this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.EDIT)
+      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.EDIT)
     },
     handleSelectionChange (val) {
       this.multipleSelection = val
     },
     show (val) {
       this.title = '查看部门信息'
-      this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.SHOW)
+      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.SHOW)
     }
   }
 }

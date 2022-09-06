@@ -103,7 +103,7 @@
 import AddEditDialog from '@/components/dict/AddEditDialog'
 import DictItemDialog from '@/components/dict/DictItemDialog'
 import { del, list, open } from '@/api/dict'
-import { DIALOG_TYPE } from '@/utils/constant'
+import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
 
 export default {
@@ -130,7 +130,7 @@ export default {
   methods: {
     reloadList () {
       list(this.buildParam()).then((rep) => {
-        if (rep) {
+        if (rep.code === 1) {
           this.tableData = rep.data.records
           this.searchForm.size = rep.data.size
           this.searchForm.current = rep.data.current
@@ -168,13 +168,17 @@ export default {
      * 批量删除
      */
     del () {
-      const ids = []
-      this.multipleSelection.forEach((x) => {
-        ids.push(x.id)
-      })
-      del(ids).then((rep) => {
-        this.$message.success('删除成功')
-        this.reloadList()
+      confirmAlert(() => {
+        const ids = []
+        this.multipleSelection.forEach((x) => {
+          ids.push(x.id)
+        })
+        del(ids).then((rep) => {
+          if (rep.code === 1) {
+            this.reloadList()
+            this.$message.success('删除成功')
+          }
+        })
       })
     },
     /**
@@ -183,10 +187,15 @@ export default {
      * @param rows
      */
     delItem (index, rows, row) {
-      const ids = []
-      ids.push(row.id)
-      del(ids).then(rep => {
-        rows.splice(index, 1)
+      confirmAlert(() => {
+        const ids = []
+        ids.push(row.id)
+        del(ids).then(rep => {
+          if (rep.code === 1) {
+            rows.splice(index, 1)
+            this.$message.success('删除成功')
+          }
+        })
       })
     },
     exportInfo () {
@@ -195,18 +204,18 @@ export default {
     },
     add () {
       this.title = '创建平台'
-      this.$refs.addEditDialog.showDialogFormVisible({}, DIALOG_TYPE.ADD)
+      this.$refs.addEditDialog.showDialogVisible({}, DIALOG_TYPE.ADD)
     },
     edit (val) {
       this.title = '修改平台'
-      this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.EDIT)
+      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.EDIT)
     },
     handleSelectionChange (val) {
       this.multipleSelection = val
     },
     show (val) {
       this.title = '查看信息'
-      this.$refs.addEditDialog.showDialogFormVisible(val, DIALOG_TYPE.SHOW)
+      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.SHOW)
     },
     showDictDetail (val) {
       this.title = '查看字典详情信息'

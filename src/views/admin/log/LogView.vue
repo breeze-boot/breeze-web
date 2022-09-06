@@ -40,15 +40,16 @@
             <el-form-item label="操作人员" prop="createBy">
               <el-input v-model="searchForm.createBy" clearable placeholder="操作人员"/>
             </el-form-item>
-
-            <el-date-picker
-              v-model="value1"
-              end-placeholder="结束日期"
-              range-separator="至"
-              start-placeholder="开始日期"
-              type="daterange">
-            </el-date-picker>
-
+            <el-form-item label="日志时间" prop="searchDate">
+              <el-date-picker
+                size="mini"
+                v-model="searchForm.logType"
+                end-placeholder="结束日期"
+                range-separator="至"
+                start-placeholder="开始日期"
+                type="daterange">
+              </el-date-picker>
+            </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search()">查询</el-button>
               <el-button type="info" @click="reset()">重置</el-button>
@@ -106,6 +107,18 @@
           prop="result">
         </el-table-column>
         <el-table-column
+          label="浏览器"
+          prop="browser">
+        </el-table-column>
+        <el-table-column
+          label="IP"
+          prop="ip">
+        </el-table-column>
+        <el-table-column
+          label="系统"
+          prop="system">
+        </el-table-column>
+        <el-table-column
           label="操作人"
           prop="createBy">
         </el-table-column>
@@ -132,44 +145,32 @@
         </el-pagination>
       </div>
     </el-main>
+    <show-dialog ref="showDialog"/>
   </el-container>
 </template>
 
 <script>
 import { del, list } from '@/api/log'
-import { Message } from 'element-ui'
+import ShowDialog from '@/components/log/ShowDialog'
+import { confirmAlert } from '@/utils/constant'
 
 export default {
   name: 'LogView',
+  components: { ShowDialog },
   data: () => ({
-    value1: [],
     title: '',
     multipleSelection: [],
     tableData: [],
+    resultOption: [],
     doTypeOption: [{
       value: '1',
       label: '黄金糕'
-    }, {
-      value: '2',
-      label: '双皮奶'
-    }],
-    logTypeOption: [{
-      value: '11',
-      label: '黄金糕'
-    }, {
-      value: '22',
-      label: '双皮奶'
-    }],
-    resultOption: [{
-      value: '12',
-      label: '黄金糕'
-    }, {
-      value: '23',
-      label: '双皮奶'
     }],
     searchForm: {
       systemModule: '',
       doType: '',
+      startDate: '',
+      searchDate: '',
       result: '',
       createBy: '',
       logType: '',
@@ -184,7 +185,7 @@ export default {
   methods: {
     reloadList () {
       list(this.buildParam()).then((rep) => {
-        if (rep) {
+        if (rep.code === 1) {
           this.tableData = rep.data.records
           this.searchForm.size = rep.data.size
           this.searchForm.current = rep.data.current
@@ -211,18 +212,27 @@ export default {
       this.searchForm.result = ''
       this.searchForm.doType = ''
       this.searchForm.createBy = ''
+      this.searchForm.searchDate = ''
+      this.searchForm.startDate = ''
+      this.searchForm.endDate = ''
+    },
+    exportInfo () {
     },
     /**
      * 批量删除
      */
     del () {
-      const ids = []
-      this.multipleSelection.forEach((x) => {
-        ids.push(x.id)
-      })
-      del(ids).then((rep) => {
-        this.$message.success('删除成功')
-        this.reloadList()
+      confirmAlert(() => {
+        const ids = []
+        this.multipleSelection.forEach((x) => {
+          ids.push(x.id)
+        })
+        del(ids).then((rep) => {
+          if (rep.code === 1) {
+            this.reloadList()
+            this.$message.success('删除成功')
+          }
+        })
       })
     },
     /**
@@ -231,19 +241,23 @@ export default {
      * @param rows
      */
     delItem (index, rows, row) {
-      const ids = []
-      ids.push(row.id)
-      del(ids).then(rep => {
-        rows.splice(index, 1)
+      confirmAlert(() => {
+        const ids = []
+        ids.push(row.id)
+        del(ids).then(rep => {
+          if (rep.code === 1) {
+            rows.splice(index, 1)
+            this.$message.success('删除成功')
+          }
+        })
       })
-    },
-    exportInfo () {
     },
     handleSelectionChange (val) {
       this.multipleSelection = val
     },
     show (val) {
-      Message.success({ message: JSON.stringify(val) })
+      this.title = '查看详情信息'
+      this.$refs.showDialog.showDialogVisible(val)
     }
   }
 }
