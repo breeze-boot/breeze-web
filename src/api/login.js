@@ -1,4 +1,4 @@
-import request from '@/utils/axios'
+import { servicePath, request } from '@/utils/axios'
 
 export function jwtToken (data) {
   const dataObj = {
@@ -7,7 +7,7 @@ export function jwtToken (data) {
   }
 
   return request({
-    url: '/admin/token',
+    url: servicePath.admin + '/token',
     method: 'post',
     data: dataObj
   })

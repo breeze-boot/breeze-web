@@ -1,4 +1,4 @@
-import request from '@/utils/axios'
+import { servicePath, request } from '@/utils/axios'
 import JSONBigInt from 'json-bigint'
 
 /**
@@ -8,7 +8,7 @@ import JSONBigInt from 'json-bigint'
  */
 export function list (data) {
   return request({
-    url: '/admin/sys/role/list',
+    url: servicePath.admin + '/sys/role/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -25,7 +25,7 @@ export function list (data) {
  */
 export function listRolesPermission (roleId) {
   return request({
-    url: '/admin/sys/role/listRolesPermission',
+    url: servicePath.admin + '/sys/role/listRolesPermission',
     method: 'get',
     params: { roleId: roleId }
   })
@@ -39,7 +39,7 @@ export function listRolesPermission (roleId) {
  */
 export function editPermission (data) {
   return request({
-    url: '/admin/sys/role/editPermission',
+    url: servicePath.admin + '/sys/role/editPermission',
     method: 'put',
     data: data
   })
@@ -51,7 +51,7 @@ export function editPermission (data) {
  */
 export function add (data) {
   return request({
-    url: '/admin/sys/role/save',
+    url: servicePath.admin + '/sys/role/save',
     method: 'post',
     data: data
   })
@@ -65,7 +65,7 @@ export function add (data) {
  */
 export function del (data) {
   return request({
-    url: '/admin/sys/role/delete',
+    url: servicePath.admin + '/sys/role/delete',
     method: 'delete',
     data: data
   })
@@ -79,7 +79,7 @@ export function del (data) {
  */
 export function edit (data) {
   return request({
-    url: '/admin/sys/role/update',
+    url: servicePath.admin + '/sys/role/update',
     method: 'put',
     data: data
   })

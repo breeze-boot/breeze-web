@@ -1,4 +1,4 @@
-import request from '@/utils/axios'
+import { servicePath, request } from '@/utils/axios'
 import JSONBigInt from 'json-bigint'
 
 /**
@@ -8,7 +8,7 @@ import JSONBigInt from 'json-bigint'
  */
 export function list (data) {
   return request({
-    url: '/admin/sys/user/list',
+    url: servicePath.admin + '/sys/user/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -24,7 +24,7 @@ export function list (data) {
  */
 export function del (data) {
   return request({
-    url: '/admin/sys/user/delete',
+    url: servicePath.admin + '/sys/user/delete',
     method: 'delete',
     data: data
   })
@@ -37,7 +37,7 @@ export function del (data) {
  */
 export function add (data) {
   return request({
-    url: '/admin/sys/user/save',
+    url: servicePath.admin + '/sys/user/save',
     method: 'post',
     data: data
   })
@@ -50,7 +50,7 @@ export function add (data) {
  */
 export function edit (data) {
   return request({
-    url: '/admin/sys/user/update',
+    url: servicePath.admin + '/sys/user/update',
     method: 'put',
     data: data
   })
@@ -63,7 +63,7 @@ export function edit (data) {
  */
 export function resetPass (data) {
   return request({
-    url: '/admin/sys/user/resetPass',
+    url: servicePath.admin + '/sys/user/resetPass',
     method: 'put',
     data: data
   })
@@ -75,7 +75,7 @@ export function resetPass (data) {
  */
 export function open (data) {
   return request({
-    url: '/admin/sys/user/open',
+    url: servicePath.admin + '/sys/user/open',
     method: 'put',
     data: data
   })

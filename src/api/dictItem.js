@@ -1,4 +1,4 @@
-import request from '@/utils/axios'
+import { servicePath, request } from '@/utils/axios'
 import JSONBigInt from 'json-bigint'
 
 /**
@@ -8,7 +8,7 @@ import JSONBigInt from 'json-bigint'
  */
 export function list (data) {
   return request({
-    url: '/admin/sys/dictItem/list',
+    url: servicePath.admin + '/sys/dictItem/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -25,7 +25,7 @@ export function list (data) {
  */
 export function add (data) {
   return request({
-    url: '/admin/sys/dictItem/save',
+    url: servicePath.admin + '/sys/dictItem/save',
     method: 'post',
     data: data
   })
@@ -39,7 +39,7 @@ export function add (data) {
  */
 export function del (data) {
   return request({
-    url: '/admin/sys/dictItem/delete',
+    url: servicePath.admin + '/sys/dictItem/delete',
     method: 'delete',
     data: data
   })
@@ -53,7 +53,7 @@ export function del (data) {
  */
 export function edit (data) {
   return request({
-    url: '/admin/sys/dictItem/update',
+    url: servicePath.admin + '/sys/dictItem/update',
     method: 'put',
     data: data
   })

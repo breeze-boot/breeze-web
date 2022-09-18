@@ -42,10 +42,10 @@
             </el-form-item>
             <el-form-item label="日志时间" prop="searchDate">
               <el-date-picker
-                size="mini"
                 v-model="searchForm.logType"
                 end-placeholder="结束日期"
                 range-separator="至"
+                size="mini"
                 start-placeholder="开始日期"
                 type="daterange">
               </el-date-picker>

@@ -1,4 +1,4 @@
-import request from '@/utils/axios'
+import { servicePath, request } from '@/utils/axios'
 import JSONBigInt from 'json-bigint'
 
 const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
@@ -11,7 +11,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function list (data) {
   return request({
-    url: '/admin/sys/dept/list',
+    url: servicePath.admin + '/sys/dept/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -26,7 +26,7 @@ export function list (data) {
  */
 export function add (data) {
   return request({
-    url: '/admin/sys/dept/save',
+    url: servicePath.admin + '/sys/dept/save',
     method: 'post',
     data: data
   })
@@ -40,7 +40,7 @@ export function add (data) {
  */
 export function del (id) {
   return request({
-    url: '/admin/sys/dept/delete',
+    url: servicePath.admin + '/sys/dept/delete',
     method: 'delete',
     params: { id: id }
   })
@@ -54,7 +54,7 @@ export function del (id) {
  */
 export function edit (data) {
   return request({
-    url: '/admin/sys/dept/update',
+    url: servicePath.admin + '/sys/dept/update',
     method: 'put',
     data: data
   })

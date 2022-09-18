@@ -1,7 +1,7 @@
 <template>
   <el-dialog :title="title" :visible.sync="dialogVisible" width="800px"
              @close="closeDialog('ruleForm')">
-    <el-form ref="ruleForm" v-show="!show" :model="dict" :rules="rules" size="mini">
+    <el-form v-show="!show" ref="ruleForm" :model="dict" :rules="rules" size="mini">
       <el-form-item :label-width="formLabelWidth" label="字典名称" prop="dictName">
         <el-input v-model="dict.dictName" autocomplete="off" clearable></el-input>
       </el-form-item>

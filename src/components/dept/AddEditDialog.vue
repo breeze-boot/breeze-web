@@ -1,7 +1,7 @@
 <template>
   <el-dialog :title="title" :visible.sync="dialogVisible" width="800px"
              @close="closeDialog('ruleForm')">
-    <el-form ref="ruleForm" v-show="!show" :model="dept" :rules="rules" size="mini">
+    <el-form v-show="!show" ref="ruleForm" :model="dept" :rules="rules" size="mini">
       <el-form-item :label-width="formLabelWidth" label="部门名称" prop="deptName">
         <el-input v-model="dept.deptName" autocomplete="off" clearable></el-input>
       </el-form-item>

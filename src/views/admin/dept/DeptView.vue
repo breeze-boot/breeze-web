@@ -33,9 +33,9 @@
         style="width: 100%"
         @selection-change="handleSelectionChange">
         <el-table-column
+          v-if="false"
           label="ID"
           prop="id"
-          v-if="false"
           width="200">
         </el-table-column>
         <el-table-column

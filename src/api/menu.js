@@ -1,4 +1,4 @@
-import request from '@/utils/axios'
+import { servicePath, request } from '@/utils/axios'
 import JSONBigInt from 'json-bigint'
 
 const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
@@ -11,7 +11,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function listTreeMenu (params) {
   return request({
-    url: '/admin/sys/menu/listTreeMenu',
+    url: servicePath.admin + '/sys/menu/listTreeMenu',
     method: 'get',
     params: params,
     transformResponse: [(data) => {
@@ -28,7 +28,7 @@ export function listTreeMenu (params) {
  */
 export function listTreePermission () {
   return request({
-    url: '/admin/sys/menu/listTreePermission',
+    url: servicePath.admin + '/sys/menu/listTreePermission',
     method: 'get',
     transformResponse: [(data) => {
       return JSONBigInt.parse(data)
@@ -43,7 +43,7 @@ export function listTreePermission () {
  */
 export function list (data) {
   return request({
-    url: '/admin/sys/menu/list',
+    url: servicePath.admin + '/sys/menu/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -58,7 +58,7 @@ export function list (data) {
  */
 export function add (data) {
   return request({
-    url: '/admin/sys/menu/save',
+    url: servicePath.admin + '/sys/menu/save',
     method: 'post',
     data: data
   })
@@ -72,7 +72,7 @@ export function add (data) {
  */
 export function del (id) {
   return request({
-    url: '/admin/sys/menu/delete',
+    url: servicePath.admin + '/sys/menu/delete',
     method: 'delete',
     params: { id: id }
   })
@@ -86,7 +86,7 @@ export function del (id) {
  */
 export function edit (data) {
   return request({
-    url: '/admin/sys/menu/update',
+    url: servicePath.admin + '/sys/menu/update',
     method: 'put',
     data: data
   })
