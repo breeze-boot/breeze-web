@@ -144,7 +144,7 @@
 
 <script>
 import { DIALOG_TYPE } from '@/utils/constant'
-import { add, edit } from '@/api/menu'
+import { add, edit } from '@/api/admin/menu'
 import { Message } from 'element-ui'
 
 export default {

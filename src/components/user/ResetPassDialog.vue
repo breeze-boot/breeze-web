@@ -17,7 +17,7 @@
 </template>
 
 <script>
-import { resetPass } from '@/api/user'
+import { resetPass } from '@/api/admin/user'
 
 export default {
   name: 'ResetPassDialog',
