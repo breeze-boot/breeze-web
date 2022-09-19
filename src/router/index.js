@@ -75,7 +75,6 @@ router.beforeEach(async (to, from, next) => {
   } else {
     const accessToken = localStorage.getItem('access_token')
     if (accessToken) {
-      debugger
       if (!store.state.menu.isLoadMenu) {
         loadRoute()
         store.commit('menu/isLoadMenu', true)

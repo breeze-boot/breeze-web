@@ -5,8 +5,13 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+
 export default {
   name: 'App',
+  methods: {
+    ...mapMutations('menu', ['addTab'])
+  },
   watch: {
     /**
      * 监听
@@ -14,13 +19,16 @@ export default {
      * @param from
      */
     $route (to, from) {
-      debugger
       const accessToken = localStorage.getItem('access_token')
       if (to.name !== 'login' && to.name !== 'home' && accessToken) {
-        this.$store.commit('menu/addTab', {
+        this.addTab({
           name: to.name,
           title: to.meta.title
         })
+        // this.$store.commit('menu/addTab', {
+        //   name: to.name,
+        //   title: to.meta.title
+        // })
       }
     }
   }

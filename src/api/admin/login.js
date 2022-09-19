@@ -1,4 +1,4 @@
-import { servicePath, request } from '@/utils/axios'
+import { request, servicePath } from '@/utils/axios'
 
 export function jwtToken (data) {
   const dataObj = {

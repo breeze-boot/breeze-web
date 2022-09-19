@@ -38,8 +38,7 @@
         <el-menu-item
           v-for="subItem in item.children"
           :key="subItem.id"
-          :index="subItem.name"
-        >
+          :index="subItem.name">
           <i :class="subItem.icon"></i>
           <span slot="title">{{ subItem.title }}</span>
         </el-menu-item>
@@ -49,39 +48,41 @@
 </template>
 
 <script>
+
+import { mapState } from 'vuex'
+
 export default {
   name: 'Menu',
   data () {
     return {}
   },
   computed: {
-    isCollapse: {
-      get () {
-        return this.$store.state.menu.isCollapse
-      },
-      set (isCollapse) {
-        this.$store.state.menu.isCollapse = isCollapse
-      }
-    },
-    menus: {
-      get () {
-        debugger
-        return this.$store.state.menu.menus
-      },
-      set (menus) {
-        debugger
-        this.$store.state.menu.menus = menus
-      }
-    }
+    // 使用mapState
+    ...mapState('menu', ['isCollapse', 'menus'])
+
+    // isCollapse: {
+    // get () {
+    //   return this.$store.state.menu.isCollapse
+    // },
+    // set (isCollapse) {
+    //   this.$store.state.menu.isCollapse = isCollapse
+    // }
+    // },
+    // menus: {
+    //   get () {
+    //     debugger
+    //     return this.$store.state.menu.menus
+    //   },
+    //   set (menus) {
+    //     debugger
+    //     this.$store.state.menu.menus = menus
+    //   }
+    // }
   },
   methods: {
     handleOpen (key, keyPath) {
     },
     handleClose (key, keyPath) {
-      // },
-      // clickMenu (menu) {
-      //   debugger
-      //   this.$store.commit('menu/addTab', menu)
     }
   }
 }

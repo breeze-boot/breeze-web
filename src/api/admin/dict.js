@@ -1,4 +1,4 @@
-import { servicePath, request } from '@/utils/axios'
+import { request, servicePath } from '@/utils/axios'
 import JSONBigInt from 'json-bigint'
 
 /**

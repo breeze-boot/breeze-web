@@ -21,6 +21,8 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex'
+
 export default {
   name: 'Header',
   data () {
@@ -40,9 +42,11 @@ export default {
         this.$router.push('/')
       }
     },
+    ...mapMutations('menu', ['setCollapse']),
     collapse () {
       this.isCollapse = !this.isCollapse
-      this.$store.commit('setCollapse', this.isCollapse)
+      this.setCollapse(this.isCollapse)
+      // this.$store.commit('setCollapse', this.isCollapse)
     }
   }
 }
