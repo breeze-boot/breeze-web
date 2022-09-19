@@ -39,7 +39,7 @@
           v-for="subItem in item.children"
           :key="subItem.id"
           :index="subItem.name"
-          @click="clickMenu(subItem)">
+        >
           <i :class="subItem.icon"></i>
           <span slot="title">{{ subItem.title }}</span>
         </el-menu-item>
@@ -57,18 +57,20 @@ export default {
   computed: {
     isCollapse: {
       get () {
-        return this.$store.state.isCollapse
+        return this.$store.state.menu.isCollapse
       },
       set (isCollapse) {
-        this.$store.state.isCollapse = isCollapse
+        this.$store.state.menu.isCollapse = isCollapse
       }
     },
     menus: {
       get () {
-        return this.$store.state.menus
+        debugger
+        return this.$store.state.menu.menus
       },
       set (menus) {
-        this.$store.state.menus = menus
+        debugger
+        this.$store.state.menu.menus = menus
       }
     }
   },
@@ -76,9 +78,10 @@ export default {
     handleOpen (key, keyPath) {
     },
     handleClose (key, keyPath) {
-    },
-    clickMenu (menu) {
-      this.$store.commit('addTab', menu)
+      // },
+      // clickMenu (menu) {
+      //   debugger
+      //   this.$store.commit('menu/addTab', menu)
     }
   }
 }

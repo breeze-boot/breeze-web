@@ -14,9 +14,10 @@ export default {
      * @param from
      */
     $route (to, from) {
+      debugger
       const accessToken = localStorage.getItem('access_token')
       if (to.name !== 'login' && to.name !== 'home' && accessToken) {
-        this.$store.commit('addTab', {
+        this.$store.commit('menu/addTab', {
           name: to.name,
           title: to.meta.title
         })

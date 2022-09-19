@@ -7,7 +7,6 @@ import { request } from '@/utils/axios'
  * 获取验证图片  以及token
  */
 export function reqGet (data) {
-  debugger
   return request({
     url: '/captcha/getCode',
     method: 'post',

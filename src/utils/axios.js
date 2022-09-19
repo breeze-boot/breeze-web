@@ -35,15 +35,13 @@ export const showWaringMsg = (success, msg) => {
  * @type {string}
  */
 export const servicePath = {
-  admin: '/admin'
+  admin: ''
 }
 
 /**
  * 请求拦截器
  */
 request.interceptors.request.use((config) => {
-  debugger
-
   /**
    * 如果存在token，请求携带token
    */

@@ -24,24 +24,25 @@ export default {
   computed: {
     editableTabsValue: {
       get () {
-        return this.$store.state.editableTabsValue
+        return this.$store.state.menu.editableTabsValue
       },
       set (editableTabsValue) {
         this.$router.push(editableTabsValue)
-        this.$store.state.editableTabsValue = editableTabsValue
+        this.$store.state.menu.editableTabsValue = editableTabsValue
       }
     },
     editableTabs: {
       get () {
-        return this.$store.state.editableTabs
+        return this.$store.state.menu.editableTabs
       },
       set (editableTabs) {
-        this.$store.state.editableTabs = editableTabs
+        this.$store.state.menu.editableTabs = editableTabs
       }
     }
   },
   methods: {
     removeTab (targetName) {
+      debugger
       if (targetName === 'welcome') {
         return
       }

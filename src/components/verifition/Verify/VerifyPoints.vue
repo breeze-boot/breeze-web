@@ -259,7 +259,6 @@ export default {
         ts: Date.now() // 现在的时间戳
       }
       reqGet(data).then((res) => {
-        debugger
         if (res.repCode === '0000') {
           this.pointBackImgBase = res.repData.originalImageBase64
           this.backToken = res.repData.token

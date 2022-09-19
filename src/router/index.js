@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import store from '../store'
+import store from '@/store/index'
+
 import { listTreeMenu } from '@/api/menu'
 
 Vue.use(VueRouter)
@@ -42,7 +43,7 @@ export const loadRoute = () => {
     if (!response.data) {
       return
     }
-    store.commit('setMenus', response.data)
+    store.commit('menu/setMenus', response.data)
     // 动态绑定路由
     response.data.forEach(menu => {
       if (!menu.children) {
@@ -74,9 +75,10 @@ router.beforeEach(async (to, from, next) => {
   } else {
     const accessToken = localStorage.getItem('access_token')
     if (accessToken) {
-      if (!store.state.isLoadMenu) {
+      debugger
+      if (!store.state.menu.isLoadMenu) {
         loadRoute()
-        store.commit('isLoadMenu', true)
+        store.commit('menu/isLoadMenu', true)
       }
       next()
     } else {
