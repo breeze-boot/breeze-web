@@ -7,7 +7,7 @@ export function jwtToken (data) {
   }
 
   return request({
-    url: servicePath.admin + '/token',
+    url: servicePath.admin + '/jwt/login',
     method: 'post',
     data: dataObj
   })

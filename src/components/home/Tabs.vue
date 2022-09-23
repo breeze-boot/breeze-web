@@ -14,34 +14,32 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 
 export default {
   name: 'Tabs',
   data () {
     return {
-      tabIndex: 1
     }
   },
   computed: {
-    ...mapState('menu', ['editableTabsValue', 'editableTabs'])
-    // editableTabsValue: {
-    //   get () {
-    //     return this.$store.state.menu.editableTabsValue
-    //   },
-    //   set (editableTabsValue) {
-    //     this.$router.push(editableTabsValue)
-    //     this.$store.state.menu.editableTabsValue = editableTabsValue
-    //   }
-    // },
-    // editableTabs: {
-    //   get () {
-    //     return this.$store.state.menu.editableTabs
-    //   },
-    //   set (editableTabs) {
-    //     this.$store.state.menu.editableTabs = editableTabs
-    //   }
-    // }
+    // ...mapState('menu', ['editableTabsValue', 'editableTabs'])
+    editableTabsValue: {
+      get () {
+        return this.$store.state.menu.editableTabsValue
+      },
+      set (editableTabsValue) {
+        this.$router.push(editableTabsValue)
+        this.$store.state.menu.editableTabsValue = editableTabsValue
+      }
+    },
+    editableTabs: {
+      get () {
+        return this.$store.state.menu.editableTabs
+      },
+      set (editableTabs) {
+        this.$store.state.menu.editableTabs = editableTabs
+      }
+    }
   },
   methods: {
     removeTab (targetName) {
