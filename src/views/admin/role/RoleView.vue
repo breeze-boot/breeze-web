@@ -103,7 +103,7 @@
 </template>
 
 <script>
-import AddEditDialog from '@/components/role/AddEditDialog'
+import AddEditDialog from '@/components/dialog/role/AddEditDialog'
 import { del, editPermission, list, listRolesPermission } from '@/api/admin/role'
 import { listTreePermission } from '@/api/admin/menu'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'

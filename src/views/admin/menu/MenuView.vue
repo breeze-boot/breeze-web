@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import AddEditDialog from '@/components/menu/AddEditDialog'
+import AddEditDialog from '@/components/dialog/menu/AddEditDialog'
 import { del, list } from '@/api/admin/menu'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 

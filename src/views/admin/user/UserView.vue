@@ -150,8 +150,8 @@
 </template>
 
 <script>
-import AddEditDialog from '@/components/user/AddEditDialog'
-import ResetPassDialog from '@/components/user/ResetPassDialog'
+import AddEditDialog from '@/components/dialog/user/AddEditDialog'
+import ResetPassDialog from '@/components/dialog/user/ResetPassDialog'
 import { del, list, open } from '@/api/admin/user'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'

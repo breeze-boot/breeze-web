@@ -1,10 +1,15 @@
 <template>
-  <el-header style="padding-left: 0">
-    <div class="menu">
-      <div class="collapse" @click="collapse">
-        <i v-show="!isCollapse" class="el-icon-s-fold"/>
-        <i v-show="isCollapse" class="el-icon-s-unfold"/>
-      </div>
+  <el-container class="header">
+    <div class="logo" :style="{width: collapseWhitespace + 'vw'}">
+      <img v-show="!isCollapse" :style="{animationName: fadeIn, animationDuration: 1 + 's'}" alt=""
+           src="../../assets/logo.png"/>
+      <img v-show="isCollapse" :style="{animationName: fadeIn, animationDuration: 1 + 's'}" alt=""
+           src="../../assets/logo.png"/>
+      <span v-show="!isCollapse">通用管理系统</span>
+    </div>
+    <div class="collapse" @click="collapse">
+      <i v-show="!isCollapse" class="el-icon-s-fold"/>
+      <i v-show="isCollapse" class="el-icon-s-unfold"/>
     </div>
     <div class="logout">
       <el-dropdown @command="handleCommand">
@@ -17,17 +22,20 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
-  </el-header>
+  </el-container>
 </template>
 
 <script>
 import { mapMutations } from 'vuex'
+import 'animate.css'
 
 export default {
   name: 'Header',
   data () {
     return {
-      isCollapse: false // 决定左侧导航栏是否展开
+      fadeIn: '', // 决定左侧导航栏是否展开
+      isCollapse: false, // 决定左侧导航栏是否展开
+      collapseWhitespace: 10.5 // 决定左侧导航栏是否展开
     }
   },
   methods: {
@@ -44,7 +52,11 @@ export default {
     },
     ...mapMutations('menu', ['setCollapse']),
     collapse () {
+      this.fadeIn = 'fadeOut'
+      this.collapseWhitespace = this.isCollapse ? 10.5 : 3.4
       this.isCollapse = !this.isCollapse
+
+      this.fadeIn = 'fadeIn'
       this.setCollapse(this.isCollapse)
       // this.$store.commit('setCollapse', this.isCollapse)
     }
@@ -53,35 +65,52 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.el-header {
-  display: flex;
-  background-color: #FFFFFF;
-  position: relative;
-  border-bottom: rgba(48, 49, 51, 0.09) solid 1px;
+.header {
+  background: #002a59;
+  height: 100%;
+  width: 100vw;
 
   .collapse {
     height: 100%;
-    width: 88px;
+    width: 50px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    flex-wrap: nowrap;
-    font-size: 30px;
+    font-size: 1.5rem;
+    color: rgba(145, 125, 125, 0.49);
     cursor: pointer;
   }
 
-  > .logout {
+  > .logo {
+    padding: 0;
     display: flex;
     align-items: center;
-    flex-wrap: nowrap;
     justify-content: center;
-    position: absolute;
-    right: 0;
-    width: 5%;
     height: 100%;
-    text-align: center;
-    color: #FFFFFF !important;
+
+    span {
+      text-align: center;
+      width: 60%;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    img {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+    }
+  }
+
+  > .logout {
+    padding-right: 1%;
+    width: 85%;
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    height: 100%;
+    text-align: right;
+    color: #ffffff !important;
   }
 }
-
 </style>

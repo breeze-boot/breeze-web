@@ -1,11 +1,15 @@
 <template>
-  <el-container style="height: 100%">
-    <Menu/>
+  <el-container>
+    <el-header>
+      <Header/>
+    </el-header>
     <el-container>
-      <el-main>
-        <Header/>
+      <el-aside style="box-shadow: 5px 0 5px -5px rgb(112,109,109); width: fit-content;">
+        <Menu/>
+      </el-aside>
+      <el-main style="padding: 1px 2px;">
         <Tabs/>
-        <router-view style="height: 87vh;"/>
+        <router-view style="height: 83vh;"/>
       </el-main>
     </el-container>
   </el-container>
@@ -34,9 +38,9 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.el-main {
-  margin: 0;
+
+.el-header, .el-footer {
   padding: 0;
-  text-align: center;
+  color: #333;
 }
 </style>

@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import DictItemAddEditDialog from '@/components/dict/DictItemAddEditDialog'
+import DictItemAddEditDialog from '@/components/dialog/dict/DictItemAddEditDialog'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { del, list } from '@/api/admin/dictItem'
 

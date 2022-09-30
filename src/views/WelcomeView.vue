@@ -11,3 +11,9 @@ export default {
   components: {}
 }
 </script>
+
+<style lang="less" scoped>
+.welcome {
+  height: 90vh;
+}
+</style>

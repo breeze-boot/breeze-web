@@ -1,17 +1,10 @@
 <template>
-  <el-aside :width="isCollapse ? '3.5vw' : '13vw'" style="height: 100vh; text-align: left;">
-    <el-header>
-      <div class="logo">
-        <img alt="" src="../../assets/logo.png"/>
-        <transition name="el-fade-in-linear">
-          <span v-show="!isCollapse">后台管理系统</span>
-        </transition>
-      </div>
-    </el-header>
+  <el-container>
     <el-menu
+      class="el-menu-vertical"
       :collapse="isCollapse"
-      :collapse-transition="false"
-      :default-active="this.$store.state.editableTabsValue"
+      :collapse-transition="true"
+      :default-active="this.$store.state.menu.editableTabsValue"
       active-text-color="#999966"
       background-color="#002a59"
       router
@@ -44,7 +37,7 @@
         </el-menu-item>
       </el-submenu>
     </el-menu>
-  </el-aside>
+  </el-container>
 </template>
 
 <script>
@@ -89,42 +82,12 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.el-header {
-  padding: 0;
+.el-menu-vertical:not(.el-menu--collapse) {
+  width: 200px;
+  min-height: 100vh - 6.2vh;
 }
 
 .el-aside {
-  background: #002a59;
-  transition: width 0.01s;
-  -webkit-transition: width 0.01s;
-  -moz-transition: width 0.01s;
-  -o-transition: width 0.01s;
+  width: fit-content;
 }
-
-.logo {
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-  width: 100%;
-  justify-content: center;
-  height: 100%;
-
-  img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-  }
-
-  span {
-    width: 5vw;
-    margin-left: 15px;
-    font-size: 1rem;
-    transition: width 0.01s;
-    color: #ffffff;
-    -webkit-transition: width 0.01s;
-    -moz-transition: width 0.01s;
-    -o-transition: width 0.01s;
-  }
-}
-
 </style>

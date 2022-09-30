@@ -151,7 +151,7 @@
 
 <script>
 import { del, list } from '@/api/admin/log'
-import ShowDialog from '@/components/log/ShowDialog'
+import ShowDialog from '@/components/dialog/log/ShowDialog'
 import { confirmAlert } from '@/utils/constant'
 
 export default {
