@@ -1,6 +1,6 @@
 <template>
   <el-container class="header">
-    <div class="logo" :style="{width: collapseWhitespace + 'vw'}">
+    <div class="logo" :style="{minWidth: collapseWhitespace  + 'px'}">
       <img v-show="!isCollapse" :style="{animationName: fadeIn, animationDuration: 1 + 's'}" alt=""
            src="../../assets/logo.png"/>
       <img v-show="isCollapse" :style="{animationName: fadeIn, animationDuration: 1 + 's'}" alt=""
@@ -34,8 +34,8 @@ export default {
   data () {
     return {
       fadeIn: '', // 决定左侧导航栏是否展开
-      isCollapse: false, // 决定左侧导航栏是否展开
-      collapseWhitespace: 10.5 // 决定左侧导航栏是否展开
+      isCollapse: false,
+      collapseWhitespace: 200
     }
   },
   methods: {
@@ -53,7 +53,7 @@ export default {
     ...mapMutations('menu', ['setCollapse']),
     collapse () {
       this.fadeIn = 'fadeOut'
-      this.collapseWhitespace = this.isCollapse ? 10.5 : 3.4
+      this.collapseWhitespace = this.isCollapse ? 200 : 65
       this.isCollapse = !this.isCollapse
 
       this.fadeIn = 'fadeIn'
@@ -68,25 +68,14 @@ export default {
 .header {
   background: #002a59;
   height: 100%;
-  width: 100vw;
+  width: 100%;
 
-  .collapse {
-    height: 100%;
-    width: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    font-size: 1.5rem;
-    color: rgba(145, 125, 125, 0.49);
-    cursor: pointer;
-  }
-
-  > .logo {
-    padding: 0;
+  .logo {
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100%;
+    padding: 0;
 
     span {
       text-align: center;
@@ -102,9 +91,20 @@ export default {
     }
   }
 
+  .collapse {
+    height: 100%;
+    min-width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 1.5rem;
+    color: rgba(145, 125, 125, 0.49);
+    cursor: pointer;
+  }
+
   > .logout {
     padding-right: 1%;
-    width: 85%;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: end;

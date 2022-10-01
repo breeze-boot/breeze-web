@@ -7,9 +7,9 @@
       <el-aside style="box-shadow: 5px 0 5px -5px rgb(112,109,109); width: fit-content;">
         <Menu/>
       </el-aside>
-      <el-main style="padding: 1px 2px;">
+      <el-main style="padding: 1px 20px;">
         <Tabs/>
-        <router-view style="height: 83vh;"/>
+        <router-view style="height: 83vh; box-shadow: 1px 1px 5px #eee;"/>
       </el-main>
     </el-container>
   </el-container>

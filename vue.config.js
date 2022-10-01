@@ -4,10 +4,29 @@ const path = require('path')
 function resolve (dir) {
   return path.join(__dirname, dir)
 }
-const name = '管理平台'
+
+const name = '咸蛋管理平台'
 
 module.exports = defineConfig({
   transpileDependencies: true,
+  chainWebpack: config => {
+    // svg-sprite-loader
+    config.module
+      .rule('svg')
+      .exclude.add(resolve('src/assets/icon'))
+      .end()
+    config.module
+      .rule('icon')
+      .test(/\.svg$/)
+      .include.add(resolve('src/assets/icon'))
+      .end()
+      .use('svg-sprite-loader')
+      .loader('svg-sprite-loader')
+      .options({
+        symbolId: '[name]'
+      })
+      .end()
+  },
   devServer: {
     port: 8080, // 端口号，被占用自动提升加1
     https: false, // 协议

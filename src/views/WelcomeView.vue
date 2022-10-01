@@ -1,14 +1,17 @@
 <template>
   <div class="welcome">
     欢迎
+    <svg-icon icon-class="abc"></svg-icon>
   </div>
 </template>
 
 <script>
 
+import SvgIcon from '@/components/svg/SvgIcon'
+
 export default {
   name: 'WelcomeView',
-  components: {}
+  components: { SvgIcon }
 }
 </script>
 
