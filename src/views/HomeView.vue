@@ -38,8 +38,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-
-.el-header, .el-footer {
+.el-header {
   padding: 0;
   color: #333;
 }
