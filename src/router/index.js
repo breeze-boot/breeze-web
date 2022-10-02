@@ -5,17 +5,25 @@ import store from '@/store/index'
 import { listTreeMenu } from '@/api/admin/menu'
 
 Vue.use(VueRouter)
-const originalPush = VueRouter.prototype.push
+// const originalPush = VueRouter.prototype.push
+//
+// VueRouter.prototype.push = function push (location) {
+//   return originalPush.call(this, location).catch(err => err)
+// }
 
-VueRouter.prototype.push = function push (location) {
-  return originalPush.call(this, location).catch(err => err)
-}
+// VueRouter.prototype.replace = function replace (location) {
+//   return originalPush.call(this, location).catch(err => err)
+// }
 
 const routes = [
   {
     path: '/',
     name: 'login',
     component: () => import('@/views/LoginView.vue')
+  },
+  {
+    path: '/login',
+    redirect: '/'
   },
   {
     path: '/home',
@@ -33,9 +41,6 @@ const routes = [
     path: '/404',
     name: '404',
     component: () => import('@/views/404.vue')
-  }, {
-    path: '*',
-    redirect: '/404'
   }
 ]
 
@@ -51,6 +56,7 @@ export const loadRoute = () => {
     if (!response.data) {
       return
     }
+    console.log('=====get routers =====')
     store.commit('menu/setMenus', response.data)
     // 动态绑定路由
     response.data.forEach(menu => {
@@ -75,10 +81,8 @@ export const getMenu = (menus) => {
   })
 }
 
-router.beforeEach(async (to, from, next) => {
-  if (to.path === '/') {
-    next()
-  } else if (to.path === '/login') {
+router.beforeEach((to, from, next) => {
+  if (to.path === '/' || to.path === '/login') {
     next()
   } else {
     const accessToken = localStorage.getItem('access_token')
@@ -89,8 +93,7 @@ router.beforeEach(async (to, from, next) => {
       }
       next()
     } else {
-      next('/')
-      Element.Message.error('您还没有登录，请先登录')
+      next('/?redirect=' + to.path)
     }
   }
 })

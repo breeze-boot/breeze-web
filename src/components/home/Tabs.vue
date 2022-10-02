@@ -45,7 +45,6 @@ export default {
   },
   methods: {
     removeTab (targetName) {
-      debugger
       if (targetName === 'welcome') {
         return
       }

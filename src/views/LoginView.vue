@@ -34,21 +34,6 @@ export default {
   position: relative;
 }
 
-.login_btn {
-  width: 25vw;
-  height: 10vh;
-  background: rgba(0, 247, 255, 0.42);
-  text-align: center;
-  line-height: 10vh;
-  cursor: pointer;
-  position: absolute;
-  top: 50vh;
-  left: 35%;
-  border-radius: 30px;
-  box-shadow: 2px 2px 5px #5b5b5b;
-  font-size: 30px;
-}
-
 @keyframes back_div {
   0% {
     background-position: 0% 50%;

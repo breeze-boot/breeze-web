@@ -75,10 +75,12 @@ export default {
     }
   },
   methods: {
-    success (params) {
+    success () {
       jwtToken(this.userLogin).then((response) => {
         if (response) {
           localStorage.setItem('access_token', response.data.access_token)
+          // const path = this.$route.query.redirect
+          // this.$router.replace(path === '/' || path === undefined ? 'welcome' : path)
           this.$router.push('welcome')
         }
       })

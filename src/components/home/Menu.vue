@@ -63,11 +63,9 @@ export default {
     // },
     // menus: {
     //   get () {
-    //     debugger
     //     return this.$store.state.menu.menus
     //   },
     //   set (menus) {
-    //     debugger
     //     this.$store.state.menu.menus = menus
     //   }
     // }
