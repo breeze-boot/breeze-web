@@ -1,20 +1,20 @@
 <template>
   <el-container>
     <el-menu
+      router
       class="el-menu-vertical"
       :collapse="isCollapse"
       :collapse-transition="true"
       :default-active="this.$store.state.menu.editableTabsValue"
-      active-text-color="#999966"
-      background-color="#002a59"
-      router
+      active-text-color="#ffd04b"
+      background-color="#545c64"
+      :unique-opened="true"
       style="border-right: 1px solid #002a59"
-      text-color="#CCCCCC"
+      text-color="#fff"
       @close="handleClose"
       @open="handleOpen">
       <el-menu-item
         key="0"
-        background-color="#509EFF"
         index="welcome">
         <i class="el-icon-s-home"></i>
         <span slot="title">欢迎</span>
@@ -22,8 +22,7 @@
       <el-submenu
         v-for="item in menus"
         :key="item.id"
-        :index="item.name"
-        background-color="#509EFF">
+        :index="item.name">
         <template slot="title">
           <i :class="item.icon"></i>
           <span slot="title">{{ item.title }}</span>
@@ -82,7 +81,7 @@ export default {
 <style lang="less" scoped>
 .el-menu-vertical:not(.el-menu--collapse) {
   width: 200px;
-  min-height: 100vh - 6.2vh;
+  min-height: 100vh - 7vh;
 }
 
 .el-aside {

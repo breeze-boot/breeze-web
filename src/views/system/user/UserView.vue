@@ -251,9 +251,15 @@ export default {
         })
       })
     },
+    restPass (row) {
+      this.$refs.resetPassDialog.showDialogVisible(row)
+    },
     exportInfo () {
     },
     importInfo () {
+    },
+    handleSelectionChange (val) {
+      this.multipleSelection = val
     },
     add () {
       this.title = '创建用户'
@@ -263,15 +269,9 @@ export default {
       this.title = '修改用户'
       this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.EDIT)
     },
-    handleSelectionChange (val) {
-      this.multipleSelection = val
-    },
     show (val) {
       this.title = '查看信息'
       this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.SHOW)
-    },
-    restPass (row) {
-      this.$refs.resetPassDialog.showDialogVisible(row)
     }
   }
 }

@@ -5,15 +5,15 @@ import store from '@/store/index'
 import { listTreeMenu } from '@/api/admin/menu'
 
 Vue.use(VueRouter)
-// const originalPush = VueRouter.prototype.push
-//
-// VueRouter.prototype.push = function push (location) {
-//   return originalPush.call(this, location).catch(err => err)
-// }
+const originalPush = VueRouter.prototype.push
 
-// VueRouter.prototype.replace = function replace (location) {
-//   return originalPush.call(this, location).catch(err => err)
-// }
+VueRouter.prototype.push = function push (location) {
+  return originalPush.call(this, location).catch(err => err)
+}
+
+VueRouter.prototype.replace = function replace (location) {
+  return originalPush.call(this, location).catch(err => err)
+}
 
 const routes = [
   {
@@ -56,7 +56,6 @@ export const loadRoute = () => {
     if (!response.data) {
       return
     }
-    console.log('=====get routers =====')
     store.commit('menu/setMenus', response.data)
     // 动态绑定路由
     response.data.forEach(menu => {
@@ -90,8 +89,13 @@ router.beforeEach((to, from, next) => {
       if (!store.state.menu.isLoadMenu) {
         loadRoute()
         store.commit('menu/isLoadMenu', true)
+        next({
+          ...to, // next({ ...to })的目的,是保证路由添加完了再进入页面 (可以理解为重进一次)
+          replace: true // 重进一次, 不保留重复历史
+        })
+      } else {
+        next()
       }
-      next()
     } else {
       next('/?redirect=' + to.path)
     }

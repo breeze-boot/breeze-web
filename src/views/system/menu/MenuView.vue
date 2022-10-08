@@ -4,11 +4,21 @@
       <el-form :inline="true" :model="searchForm" class="demo-form-inline" size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
-            <el-form-item label="部门名称">
-              <el-input v-model="searchForm.deptName" clearable placeholder="部门名称"/>
+            <el-form-item label="菜单名称">
+              <el-input v-model="searchForm.title" clearable placeholder="菜单名称"/>
             </el-form-item>
-            <el-form-item label="部门编号">
-              <el-input v-model="searchForm.deptCode" clearable placeholder="部门编号"/>
+            <el-form-item label="路由名称">
+              <el-input v-model="searchForm.name" clearable placeholder="路由名称"/>
+            </el-form-item>
+            <el-form-item label="平台">
+              <el-select v-model="searchForm.platformId" placeholder="请选择平台">
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search()">查询</el-button>
@@ -27,7 +37,7 @@
         :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
         border
         height="90%"
-        row-key="id"
+        row-key="sid"
         size="mini"
         stripe
         style="width: 100%"
@@ -39,16 +49,47 @@
           width="200">
         </el-table-column>
         <el-table-column
-          label="部门名称"
-          prop="deptName">
+          label="菜单名称"
+          prop="title"
+          show-overflow-tooltip
+          width="180">
         </el-table-column>
         <el-table-column
-          label="部门编码"
-          prop="deptCode">
+          label="路由名称"
+          prop="name"
+          show-overflow-tooltip>
         </el-table-column>
         <el-table-column
-          label="是否停用"
-          prop="isClose">
+          label="排序"
+          prop="sort"
+          width="50"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
+          label="图标"
+          prop="icon"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
+          label="权限标识"
+          prop="permission"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
+          label="路由路径"
+          prop="path"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
+          label="组件路径"
+          width="250"
+          prop="component"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
+          label="类型"
+          prop="type"
+          show-overflow-tooltip>
         </el-table-column>
         <el-table-column
           fixed="right"
@@ -57,7 +98,7 @@
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
             <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
-            <el-button size="mini" type="text" @click.native.prevent="delItem(scope.$index, tableData, scope.row)">删除
+            <el-button size="mini" type="text" @click.native.prevent="delItem(scope.$index, tableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
@@ -71,21 +112,26 @@
 </template>
 
 <script>
-import AddEditDialog from '@/components/dialog/dept/AddEditDialog'
-import { del, list } from '@/api/admin/dept'
+import AddEditDialog from '@/components/dialog/menu/AddEditDialog'
+import { del, list } from '@/api/admin/menu'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 
 export default {
-  name: 'DeptView',
+  name: 'MenuView',
   components: { AddEditDialog },
   data: () => ({
     title: '',
     rowIndex: 0,
     multipleSelection: [],
     tableData: [],
+    options: [{
+      value: '1564528653105573889',
+      label: '后台管理中心'
+    }],
     searchForm: {
-      deptName: '',
-      deptCode: ''
+      platformId: '1564528653105573889',
+      name: '',
+      title: ''
     }
   }),
   created () {
@@ -106,8 +152,8 @@ export default {
       this.reloadList()
     },
     reset () {
-      this.searchForm.deptName = ''
-      this.searchForm.deptCode = ''
+      this.searchForm.title = ''
+      this.searchForm.name = ''
     },
     /**
      * 删除行
@@ -116,16 +162,15 @@ export default {
      */
     delItem (index, rows, row) {
       confirmAlert(() => {
-        del(row.id.toString()).then(rep => {
+        del(row.id).then(rep => {
+          debugger
           if (rep.code === 1) {
             this.deleteTreeTableData(rows, index)
-            this.$message.success('删除成功')
           }
         })
       })
     },
     deleteTreeTableData (rows, index) {
-      debugger
       for (let i = 0; i < rows.length; i++) {
         if (this.rowIndex === index) {
           rows.splice(i, 1)
@@ -142,19 +187,19 @@ export default {
     },
     importInfo () {
     },
-    add () {
-      this.title = '创建部门'
-      this.$refs.addEditDialog.showDialogVisible({}, DIALOG_TYPE.ADD)
-    },
-    edit (val) {
-      this.title = '修改部门信息'
-      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.EDIT)
-    },
     handleSelectionChange (val) {
       this.multipleSelection = val
     },
+    add () {
+      this.title = '创建菜单'
+      this.$refs.addEditDialog.showDialogVisible({}, DIALOG_TYPE.ADD)
+    },
+    edit (val) {
+      this.title = '修改菜单'
+      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.EDIT)
+    },
     show (val) {
-      this.title = '查看部门信息'
+      this.title = '查看信息'
       this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.SHOW)
     }
   }

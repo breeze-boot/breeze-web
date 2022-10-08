@@ -118,6 +118,7 @@ export default {
      * flag 0 创建 1 修改 2 显示
      */
     showDialogVisible (val, dialogStatus) {
+      debugger
       this.dialogVisible = true
       if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
         this.$nextTick(() => {

@@ -11,7 +11,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function listTreeMenu (params) {
   return request({
-    url: servicePath.admin + '/sys/menu/listTreeMenu',
+    url: servicePath.system + '/sys/menu/listTreeMenu',
     method: 'get',
     params: params,
     transformResponse: [(data) => {
@@ -28,7 +28,7 @@ export function listTreeMenu (params) {
  */
 export function listTreePermission () {
   return request({
-    url: servicePath.admin + '/sys/menu/listTreePermission',
+    url: servicePath.system + '/sys/menu/listTreePermission',
     method: 'get',
     transformResponse: [(data) => {
       return JSONBigInt.parse(data)
@@ -43,7 +43,7 @@ export function listTreePermission () {
  */
 export function list (data) {
   return request({
-    url: servicePath.admin + '/sys/menu/list',
+    url: servicePath.system + '/sys/menu/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -58,7 +58,7 @@ export function list (data) {
  */
 export function add (data) {
   return request({
-    url: servicePath.admin + '/sys/menu/save',
+    url: servicePath.system + '/sys/menu/save',
     method: 'post',
     data: data
   })
@@ -70,11 +70,11 @@ export function add (data) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function del (id) {
+export function del (data) {
   return request({
-    url: servicePath.admin + '/sys/menu/delete',
+    url: servicePath.system + '/sys/menu/delete',
     method: 'delete',
-    params: { id: id }
+    data: data
   })
 }
 
@@ -86,8 +86,22 @@ export function del (id) {
  */
 export function edit (data) {
   return request({
-    url: servicePath.admin + '/sys/menu/update',
+    url: servicePath.system + '/sys/menu/update',
     method: 'put',
+    data: data
+  })
+}
+
+/**
+ * 菜单下拉框
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function selectMenu (data) {
+  return request({
+    url: servicePath.system + '/sys/open/selectMenu',
+    method: 'get',
     data: data
   })
 }

@@ -8,7 +8,7 @@ import JSONBigInt from 'json-bigint'
  */
 export function list (data) {
   return request({
-    url: servicePath.admin + '/sys/platform/list',
+    url: servicePath.system + '/sys/platform/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -24,7 +24,7 @@ export function list (data) {
  */
 export function del (data) {
   return request({
-    url: servicePath.admin + '/sys/platform/delete',
+    url: servicePath.system + '/sys/platform/delete',
     method: 'delete',
     data: data
   })
@@ -37,7 +37,7 @@ export function del (data) {
  */
 export function add (data) {
   return request({
-    url: servicePath.admin + '/sys/platform/save',
+    url: servicePath.system + '/sys/platform/save',
     method: 'post',
     data: data
   })
@@ -50,7 +50,7 @@ export function add (data) {
  */
 export function edit (data) {
   return request({
-    url: servicePath.admin + '/sys/platform/update',
+    url: servicePath.system + '/sys/platform/update',
     method: 'put',
     data: data
   })

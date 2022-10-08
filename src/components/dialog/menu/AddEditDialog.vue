@@ -12,39 +12,51 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="菜单名称" prop="title">
-        <el-input v-model="menu.title" autocomplete="off" clearable placeholder="请输入菜单名称"></el-input>
+      <el-form-item :label-width="formLabelWidth" label="组件类型" prop="type" style="text-align: left;">
+        <el-radio-group v-model="menu.type" @change="handleTypeChange">
+          <el-radio-button
+            v-for="item in typeOptions"
+            :key="item.label"
+            :label="item.label">
+            {{ item.name }}
+          </el-radio-button>
+        </el-radio-group>
       </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="组件名称" prop="name">
+      <el-form-item :label-width="formLabelWidth" label="上级菜单" prop="parentId">
+        <el-cascader
+          v-model="menu.parentId"
+          :options="menuOption"
+          :props="{ checkStrictly: true }"
+          filterable
+        ></el-cascader>
+      </el-form-item>
+
+      <el-form-item :label-width="formLabelWidth" label="标题" prop="title">
+        <el-input v-model="menu.title" autocomplete="off" clearable placeholder="请输入组件显示的标题"></el-input>
+      </el-form-item>
+
+      <el-form-item v-if="btnVisible" :label-width="formLabelWidth" label="组件图标" prop="icon">
+        <el-input v-model="menu.icon" autocomplete="off" clearable placeholder="请选择组件图标"></el-input>
+      </el-form-item>
+
+      <el-form-item v-if="btnVisible" :label-width="formLabelWidth" label="组件名称" prop="name">
         <el-input v-model="menu.name" autocomplete="off" clearable placeholder="请输入组件名称"></el-input>
       </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="排序" prop="sort" style="text-align: left;">
-        <el-input-number v-model="menu.sort" :max="10" :min="1" label="排序" @change="handleChange"/>
-      </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="组件名称" prop="icon">
-        <el-input v-model="menu.icon" autocomplete="off" clearable placeholder="请输入组件名称"></el-input>
-      </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="父级元素" prop="parentId">
-        123
-      </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="权限标识" prop="permission">
-        <el-input v-model="menu.permission" autocomplete="off" clearable placeholder="请输入权限标识"></el-input>
-      </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="菜单路径" prop="path">
+
+      <el-form-item v-if="btnVisible" :label-width="formLabelWidth" label="菜单路径" prop="path">
         <el-input v-model="menu.path" autocomplete="off" clearable placeholder="请输入菜单路径"></el-input>
       </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="组件路径" prop="component">
+
+      <el-form-item :label-width="formLabelWidth" label="排序" prop="sort" style="text-align: left;">
+        <el-input-number v-model="menu.sort" :max="10" :min="1" label="排序" @change="handleChangeSort"/>
+      </el-form-item>
+
+      <el-form-item v-if="btnVisible" :label-width="formLabelWidth" label="组件路径" prop="component">
         <el-input v-model="menu.component" autocomplete="off" clearable placeholder="请输入组件路径"></el-input>
       </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="类型" prop="type" style="text-align: left;">
-        <el-select v-model="menu.type" placeholder="请选择类型">
-          <el-option
-            v-for="item in typeOptions"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
+
+      <el-form-item v-if="folderVisible" :label-width="formLabelWidth" label="权限标识" prop="permission">
+        <el-input v-model="menu.permission" autocomplete="off" clearable placeholder="请输入权限标识"></el-input>
       </el-form-item>
     </el-form>
     <div v-show="!show" slot="footer" class="dialog-footer">
@@ -144,7 +156,7 @@
 
 <script>
 import { DIALOG_TYPE } from '@/utils/constant'
-import { add, edit } from '@/api/admin/menu'
+import { add, edit, selectMenu } from '@/api/admin/menu'
 import { Message } from 'element-ui'
 
 export default {
@@ -155,33 +167,37 @@ export default {
   data () {
     return {
       dialogVisible: false,
+      // folder需要隐藏的
+      folderVisible: false,
+      // btn需要隐藏的
+      btnVisible: true,
       menu: {
         id: null,
         name: '',
         title: '',
         icon: '',
         sort: 0,
-        parentId: null,
+        parentId: '0',
         permission: '',
         component: '',
         platformId: '',
         platformName: '',
-        type: 0,
+        type: 'folder',
         path: ''
       },
       menuOption: [],
       typeOptions: [
         {
-          value: 0,
-          label: '文件夹'
+          label: 'folder',
+          name: '文件夹'
         },
         {
-          value: 1,
-          label: '菜单'
+          label: 'menu',
+          name: '菜单'
         },
         {
-          value: 2,
-          label: '按钮'
+          label: 'btn',
+          name: '按钮'
         }
       ],
       platformOptions: [
@@ -194,7 +210,7 @@ export default {
       // 默认是创建
       dialogStatus: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
-      show: true,
+      show: false,
       rules: {
         platformId: [
           {
@@ -213,7 +229,7 @@ export default {
         title: [
           {
             required: true,
-            message: '请输入组件名称',
+            message: '请输入组件显示的标题',
             trigger: 'blur'
           }
         ],
@@ -241,7 +257,7 @@ export default {
         path: [
           {
             required: true,
-            message: '请输入路由路径',
+            message: '请输入路径',
             trigger: 'blur'
           }
         ],
@@ -258,12 +274,47 @@ export default {
             message: '请选择组件类型',
             trigger: 'change'
           }
+        ],
+        parentId: [
+          {
+            required: true,
+            message: '请选择上级菜单',
+            trigger: 'change'
+          }
         ]
       }
     }
   },
+  mounted () {
+    this.selectMenu()
+  },
   methods: {
-    handleChange (val) {
+    handleTypeChange (e) {
+      if (e === 'menu') {
+        this.folderVisible = true
+        this.btnVisible = true
+      } else if (e === 'btn') {
+        this.folderVisible = true
+        this.btnVisible = false
+      } else {
+        this.folderVisible = false
+        this.btnVisible = true
+      }
+    },
+    handleChangeSort (val) {
+      debugger
+    },
+    selectMenu () {
+      selectMenu().then(resp => {
+        if (resp.data) {
+          const root = [{
+            value: '0',
+            label: '根节点',
+            children: resp.data
+          }]
+          this.menuOption = root
+        }
+      })
     },
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
@@ -276,13 +327,18 @@ export default {
       })
     },
     add () {
+      debugger
+      this.menu.parentId = this.menu.parentId[this.menu.parentId.length - 1]
       add(this.menu).then((rep) => {
-        Message.success({ message: rep.message })
-        this.dialogVisible = false
-        this.$emit('reloadList')
+        if (rep.data) {
+          Message.success({ message: rep.message })
+          this.dialogVisible = false
+          this.$emit('reloadList')
+        }
       })
     },
     edit () {
+      this.menu.parentId = this.menu.parentId[this.menu.parentId.length - 1]
       edit(this.menu).then((rep) => {
         Message.success({ message: rep.message })
         this.dialogVisible = false

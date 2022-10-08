@@ -33,6 +33,7 @@
             height="600"
             size="mini"
             stripe
+            row-key="sid"
             style="width: 100%"
             @row-click="rowClick"
             @selection-change="handleSelectionChange">
@@ -82,9 +83,8 @@
         <el-col :md="5">
           <el-tree ref="roleTree"
                    :data="roleTreeData"
-                   :default-expanded-keys="[2, 3]"
                    :props="defaultProps"
-                   node-key="id"
+                   node-key="sid"
                    show-checkbox
                    style="height: 560px; overflow-y:scroll; border: #e1e1e1 1px solid; margin-top:37px;">
           </el-tree>
@@ -145,10 +145,12 @@ export default {
         this.$message.warning('请先点击角色')
         return
       }
+      debugger
       editPermission({
         roleId: this.roleId,
         permissionIds: checkedKeys
       }).then(rep => {
+        console.log(rep)
       })
     },
     resetPermission () {
@@ -244,6 +246,9 @@ export default {
     },
     importInfo () {
     },
+    handleSelectionChange (val) {
+      this.multipleSelection = val
+    },
     add () {
       this.title = '创建角色'
       this.$refs.addEditDialog.showDialogVisible({}, DIALOG_TYPE.ADD)
@@ -251,9 +256,6 @@ export default {
     edit (val) {
       this.title = '修改角色信息'
       this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.EDIT)
-    },
-    handleSelectionChange (val) {
-      this.multipleSelection = val
     },
     show (val) {
       this.title = '查看角色信息'

@@ -13,7 +13,7 @@
     </div>
     <div class="logout">
       <el-dropdown @command="handleCommand">
-        <span class="el-dropdown-link">
+        <span style="color: #fff;" class="el-dropdown-link">
           <span>admin</span>
         </span>
         <el-dropdown-menu slot="dropdown">
@@ -66,7 +66,7 @@ export default {
 
 <style lang="less" scoped>
 .header {
-  background: #002a59;
+  background: #545c64;
   height: 100%;
   width: 100%;
 
@@ -97,8 +97,8 @@ export default {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    font-size: 1.5rem;
-    color: rgba(145, 125, 125, 0.49);
+    font-size: 1.2rem;
+    color: rgb(246, 246, 246);
     cursor: pointer;
   }
 

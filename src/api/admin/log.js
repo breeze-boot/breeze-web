@@ -8,7 +8,7 @@ import JSONBigInt from 'json-bigint'
  */
 export function list (params) {
   return request({
-    url: servicePath.admin + '/sys/log/list',
+    url: servicePath.system + '/sys/log/list',
     method: 'post',
     data: params,
     transformResponse: [(data) => {
@@ -25,7 +25,7 @@ export function list (params) {
  */
 export function del (params) {
   return request({
-    url: servicePath.admin + '/sys/log/delete',
+    url: servicePath.system + '/sys/log/delete',
     method: 'delete',
     data: params
   })

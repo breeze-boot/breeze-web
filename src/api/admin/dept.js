@@ -11,7 +11,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function list (data) {
   return request({
-    url: servicePath.admin + '/sys/dept/list',
+    url: servicePath.system + '/sys/dept/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -26,7 +26,7 @@ export function list (data) {
  */
 export function add (data) {
   return request({
-    url: servicePath.admin + '/sys/dept/save',
+    url: servicePath.system + '/sys/dept/save',
     method: 'post',
     data: data
   })
@@ -40,7 +40,7 @@ export function add (data) {
  */
 export function del (id) {
   return request({
-    url: servicePath.admin + '/sys/dept/delete',
+    url: servicePath.system + '/sys/dept/delete',
     method: 'delete',
     params: { id: id }
   })
@@ -54,7 +54,7 @@ export function del (id) {
  */
 export function edit (data) {
   return request({
-    url: servicePath.admin + '/sys/dept/update',
+    url: servicePath.system + '/sys/dept/update',
     method: 'put',
     data: data
   })

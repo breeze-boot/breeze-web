@@ -1,13 +1,15 @@
 <template>
-  <bpmn-modeler
-    ref="refNode"
-    :categorys="categorys"
-    :groups="groups"
-    :is-view="false"
-    :users="users"
-    :xml="xml"
-    @save="save"
-  />
+  <el-container class="designer">
+    <bpmn-modeler
+      ref="refNode"
+      :categorys="categorys"
+      :groups="groups"
+      :is-view="false"
+      :users="users"
+      :xml="xml"
+      @save="save"
+    />
+  </el-container>
 </template>
 
 <script>
@@ -73,30 +75,32 @@ export default {
   }
 }
 </script>
-<style>
-.flow-containers .djs-palette {
-  left: 0px !important;
-  top: 0px;
-  border: 1px solid rgba(199, 197, 197, 0.32);
-  width: 130px !important;
-  margin: 10px 20px;
-  border-radius: 10px !important;
-}
+<style lang="less">
+.designer {
+  .flow-containers .djs-palette {
+    left: 0px !important;
+    top: 0px;
+    border: 1px solid rgba(199, 197, 197, 0.32);
+    width: 130px !important;
+    margin: 10px 20px;
+    border-radius: 10px !important;
+  }
 
-.is-vertical .el-aside {
-  background: rgb(240, 240, 240) !important;
-  margin-top: 5px;
-  border-radius: 10px !important;
-}
+  .is-vertical .el-aside {
+    background: rgb(240, 240, 240) !important;
+    margin-top: 5px;
+    border-radius: 10px !important;
+  }
 
-.flow-containers {
-  background-image: linear-gradient(90deg, rgba(60, 10, 30, .04) 3%, transparent 0), linear-gradient(1turn, rgba(60, 10, 30, .04) 3%, transparent 0);
-  background-size: 20px 20px;
-  background-position: 50%;
-  background-repeat: repeat;
-}
+  .flow-containers {
+    background-image: linear-gradient(90deg, rgba(60, 10, 30, .04) 3%, transparent 0), linear-gradient(1turn, rgba(60, 10, 30, .04) 3%, transparent 0);
+    background-size: 20px 20px;
+    background-position: 50%;
+    background-repeat: repeat;
+  }
 
-.is-vertical .el-header {
-  background: rgb(253, 253, 253) !important;
+  .is-vertical .el-header {
+    background: rgb(253, 253, 253) !important;
+  }
 }
 </style>

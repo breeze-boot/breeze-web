@@ -4,7 +4,8 @@
       <Header/>
     </el-header>
     <el-container>
-      <el-aside style="box-shadow: 5px 0 5px -5px rgb(112,109,109); width: fit-content;">
+      <el-aside
+        style="box-shadow: 5px 0 5px -5px rgb(112,109,109); background: #545c64; height: 93vh;width: fit-content;">
         <Menu/>
       </el-aside>
       <el-main style="padding: 1px 20px;">

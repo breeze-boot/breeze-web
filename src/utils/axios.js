@@ -5,7 +5,7 @@ let loadingInstance = {}
 
 /**
  * 创建的实例返回一个对象,实例对象
-  */
+ */
 export const request = axios.create({
   // 请求路径，基础接口路径 请求 9000 时经过/dev-api相当于请求
   // http://localhost:9000
@@ -35,7 +35,7 @@ export const showWaringMsg = (success, msg) => {
  * @type {string}
  */
 export const servicePath = {
-  admin: ''
+  system: ''
 }
 
 /**
@@ -70,8 +70,7 @@ request.interceptors.response.use((success) => {
     if (success.data.code === 2 && success.data.message) {
       // 警告
       showWaringMsg(success, '请求不合法')
-    }
-    if (success.data.code === 0 && success.data.message) {
+    } else if (success.data.code === 0 && success.data.message) {
       // 错误
       showErrorMsg(success, '系统异常')
     } else if (success.status && success.status !== 200) {

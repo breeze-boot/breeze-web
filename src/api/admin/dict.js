@@ -8,7 +8,7 @@ import JSONBigInt from 'json-bigint'
  */
 export function list (data) {
   return request({
-    url: servicePath.admin + '/sys/dict/list',
+    url: servicePath.system + '/sys/dict/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -25,7 +25,7 @@ export function list (data) {
  */
 export function add (data) {
   return request({
-    url: servicePath.admin + '/sys/dict/save',
+    url: servicePath.system + '/sys/dict/save',
     method: 'post',
     data: data
   })
@@ -39,7 +39,7 @@ export function add (data) {
  */
 export function del (data) {
   return request({
-    url: servicePath.admin + '/sys/dict/delete',
+    url: servicePath.system + '/sys/dict/delete',
     method: 'delete',
     data: data
   })
@@ -53,7 +53,7 @@ export function del (data) {
  */
 export function edit (data) {
   return request({
-    url: servicePath.admin + '/sys/dict/update',
+    url: servicePath.system + '/sys/dict/update',
     method: 'put',
     data: data
   })
@@ -65,7 +65,7 @@ export function edit (data) {
  */
 export function open (data) {
   return request({
-    url: servicePath.admin + '/sys/dict/open',
+    url: servicePath.system + '/sys/dict/open',
     method: 'put',
     data: data
   })

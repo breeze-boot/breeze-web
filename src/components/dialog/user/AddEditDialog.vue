@@ -2,7 +2,7 @@
   <el-dialog :title="title" :visible.sync="dialogVisible" width="800px"
              @close="closeDialog('ruleForm')">
     <el-form v-show="!show" ref="ruleForm" :model="user" :rules="rules" size="mini" style="padding-right: 15px;">
-      <el-form-item>
+      <el-form-item style="text-align: center;">
         <el-upload
           :before-upload="beforeAvatarUpload"
           :on-success="handleAvatarSuccess"
@@ -180,7 +180,7 @@ export default {
       },
       deptOption: [
         {
-          value: 1,
+          value: 1565314987957145600,
           label: 'CEO'
         }
       ],

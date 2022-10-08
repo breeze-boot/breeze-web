@@ -187,6 +187,9 @@ export default {
     },
     importInfo () {
     },
+    handleSelectionChange (val) {
+      this.multipleSelection = val
+    },
     add () {
       this.title = '创建平台'
       this.$refs.addEditDialog.showDialogVisible({}, DIALOG_TYPE.ADD)
@@ -194,9 +197,6 @@ export default {
     edit (val) {
       this.title = '修改平台'
       this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.EDIT)
-    },
-    handleSelectionChange (val) {
-      this.multipleSelection = val
     },
     show (val) {
       this.title = '查看信息'
