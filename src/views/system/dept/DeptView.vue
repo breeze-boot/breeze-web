@@ -72,7 +72,7 @@
 
 <script>
 import AddEditDialog from '@/components/dialog/dept/AddEditDialog'
-import { del, list } from '@/api/admin/dept'
+import { del, list } from '@/api/system/dept'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 
 export default {

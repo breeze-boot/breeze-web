@@ -150,7 +150,7 @@
 </template>
 
 <script>
-import { del, list } from '@/api/admin/log'
+import { del, list } from '@/api/system/log'
 import ShowDialog from '@/components/dialog/log/ShowDialog'
 import { confirmAlert } from '@/utils/constant'
 

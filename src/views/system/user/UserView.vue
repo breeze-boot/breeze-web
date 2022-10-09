@@ -152,7 +152,7 @@
 <script>
 import AddEditDialog from '@/components/dialog/user/AddEditDialog'
 import ResetPassDialog from '@/components/dialog/user/ResetPassDialog'
-import { del, list, open } from '@/api/admin/user'
+import { del, list, open } from '@/api/system/user'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
 

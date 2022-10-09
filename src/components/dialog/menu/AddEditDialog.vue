@@ -31,31 +31,36 @@
         ></el-cascader>
       </el-form-item>
 
-      <el-form-item :label-width="formLabelWidth" label="标题" prop="title">
-        <el-input v-model="menu.title" autocomplete="off" clearable placeholder="请输入组件显示的标题"></el-input>
-      </el-form-item>
-
-      <el-form-item v-if="btnVisible" :label-width="formLabelWidth" label="组件图标" prop="icon">
-        <el-input v-model="menu.icon" autocomplete="off" clearable placeholder="请选择组件图标"></el-input>
-      </el-form-item>
-
-      <el-form-item v-if="btnVisible" :label-width="formLabelWidth" label="组件名称" prop="name">
-        <el-input v-model="menu.name" autocomplete="off" clearable placeholder="请输入组件名称"></el-input>
-      </el-form-item>
-
-      <el-form-item v-if="btnVisible" :label-width="formLabelWidth" label="菜单路径" prop="path">
-        <el-input v-model="menu.path" autocomplete="off" clearable placeholder="请输入菜单路径"></el-input>
-      </el-form-item>
-
       <el-form-item :label-width="formLabelWidth" label="排序" prop="sort" style="text-align: left;">
         <el-input-number v-model="menu.sort" :max="10" :min="1" label="排序" @change="handleChangeSort"/>
       </el-form-item>
 
-      <el-form-item v-if="btnVisible" :label-width="formLabelWidth" label="组件路径" prop="component">
+      <el-form-item :label-width="formLabelWidth" label="标题" prop="title">
+        <el-input v-model="menu.title" autocomplete="off" clearable placeholder="请输入组件显示的标题"></el-input>
+      </el-form-item>
+
+      <el-form-item :label-width="formLabelWidth" label="组件图标"
+                    prop="icon">
+        <el-input v-model="menu.icon" autocomplete="off" clearable placeholder="请选择组件图标"></el-input>
+      </el-form-item>
+
+      <el-form-item v-if="menu.type === 'folder' || menu.type === 'menu'" :label-width="formLabelWidth" label="菜单路径"
+                    prop="path">
+        <el-input v-model="menu.path" autocomplete="off" clearable placeholder="请输入菜单路径"></el-input>
+      </el-form-item>
+
+      <el-form-item v-if="menu.type === 'menu'" :label-width="formLabelWidth" label="组件名称"
+                    prop="name">
+        <el-input v-model="menu.name" autocomplete="off" clearable placeholder="请输入组件名称"></el-input>
+      </el-form-item>
+
+      <el-form-item v-if="menu.type === 'menu'" :label-width="formLabelWidth" label="组件路径"
+                    prop="component">
         <el-input v-model="menu.component" autocomplete="off" clearable placeholder="请输入组件路径"></el-input>
       </el-form-item>
 
-      <el-form-item v-if="folderVisible" :label-width="formLabelWidth" label="权限标识" prop="permission">
+      <el-form-item v-if="menu.type === 'menu' || menu.type === 'btn'" :label-width="formLabelWidth" label="权限标识"
+                    prop="permission">
         <el-input v-model="menu.permission" autocomplete="off" clearable placeholder="请输入权限标识"></el-input>
       </el-form-item>
     </el-form>
@@ -156,7 +161,7 @@
 
 <script>
 import { DIALOG_TYPE } from '@/utils/constant'
-import { add, edit, selectMenu } from '@/api/admin/menu'
+import { add, edit, selectMenu } from '@/api/system/menu'
 import { Message } from 'element-ui'
 
 export default {
@@ -167,10 +172,6 @@ export default {
   data () {
     return {
       dialogVisible: false,
-      // folder需要隐藏的
-      folderVisible: false,
-      // btn需要隐藏的
-      btnVisible: true,
       menu: {
         id: null,
         name: '',
@@ -240,13 +241,6 @@ export default {
             trigger: 'change'
           }
         ],
-        icon: [
-          {
-            required: true,
-            message: '请选择icon图标',
-            trigger: 'blur'
-          }
-        ],
         permission: [
           {
             required: true,
@@ -289,18 +283,6 @@ export default {
     this.selectMenu()
   },
   methods: {
-    handleTypeChange (e) {
-      if (e === 'menu') {
-        this.folderVisible = true
-        this.btnVisible = true
-      } else if (e === 'btn') {
-        this.folderVisible = true
-        this.btnVisible = false
-      } else {
-        this.folderVisible = false
-        this.btnVisible = true
-      }
-    },
     handleChangeSort (val) {
       debugger
     },

@@ -104,8 +104,8 @@
 
 <script>
 import AddEditDialog from '@/components/dialog/role/AddEditDialog'
-import { del, editPermission, list, listRolesPermission } from '@/api/admin/role'
-import { listTreePermission } from '@/api/admin/menu'
+import { del, editPermission, list, listRolesPermission } from '@/api/system/role'
+import { listTreePermission } from '@/api/system/menu'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 
 export default {

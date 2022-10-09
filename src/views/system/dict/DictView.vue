@@ -102,7 +102,7 @@
 <script>
 import AddEditDialog from '@/components/dialog/dict/AddEditDialog'
 import DictItemDialog from '@/components/dialog/dict/DictItemDialog'
-import { del, list, open } from '@/api/admin/dict'
+import { del, list, open } from '@/api/system/dict'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
 

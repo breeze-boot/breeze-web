@@ -42,7 +42,7 @@
 
 <script>
 import Verify from '@/components/verifition/Verify'
-import { jwtToken } from '@/api/admin/login'
+import { jwtToken } from '@/api/system/login'
 
 export default {
   name: 'userLogin',

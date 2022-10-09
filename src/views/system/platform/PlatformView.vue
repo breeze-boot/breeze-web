@@ -98,7 +98,7 @@
 
 <script>
 import AddEditDialog from '@/components/dialog/platform/AddEditDialog'
-import { del, list } from '@/api/admin/platform'
+import { del, list } from '@/api/system/platform'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 
 export default {

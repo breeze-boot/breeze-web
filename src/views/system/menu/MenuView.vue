@@ -49,13 +49,13 @@
           width="200">
         </el-table-column>
         <el-table-column
-          label="菜单名称"
+          label="标题"
           prop="title"
           show-overflow-tooltip
           width="180">
         </el-table-column>
         <el-table-column
-          label="路由名称"
+          label="组件名称"
           prop="name"
           show-overflow-tooltip>
         </el-table-column>
@@ -76,7 +76,7 @@
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
-          label="路由路径"
+          label="菜单路径"
           prop="path"
           show-overflow-tooltip>
         </el-table-column>
@@ -113,7 +113,7 @@
 
 <script>
 import AddEditDialog from '@/components/dialog/menu/AddEditDialog'
-import { del, list } from '@/api/admin/menu'
+import { del, list } from '@/api/system/menu'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 
 export default {

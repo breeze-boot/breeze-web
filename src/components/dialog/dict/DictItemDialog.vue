@@ -31,7 +31,7 @@
 <script>
 import DictItemAddEditDialog from '@/components/dialog/dict/DictItemAddEditDialog'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
-import { del, list } from '@/api/admin/dictItem'
+import { del, list } from '@/api/system/dictItem'
 
 export default {
   name: 'DictItemDialog',

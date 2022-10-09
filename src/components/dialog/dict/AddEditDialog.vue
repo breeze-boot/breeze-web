@@ -44,7 +44,7 @@
 
 <script>
 import { DIALOG_TYPE } from '@/utils/constant'
-import { add, edit } from '@/api/admin/dict'
+import { add, edit } from '@/api/system/dict'
 import { Message } from 'element-ui'
 
 export default {
