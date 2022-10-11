@@ -323,8 +323,8 @@ export default {
         let moveLeftDistance = parseInt(
           (this.moveBlockLeft || '').replace('px', '')
         )
-        moveLeftDistance =
-          (moveLeftDistance * 310) / parseInt(this.setSize.imgWidth)
+        moveLeftDistance = (moveLeftDistance * 310) / parseInt(this.setSize.imgWidth)
+        moveLeftDistance = isNaN(moveLeftDistance) ? '0' : moveLeftDistance
         const data = {
           captchaType: this.captchaType,
           pointJson: this.secretKey

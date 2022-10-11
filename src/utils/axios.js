@@ -10,7 +10,7 @@ export const request = axios.create({
   // 请求路径，基础接口路径 请求 9000 时经过/dev-api相当于请求
   // http://localhost:9000
   baseURL: process.env.VUE_APP_BASE_API,
-  timeout: 100000 // 请求超时时间
+  timeout: 30000 // 请求超时时间
 })
 
 export const showErrorMsg = (success, msg) => {
@@ -73,23 +73,22 @@ request.interceptors.response.use((success) => {
     } else if (success.data.code === 0 && success.data.message) {
       // 错误
       showErrorMsg(success, '系统异常')
-    } else if (success.status && success.status !== 200) {
-      showErrorMsg(success, '系统异常')
+    } else if (success.data.code === 500) {
+      console.error(success.data.data)
+      showErrorMsg(success, '服务异常')
+      return success.data
+    } else if (success.status === 401) {
+      showErrorMsg(success, success.data.message)
+      return success.data
     }
     loadingInstance.close()
     return success.data
   }
 }, (error) => {
-  console.error(error.response.status)
-  if (error.response.status === 500 || error.response.status === 404) {
-    Message.error({ message: '服务异常' })
-  } else if (error.response.status === 401) {
-    Message.error({ message: error.response.data.message })
-  } else {
-    if (error.response.data.message) {
-      Message.error({ message: error.response.data.message })
-    } else {
-      Message.error({ message: '服务异常' })
-    }
+  if (error.message.includes('timeout of')) {
+    Message.error({ message: '请求超时' })
+  } else if (error.response.status === 404) {
+    Message.error({ message: '请求地址不存在' })
   }
+  console.error(error.response.status)
 })
