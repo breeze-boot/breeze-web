@@ -103,8 +103,6 @@ export default {
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .userLogin {
   position: absolute;
@@ -112,12 +110,11 @@ export default {
   top: 50%;
   transform: translate(-50%, -70%);
   background: rgba(236, 236, 236, 0.5);
-  border-radius: 15px;
   background-clip: padding-box;
   padding: 2vh 2vw;
-  width: 18vw;
-  border: 1px #eaeaea solid;
-  box-shadow: 0 0 10px #9b9b9b;
+  min-width: 18vw;
+  border: 1px #bdbdbd solid;
+  box-shadow: 0 0 5px #9b9b9b;
 }
 
 .userLogin > h3 {

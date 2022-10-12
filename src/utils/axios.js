@@ -69,7 +69,7 @@ request.interceptors.response.use((success) => {
   if (success.status && success.status === 200) {
     if (success.data.code === 2 && success.data.message) {
       // 警告
-      showWaringMsg(success, '请求不合法')
+      showWaringMsg(success, success.data.message)
     } else if (success.data.code === 0 && success.data.message) {
       // 错误
       showErrorMsg(success, '系统异常')
@@ -79,6 +79,7 @@ request.interceptors.response.use((success) => {
       return success.data
     } else if (success.status === 401) {
       showErrorMsg(success, success.data.message)
+      // TODO 重新登录
       return success.data
     }
     loadingInstance.close()

@@ -97,14 +97,18 @@ export default {
     },
     add () {
       add(this.platform).then((rep) => {
-        Message.success({ message: rep.message })
+        if (rep.code === 1) {
+          Message.success({ message: '添加成功' })
+        }
         this.dialogVisible = false
         this.$emit('reloadList')
       })
     },
     edit () {
       edit(this.platform).then((rep) => {
-        Message.success({ message: rep.message })
+        if (rep.code === 1) {
+          Message.success({ message: '修改成功' })
+        }
         this.dialogVisible = false
         this.$emit('reloadList')
       })
@@ -118,7 +122,6 @@ export default {
      * flag 0 创建 1 修改 2 显示
      */
     showDialogVisible (val, dialogStatus) {
-      debugger
       this.dialogVisible = true
       if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
         this.$nextTick(() => {

@@ -145,7 +145,6 @@ export default {
         this.$message.warning('请先点击角色')
         return
       }
-      debugger
       editPermission({
         roleId: this.roleId,
         permissionIds: checkedKeys

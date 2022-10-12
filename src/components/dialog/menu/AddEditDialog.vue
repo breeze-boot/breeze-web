@@ -13,7 +13,7 @@
         </el-select>
       </el-form-item>
       <el-form-item :label-width="formLabelWidth" label="组件类型" prop="type" style="text-align: left;">
-        <el-radio-group v-model="menu.type" @change="handleTypeChange">
+        <el-radio-group v-model="menu.type">
           <el-radio-button
             v-for="item in typeOptions"
             :key="item.label"
@@ -28,6 +28,8 @@
           :options="menuOption"
           :props="{ checkStrictly: true }"
           filterable
+          clearable
+          :show-all-levels="false"
         ></el-cascader>
       </el-form-item>
 
@@ -110,14 +112,16 @@
           <i class="el-icon-tickets"></i>
           父级元素
         </template>
-        <el-select v-model="menu.deptId" :disabled="true" size="mini">
-          <el-option
-            v-for="item in menuOption"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
-        </el-select>
+        <el-cascader
+          disabled
+          v-model="menu.parentId"
+          size="mini"
+          :options="menuOption"
+          :props="{ checkStrictly: true }"
+          filterable
+          clearable
+          :show-all-levels="false"
+        ></el-cascader>
       </el-descriptions-item>
       <el-descriptions-item>
         <template slot="label">
@@ -284,7 +288,6 @@ export default {
   },
   methods: {
     handleChangeSort (val) {
-      debugger
     },
     selectMenu () {
       selectMenu().then(resp => {
@@ -309,7 +312,6 @@ export default {
       })
     },
     add () {
-      debugger
       this.menu.parentId = this.menu.parentId[this.menu.parentId.length - 1]
       add(this.menu).then((rep) => {
         if (rep.data) {
@@ -336,11 +338,13 @@ export default {
      * flag 0 创建 1 修改 2 显示
      */
     showDialogVisible (val, dialogStatus) {
+      debugger
       this.dialogVisible = true
       if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
         this.$nextTick(() => {
           // 赋值
           Object.assign(this.menu, val)
+          this.menu.parentId = val.parentId.toString()
         })
       }
       if (dialogStatus === DIALOG_TYPE.SHOW) {

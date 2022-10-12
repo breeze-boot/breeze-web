@@ -4,13 +4,14 @@
       <Header/>
     </el-header>
     <el-container>
-      <el-aside
-        style="box-shadow: 5px 0 5px -5px rgb(112,109,109); background: #545c64; height: 93vh;width: fit-content;">
+      <el-aside class="left-aside">
         <Menu/>
       </el-aside>
       <el-main style="padding: 1px 20px;">
         <Tabs/>
-        <router-view style="height: 83vh; box-shadow: 1px 1px 5px #eee;"/>
+        <router-view
+          class="router-main"
+          :style="{animationName: 'headShake', animationDuration: 0.5 + 's'}"/>
       </el-main>
     </el-container>
   </el-container>
@@ -42,5 +43,17 @@ export default {
 .el-header {
   padding: 0;
   color: #333;
+}
+
+.left-aside {
+  box-shadow: 5px 0 5px -5px rgb(112, 109, 109);
+  background: #545c64;
+  height: 93vh;
+  width: fit-content !important;
+}
+
+.router-main {
+  height: 83vh;
+  box-shadow: 1px 1px 5px #eee;
 }
 </style>

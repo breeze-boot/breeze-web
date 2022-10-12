@@ -125,7 +125,6 @@ export default {
       })
     },
     deleteTreeTableData (rows, index) {
-      debugger
       for (let i = 0; i < rows.length; i++) {
         if (this.rowIndex === index) {
           rows.splice(i, 1)
