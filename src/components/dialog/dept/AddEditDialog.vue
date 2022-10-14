@@ -89,16 +89,20 @@ export default {
     },
     add () {
       add(this.dept).then((rep) => {
-        Message.success({ message: rep.message })
-        this.dialogVisible = false
-        this.$emit('reloadList')
+        if (rep.code === 1) {
+          Message.success({ message: rep.message })
+          this.dialogVisible = false
+          this.$emit('reloadList')
+        }
       })
     },
     edit () {
       edit(this.dept).then((rep) => {
-        Message.success({ message: rep.message })
-        this.dialogVisible = false
-        this.$emit('reloadList')
+        if (rep.code === 1) {
+          Message.success({ message: rep.message })
+          this.dialogVisible = false
+          this.$emit('reloadList')
+        }
       })
     },
     resetForm (formName) {
@@ -110,6 +114,7 @@ export default {
      * flag 0 创建 1 修改 2 显示
      */
     showDialogVisible (val, dialogStatus) {
+      debugger
       this.dialogVisible = true
       if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
         this.$nextTick(() => {

@@ -99,18 +99,18 @@ export default {
       add(this.platform).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '添加成功' })
+          this.dialogVisible = false
+          this.$emit('reloadList')
         }
-        this.dialogVisible = false
-        this.$emit('reloadList')
       })
     },
     edit () {
       edit(this.platform).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '修改成功' })
+          this.dialogVisible = false
+          this.$emit('reloadList')
         }
-        this.dialogVisible = false
-        this.$emit('reloadList')
       })
     },
     resetForm (formName) {

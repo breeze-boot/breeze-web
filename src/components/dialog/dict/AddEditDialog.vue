@@ -96,16 +96,20 @@ export default {
     },
     add () {
       add(this.dict).then((rep) => {
-        Message.success({ message: rep.message })
-        this.dialogVisible = false
-        this.$emit('reloadList')
+        if (rep.code === 1) {
+          Message.success({ message: rep.message })
+          this.dialogVisible = false
+          this.$emit('reloadList')
+        }
       })
     },
     edit () {
       edit(this.dict).then((rep) => {
-        Message.success({ message: rep.message })
-        this.dialogVisible = false
-        this.$emit('reloadList')
+        if (rep.code === 1) {
+          Message.success({ message: rep.message })
+          this.dialogVisible = false
+          this.$emit('reloadList')
+        }
       })
     },
     resetForm (formName) {

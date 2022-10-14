@@ -98,10 +98,12 @@ export function edit (data) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function selectMenu (data) {
+export function selectMenu () {
   return request({
     url: servicePath.system + '/sys/open/selectMenu',
     method: 'get',
-    data: data
+    transformResponse: [(data) => {
+      return JSONBigInt.parse(data)
+    }]
   })
 }

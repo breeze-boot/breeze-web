@@ -22,7 +22,7 @@
           </el-radio-button>
         </el-radio-group>
       </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="上级菜单" prop="parentId">
+      <el-form-item class="parentId" :label-width="formLabelWidth" label="上级菜单" prop="parentId">
         <el-cascader
           v-model="menu.parentId"
           :options="menuOption"
@@ -46,22 +46,22 @@
         <el-input v-model="menu.icon" autocomplete="off" clearable placeholder="请选择组件图标"></el-input>
       </el-form-item>
 
-      <el-form-item v-if="menu.type === 'folder' || menu.type === 'menu'" :label-width="formLabelWidth" label="菜单路径"
+      <el-form-item v-if="menu.type === 0 || menu.type === 1" :label-width="formLabelWidth" label="菜单路径"
                     prop="path">
         <el-input v-model="menu.path" autocomplete="off" clearable placeholder="请输入菜单路径"></el-input>
       </el-form-item>
 
-      <el-form-item v-if="menu.type === 'menu'" :label-width="formLabelWidth" label="组件名称"
+      <el-form-item v-if="menu.type === 1" :label-width="formLabelWidth" label="组件名称"
                     prop="name">
         <el-input v-model="menu.name" autocomplete="off" clearable placeholder="请输入组件名称"></el-input>
       </el-form-item>
 
-      <el-form-item v-if="menu.type === 'menu'" :label-width="formLabelWidth" label="组件路径"
+      <el-form-item v-if="menu.type === 1" :label-width="formLabelWidth" label="组件路径"
                     prop="component">
         <el-input v-model="menu.component" autocomplete="off" clearable placeholder="请输入组件路径"></el-input>
       </el-form-item>
 
-      <el-form-item v-if="menu.type === 'menu' || menu.type === 'btn'" :label-width="formLabelWidth" label="权限标识"
+      <el-form-item v-if="menu.type === 1 || menu.type === 2" :label-width="formLabelWidth" label="权限标识"
                     prop="permission">
         <el-input v-model="menu.permission" autocomplete="off" clearable placeholder="请输入权限标识"></el-input>
       </el-form-item>
@@ -187,21 +187,21 @@ export default {
         component: '',
         platformId: '',
         platformName: '',
-        type: 'folder',
+        type: 0,
         path: ''
       },
       menuOption: [],
       typeOptions: [
         {
-          label: 'folder',
+          label: 0,
           name: '文件夹'
         },
         {
-          label: 'menu',
+          label: 1,
           name: '菜单'
         },
         {
-          label: 'btn',
+          label: 2,
           name: '按钮'
         }
       ],
@@ -284,20 +284,29 @@ export default {
     }
   },
   mounted () {
-    this.selectMenu()
   },
   methods: {
     handleChangeSort (val) {
     },
     selectMenu () {
-      selectMenu().then(resp => {
-        if (resp.data) {
+      selectMenu().then(res => {
+        if (res.code === 1 && res.data) {
           const root = [{
             value: '0',
             label: '根节点',
-            children: resp.data
+            children: res.data
           }]
           this.menuOption = root
+          if (this.dialogStatus === DIALOG_TYPE.EDIT) {
+            this.$nextTick(() => {
+              const temp = this.filterMenuParentId(res.data, (tree) => tree.id && tree.id.eq(this.menu.parentId), 'id')
+              const temp1 = ['0']
+              temp.forEach(id => {
+                temp1.push(id.toString())
+              })
+              this.menu.parentId = temp1
+            })
+          }
         }
       })
     },
@@ -314,7 +323,7 @@ export default {
     add () {
       this.menu.parentId = this.menu.parentId[this.menu.parentId.length - 1]
       add(this.menu).then((rep) => {
-        if (rep.data) {
+        if (rep.code === 1) {
           Message.success({ message: rep.message })
           this.dialogVisible = false
           this.$emit('reloadList')
@@ -324,9 +333,11 @@ export default {
     edit () {
       this.menu.parentId = this.menu.parentId[this.menu.parentId.length - 1]
       edit(this.menu).then((rep) => {
-        Message.success({ message: rep.message })
-        this.dialogVisible = false
-        this.$emit('reloadList')
+        if (rep.code === 1) {
+          Message.success({ message: rep.message })
+          this.dialogVisible = false
+          this.$emit('reloadList')
+        }
       })
     },
     resetForm (formName) {
@@ -338,13 +349,12 @@ export default {
      * flag 0 创建 1 修改 2 显示
      */
     showDialogVisible (val, dialogStatus) {
-      debugger
+      this.selectMenu()
       this.dialogVisible = true
       if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
         this.$nextTick(() => {
           // 赋值
           Object.assign(this.menu, val)
-          this.menu.parentId = val.parentId.toString()
         })
       }
       if (dialogStatus === DIALOG_TYPE.SHOW) {
@@ -357,11 +367,34 @@ export default {
       this.$refs[formName].clearValidate()
       this.$refs[formName].resetFields()
       this.show = false
+    },
+    /**
+     * @param menuTree 原始数据
+     * @param func 比较方式
+     * @param filed 要收集起来的属性字段
+     * @param result 结果集
+     */
+    filterMenuParentId (menuTree, func, filed = '', result = []) {
+      if (!menuTree) return []
+      for (const tree of menuTree) {
+        filed !== '' ? result.push(tree[filed]) : result.push(tree)
+        if (func(tree)) return result
+        if (tree.children) {
+          const children = this.filterMenuParentId(tree.children, func, filed, result)
+          if (children.length) {
+            return children
+          }
+        }
+        result.pop()
+      }
+      return []
     }
   }
 }
-
 </script>
 
 <style>
+
+.parentId {
+}
 </style>

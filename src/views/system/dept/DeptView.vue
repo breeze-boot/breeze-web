@@ -47,10 +47,6 @@
           prop="deptCode">
         </el-table-column>
         <el-table-column
-          label="是否停用"
-          prop="isClose">
-        </el-table-column>
-        <el-table-column
           fixed="right"
           label="操作"
           width="150">
