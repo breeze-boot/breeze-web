@@ -41,7 +41,7 @@
         <el-input v-model="menu.title" autocomplete="off" clearable placeholder="请输入组件显示的标题"></el-input>
       </el-form-item>
 
-      <el-form-item :label-width="formLabelWidth" label="组件图标"
+      <el-form-item v-if="menu.type === 0 || menu.type === 1" :label-width="formLabelWidth" label="组件图标"
                     prop="icon">
         <el-input v-model="menu.icon" autocomplete="off" clearable placeholder="请选择组件图标"></el-input>
       </el-form-item>
