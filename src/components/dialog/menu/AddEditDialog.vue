@@ -12,8 +12,10 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="组件类型" style="text-align: left;">
-        <el-radio-group v-model="menu.type">
+      <el-form-item :label-width="formLabelWidth" label="组件类型"
+                    style="text-align: left;">
+        <el-radio-group v-model="menu.type"
+                        @click="menu.type === 2 ? menu.href = 0 : menu.href = 1">
           <el-radio-button
             v-for="item in typeOptions"
             :key="item.label"
@@ -22,10 +24,33 @@
           </el-radio-button>
         </el-radio-group>
       </el-form-item>
+
+      <el-form-item v-if="menu.type === 1" :label-width="formLabelWidth" label="外链" style="text-align: left;">
+        <el-radio-group v-model="menu.href">
+          <el-radio-button
+            v-for="item in hrefOptions"
+            :key="item.label"
+            :label="item.label">
+            {{ item.name }}
+          </el-radio-button>
+        </el-radio-group>
+      </el-form-item>
+
+      <el-form-item v-if="menu.type === 1" :label-width="formLabelWidth" label="缓存" style="text-align: left;">
+        <el-radio-group v-model="menu.keepAlive">
+          <el-radio-button
+            v-for="item in keepAliveOptions"
+            :key="item.label"
+            :label="item.label">
+            {{ item.name }}
+          </el-radio-button>
+        </el-radio-group>
+      </el-form-item>
+
       <el-form-item class="parentId" :label-width="formLabelWidth" label="上级菜单" prop="parentId">
         <el-cascader
           v-model="menu.parentId"
-          :options="menuOption"
+          :options="menuOptions"
           :props="{ checkStrictly: true }"
           filterable
           clearable
@@ -48,22 +73,24 @@
         {{ menu.icon }}
       </el-form-item>
 
-      <el-form-item v-if="menu.type === 0 || menu.type === 1" :label-width="formLabelWidth" label="菜单路径"
+      <el-form-item v-if="menu.type === 0 || menu.type === 1" :label-width="formLabelWidth"
+                    label="菜单路径"
                     prop="path">
         <el-input v-model="menu.path" autocomplete="off" clearable placeholder="请输入菜单路径"></el-input>
       </el-form-item>
 
-      <el-form-item v-if="menu.type === 1" :label-width="formLabelWidth" label="组件名称"
+      <el-form-item v-if="menu.href === 0 && menu.type === 1" :label-width="formLabelWidth" label="组件名称"
                     prop="name">
         <el-input v-model="menu.name" autocomplete="off" clearable placeholder="请输入组件名称"></el-input>
       </el-form-item>
 
-      <el-form-item v-if="menu.type === 1" :label-width="formLabelWidth" label="组件路径"
+      <el-form-item v-if="menu.href === 0 && menu.type === 1" :label-width="formLabelWidth" label="组件路径"
                     prop="component">
         <el-input v-model="menu.component" autocomplete="off" clearable placeholder="请输入组件路径"></el-input>
       </el-form-item>
 
-      <el-form-item v-if="menu.type === 1 || menu.type === 2" :label-width="formLabelWidth" label="权限标识"
+      <el-form-item v-if="menu.href === 0 && (menu.type === 1 || menu.type === 2)" :label-width="formLabelWidth"
+                    label="权限标识"
                     prop="permission">
         <el-input v-model="menu.permission" autocomplete="off" clearable placeholder="请输入权限标识"></el-input>
       </el-form-item>
@@ -109,6 +136,22 @@
         </template>
         {{ menu.platformName }}
       </el-descriptions-item>
+
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-tickets"></i>
+          开启缓存
+        </template>
+        {{ menu.keepAlive }}
+      </el-descriptions-item>
+
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-tickets"></i>
+          外链
+        </template>
+        {{ menu.href }}
+      </el-descriptions-item>
       <el-descriptions-item>
         <template slot="label">
           <i class="el-icon-tickets"></i>
@@ -118,7 +161,7 @@
           disabled
           v-model="menu.parentId"
           size="mini"
-          :options="menuOption"
+          :options="menuOptions"
           :props="{ checkStrictly: true }"
           filterable
           clearable
@@ -197,10 +240,32 @@ export default {
         parentId: '0',
         permission: '',
         component: '',
+        href: 0,
+        keepAlive: 0,
         type: 0,
         path: ''
       },
-      menuOption: [],
+      menuOptions: [],
+      hrefOptions: [
+        {
+          label: 0,
+          name: '组件'
+        },
+        {
+          label: 1,
+          name: '外链'
+        }
+      ],
+      keepAliveOptions: [
+        {
+          label: 0,
+          name: '关闭缓存'
+        },
+        {
+          label: 1,
+          name: '开启缓存'
+        }
+      ],
       typeOptions: [
         {
           label: 0,
@@ -284,7 +349,7 @@ export default {
             label: '根节点',
             children: res.data
           }]
-          this.menuOption = root
+          this.menuOptions = root
           if (this.dialogStatus === DIALOG_TYPE.EDIT) {
             this.$nextTick(() => {
               const treeTemp = this.filterMenuParentId(res.data, (tree) => tree.id && tree.id.eq(this.menu.parentId), 'id')
@@ -343,6 +408,7 @@ export default {
       this.dialogVisible = true
       if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
         this.$nextTick(() => {
+          debugger
           // 赋值
           Object.assign(this.menu, val)
         })
@@ -365,7 +431,9 @@ export default {
           parentId: '0',
           permission: '',
           component: '',
+          href: 0,
           type: 0,
+          keepAlive: 0,
           path: ''
         }
       })
