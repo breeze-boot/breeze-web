@@ -10,6 +10,7 @@ requireAll(req)
 // icons
 const requireAllIcon = requireContext => requireContext.keys()
 const icons = requireAllIcon(req).map(i => {
-  return i.match(/\.\/(.*)\.svg/)[1]
+  const icon = i.match(/\.\/(.*)\.svg/)[1]
+  return icon.replace('icon-', '')
 })
 export default icons

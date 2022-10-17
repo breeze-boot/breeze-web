@@ -135,8 +135,8 @@ const menuToRoute = (menu) => {
     meta: {
       icon: menu.icon,
       title: menu.title,
-      roles: menu.roles,
-      permissions: menu.permissions
+      roles: menu.roles || '',
+      permissions: menu.permissions || ''
     }
   }
   route.component = loadView(menu.component)

@@ -107,6 +107,7 @@ import AddEditDialog from '@/components/dialog/role/AddEditDialog'
 import { del, editPermission, list, listRolesPermission } from '@/api/system/role'
 import { listTreePermission } from '@/api/system/menu'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { Message } from 'element-ui'
 
 export default {
   name: 'RoleView',
@@ -137,6 +138,11 @@ export default {
   methods: {
     submitPermission () {
       const checkedKeys = this.$refs.roleTree.getCheckedKeys()
+      const halfCheckedKeys = this.$refs.roleTree.getHalfCheckedKeys()
+      if (halfCheckedKeys.length > 0) {
+        checkedKeys.push(...halfCheckedKeys)
+      }
+      debugger
       if (checkedKeys.length <= 0) {
         this.$message.warning('请选择角色权限')
         return
@@ -149,7 +155,10 @@ export default {
         roleId: this.roleId,
         permissionIds: checkedKeys
       }).then(rep => {
-        console.log(rep)
+        if (rep.code === 1) {
+          Message.success({ message: rep.message })
+          this.listSelectedTreeData(this.roleId.toString())
+        }
       })
     },
     resetPermission () {
@@ -175,11 +184,11 @@ export default {
     listSelectedTreeData (roleId) {
       listRolesPermission(roleId).then((rep) => {
         if (rep.code === 1) {
-          const selectTreeData = []
-          rep.data.forEach(roleData => {
-            selectTreeData.push(roleData.menuId)
+          this.$nextTick(() => {
+            rep.data.forEach(data => {
+              this.$refs.roleTree.setChecked(data.menuId.toString(), true, false)
+            })
           })
-          this.$refs.roleTree.setCheckedKeys(selectTreeData)
           this.disabled = false
         }
       })

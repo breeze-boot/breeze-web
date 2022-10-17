@@ -77,11 +77,12 @@ export default {
   methods: {
     success () {
       jwtToken(this.userLogin).then((response) => {
-        if (response) {
+        if (response.code === 1) {
           localStorage.setItem('access_token', response.data.access_token)
-          // const path = this.$route.query.redirect
+          localStorage.setItem('permissions', response.data.permissions)
+          const path = this.$route.query.redirect
           // this.$router.replace(path === '/' || path === undefined ? 'welcome' : path)
-          this.$router.push('welcome')
+          this.$router.replace(path === '/' || path === undefined ? 'welcome' : path)
         }
       })
     },

@@ -10,7 +10,7 @@
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button size="mini" @click="resetForm('ruleForm')">取 消</el-button>
+      <el-button size="mini" @click="resetForm()">取 消</el-button>
       <el-button size="mini" type="primary" @click="submitForm('ruleForm')">确 定</el-button>
     </div>
   </el-dialog>
@@ -83,8 +83,7 @@ export default {
         }
       })
     },
-    resetForm (formName) {
-      this.$refs[formName].resetFields()
+    resetForm () {
       this.dialogVisible = false
     },
     /*
@@ -101,7 +100,6 @@ export default {
     },
     closeDialog (formName) {
       this.user.id = undefined
-      this.$refs[formName].clearValidate()
       this.$refs[formName].resetFields()
     }
   }

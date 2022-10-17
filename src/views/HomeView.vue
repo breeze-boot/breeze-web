@@ -9,9 +9,12 @@
       </el-aside>
       <el-main style="padding: 1px 20px;">
         <Tabs/>
-        <router-view
-          class="router-main"
-          :style="{animationName: 'headShake', animationDuration: 0.5 + 's'}"/>
+        <keep-alive :include="keepAlive">
+          <router-view
+            :key="key"
+            class="router-main"
+            :style="{animationName: 'headShake', animationDuration: 0.5 + 's'}"/>
+        </keep-alive>
       </el-main>
     </el-container>
   </el-container>
@@ -32,7 +35,14 @@ export default {
   data () {
     return {}
   },
-  computed: {},
+  computed: {
+    keepAlive () {
+      return this.$store.state.menu.keepAliveMenus
+    },
+    key () {
+      return this.$route.fullPath
+    }
+  },
   mounted () {
   },
   methods: {}

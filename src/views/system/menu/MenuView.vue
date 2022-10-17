@@ -118,7 +118,9 @@ import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 
 export default {
   name: 'MenuView',
-  components: { AddEditDialog },
+  components: {
+    AddEditDialog
+  },
   data: () => ({
     title: '',
     multipleSelection: [],

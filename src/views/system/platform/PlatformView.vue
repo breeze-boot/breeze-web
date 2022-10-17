@@ -18,8 +18,8 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button plain size="mini" type="primary" @click="add">新建</el-button>
-        <el-button plain size="mini" type="danger" @click="del">删除</el-button>
+        <el-button plain size="mini" type="primary" @click="add" v-has="['sys:platform:save']">新建</el-button>
+        <el-button plain size="mini" type="danger" @click="del" v-has="['sys:platform:delete']">删除</el-button>
         <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
         <el-button plain size="mini" @click="importInfo">导入</el-button>
       </div>

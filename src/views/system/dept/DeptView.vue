@@ -53,7 +53,7 @@
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
             <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
-            <el-button size="mini" type="text" @click.native.prevent="delItem(scope.$index, tableData, scope.row)">删除
+            <el-button size="mini" type="text" @click.native.prevent="delItem(tableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
@@ -110,26 +110,24 @@ export default {
      *
      * @param rows
      */
-    delItem (index, rows, row) {
+    delItem (rows, row) {
       confirmAlert(() => {
-        del(row.id.toString()).then(rep => {
+        del(row.id).then(rep => {
           if (rep.code === 1) {
-            this.deleteTreeTableData(rows, index)
-            this.$message.success('删除成功')
+            this.deleteTreeTableData(rows, row)
           }
         })
       })
     },
-    deleteTreeTableData (rows, index) {
-      for (let i = 0; i < rows.length; i++) {
-        if (this.rowIndex === index) {
-          rows.splice(i, 1)
+    deleteTreeTableData (rows, row) {
+      for (let index = 0; index < rows.length; index++) {
+        if (rows[index].id === row.id) {
+          rows.splice(index, 1)
           return
         }
-        this.rowIndex++
-        const tempTable = rows[i]
+        const tempTable = rows[index]
         if (tempTable.children && tempTable.children.length > 0) {
-          this.deleteTreeTableData(tempTable.children, index)
+          this.deleteTreeTableData(tempTable.children, row)
         }
       }
     },

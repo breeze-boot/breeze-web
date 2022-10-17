@@ -12,7 +12,7 @@
           </el-option>
         </el-select>
       </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="组件类型" prop="type" style="text-align: left;">
+      <el-form-item :label-width="formLabelWidth" label="组件类型" style="text-align: left;">
         <el-radio-group v-model="menu.type">
           <el-radio-button
             v-for="item in typeOptions"
@@ -43,7 +43,9 @@
 
       <el-form-item v-if="menu.type === 0 || menu.type === 1" :label-width="formLabelWidth" label="组件图标"
                     prop="icon">
-        <el-input v-model="menu.icon" autocomplete="off" clearable placeholder="请选择组件图标"></el-input>
+        <el-button plain type="success" style="margin:0 10px" @click="showIconDialog">打开</el-button>
+        <svg-icon :icon-class="menu.icon" style="width: 21px; height: 20px;"/>
+        {{ menu.icon }}
       </el-form-item>
 
       <el-form-item v-if="menu.type === 0 || menu.type === 1" :label-width="formLabelWidth" label="菜单路径"
@@ -67,7 +69,7 @@
       </el-form-item>
     </el-form>
     <div v-show="!show" slot="footer" class="dialog-footer">
-      <el-button size="mini" @click="resetForm('ruleForm')">取 消</el-button>
+      <el-button size="mini" @click="resetForm()">取 消</el-button>
       <el-button size="mini" type="primary" @click="submitForm('ruleForm')">确 定</el-button>
     </div>
 
@@ -160,6 +162,10 @@
         </el-tag>
       </el-descriptions-item>
     </el-descriptions>
+
+    <icon-dialog
+      @choiceIcon="choiceIcon"
+      ref="iconDialog"/>
   </el-dialog>
 </template>
 
@@ -167,17 +173,23 @@
 import { DIALOG_TYPE } from '@/utils/constant'
 import { add, edit, selectMenu } from '@/api/system/menu'
 import { Message } from 'element-ui'
+import IconDialog from '@/components/dialog/menu/IconDialog'
 
 export default {
   name: 'AddEditDialog',
   props: {
     title: String
   },
+  components: {
+    IconDialog
+  },
   data () {
     return {
       dialogVisible: false,
       menu: {
         id: null,
+        platformId: '',
+        platformName: '',
         name: '',
         title: '',
         icon: '',
@@ -185,8 +197,6 @@ export default {
         parentId: '0',
         permission: '',
         component: '',
-        platformId: '',
-        platformName: '',
         type: 0,
         path: ''
       },
@@ -211,7 +221,6 @@ export default {
           label: '平台'
         }
       ],
-      selectTreeOptions: [],
       // 默认是创建
       dialogStatus: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
@@ -234,15 +243,8 @@ export default {
         title: [
           {
             required: true,
-            message: '请输入组件显示的标题',
+            message: '请输入组件的标题',
             trigger: 'blur'
-          }
-        ],
-        sort: [
-          {
-            required: true,
-            message: '请设置排序',
-            trigger: 'change'
           }
         ],
         permission: [
@@ -265,20 +267,6 @@ export default {
             message: '请输入组件路径',
             trigger: 'blur'
           }
-        ],
-        type: [
-          {
-            required: true,
-            message: '请选择组件类型',
-            trigger: 'change'
-          }
-        ],
-        parentId: [
-          {
-            required: true,
-            message: '请选择上级菜单',
-            trigger: 'change'
-          }
         ]
       }
     }
@@ -299,12 +287,12 @@ export default {
           this.menuOption = root
           if (this.dialogStatus === DIALOG_TYPE.EDIT) {
             this.$nextTick(() => {
-              const temp = this.filterMenuParentId(res.data, (tree) => tree.id && tree.id.eq(this.menu.parentId), 'id')
-              const temp1 = ['0']
-              temp.forEach(id => {
-                temp1.push(id.toString())
+              const treeTemp = this.filterMenuParentId(res.data, (tree) => tree.id && tree.id.eq(this.menu.parentId), 'id')
+              const tempArray = ['0']
+              treeTemp.forEach(id => {
+                tempArray.push(id.toString())
               })
-              this.menu.parentId = temp1
+              this.menu.parentId = tempArray
             })
           }
         }
@@ -340,9 +328,11 @@ export default {
         }
       })
     },
-    resetForm (formName) {
-      this.$refs[formName].resetFields()
+    resetForm () {
       this.dialogVisible = false
+    },
+    showIconDialog () {
+      this.$refs.iconDialog.showIconDialog({})
     },
     /*
      * val: 参数值
@@ -363,10 +353,27 @@ export default {
       this.dialogStatus = dialogStatus
     },
     closeDialog (formName) {
-      this.menu.id = undefined
-      this.$refs[formName].clearValidate()
-      this.$refs[formName].resetFields()
+      this.$nextTick(() => {
+        this.menu = {
+          id: null,
+          platformId: '',
+          platformName: '',
+          name: '',
+          title: '',
+          icon: '',
+          sort: 0,
+          parentId: '0',
+          permission: '',
+          component: '',
+          type: 0,
+          path: ''
+        }
+      })
       this.show = false
+    },
+    choiceIcon (val) {
+      this.menu.icon = val
+      console.log('item' + val)
     },
     /**
      * @param menuTree 原始数据
@@ -394,7 +401,4 @@ export default {
 </script>
 
 <style>
-
-.parentId {
-}
 </style>

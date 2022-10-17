@@ -16,11 +16,16 @@ export default {
     menus: [],
     breads: [],
     isCollapse: false,
-    isLoadMenu: false
+    isLoadMenu: false,
+    keepAliveMenus: []
   },
   mutations: {
     setMenus (state, menus) {
       state.menus = menus
+      // 过滤出哪些路由需要缓存
+      state.keepAliveMenus = menus.filter((item) => {
+        return item.keepAlive === 1
+      })
     },
     setCollapse (state, isCollapse) {
       state.isCollapse = isCollapse
