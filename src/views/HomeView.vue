@@ -13,7 +13,7 @@
           <router-view
             :key="key"
             class="router-main"
-            :style="{animationName: 'headShake', animationDuration: 0.5 + 's'}"/>
+            :style="{animationName: 'fadIn', animationDuration: 0.5 + 's'}"/>
         </keep-alive>
       </el-main>
     </el-container>

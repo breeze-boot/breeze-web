@@ -142,7 +142,6 @@ export default {
       if (halfCheckedKeys.length > 0) {
         checkedKeys.push(...halfCheckedKeys)
       }
-      debugger
       if (checkedKeys.length <= 0) {
         this.$message.warning('请选择角色权限')
         return

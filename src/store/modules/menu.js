@@ -22,9 +22,13 @@ export default {
   mutations: {
     setMenus (state, menus) {
       state.menus = menus
+    },
+    setKeepAliveMenus (state, menus) {
       // 过滤出哪些路由需要缓存
       state.keepAliveMenus = menus.filter((item) => {
         return item.keepAlive === 1
+      }).map(m => {
+        return m.component.substr(m.component.lastIndexOf('/') + 1)
       })
     },
     setCollapse (state, isCollapse) {

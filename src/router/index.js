@@ -71,6 +71,7 @@ export const getMenu = (menus) => {
   menus.forEach(menu => {
     const route = menuToRoute(menu)
     if (route) {
+      store.commit('menu/setKeepAliveMenus', menus)
       router.addRoute('home', route)
     }
     if (!menu.children) {
@@ -134,9 +135,7 @@ const menuToRoute = (menu) => {
     path: menu.path,
     meta: {
       icon: menu.icon,
-      title: menu.title,
-      roles: menu.roles || '',
-      permissions: menu.permissions || ''
+      title: menu.title
     }
   }
   route.component = loadView(menu.component)

@@ -16,7 +16,6 @@ const has = Vue.directive('has', {
  * 权限检查方法
  */
 const isHasPer = (array) => {
-  debugger
   // 获取用户按钮权限
   const permissionsStr = localStorage.getItem('permissions')
   if (!permissionsStr) {
