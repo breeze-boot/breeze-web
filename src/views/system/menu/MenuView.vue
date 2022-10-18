@@ -69,6 +69,16 @@
           label="图标"
           prop="icon"
           show-overflow-tooltip>
+          <template slot-scope="scope">
+            <svg-icon :icon-name="scope.row.icon" style="font-size: 20px;" :icon-style="'margin-right: 0px;'"/>
+            <el-tag
+              v-if="scope.row.icon"
+              type="success"
+              disable-transitions
+              size="mini">
+              {{ scope.row.icon }}
+            </el-tag>
+          </template>
         </el-table-column>
         <el-table-column
           label="权限标识"
@@ -90,6 +100,11 @@
           label="类型"
           prop="type"
           show-overflow-tooltip>
+          <template slot-scope="scope">
+            <el-tag :type="'success'">
+              {{ scope.row.type === 0 ? '文件夹' : (scope.row.type === 1 ? '菜单' : '按钮') }}
+            </el-tag>
+          </template>
         </el-table-column>
         <el-table-column
           fixed="right"

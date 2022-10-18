@@ -1,6 +1,7 @@
 <template>
-  <svg :class="svgClass" aria-hidden="true">
-    <use :xlink:href="iconName"/>
+  <i v-if="iconName && iconName.startsWith('el-icon')" :class="iconName"></i>
+  <svg v-else class="icon" :style="iconStyle" aria-hidden="true">
+    <use :xlink:href="`#icon-${iconName}`" class="icon"/>
   </svg>
 </template>
 
@@ -8,35 +9,25 @@
 export default {
   name: 'SvgIcon',
   props: {
-    iconClass: {
-      type: String,
-      required: true
-    },
-    className: {
+    iconName: {
       type: String,
       default: ''
-    }
-  },
-  computed: {
-    iconName () {
-      return `#icon-${this.iconClass}`
     },
-    svgClass () {
-      if (this.className) {
-        return 'svg-icon ' + this.className
-      } else {
-        return 'svg-icon'
-      }
+    iconStyle: {
+      type: String,
+      default: ''
     }
   }
 }
 </script>
 
 <style scoped>
-.svg-icon {
+.icon {
   width: 1em;
   height: 1em;
-  vertical-align: -0.15em;
+  margin-left: 2px;
+  margin-right: 7px;
+  vertical-align: middle;
   fill: currentColor;
   overflow: hidden;
 }

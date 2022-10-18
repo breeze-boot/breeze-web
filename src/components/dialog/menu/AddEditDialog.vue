@@ -69,8 +69,10 @@
       <el-form-item v-if="menu.type === 0 || menu.type === 1" :label-width="formLabelWidth" label="组件图标"
                     prop="icon">
         <el-button plain type="success" style="margin:0 10px" @click="showIconDialog">打开</el-button>
-        <svg-icon :icon-class="menu.icon" style="width: 21px; height: 20px;"/>
-        {{ menu.icon }}
+        <svg-icon :icon-name="menu.icon" style="font-size: 20px;"/>
+        <span>
+          {{ menu.icon }}
+        </span>
       </el-form-item>
 
       <el-form-item v-if="menu.type === 0 || menu.type === 1" :label-width="formLabelWidth"
@@ -120,7 +122,10 @@
           <i class="el-icon-mobile-phone"></i>
           icon
         </template>
-        {{ menu.icon }}
+        <svg-icon :icon-name="menu.icon" style="font-size: 20px;"/>
+        <span>
+          {{ menu.icon }}
+        </span>
       </el-descriptions-item>
       <el-descriptions-item>
         <template slot="label">

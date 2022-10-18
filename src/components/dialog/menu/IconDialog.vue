@@ -6,10 +6,11 @@
               @input.native="filterIcon">
       <i slot="suffix" class="el-icon-search el-input__icon"/>
     </el-input>
-    <div class="icon">
+    <div class="icon" style="border: 1px solid #eee;">
       <div class="svg-icon" v-for="(item, index) in iconList" :key="index" @click="clickIcon(item)">
-        <svg-icon :icon-class="item" style="width: 20px; height: 20px;"/>
-        {{ item }}
+        <svg-icon :icon-name="item" style="font-size: 20px;"/>
+        <div style="padding: 4px 6px 4px 2px; height: 2em; line-height: 2.5em;">{{ item }}
+        </div>
       </div>
     </div>
   </el-dialog>
@@ -60,7 +61,6 @@ export default {
 
 <style scoped lang="less">
 .icon {
-  border: 1px solid #eee;
   padding: 10px;
   margin-top: 10px;
   display: flex;
@@ -69,12 +69,12 @@ export default {
   height: 100px;
 
   .svg-icon {
+    height: 20px;
     cursor: pointer;
     margin: 3px;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: inherit;
   }
 }
 </style>

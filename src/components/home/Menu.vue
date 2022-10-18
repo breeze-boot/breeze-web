@@ -24,14 +24,14 @@
         :key="item.id"
         :index="item.id">
         <template slot="title">
-          <i :class="item.icon"></i>
+          <svg-icon :icon-name="item.icon" style="font-size: 20px;"/>
           <span slot="title">{{ item.title }}</span>
         </template>
         <el-menu-item
           v-for="subItem in item.children"
           :key="subItem.id"
           :index="subItem.name">
-          <i :class="subItem.icon"></i>
+          <svg-icon :icon-name="subItem.icon" style="font-size: 20px;"/>
           <span slot="title">{{ subItem.title }}</span>
         </el-menu-item>
       </el-submenu>

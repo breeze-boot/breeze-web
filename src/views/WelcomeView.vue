@@ -1,17 +1,16 @@
 <template>
   <div class="welcome">
     欢迎
-    <svg-icon icon-class="abc"></svg-icon>
+    <svg aria-hidden="true" width="2em" height="2em">
+      <use :xlink:href="'#icon-abc12312312'"/>
+    </svg>
   </div>
 </template>
 
 <script>
 
-import SvgIcon from '@/components/svg/SvgIcon'
-
 export default {
-  name: 'WelcomeView',
-  components: { SvgIcon }
+  name: 'WelcomeView'
 }
 </script>
 
