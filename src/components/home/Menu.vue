@@ -19,32 +19,23 @@
         <i class="el-icon-s-home"></i>
         <span slot="title">欢迎</span>
       </el-menu-item>
-      <el-submenu
-        v-for="item in menus"
-        :key="item.id"
-        :index="item.id">
-        <template slot="title">
-          <svg-icon :icon-name="item.icon" style="font-size: 20px;"/>
-          <span slot="title">{{ item.title }}</span>
-        </template>
-        <el-menu-item
-          v-for="subItem in item.children"
-          :key="subItem.id"
-          :index="subItem.name">
-          <svg-icon :icon-name="subItem.icon" style="font-size: 20px;"/>
-          <span slot="title">{{ subItem.title }}</span>
-        </el-menu-item>
-      </el-submenu>
+      <menu-item v-for="menu in menus"
+                 :key="menu.id"
+                 :menu="menu"/>
     </el-menu>
   </el-container>
 </template>
 
 <script>
 
+import MenuItem from '@/components/home/MenuItem'
 import { mapState } from 'vuex'
 
 export default {
   name: 'Menu',
+  components: {
+    MenuItem
+  },
   data () {
     return {}
   },
@@ -82,9 +73,5 @@ export default {
 .el-menu-vertical:not(.el-menu--collapse) {
   width: 200px;
   min-height: 100vh - 7vh;
-}
-
-.el-aside {
-  width: fit-content;
 }
 </style>

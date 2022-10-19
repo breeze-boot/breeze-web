@@ -1,10 +1,10 @@
 <template>
-  <div class="welcome">
+  <el-container>
     欢迎
     <svg aria-hidden="true" width="2em" height="2em">
       <use :xlink:href="'#icon-abc12312312'"/>
     </svg>
-  </div>
+  </el-container>
 </template>
 
 <script>
@@ -15,7 +15,4 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.welcome {
-  height: 90vh;
-}
 </style>

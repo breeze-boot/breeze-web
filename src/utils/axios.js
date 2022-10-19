@@ -14,6 +14,7 @@ export const request = axios.create({
 })
 
 export const showErrorMsg = (success, msg) => {
+  debugger
   if (success.data.message) {
     Message.error({ message: success.data.message })
   } else {
@@ -74,12 +75,8 @@ request.interceptors.response.use((success) => {
       // 错误
       showErrorMsg(success, '系统异常')
     } else if (success.data.code === 500) {
-      console.error(success.data.data)
+      console.error(success)
       showErrorMsg(success, '服务异常')
-      return success.data
-    } else if (success.status === 401) {
-      showErrorMsg(success, success.data.message)
-      // TODO 重新登录
       return success.data
     }
     loadingInstance.close()
@@ -90,6 +87,11 @@ request.interceptors.response.use((success) => {
     Message.error({ message: '请求超时' })
   } else if (error.response.status === 404) {
     Message.error({ message: '请求地址不存在' })
+  } else if (error.response.status === 401) {
+    showErrorMsg(error.response, error.response.data.message)
+    // TODO 重新登录
+  } else if (error.response.status === 402) {
+    showErrorMsg(error.response, error.response.data.message)
   }
   console.error(error.response.status)
 })
