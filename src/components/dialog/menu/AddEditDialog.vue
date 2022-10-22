@@ -6,9 +6,9 @@
         <el-select v-model="menu.platformId" placeholder="请选择所属的平台">
           <el-option
             v-for="item in platformOptions"
-            :key="item.value"
+            :key="item.value.toString()"
             :label="item.label"
-            :value="item.value">
+            :value="item.value.toString()">
           </el-option>
         </el-select>
       </el-form-item>
@@ -219,7 +219,7 @@
 
 <script>
 import { DIALOG_TYPE } from '@/utils/constant'
-import { add, edit, selectMenu } from '@/api/system/menu'
+import { add, edit, selectMenu, selectPlatform } from '@/api/system/menu'
 import { Message } from 'element-ui'
 import IconDialog from '@/components/dialog/menu/IconDialog'
 
@@ -346,6 +346,13 @@ export default {
   methods: {
     handleChangeSort (val) {
     },
+    selectPlatform () {
+      selectPlatform().then((rep) => {
+        this.platformOptions = rep.data
+      }).catch((e) => {
+        console.error(e)
+      })
+    },
     selectMenu () {
       selectMenu().then(res => {
         if (res.code === 1 && res.data) {
@@ -410,6 +417,7 @@ export default {
      */
     showDialogVisible (val, dialogStatus) {
       this.selectMenu()
+      this.selectPlatform()
       this.dialogVisible = true
       if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
         this.$nextTick(() => {

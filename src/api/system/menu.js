@@ -107,3 +107,19 @@ export function selectMenu () {
     }]
   })
 }
+
+/**
+ * 平台下拉框
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function selectPlatform () {
+  return request({
+    url: servicePath.system + '/sys/common/selectPlatform',
+    method: 'get',
+    transformResponse: [(data) => {
+      return JSONBigInt.parse(data)
+    }]
+  })
+}

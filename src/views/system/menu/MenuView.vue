@@ -13,10 +13,10 @@
             <el-form-item label="平台">
               <el-select v-model="searchForm.platformId" placeholder="请选择平台">
                 <el-option
-                  v-for="item in options"
-                  :key="item.value"
+                  v-for="item in platformOptions"
+                  :key="item.value.toString()"
                   :label="item.label"
-                  :value="item.value">
+                  :value="item.value.toString()">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -128,7 +128,7 @@
 
 <script>
 import AddEditDialog from '@/components/dialog/menu/AddEditDialog'
-import { del, list } from '@/api/system/menu'
+import { del, list, selectPlatform } from '@/api/system/menu'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 
 export default {
@@ -140,7 +140,7 @@ export default {
     title: '',
     multipleSelection: [],
     tableData: [],
-    options: [{
+    platformOptions: [{
       value: '1564528653105573889',
       label: '后台管理中心'
     }],
@@ -150,10 +150,18 @@ export default {
       title: ''
     }
   }),
-  created () {
+  mounted () {
     this.reloadList()
+    this.selectPlatform()
   },
   methods: {
+    selectPlatform () {
+      selectPlatform().then((rep) => {
+        this.platformOptions = rep.data
+      }).catch((e) => {
+        console.error(e)
+      })
+    },
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
