@@ -100,7 +100,7 @@ export function edit (data) {
  */
 export function selectMenu () {
   return request({
-    url: servicePath.system + '/sys/open/selectMenu',
+    url: servicePath.system + '/sys/common/selectMenu',
     method: 'get',
     transformResponse: [(data) => {
       return JSONBigInt.parse(data)
