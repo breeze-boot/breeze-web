@@ -53,7 +53,7 @@ export function del (data) {
  */
 export function edit (data) {
   return request({
-    url: servicePath.system + '/sys/dictItem/update',
+    url: servicePath.system + '/sys/dictItem/edit',
     method: 'put',
     data: data
   })

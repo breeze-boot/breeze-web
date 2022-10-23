@@ -54,7 +54,7 @@ export function del (id) {
  */
 export function edit (data) {
   return request({
-    url: servicePath.system + '/sys/dept/update',
+    url: servicePath.system + '/sys/dept/edit',
     method: 'put',
     data: data
   })

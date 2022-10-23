@@ -82,7 +82,7 @@ export function del (data) {
  */
 export function edit (data) {
   return request({
-    url: servicePath.system + '/sys/role/update',
+    url: servicePath.system + '/sys/role/edit',
     method: 'put',
     data: data
   })

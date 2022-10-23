@@ -50,7 +50,7 @@ export function add (data) {
  */
 export function edit (data) {
   return request({
-    url: servicePath.system + '/sys/user/update',
+    url: servicePath.system + '/sys/user/edit',
     method: 'put',
     data: data
   })
