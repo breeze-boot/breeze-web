@@ -33,15 +33,17 @@
         <el-button plain size="mini" @click="importInfo">导入</el-button>
       </div>
       <el-table
+        ref="menuTable"
         :data="tableData"
         :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
         border
+        empty-text="无数据"
         height="90%"
         row-key="sid"
         size="mini"
         stripe
         style="width: 100%"
-        @selection-change="handleSelectionChange">
+        @expand-change="handleExpandChange">
         <el-table-column
           v-if="false"
           label="ID"
@@ -166,6 +168,9 @@ export default {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
           this.tableData = rep.data
+          this.$nextTick(() => {
+            this.$refs.menuTable.doLayout()
+          })
         }
       })
     },
@@ -209,8 +214,11 @@ export default {
     },
     importInfo () {
     },
-    handleSelectionChange (val) {
+    handleExpandChange (val) {
       this.multipleSelection = val
+      this.$nextTick(() => {
+        this.$refs.menuTable.doLayout()
+      })
     },
     add () {
       this.title = '创建菜单'

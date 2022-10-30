@@ -64,8 +64,8 @@ export default {
   padding: 10px;
   margin-top: 10px;
   display: flex;
-  justify-content: start;
-  align-items: start;
+  justify-content: flex-start;
+  align-items: flex-start;
   height: 100px;
 
   .svg-icon {

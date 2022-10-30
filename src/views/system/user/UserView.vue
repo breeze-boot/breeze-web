@@ -107,8 +107,8 @@
               v-model="scope.row.isLock"
               :active-value="1"
               :inactive-value="0"
-              active-color="#13ce66"
-              inactive-color="#ff4949"
+              active-color="#ff4949"
+              inactive-color="#13ce66"
               size="mini"
               @change="open(scope.$index, scope.row)">
             </el-switch>
@@ -191,10 +191,12 @@ export default {
     },
     open (index, row) {
       open({
-        id: row.id,
+        username: row.username,
         isLock: row.isLock
       }).then((rep) => {
-        Message.success({ message: rep.message })
+        if (rep.code === 1) {
+          Message.success({ message: rep.message })
+        }
       })
     },
     buildParam () {
@@ -241,9 +243,9 @@ export default {
      */
     delItem (index, rows, row) {
       confirmAlert(() => {
-        const ids = []
-        ids.push(row.id)
-        del(ids).then(rep => {
+        const usernames = []
+        usernames.push(row.username)
+        del(usernames).then(rep => {
           if (rep.code === 1) {
             rows.splice(index, 1)
             this.$message.success('删除成功')

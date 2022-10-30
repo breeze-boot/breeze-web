@@ -47,6 +47,17 @@
         </el-radio-group>
       </el-form-item>
 
+      <el-form-item v-if="menu.type === 1" :label-width="formLabelWidth" label="隐藏" style="text-align: left;">
+        <el-radio-group v-model="menu.hidden">
+          <el-radio-button
+            v-for="item in hiddenOptions"
+            :key="item.label"
+            :label="item.label">
+            {{ item.name }}
+          </el-radio-button>
+        </el-radio-group>
+      </el-form-item>
+
       <el-form-item class="parentId" :label-width="formLabelWidth" label="上级菜单" prop="parentId">
         <el-cascader
           v-model="menu.parentId"
@@ -140,6 +151,14 @@
           平台名称
         </template>
         {{ menu.platformName }}
+      </el-descriptions-item>
+
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-tickets"></i>
+          开启缓存
+        </template>
+        {{ menu.keepAlive }}
       </el-descriptions-item>
 
       <el-descriptions-item>
@@ -247,6 +266,7 @@ export default {
         component: '',
         href: 0,
         keepAlive: 0,
+        hidden: 0,
         type: 0,
         path: ''
       },
@@ -269,6 +289,16 @@ export default {
         {
           label: 1,
           name: '开启缓存'
+        }
+      ],
+      hiddenOptions: [
+        {
+          label: 0,
+          name: '显示'
+        },
+        {
+          label: 1,
+          name: '隐藏'
         }
       ],
       typeOptions: [
@@ -447,6 +477,7 @@ export default {
           href: 0,
           type: 0,
           keepAlive: 0,
+          hidden: 0,
           path: ''
         }
       })

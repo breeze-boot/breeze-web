@@ -107,7 +107,7 @@ export default {
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: end;
+    justify-content: flex-end;
     height: 100%;
     text-align: right;
     color: #ffffff !important;
