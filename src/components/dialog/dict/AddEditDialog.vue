@@ -27,7 +27,7 @@
       <el-descriptions-item>
         <template slot="label">
           <i class="el-icon-user"></i>
-          字典标识
+          字典编码
         </template>
         {{ dict.dictCode }}
       </el-descriptions-item>
@@ -76,7 +76,7 @@ export default {
         dictCode: [
           {
             required: true,
-            message: '请输入字典标识',
+            message: '请输入字典编码',
             trigger: 'blur'
           }
         ]

@@ -4,14 +4,11 @@
       <el-form :inline="true" :model="searchForm" class="demo-form-inline" size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
-            <el-form-item label="用户名称">
-              <el-input v-model="searchForm.username" clearable placeholder="用户名称"/>
+            <el-form-item label="名称">
+              <el-input v-model="searchForm.name" clearable placeholder="名称"/>
             </el-form-item>
-            <el-form-item label="手机号">
-              <el-input v-model="searchForm.phone" clearable placeholder="手机号"/>
-            </el-form-item>
-            <el-form-item label="用户编码">
-              <el-input v-model="searchForm.userCode" clearable placeholder="用户编码"/>
+            <el-form-item label="编码">
+              <el-input v-model="searchForm.code" clearable placeholder="编码"/>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search">查询</el-button>
@@ -103,13 +100,13 @@
 </template>
 
 <script>
-import AddEditDialog from '@/components/dialog/user/AddEditDialog'
+import AddEditDialog from '@/components/dialog/permission/AddEditDialog'
 import { del, list } from '@/api/system/permission'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
 
 export default {
-  name: 'UserPermissionView',
+  name: 'PermissionView',
   components: {
     AddEditDialog
   },
@@ -212,15 +209,15 @@ export default {
       this.multipleSelection = val
     },
     add () {
-      this.title = '创建用户'
+      this.title = '创建权限规则'
       this.$refs.addEditDialog.showDialogVisible({}, DIALOG_TYPE.ADD)
     },
     edit (val) {
-      this.title = '修改用户'
+      this.title = '修改权限规则'
       this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.EDIT)
     },
     show (val) {
-      this.title = '查看信息'
+      this.title = '查看规则信息'
       this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.SHOW)
     }
   }

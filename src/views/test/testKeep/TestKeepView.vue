@@ -48,7 +48,7 @@ export default {
         dictCode: [
           {
             required: true,
-            message: '请输入字典标识',
+            message: '请输入字典编码',
             trigger: 'blur'
           }
         ]

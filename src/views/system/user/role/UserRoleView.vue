@@ -15,8 +15,8 @@
                 <el-form-item label="角色名称">
                   <el-input v-model="roleSearchForm.roleName" clearable placeholder="角色名称"/>
                 </el-form-item>
-                <el-form-item label="角色标识">
-                  <el-input v-model="roleSearchForm.roleCode" clearable placeholder="角色标识"/>
+                <el-form-item label="角色编码">
+                  <el-input v-model="roleSearchForm.roleCode" clearable placeholder="角色编码"/>
                 </el-form-item>
                 <el-form-item>
                   <el-button type="primary" @click="search()">查询</el-button>
@@ -53,7 +53,7 @@
                   prop="roleName">
                 </el-table-column>
                 <el-table-column
-                  label="角色标识"
+                  label="角色编码"
                   prop="roleCode">
                 </el-table-column>
               </el-table>

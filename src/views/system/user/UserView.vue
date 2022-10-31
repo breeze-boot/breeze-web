@@ -125,7 +125,7 @@
             </el-button>
             <el-dropdown size="mini" type="primary" style="margin-left: 5px;" trigger="click">
               <span class="el-dropdown-link">
-                下拉菜单
+                更多
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </span>
               <el-dropdown-menu slot="dropdown">

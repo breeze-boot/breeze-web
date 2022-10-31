@@ -21,7 +21,7 @@
       <el-descriptions-item>
         <template slot="label">
           <i class="el-icon-user"></i>
-          部门标识
+          部门编码
         </template>
         {{ dept.deptCode }}
       </el-descriptions-item>

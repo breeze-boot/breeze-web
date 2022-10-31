@@ -50,7 +50,7 @@ export default {
         value: [
           {
             required: true,
-            message: '请输入字典项标识',
+            message: '请输入字典项编码',
             trigger: 'blur'
           }
         ]

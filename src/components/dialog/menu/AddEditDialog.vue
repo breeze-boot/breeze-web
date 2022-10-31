@@ -103,9 +103,9 @@
       </el-form-item>
 
       <el-form-item v-if="menu.href === 0 && (menu.type === 1 || menu.type === 2)" :label-width="formLabelWidth"
-                    label="权限标识"
+                    label="权限编码"
                     prop="permission">
-        <el-input v-model="menu.permission" autocomplete="off" clearable placeholder="请输入权限标识"></el-input>
+        <el-input v-model="menu.permission" autocomplete="off" clearable placeholder="请输入权限编码"></el-input>
       </el-form-item>
     </el-form>
     <div v-show="!show" slot="footer" class="dialog-footer">
@@ -195,7 +195,7 @@
       <el-descriptions-item>
         <template slot="label">
           <i class="el-icon-tickets"></i>
-          权限标识
+          权限编码
         </template>
         <el-tag v-if="menu.permission !== ''" type="primary">
           {{ menu.permission }}
@@ -350,7 +350,7 @@ export default {
         permission: [
           {
             required: true,
-            message: '请输入权限标识',
+            message: '请输入权限编码',
             trigger: 'blur'
           }
         ],

@@ -5,7 +5,7 @@
       <el-form-item :label-width="formLabelWidth" label="角色名称" prop="roleName">
         <el-input v-model="role.roleName" autocomplete="off" clearable></el-input>
       </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="角色标识" prop="roleCode">
+      <el-form-item :label-width="formLabelWidth" label="角色编码" prop="roleCode">
         <el-input v-model="role.roleCode" autocomplete="off" clearable></el-input>
       </el-form-item>
     </el-form>
@@ -18,7 +18,7 @@
       <el-descriptions-item>
         <template slot="label">
           <i class="el-icon-user"></i>
-          角色标识
+          角色编码
         </template>
         {{ role.roleCode }}
       </el-descriptions-item>
@@ -66,7 +66,7 @@ export default {
         roleCode: [
           {
             required: true,
-            message: '请输入角色标识',
+            message: '请输入角色编码',
             trigger: 'blur'
           }
         ]

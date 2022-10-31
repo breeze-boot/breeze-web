@@ -1,15 +1,21 @@
 <template>
-  <el-dialog :title="title" :visible.sync="dialogVisible" width="800px"
+  <el-dialog :title="title" :visible.sync="dialogVisible" width="600px"
              @close="closeDialog('ruleForm')">
-    <el-form v-show="!show" ref="ruleForm" :model="platform" :rules="rules" size="mini">
-      <el-form-item :label-width="formLabelWidth" label="平台名称" prop="platformName">
-        <el-input v-model="platform.platformName" autocomplete="off" clearable></el-input>
+    <el-form v-show="!show" ref="ruleForm" :model="permission" :rules="rules" size="mini">
+      <el-form-item :label-width="formLabelWidth" label="规则名称" prop="name">
+        <el-input v-model="permission.name" autocomplete="off" clearable></el-input>
       </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="平台标志" prop="platformCode">
-        <el-input v-model="platform.platformCode" autocomplete="off" clearable></el-input>
+      <el-form-item :label-width="formLabelWidth" label="规则编码" prop="code">
+        <el-input v-model="permission.code" autocomplete="off" clearable></el-input>
       </el-form-item>
-      <el-form-item :label-width="formLabelWidth" label="描述" prop="description">
-        <el-input v-model="platform.description" autocomplete="off" clearable type="textarea"></el-input>
+      <el-form-item :label-width="formLabelWidth" label="运算符" prop="operator">
+        <el-input v-model="permission.operator" autocomplete="off" clearable></el-input>
+      </el-form-item>
+      <el-form-item :label-width="formLabelWidth" label="自定义SQL" prop="sql">
+        <el-input v-model="permission.sql" autocomplete="off" clearable></el-input>
+      </el-form-item>
+      <el-form-item :label-width="formLabelWidth" label="权限" prop="permissions">
+        <el-input v-model="permission.permissions" autocomplete="off" clearable></el-input>
       </el-form-item>
     </el-form>
     <div v-show="!show" slot="footer" class="dialog-footer">
@@ -21,23 +27,37 @@
       <el-descriptions-item>
         <template slot="label">
           <i class="el-icon-user"></i>
-          平台名称
+          规则名称
         </template>
-        {{ platform.platformName }}
+        {{ permission.name }}
       </el-descriptions-item>
       <el-descriptions-item>
         <template slot="label">
           <i class="el-icon-tickets"></i>
-          平台编码
+          规则编码
         </template>
-        <el-tag size="small">{{ platform.platformCode }}</el-tag>
+        <el-tag size="small">{{ permission.code }}</el-tag>
       </el-descriptions-item>
       <el-descriptions-item>
         <template slot="label">
           <i class="el-icon-office-building"></i>
-          描述
+          自定义SQL
         </template>
-        {{ platform.description }}
+        {{ permission.sql }}
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-office-building"></i>
+          运算符
+        </template>
+        {{ permission.operator }}
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-office-building"></i>
+          权限
+        </template>
+        {{ permission.permissions }}
       </el-descriptions-item>
     </el-descriptions>
   </el-dialog>
@@ -45,7 +65,7 @@
 
 <script>
 import { DIALOG_TYPE } from '@/utils/constant'
-import { add, edit } from '@/api/system/platform'
+import { add, edit } from '@/api/system/permission'
 import { Message } from 'element-ui'
 
 export default {
@@ -56,28 +76,30 @@ export default {
   data () {
     return {
       dialogVisible: false,
-      platform: {
+      permission: {
         id: null,
-        platformName: '',
-        platformCode: '',
-        description: ''
+        name: '',
+        code: '',
+        sql: '',
+        operator: '',
+        permissions: ''
       },
       // 默认是创建
       dialogStatus: DIALOG_TYPE.ADD,
-      formLabelWidth: '80px',
+      formLabelWidth: '100px',
       show: false,
       rules: {
-        platformName: [
+        name: [
           {
             required: true,
-            message: '请输入平台名称',
+            message: '请输入规则名称',
             trigger: 'blur'
           }
         ],
-        platformCode: [
+        code: [
           {
             required: true,
-            message: '请输入平台编码',
+            message: '请输入规则编码',
             trigger: 'blur'
           }
         ]
@@ -96,7 +118,7 @@ export default {
       })
     },
     add () {
-      add(this.platform).then((rep) => {
+      add(this.permission).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '添加成功' })
           this.dialogVisible = false
@@ -105,7 +127,7 @@ export default {
       })
     },
     edit () {
-      edit(this.platform).then((rep) => {
+      edit(this.permission).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '修改成功' })
           this.dialogVisible = false
@@ -125,7 +147,7 @@ export default {
       if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
         this.$nextTick(() => {
           // 赋值
-          Object.assign(this.platform, val)
+          Object.assign(this.permission, val)
         })
       }
       if (dialogStatus === DIALOG_TYPE.SHOW) {
@@ -134,7 +156,7 @@ export default {
       this.dialogStatus = dialogStatus
     },
     closeDialog (formName) {
-      this.platform.id = undefined
+      this.permission.id = undefined
       this.$refs[formName].resetFields()
       this.show = false
     }

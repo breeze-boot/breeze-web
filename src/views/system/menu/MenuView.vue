@@ -83,7 +83,7 @@
           </template>
         </el-table-column>
         <el-table-column
-          label="权限标识"
+          label="权限编码"
           prop="permission"
           show-overflow-tooltip>
         </el-table-column>
