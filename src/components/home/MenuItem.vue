@@ -7,11 +7,11 @@
     <menu-item v-for="item in menu.children" :key="item.id" :menu="item"></menu-item>
   </el-submenu>
 
-  <el-menu-item v-else-if="!menu.children && menu.href===0" :index="menu.name">
+  <el-menu-item v-else-if="menu && menu.href===0" :index="menu.name">
     <svg-icon :icon-name="menu.icon" style="font-size: 20px;"/>
     <span slot="title">{{ menu.title }}</span>
   </el-menu-item>
-  <el-menu-item v-else-if="!menu.children && menu.href===1">
+  <el-menu-item v-else-if="menu && menu.href===1">
     <a :href="menu.path" target="_blank">
       <svg-icon :icon-name="menu.icon" style="font-size: 20px;"/>
       <span>{{ menu.title }}</span>

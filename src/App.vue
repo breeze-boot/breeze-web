@@ -23,7 +23,8 @@ export default {
       if (to.name !== 'login' && to.name !== 'home' && accessToken) {
         this.addTab({
           name: to.name,
-          title: to.meta.title
+          title: to.meta.title,
+          hidden: to.meta.hidden
         })
         // this.$store.commit('menu/addTab', {
         //   name: to.name,

@@ -14,7 +14,6 @@ export const request = axios.create({
 })
 
 export const showErrorMsg = (success, msg) => {
-  debugger
   if (success.data.message) {
     Message.error({ message: success.data.message })
   } else {

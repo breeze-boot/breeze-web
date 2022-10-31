@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { filterTree } from '@/utils/constant'
 
 Vue.use(Vuex)
 
@@ -10,7 +11,8 @@ export default {
     editableTabs: [
       {
         title: '欢迎',
-        name: 'welcome'
+        name: 'welcome',
+        hidden: 0
       }
     ],
     menus: [],
@@ -50,7 +52,8 @@ export default {
       }
       state.editableTabs.push({
         title: menu.title,
-        name: menu.name
+        name: menu.name,
+        hidden: menu.hidden
       })
     },
     clearTab (state) {
@@ -65,5 +68,14 @@ export default {
     }
   },
   actions: {},
-  getters: {}
+  getters: {
+    menus (state) {
+      const result = []
+      filterTree(state.menus, result, (tree) => tree.hidden === 1)
+      return result
+    },
+    isCollapse (state) {
+      return state.isCollapse
+    }
+  }
 }

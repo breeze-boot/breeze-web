@@ -48,93 +48,38 @@
           width="55">
         </el-table-column>
         <el-table-column
-          v-if="false"
-          label="头像"
-          prop="avatar"
-          width="90">
-          <template slot-scope="scope">
-            <img :src="scope.row.avatar" alt="" style="border-radius:100px;width: 50px;height: 50px;">
-          </template>
+          label="名称"
+          prop="name">
         </el-table-column>
         <el-table-column
-          label="展示名称"
-          prop="amountName"
+          label="编码"
+          prop="code"
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
-          label="用户编号"
+          label="自定义sql"
           prop="userCode"
-          show-overflow-tooltip
-          width="180">
-        </el-table-column>
-        <el-table-column
-          label="用户名"
-          prop="username"
-          show-overflow-tooltip
-          width="180">
-        </el-table-column>
-        <el-table-column
-          label="部门"
-          prop="deptName"
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
-          label="身份证"
-          prop="idCard"
+          label="运算符"
+          prop="operator"
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
-          label="用户邮箱"
-          prop="email"
+          label="权限"
+          prop="permissions"
           show-overflow-tooltip>
-        </el-table-column>
-        <el-table-column
-          label="性别"
-          prop="sex">
-          <template slot-scope="scope">
-            <el-tag
-              :type="scope.row.sex === 1 ? 'primary' : 'success'"
-              disable-transitions
-              size="mini">{{ scope.row.sex === 1 ? '男' : '女' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column
-          label="是否锁定"
-          prop="isLock">
-          <template slot-scope="scope">
-            <el-switch
-              v-model="scope.row.isLock"
-              :active-value="1"
-              :inactive-value="0"
-              active-color="#ff4949"
-              inactive-color="#13ce66"
-              size="mini"
-              @change="open(scope.$index, scope.row)">
-            </el-switch>
-          </template>
         </el-table-column>
         <el-table-column
           fixed="right"
           label="操作"
-          width="220">
+          width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
             <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
             <el-button size="mini" type="text" @click.native.prevent="delItem(scope.$index, tableData,scope.row)">删除
             </el-button>
-            <el-dropdown size="mini" type="primary" style="margin-left: 5px;" trigger="click">
-              <span class="el-dropdown-link">
-                下拉菜单
-                <i class="el-icon-arrow-down el-icon--right"></i>
-              </span>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="1" @click.native="resetPass(scope.row)">重置密码</el-dropdown-item>
-                <el-dropdown-item command="2" @click.native="goRoleView(scope.row)"
-                >角色分配
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -154,24 +99,19 @@
       ref="addEditDialog"
       :title="title"
       @reloadList="reloadList"/>
-    <reset-pass-dialog
-      ref="resetPassDialog"
-      :title="title"/>
   </el-container>
 </template>
 
 <script>
 import AddEditDialog from '@/components/dialog/user/AddEditDialog'
-import ResetPassDialog from '@/components/dialog/user/ResetPassDialog'
-import { del, list, open } from '@/api/system/user'
+import { del, list } from '@/api/system/permission'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
 
 export default {
-  name: 'UserView',
+  name: 'UserPermissionView',
   components: {
-    AddEditDialog,
-    ResetPassDialog
+    AddEditDialog
   },
   data: () => ({
     title: '',
@@ -190,12 +130,6 @@ export default {
     this.reloadList()
   },
   methods: {
-    goRoleView (row) {
-      this.$router.push({
-        name: 'userRole',
-        path: '/userRole'
-      })
-    },
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
@@ -270,9 +204,6 @@ export default {
         })
       })
     },
-    resetPass (row) {
-      this.$refs.resetPassDialog.showDialogVisible(row)
-    },
     exportInfo () {
     },
     importInfo () {
@@ -295,23 +226,3 @@ export default {
   }
 }
 </script>
-
-<style lang="less">
-.el-dropdown {
-  font-size: 0.5rem;
-
-  i {
-    font-size: 0.5rem;
-  }
-}
-
-.el-dropdown-menu__item {
-  font-size: 0.5rem;
-}
-
-.el-dropdown-link {
-  cursor: pointer;
-  color: #409EFF;
-}
-
-</style>

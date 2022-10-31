@@ -135,7 +135,8 @@ const menuToRoute = (menu) => {
     path: menu.path,
     meta: {
       icon: menu.icon,
-      title: menu.title
+      title: menu.title,
+      hidden: menu.hidden
     }
   }
   route.component = loadView(menu.component)

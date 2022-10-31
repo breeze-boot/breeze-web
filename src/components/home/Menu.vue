@@ -29,7 +29,7 @@
 <script>
 
 import MenuItem from '@/components/home/MenuItem'
-import { mapState } from 'vuex'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'Menu',
@@ -40,16 +40,18 @@ export default {
     return {}
   },
   computed: {
-    // 使用mapState
-    ...mapState('menu', ['isCollapse', 'menus'])
+    // 使用 mapState
+    // ...mapState('menu', ['isCollapse', 'menus'])
+    // 使用 mapGetters
+    ...mapGetters('menu', ['isCollapse', 'menus'])
 
     // isCollapse: {
-    // get () {
-    //   return this.$store.state.menu.isCollapse
-    // },
-    // set (isCollapse) {
-    //   this.$store.state.menu.isCollapse = isCollapse
-    // }
+    //   get () {
+    //     return this.$store.state.menu.isCollapse
+    //   },
+    //   set (isCollapse) {
+    //     this.$store.state.menu.isCollapse = isCollapse
+    //   }
     // },
     // menus: {
     //   get () {

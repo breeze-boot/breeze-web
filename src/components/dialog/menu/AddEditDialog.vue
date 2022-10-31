@@ -237,7 +237,7 @@
 </template>
 
 <script>
-import { DIALOG_TYPE } from '@/utils/constant'
+import { DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
 import { add, edit, selectMenu, selectPlatform } from '@/api/system/menu'
 import { Message } from 'element-ui'
 import IconDialog from '@/components/dialog/menu/IconDialog'
@@ -394,7 +394,7 @@ export default {
           this.menuOptions = root
           if (this.dialogStatus === DIALOG_TYPE.EDIT) {
             this.$nextTick(() => {
-              const treeTemp = this.filterMenuParentId(res.data, (tree) => tree.id && tree.id.eq(this.menu.parentId), 'id')
+              const treeTemp = filterTreeParentId(res.data, (tree) => tree.id && tree.id.eq(this.menu.parentId), 'id')
               const tempArray = ['0']
               treeTemp.forEach(id => {
                 tempArray.push(id.toString())
@@ -451,7 +451,6 @@ export default {
       this.dialogVisible = true
       if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
         this.$nextTick(() => {
-          debugger
           // 赋值
           Object.assign(this.menu, val)
         })
@@ -486,27 +485,6 @@ export default {
     choiceIcon (val) {
       this.menu.icon = val
       console.log('item' + val)
-    },
-    /**
-     * @param menuTree 原始数据
-     * @param func 比较方式
-     * @param filed 要收集起来的属性字段
-     * @param result 结果集
-     */
-    filterMenuParentId (menuTree, func, filed = '', result = []) {
-      if (!menuTree) return []
-      for (const tree of menuTree) {
-        filed !== '' ? result.push(tree[filed]) : result.push(tree)
-        if (func(tree)) return result
-        if (tree.children) {
-          const children = this.filterMenuParentId(tree.children, func, filed, result)
-          if (children.length) {
-            return children
-          }
-        }
-        result.pop()
-      }
-      return []
     }
   }
 }

@@ -29,3 +29,44 @@ export const confirmAlert = (func) => {
     })
   })
 }
+
+/**
+ * @param treeData 原始数据
+ * @param func 比较方式
+ * @param filed 要收集起来的属性字段
+ * @param result 结果集
+ */
+export const filterTreeParentId = (treeData, func, filed = '', result = []) => {
+  if (!treeData) return []
+  for (const tree of treeData) {
+    filed !== '' ? result.push(tree[filed]) : result.push(tree)
+    if (func(tree)) return result
+    if (tree.children) {
+      const children = filterTreeParentId(tree.children, func, filed, result)
+      if (children.length) {
+        return children
+      }
+    }
+    result.pop()
+  }
+  return []
+}
+
+export function filterTree (treeData, result = [], func = {}) {
+  if (!treeData.length) return []
+  for (const tree of treeData) {
+    // 跳出条件
+    if (func(tree)) {
+      continue
+    }
+    const temp = {
+      ...tree,
+      children: []
+    }
+    result.push(temp)
+    if (tree.children && tree.children.length > 0) {
+      filterTree(tree.children, temp.children, (tree) => !tree.children && tree.hidden === 1)
+    }
+  }
+  return result
+}
