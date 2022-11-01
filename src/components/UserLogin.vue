@@ -80,8 +80,9 @@ export default {
         if (response.code === 1) {
           localStorage.setItem('access_token', response.data.access_token)
           localStorage.setItem('permissions', response.data.permissions)
+          localStorage.setItem('user_info', JSON.stringify(response.data.user_info))
+          this.$store.commit('userInfo/setUserInfo')
           const path = this.$route.query.redirect
-          // this.$router.replace(path === '/' || path === undefined ? 'welcome' : path)
           this.$router.replace(path === '/' || path === undefined ? 'welcome' : path)
         }
       })

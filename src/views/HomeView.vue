@@ -1,19 +1,19 @@
 <template>
   <el-container>
-    <el-header>
-      <Header/>
-    </el-header>
+    <el-aside class="left-aside">
+      <Menu/>
+    </el-aside>
     <el-container>
-      <el-aside class="left-aside">
-        <Menu/>
-      </el-aside>
+      <el-header>
+        <Header/>
+      </el-header>
       <el-main style="padding: 1px 20px;">
-        <Tabs/>
+        <Tag/>
         <keep-alive :include="keepAlive">
           <router-view
             :key="key"
             class="router-main"
-            :style="{animationName: 'fadIn', animationDuration: 0.5 + 's'}"/>
+            :style="{animationName: 'fadIn', animationDuration: 1 + 's'}"/>
         </keep-alive>
       </el-main>
     </el-container>
@@ -21,14 +21,14 @@
 </template>
 
 <script>
-import Tabs from '@/components/home/Tabs'
 import Header from '@/components/home/Header'
 import Menu from '@/components/home/Menu'
+import Tag from '@/components/home/Tag'
 
 export default {
   name: 'HomeView',
   components: {
-    Tabs,
+    Tag,
     Header,
     Menu
   },
@@ -58,7 +58,7 @@ export default {
 .left-aside {
   box-shadow: 5px 0 5px -5px rgb(112, 109, 109);
   background: #545c64;
-  height: 93vh;
+  height: 100vh;
   width: fit-content !important;
 }
 

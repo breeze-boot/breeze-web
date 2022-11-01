@@ -1,25 +1,26 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { filterTree } from '@/utils/constant'
+import router from '@/router/index'
 
 Vue.use(Vuex)
 
 export default {
   namespaced: true,
   state: {
-    editableTabsValue: 'welcome',
-    editableTabs: [
-      {
-        title: '欢迎',
-        name: 'welcome',
-        hidden: 0
-      }
-    ],
+    currentTagValue: 'welcome',
+    dynamicTags: [{
+      title: '欢迎',
+      name: 'welcome',
+      hidden: 0
+    }],
     menus: [],
+    keepAliveMenus: [],
     breads: [],
-    isCollapse: false,
-    isLoadMenu: false,
-    keepAliveMenus: []
+    isCollapse: true,
+    fadeIn: 'fadeIn',
+    collapseWhitespace: '200',
+    isLoadMenu: false
   },
   mutations: {
     setMenus (state, menus) {
@@ -36,35 +37,30 @@ export default {
     setCollapse (state, isCollapse) {
       state.isCollapse = isCollapse
     },
+    setFadeIn (state, fadeIn) {
+      state.fadeIn = fadeIn
+    },
+    setCollapseWhitespace (state, collapseWhitespace) {
+      state.collapseWhitespace = collapseWhitespace
+    },
     isLoadMenu (state, isLoadMenu) {
       state.isLoadMenu = isLoadMenu
     },
-    addTab (state, menu) {
-      if (menu.name === 'welcome') {
-        menu.title = '欢迎'
+    setTag (state, menu) {
+      if (state.hidden === 0) {
+        if (menu.name === 'welcome') {
+          menu.title = '欢迎'
+        }
+        state.currentTagValue = menu.name
       }
-      state.editableTabsValue = menu.name
-      const result = state.editableTabs.filter((item) => {
-        return item.name === menu.name
-      }).length > 0
-      if (result) {
+      if (state.dynamicTags.filter((item) => item.name === menu.name).length > 0) {
         return
       }
-      state.editableTabs.push({
-        title: menu.title,
-        name: menu.name,
-        hidden: menu.hidden
-      })
+      state.dynamicTags.push(menu)
     },
-    clearTab (state) {
-      state.editableTabs = []
-      state.editableTabsValue = 'welcome'
-      state.editableTabs = [
-        {
-          title: '欢迎',
-          name: 'welcome'
-        }
-      ]
+    setCurrentTagValue (state, tag) {
+      router.push({ name: tag.name }).then(r => console.log(r))
+      state.currentTagValue = tag.name
     }
   },
   actions: {},
@@ -74,8 +70,20 @@ export default {
       filterTree(state.menus, result, (tree) => tree.hidden === 1)
       return result
     },
+    fadeIn (state) {
+      return state.fadeIn
+    },
+    collapseWhitespace (state) {
+      return state.collapseWhitespace
+    },
     isCollapse (state) {
       return state.isCollapse
+    },
+    getDynamicTags (state) {
+      return state.dynamicTags
+    },
+    getCurrentTagValue (state) {
+      return state.currentTagValue
     }
   }
 }

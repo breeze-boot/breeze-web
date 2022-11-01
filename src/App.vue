@@ -10,7 +10,7 @@ import { mapMutations } from 'vuex'
 export default {
   name: 'App',
   methods: {
-    ...mapMutations('menu', ['addTab'])
+    ...mapMutations('menu', ['setTag'])
   },
   watch: {
     /**
@@ -21,7 +21,7 @@ export default {
     $route (to, from) {
       const accessToken = localStorage.getItem('access_token')
       if (to.name !== 'login' && to.name !== 'home' && accessToken) {
-        this.addTab({
+        this.setTag({
           name: to.name,
           title: to.meta.title,
           hidden: to.meta.hidden
