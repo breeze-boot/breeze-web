@@ -34,7 +34,7 @@
                 height="500"
                 size="mini"
                 stripe
-                row-key="sid"
+                row-key="id"
                 style="width: 100%"
                 @row-click="rowClick"
                 @selection-change="handleSelectionChange">

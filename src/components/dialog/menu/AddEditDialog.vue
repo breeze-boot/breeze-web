@@ -270,7 +270,11 @@ export default {
         type: 0,
         path: ''
       },
-      menuOptions: [],
+      menuOptions: [{
+        value: '1',
+        label: '根节点',
+        children: []
+      }],
       hrefOptions: [
         {
           label: 0,
@@ -384,14 +388,14 @@ export default {
       selectMenu().then(res => {
         if (res.code === 1 && res.data) {
           this.menuOptions = [{
-            value: '0',
+            value: '1',
             label: '根节点',
             children: res.data
           }]
           const treeTemp = filterTreeParentId(res.data, (tree) => {
             return tree.id && tree.id === this.menu.parentId
           }, 'id')
-          const tempArray = ['0']
+          const tempArray = ['1']
           treeTemp.map(id => tempArray.push(id))
           this.menu.parentId = tempArray
         }
@@ -442,11 +446,12 @@ export default {
           // 赋值
           Object.assign(this.menu, val)
         })
-      } else if (dialogType === DIALOG_TYPE.SHOW) {
+      }
+      if (dialogType === DIALOG_TYPE.SHOW) {
         this.show = true
-      } else {
-        this.menu.id = val.id
-        this.menu.parentId = val.parentId
+      } else if (dialogType === DIALOG_TYPE.ADD) {
+        // 由于根节点是 1 JS 未转换字符串
+        this.menu.parentId = val.parentId + ''
       }
       this.selectPlatform()
       this.selectMenu()

@@ -70,6 +70,7 @@
 import AddEditDialog from '@/components/dialog/dept/AddEditDialog'
 import { del, list } from '@/api/system/dept'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import JSONBigInt from 'json-bigint'
 
 export default {
   name: 'DeptView',
@@ -112,7 +113,7 @@ export default {
      */
     delItem (rows, row) {
       confirmAlert(() => {
-        del(row.id).then(rep => {
+        del([JSONBigInt.parse(row.id)]).then(rep => {
           if (rep.code === 1) {
             this.deleteTreeTableData(rows, row)
           }

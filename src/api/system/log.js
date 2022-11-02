@@ -25,10 +25,22 @@ export function list (params) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function del (params) {
+export function clean () {
   return request({
     url: servicePath.system + '/sys/log/delete',
-    method: 'delete',
-    data: params
+    method: 'delete'
+  })
+}
+
+/**
+ * 删除
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function del (id) {
+  return request({
+    url: servicePath.system + '/sys/log/delete',
+    method: 'delete'
   })
 }

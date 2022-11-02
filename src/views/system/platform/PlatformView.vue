@@ -100,6 +100,7 @@
 import AddEditDialog from '@/components/dialog/platform/AddEditDialog'
 import { del, list } from '@/api/system/platform'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import JSONBigInt from 'json-bigint'
 
 export default {
   name: 'PlatformView',
@@ -156,10 +157,8 @@ export default {
     del () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelection.forEach((x) => {
-          ids.push(x.id)
-        })
-        del(ids).then((rep) => {
+        this.multipleSelection.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        del(ids).then(rep => {
           if (rep.code === 1) {
             this.reloadList()
             this.$message.success('删除成功')
@@ -174,9 +173,7 @@ export default {
      */
     delItem (index, rows, row) {
       confirmAlert(() => {
-        const ids = []
-        ids.push(row.id)
-        del(ids).then(rep => {
+        del([JSONBigInt.parse(row.id)]).then(rep => {
           if (rep.code === 1) {
             rows.splice(index, 1)
             this.$message.success('删除成功')

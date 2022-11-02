@@ -33,7 +33,7 @@
             height="600"
             size="mini"
             stripe
-            row-key="sid"
+            row-key="id"
             style="width: 100%"
             @row-click="rowClick"
             @selection-change="handleSelectionChange">
@@ -84,7 +84,7 @@
           <el-tree ref="roleTree"
                    :data="roleTreeData"
                    :props="defaultProps"
-                   node-key="sid"
+                   node-key="id"
                    show-checkbox
                    style="height: 560px; overflow-y:scroll; border: #e1e1e1 1px solid; margin-top:37px;">
           </el-tree>
@@ -108,6 +108,7 @@ import { del, editPermission, list, listRolesPermission } from '@/api/system/rol
 import { listTreePermission } from '@/api/system/menu'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
+import JSONBigInt from 'json-bigint'
 
 export default {
   name: 'RoleView',
@@ -221,9 +222,7 @@ export default {
     del () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelection.forEach((x) => {
-          ids.push(x.id)
-        })
+        this.multipleSelection.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then((rep) => {
           if (rep.code === 1) {
             this.reloadList()
@@ -239,9 +238,7 @@ export default {
      */
     delItem (index, rows, row) {
       confirmAlert(() => {
-        const ids = []
-        ids.push(row.id)
-        del(ids).then(rep => {
+        del([JSONBigInt.parse(row.id)]).then(rep => {
           if (rep.code === 1) {
             rows.splice(index, 1)
             this.$message.success('删除成功')

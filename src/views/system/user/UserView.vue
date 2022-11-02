@@ -171,6 +171,7 @@ import ResetPassDialog from '@/components/dialog/user/ResetPassDialog'
 import { del, list, open } from '@/api/system/user'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
+import JSONBigInt from 'json-bigint'
 
 export default {
   name: 'UserView',
@@ -248,10 +249,8 @@ export default {
     del () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelection.forEach((x) => {
-          ids.push(x.id)
-        })
-        del(ids).then((rep) => {
+        this.multipleSelection.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        del(ids).then(rep => {
           if (rep.code === 1) {
             this.reloadList()
             this.$message.success('删除成功')
@@ -268,9 +267,7 @@ export default {
      */
     delItem (index, rows, row) {
       confirmAlert(() => {
-        const usernames = []
-        usernames.push(row.username)
-        del(usernames).then(rep => {
+        del([JSONBigInt.parse(row.id)]).then(rep => {
           if (rep.code === 1) {
             rows.splice(index, 1)
             this.$message.success('删除成功')

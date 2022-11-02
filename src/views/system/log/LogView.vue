@@ -88,11 +88,13 @@
         <el-table-column
           label="日志标题"
           prop="logTitle"
-          width="180">
+          width="180"
+          show-overflow-tooltip>
         </el-table-column>
         <el-table-column
           label="日志类型"
-          prop="logType">
+          prop="logType"
+          show-overflow-tooltip>
         </el-table-column>
         <el-table-column
           label="操作类型"
@@ -100,23 +102,28 @@
         </el-table-column>
         <el-table-column
           label="请求类型"
-          prop="requestType">
+          prop="requestType"
+          show-overflow-tooltip>
         </el-table-column>
         <el-table-column
           label="执行结果"
-          prop="result">
+          prop="result"
+          show-overflow-tooltip>
         </el-table-column>
         <el-table-column
           label="浏览器"
-          prop="browser">
+          prop="browser"
+          show-overflow-tooltip>
         </el-table-column>
         <el-table-column
           label="IP"
-          prop="ip">
+          prop="ip"
+          show-overflow-tooltip>
         </el-table-column>
         <el-table-column
           label="系统"
-          prop="system">
+          prop="system"
+          show-overflow-tooltip>
         </el-table-column>
         <el-table-column
           label="操作人"
@@ -150,7 +157,7 @@
 </template>
 
 <script>
-import { del, list } from '@/api/system/log'
+import { clean, del, list } from '@/api/system/log'
 import ShowDialog from '@/components/dialog/log/ShowDialog'
 import { confirmAlert } from '@/utils/constant'
 
@@ -223,14 +230,10 @@ export default {
      */
     del () {
       confirmAlert(() => {
-        const ids = []
-        this.multipleSelection.forEach((x) => {
-          ids.push(x.id)
-        })
-        del(ids).then((rep) => {
+        clean().then((rep) => {
           if (rep.code === 1) {
             this.reloadList()
-            this.$message.success('删除成功')
+            this.$message.success('全部清空')
           }
         })
       })

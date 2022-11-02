@@ -1,4 +1,7 @@
 import { request, servicePath } from '@/utils/axios'
+import JSONBigInt from 'json-bigint'
+
+const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
 
 /**
  * 列表
@@ -9,7 +12,10 @@ export function list (data) {
   return request({
     url: servicePath.system + '/sys/user/list',
     method: 'post',
-    data: data
+    data: data,
+    transformResponse: [(data) => {
+      return JSONBigInt2Str.parse(data)
+    }]
   })
 }
 
@@ -18,11 +24,11 @@ export function list (data) {
  *
  * @returns {AxiosPromise}
  */
-export function del (data) {
+export function del (ids) {
   return request({
     url: servicePath.system + '/sys/user/delete',
     method: 'delete',
-    data: data
+    data: ids
   })
 }
 
