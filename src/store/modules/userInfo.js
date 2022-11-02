@@ -21,7 +21,6 @@ export default {
       store.commit('userInfo/setUserInfo')
       if (!state.userInfo) {
         router.replace('/').then(r => {
-          console.error(r)
         })
       }
       return state.userInfo.username

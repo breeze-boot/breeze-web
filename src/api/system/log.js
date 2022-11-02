@@ -1,6 +1,8 @@
 import { request, servicePath } from '@/utils/axios'
 import JSONBigInt from 'json-bigint'
 
+const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
+
 /**
  * 列表
  *
@@ -12,7 +14,7 @@ export function list (params) {
     method: 'post',
     data: params,
     transformResponse: [(data) => {
-      return JSONBigInt.parse(data)
+      return JSONBigInt2Str.parse(data)
     }]
   })
 }

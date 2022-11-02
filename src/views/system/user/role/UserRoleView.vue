@@ -85,6 +85,7 @@
 
 <script>
 import { list } from '@/api/system/role'
+import { userAddRole } from '@/api/system/user'
 
 export default {
   name: 'RoleView',
@@ -126,7 +127,7 @@ export default {
       this.reloadList()
     },
     rowClick (row, column, event) {
-      this.roleId = row.id.toString()
+      this.roleId = row.id
     },
     buildParam () {
       return this.roleSearchForm
@@ -146,7 +147,20 @@ export default {
         this.$message.warning('选择用户的角色')
         return
       }
-      this.$message.success('OK')
+      if (!this.$route.params.id) {
+        this.$message.warning('选择分配角色的用户')
+        return
+      }
+      const temp = {
+        username: this.$route.params.username,
+        roleId: this.multipleSelection.map(role => role.id)
+      }
+      console.log(JSON.stringify(temp))
+      userAddRole(temp).then(rep => {
+        if (rep.code === 1) {
+          this.$message.success('分配成功')
+        }
+      })
     },
     resetForm () {
 

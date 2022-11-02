@@ -41,7 +41,7 @@ export default {
       title: '',
       dialogTableVisible: false,
       // 默认是创建
-      dialogStatus: DIALOG_TYPE.ADD,
+      dialogType: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
       gridData: [],
       rowData: {}

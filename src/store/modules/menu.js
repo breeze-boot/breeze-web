@@ -59,7 +59,8 @@ export default {
       state.dynamicTags.push(menu)
     },
     setCurrentTagValue (state, tag) {
-      router.push({ name: tag.name }).then(r => console.log(r))
+      router.push({ name: tag.name }).then(r => {
+      })
       state.currentTagValue = tag.name
     }
   },

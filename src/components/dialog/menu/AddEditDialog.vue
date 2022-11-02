@@ -6,9 +6,9 @@
         <el-select v-model="menu.platformId" placeholder="请选择所属的平台">
           <el-option
             v-for="item in platformOptions"
-            :key="item.value.toString()"
+            :key="item.value"
             :label="item.label"
-            :value="item.value.toString()">
+            :value="item.value">
           </el-option>
         </el-select>
       </el-form-item>
@@ -254,7 +254,7 @@ export default {
     return {
       dialogVisible: false,
       menu: {
-        id: null,
+        id: undefined,
         platformId: '',
         platformName: '',
         name: '',
@@ -315,14 +315,9 @@ export default {
           name: '按钮'
         }
       ],
-      platformOptions: [
-        {
-          value: '1564528653105573889',
-          label: '平台'
-        }
-      ],
+      platformOptions: [],
       // 默认是创建
-      dialogStatus: DIALOG_TYPE.ADD,
+      dialogType: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
       show: false,
       rules: {
@@ -378,7 +373,9 @@ export default {
     },
     selectPlatform () {
       selectPlatform().then((rep) => {
-        this.platformOptions = rep.data
+        if (rep.code === 1) {
+          this.platformOptions = rep.data
+        }
       }).catch((e) => {
         console.error(e)
       })
@@ -386,32 +383,26 @@ export default {
     selectMenu () {
       selectMenu().then(res => {
         if (res.code === 1 && res.data) {
-          const root = [{
+          this.menuOptions = [{
             value: '0',
             label: '根节点',
             children: res.data
           }]
-          this.menuOptions = root
-          if (this.dialogStatus === DIALOG_TYPE.EDIT) {
-            this.$nextTick(() => {
-              const treeTemp = filterTreeParentId(res.data, (tree) => tree.id && tree.id.eq(this.menu.parentId), 'id')
-              const tempArray = ['0']
-              treeTemp.forEach(id => {
-                tempArray.push(id.toString())
-              })
-              this.menu.parentId = tempArray
-            })
-          }
+          const treeTemp = filterTreeParentId(res.data, (tree) => {
+            return tree.id && tree.id === this.menu.parentId
+          }, 'id')
+          const tempArray = ['0']
+          treeTemp.map(id => tempArray.push(id))
+          this.menu.parentId = tempArray
         }
       })
     },
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogStatus === DIALOG_TYPE.ADD ? this.add() : this.edit()
+          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
         } else {
           console.log('error submit!!')
-          return false
         }
       })
     },
@@ -445,20 +436,22 @@ export default {
      * val: 参数值
      * flag 0 创建 1 修改 2 显示
      */
-    showDialogVisible (val, dialogStatus) {
-      this.selectMenu()
-      this.selectPlatform()
-      this.dialogVisible = true
-      if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
+    showDialogVisible (val, dialogType) {
+      if (dialogType === DIALOG_TYPE.EDIT || dialogType === DIALOG_TYPE.SHOW) {
         this.$nextTick(() => {
           // 赋值
           Object.assign(this.menu, val)
         })
-      }
-      if (dialogStatus === DIALOG_TYPE.SHOW) {
+      } else if (dialogType === DIALOG_TYPE.SHOW) {
         this.show = true
+      } else {
+        this.menu.id = val.id
+        this.menu.parentId = val.parentId
       }
-      this.dialogStatus = dialogStatus
+      this.selectPlatform()
+      this.selectMenu()
+      this.dialogVisible = true
+      this.dialogType = dialogType
     },
     closeDialog (formName) {
       this.$nextTick(() => {
@@ -484,7 +477,6 @@ export default {
     },
     choiceIcon (val) {
       this.menu.icon = val
-      console.log('item' + val)
     }
   }
 }

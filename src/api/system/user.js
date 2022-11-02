@@ -1,5 +1,4 @@
 import { request, servicePath } from '@/utils/axios'
-import JSONBigInt from 'json-bigint'
 
 /**
  * 列表
@@ -10,10 +9,7 @@ export function list (data) {
   return request({
     url: servicePath.system + '/sys/user/list',
     method: 'post',
-    data: data,
-    transformResponse: [(data) => {
-      return JSONBigInt.parse(data)
-    }]
+    data: data
   })
 }
 
@@ -57,6 +53,18 @@ export function edit (data) {
 }
 
 /**
+ * 详情
+ *
+ * @returns {AxiosPromise}
+ */
+export function info (id) {
+  return request({
+    url: servicePath.system + '/sys/user/info/' + id,
+    method: 'get'
+  })
+}
+
+/**
  * 修改
  *
  * @returns {AxiosPromise}
@@ -76,6 +84,18 @@ export function resetPass (data) {
 export function open (data) {
   return request({
     url: servicePath.system + '/sys/user/open',
+    method: 'put',
+    data: data
+  })
+}
+
+/**
+ * 用户分配角色
+ * @returns {AxiosPromise}
+ */
+export function userAddRole (data) {
+  return request({
+    url: servicePath.system + '/sys/user/userAddRole',
     method: 'put',
     data: data
   })

@@ -6,7 +6,7 @@
     </div>
     <div class="logout">
       <el-dropdown @command="handleCommand">
-        <span style="color: #fff;" class="el-dropdown-link">
+        <span class="el-dropdown-link">
           <i class="el-icon-user-solid"/>
           <span> {{ this.getUsername }}</span>
         </span>
@@ -58,7 +58,7 @@ export default {
 
 <style lang="less" scoped>
 .header {
-  background: #545c64;
+  background: #ffffff;
   height: 100%;
   width: 100%;
   display: flex;
@@ -69,7 +69,7 @@ export default {
     height: 100%;
     min-width: 50px;
     font-size: 1.2rem;
-    color: rgb(246, 246, 246);
+    color: rgb(134, 124, 124);
     cursor: pointer;
     display: flex;
     align-items: center;

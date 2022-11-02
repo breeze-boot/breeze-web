@@ -36,7 +36,7 @@ export default {
         value: ''
       },
       // 默认是创建
-      dialogStatus: DIALOG_TYPE.ADD,
+      dialogType: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
       show: true,
       rules: {
@@ -61,7 +61,7 @@ export default {
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogStatus === DIALOG_TYPE.ADD ? this.add() : this.edit()
+          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
         } else {
           console.log('error submit!!')
           return false
@@ -93,19 +93,19 @@ export default {
      * val: 参数值
      * flag 0 创建 1 修改 2 显示
      */
-    showDialogVisible (val, dialogStatus) {
+    showDialogVisible (val, dialogType) {
       this.dialogVisible = true
-      if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
+      if (dialogType === DIALOG_TYPE.EDIT || dialogType === DIALOG_TYPE.SHOW) {
         this.$nextTick(() => {
           // 赋值
           Object.assign(this.dictItem, val)
         })
       }
-      if (dialogStatus === DIALOG_TYPE.SHOW) {
+      if (dialogType === DIALOG_TYPE.SHOW) {
         this.show = false
       }
       this.dictItem.dictId = val.id
-      this.dialogStatus = dialogStatus
+      this.dialogType = dialogType
     },
     closeDialog (formName) {
       this.dictItem.id = undefined

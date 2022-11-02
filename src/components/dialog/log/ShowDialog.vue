@@ -85,7 +85,7 @@ export default {
         createBy: ''
       },
       // 默认是创建
-      dialogStatus: DIALOG_TYPE.ADD,
+      dialogType: DIALOG_TYPE.ADD,
       formLabelWidth: '80px'
     }
   },
@@ -94,13 +94,13 @@ export default {
      * val: 参数值
      * flag: 0 创建 1 修改 2 显示
      */
-    showDialogVisible (val, dialogStatus) {
+    showDialogVisible (val, dialogType) {
       this.dialogVisible = true
       this.$nextTick(() => {
         // 赋值
         Object.assign(this.log, val)
       })
-      this.dialogStatus = dialogStatus
+      this.dialogType = dialogType
     },
     closeDialog () {
     }

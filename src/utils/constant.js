@@ -31,6 +31,8 @@ export const confirmAlert = (func) => {
 }
 
 /**
+ * 根据子节点查找父节点属性
+ *
  * @param treeData 原始数据
  * @param func 比较方式
  * @param filed 要收集起来的属性字段
@@ -52,6 +54,14 @@ export const filterTreeParentId = (treeData, func, filed = '', result = []) => {
   return []
 }
 
+/**
+ * 过滤树形结构数据
+ *
+ * @param treeData
+ * @param result
+ * @param func
+ * @returns {*[]}
+ */
 export function filterTree (treeData, result = [], func = {}) {
   if (!treeData.length) return []
   for (const tree of treeData) {

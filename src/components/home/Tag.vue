@@ -1,7 +1,8 @@
 <template>
-  <div id="tag" @mousewheel="wheel">
+  <div id="tag">
     <el-tag
       :key="tag.name"
+      size="medium"
       v-for="tag in this.getDynamicTags"
       :closable="tag.name !== 'welcome'"
       :effect="$route.name  !== tag.name ? 'plain' : 'dark'"
@@ -39,53 +40,52 @@ export default {
         --index
       }
       this.$router.push({ name: this.getDynamicTags[index].name })
-    },
-    wheel (e) {
-      const a = document.getElementById('tag')
-      const scrollWidth = 100
-      let flag
-      e.wheelDelta ? flag = e.wheelDelta : flag = e.detail
-      if (flag > 3 || -flag > 3) flag = -flag
-      flag > 0 ? a.scrollLeft += scrollWidth : a.scrollLeft -= scrollWidth
-      e.preventDefault()
     }
   }
 }
 </script>
-<style lang="less" scoped>
+<style lang="less">
 #tag {
   padding: 2px 2px;
   margin-bottom: 2px;
   overflow-x: scroll;
   position: relative;
   height: 4vh;
-  box-shadow: 0 0px 1px rgba(61, 57, 57, 0.29);
+  box-shadow: 0 0 1px rgba(61, 57, 57, 0.29);
   white-space: nowrap;
-
-  .el-tag + .el-tag {
-    margin-left: 5px;
-    cursor: pointer;
-  }
-
 }
 
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0);
-  border-radius: 0;
-}
-
-::-webkit-scrollbar {
-  -webkit-appearance: none;
-  width: 10px;
-  height: 0px;
-}
-
-::-webkit-scrollbar-thumb {
+#tag .el-tag {
+  margin-left: 5px;
   cursor: pointer;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0);
-  transition: color .2s ease;
 }
 
+#tag .el-tag--plain {
+  background: #d3d3d3 !important;
+  //box-shadow: 1px 1px 10px #d7d7d7;
+  border-radius: 3px;
+  color: #4d4d4d !important;
+  border: solid 1px #d3d3d3;
+}
+
+#tag .el-tag--dark {
+  border-radius: 3px;
+  //box-shadow: 1px 1px 5px #d7d7d7;
+  //background: rgb(117, 117, 118) !important;
+  color: #f1f1f1 !important;
+}
+
+#tag .el-tag--plain > .el-tag__close:hover {
+  background-color: #d3d3d3 !important;
+  color: #565656 !important;
+}
+
+#tag .el-tag--plain > .el-tag__close {
+  color: #ffffff !important;
+}
+
+#tag .el-tag--dark > .el-tag__close:hover {
+  background-color: #409eff !important;
+  color: #ffffff !important;
+}
 </style>
-`

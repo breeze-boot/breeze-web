@@ -7,10 +7,10 @@ let loadingInstance = {}
  * 创建的实例返回一个对象,实例对象
  */
 export const request = axios.create({
-  // 请求路径，基础接口路径 请求 9000 时经过/dev-api相当于请求
-  // http://localhost:9000
+  // 请求路径，基础接口路径 请求 9000 时经过/dev-api相当于请求 http://localhost:9000
   baseURL: process.env.VUE_APP_BASE_API,
-  timeout: 30000 // 请求超时时间
+  // 请求超时时间
+  timeout: 30000
 })
 
 export const showErrorMsg = (success, msg) => {
@@ -84,6 +84,8 @@ request.interceptors.response.use((success) => {
 }, (error) => {
   if (error.message.includes('timeout of')) {
     Message.error({ message: '请求超时' })
+  } else if (error.response.status === 400) {
+    Message.error({ message: '参数解析失败' })
   } else if (error.response.status === 404) {
     Message.error({ message: '请求地址不存在' })
   } else if (error.response.status === 401) {

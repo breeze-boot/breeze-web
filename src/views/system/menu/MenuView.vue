@@ -14,9 +14,9 @@
               <el-select v-model="searchForm.platformId" placeholder="请选择平台">
                 <el-option
                   v-for="item in platformOptions"
-                  :key="item.value.toString()"
+                  :key="item.value"
                   :label="item.label"
-                  :value="item.value.toString()">
+                  :value="item.value">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -111,9 +111,10 @@
         <el-table-column
           fixed="right"
           label="操作"
-          width="150">
+          width="200">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
+            <el-button size="mini" type="text" @click="add(scope.row)">新建</el-button>
             <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
             <el-button size="mini" type="text" @click.native.prevent="delItem(tableData,scope.row)">删除
             </el-button>
@@ -200,7 +201,7 @@ export default {
     },
     deleteTreeTableData (rows, row) {
       for (let index = 0; index < rows.length; index++) {
-        if (rows[index].id.eq(row.id)) {
+        if (rows[index].id === row.id) {
           rows.splice(index, 1)
           return
         }
@@ -220,7 +221,11 @@ export default {
         this.$refs.menuTable.doLayout()
       })
     },
-    add () {
+    add (val) {
+      this.title = '创建菜单'
+      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.ADD)
+    },
+    clone () {
       this.title = '创建菜单'
       this.$refs.addEditDialog.showDialogVisible({}, DIALOG_TYPE.ADD)
     },

@@ -14,6 +14,7 @@ export function listTreeMenu (params) {
     url: servicePath.system + '/sys/menu/listTreeMenu',
     method: 'get',
     params: params,
+    // 前端处理Long类型
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)
     }]
@@ -31,7 +32,7 @@ export function listTreePermission () {
     url: servicePath.system + '/sys/menu/listTreePermission',
     method: 'get',
     transformResponse: [(data) => {
-      return JSONBigInt.parse(data)
+      return JSONBigInt2Str.parse(data)
     }]
   })
 }
@@ -47,7 +48,7 @@ export function list (data) {
     method: 'post',
     data: data,
     transformResponse: [(data) => {
-      return JSONBigInt.parse(data)
+      return JSONBigInt2Str.parse(data)
     }]
   })
 }
@@ -103,7 +104,7 @@ export function selectMenu () {
     url: servicePath.system + '/sys/common/selectMenu',
     method: 'get',
     transformResponse: [(data) => {
-      return JSONBigInt.parse(data)
+      return JSONBigInt2Str.parse(data)
     }]
   })
 }
@@ -119,7 +120,7 @@ export function selectPlatform () {
     url: servicePath.system + '/sys/common/selectPlatform',
     method: 'get',
     transformResponse: [(data) => {
-      return JSONBigInt.parse(data)
+      return JSONBigInt2Str.parse(data)
     }]
   })
 }

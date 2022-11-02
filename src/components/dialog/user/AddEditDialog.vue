@@ -24,7 +24,7 @@
         <el-input v-model="user.confirmPassword" autocomplete="off" clearable type="password"></el-input>
       </el-form-item>
       <el-form-item :label-width="formLabelWidth" label="用户工号" prop="userCode">
-        <el-input v-model="user.userCode" autocomplete="off" clearable disabled></el-input>
+        <el-input v-model="user.userCode" autocomplete="off" clearable></el-input>
       </el-form-item>
       <el-form-item :label-width="formLabelWidth" label="手机号" prop="phone">
         <el-input v-model="user.phone" autocomplete="off" clearable></el-input>
@@ -36,9 +36,19 @@
         <el-input v-model="user.amountName" autocomplete="off" clearable type="input"></el-input>
       </el-form-item>
       <el-form-item :label-width="formLabelWidth" label="部门" prop="deptId" style="text-align: left;">
-        <el-select v-model="user.deptId" filterable placeholder="请选择">
+        <el-select v-model="user.deptId" filterable placeholder="请选择部门">
           <el-option
             v-for="item in deptOption"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item :label-width="formLabelWidth" label="角色" prop="roleId" style="text-align: left;">
+        <el-select v-model="user.roleId" filterable placeholder="请选择用户角色">
+          <el-option
+            v-for="item in roleOption"
             :key="item.value"
             :label="item.label"
             :value="item.value">
@@ -60,7 +70,7 @@
           :active-value="1"
           :inactive-value="0"
           active-color="#13ce66"
-          inactive-color="#ff4949">
+          inactive-color="#AAAAAA">
         </el-switch>
       </el-form-item>
     </el-form>
@@ -122,6 +132,20 @@
       <el-descriptions-item>
         <template slot="label">
           <i class="el-icon-tickets"></i>
+          用户角色
+        </template>
+        <el-select v-model="user.roleId" :disabled="true" size="mini">
+          <el-option
+            v-for="item in roleOption"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-descriptions-item>
+      <el-descriptions-item>
+        <template slot="label">
+          <i class="el-icon-tickets"></i>
           性别
         </template>
         <el-tag :type="user.sex === 1 ? 'primary' : 'success'">
@@ -133,7 +157,7 @@
           <i class="el-icon-user-solid"></i>
           身份证
         </template>
-        <el-tag> {{ user.idCard }}</el-tag>
+        {{ user.idCard }}
       </el-descriptions-item>
       <el-descriptions-item>
         <template slot="label">
@@ -151,7 +175,7 @@
 
 <script>
 import { DIALOG_TYPE } from '@/utils/constant'
-import { add, edit } from '@/api/system/user'
+import { add, edit, info } from '@/api/system/user'
 import { Message } from 'element-ui'
 
 export default {
@@ -173,6 +197,7 @@ export default {
         userCode: '',
         username: '',
         deptId: '',
+        roleId: '',
         idCard: '',
         email: '',
         sex: 1,
@@ -180,12 +205,18 @@ export default {
       },
       deptOption: [
         {
-          value: 1565314987957145600,
-          label: 'CEO'
+          value: 1,
+          label: '董事长'
+        }
+      ],
+      roleOption: [
+        {
+          value: 1,
+          label: '超级管理员'
         }
       ],
       // 默认是创建
-      dialogStatus: DIALOG_TYPE.ADD,
+      dialogType: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
       show: false,
       isEdit: false,
@@ -291,7 +322,7 @@ export default {
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogStatus === DIALOG_TYPE.ADD ? this.add() : this.edit()
+          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
         } else {
           console.log('error submit!!')
           return false
@@ -323,19 +354,23 @@ export default {
      * val: 参数值
      * flag 0 创建 1 修改 2 显示
      */
-    showDialogVisible (val, dialogStatus) {
+    showDialogVisible (val, dialogType) {
       this.dialogVisible = true
-      if (dialogStatus === DIALOG_TYPE.EDIT || dialogStatus === DIALOG_TYPE.SHOW) {
+      if (dialogType === DIALOG_TYPE.EDIT || dialogType === DIALOG_TYPE.SHOW) {
         this.$nextTick(() => {
           // 赋值
-          Object.assign(this.user, val)
+          info(val.id).then(rep => {
+            if (rep.code === 1) {
+              Object.assign(this.user, rep.data)
+            }
+          })
           this.isEdit = true
         })
       }
-      if (dialogStatus === DIALOG_TYPE.SHOW) {
+      if (dialogType === DIALOG_TYPE.SHOW) {
         this.show = true
       }
-      this.dialogStatus = dialogStatus
+      this.dialogType = dialogType
     },
     closeDialog (formName) {
       this.user.id = undefined

@@ -156,7 +156,7 @@ export default {
       }).then(rep => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })
-          this.listSelectedTreeData(this.roleId.toString())
+          this.listSelectedTreeData(this.roleId)
         }
       })
     },
@@ -185,7 +185,7 @@ export default {
         if (rep.code === 1) {
           this.$nextTick(() => {
             rep.data.forEach(data => {
-              this.$refs.roleTree.setChecked(data.menuId.toString(), true, false)
+              this.$refs.roleTree.setChecked(data.menuId, true, false)
             })
           })
           this.disabled = false
@@ -205,8 +205,8 @@ export default {
       this.reloadListTreeMenu()
     },
     rowClick (row, column, event) {
-      this.roleId = row.id.toString()
-      this.listSelectedTreeData(row.id.toString())
+      this.roleId = row.id
+      this.listSelectedTreeData(row.id)
     },
     buildParam () {
       return this.searchForm

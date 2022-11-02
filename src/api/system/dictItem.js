@@ -1,6 +1,8 @@
 import { request, servicePath } from '@/utils/axios'
 import JSONBigInt from 'json-bigint'
 
+const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
+
 /**
  * 列表
  *
@@ -11,8 +13,9 @@ export function list (data) {
     url: servicePath.system + '/sys/dictItem/list',
     method: 'post',
     data: data,
+    // `transformResponse` 在传递给 then/catch 前，允许修改响应数据 注意 network中依然是丢失精度的数字，接收到数据后转换成的String
     transformResponse: [(data) => {
-      return JSONBigInt.parse(data)
+      return JSONBigInt2Str.parse(data)
     }]
   })
 }

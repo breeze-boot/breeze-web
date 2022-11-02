@@ -123,6 +123,7 @@ export default {
   methods: {
     reloadList () {
       list(this.buildParam()).then((rep) => {
+        console.log(rep)
         if (rep.code === 1) {
           this.tableData = rep.data.records
           this.searchForm.size = rep.data.size

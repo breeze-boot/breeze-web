@@ -7,9 +7,9 @@
       :collapse-transition="true"
       :default-active="this.getCurrentTagValue"
       active-text-color="#ffd04b"
-      background-color="#545c64"
+      background-color="#093f6b"
       :unique-opened="true"
-      style="border-right: 1px solid #002a59"
+      style="border-right: 1px solid #093f6b"
       text-color="#fff"
       @close="handleClose"
       @open="handleOpen">

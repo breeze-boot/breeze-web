@@ -79,6 +79,11 @@
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
+          label="角色"
+          prop="roleNames"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
           label="身份证"
           prop="idCard"
           show-overflow-tooltip>
@@ -107,8 +112,8 @@
               v-model="scope.row.isLock"
               :active-value="1"
               :inactive-value="0"
-              active-color="#ff4949"
-              inactive-color="#13ce66"
+              active-color="#13ce66"
+              inactive-color="#AAAAAA"
               size="mini"
               @change="open(scope.$index, scope.row)">
             </el-switch>
@@ -193,7 +198,8 @@ export default {
     goRoleView (row) {
       this.$router.push({
         name: 'userRole',
-        path: '/userRole'
+        path: '/userRole',
+        params: row
       })
     },
     reloadList () {
@@ -256,7 +262,9 @@ export default {
     /**
      * 删除行
      *
+     * @param index
      * @param rows
+     * @param row
      */
     delItem (index, rows, row) {
       confirmAlert(() => {
