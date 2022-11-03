@@ -61,7 +61,7 @@
       <el-form-item class="parentId" :label-width="formLabelWidth" label="上级菜单" prop="parentId">
         <el-cascader
           v-model="menu.parentId"
-          :options="menuOptions"
+          :options="menuOption"
           :props="{ checkStrictly: true }"
           filterable
           clearable
@@ -185,7 +185,7 @@
           disabled
           v-model="menu.parentId"
           size="mini"
-          :options="menuOptions"
+          :options="menuOption"
           :props="{ checkStrictly: true }"
           filterable
           clearable
@@ -229,7 +229,6 @@
         </el-tag>
       </el-descriptions-item>
     </el-descriptions>
-
     <icon-dialog
       @choiceIcon="choiceIcon"
       ref="iconDialog"/>
@@ -261,7 +260,7 @@ export default {
         title: '',
         icon: '',
         sort: 0,
-        parentId: '0',
+        parentId: '1111111111111111111',
         permission: '',
         component: '',
         href: 0,
@@ -270,11 +269,7 @@ export default {
         type: 0,
         path: ''
       },
-      menuOptions: [{
-        value: '1',
-        label: '根节点',
-        children: []
-      }],
+      menuOption: [],
       hrefOptions: [
         {
           label: 0,
@@ -384,18 +379,18 @@ export default {
         console.error(e)
       })
     },
-    selectMenu () {
-      selectMenu().then(res => {
+    selectMenu (id) {
+      selectMenu(id).then(res => {
         if (res.code === 1 && res.data) {
-          this.menuOptions = [{
-            value: '1',
+          this.menuOption = [{
+            value: '1111111111111111111',
             label: '根节点',
             children: res.data
           }]
           const treeTemp = filterTreeParentId(res.data, (tree) => {
             return tree.id && tree.id === this.menu.parentId
           }, 'id')
-          const tempArray = ['1']
+          const tempArray = ['1111111111111111111']
           treeTemp.map(id => tempArray.push(id))
           this.menu.parentId = tempArray
         }
@@ -404,6 +399,7 @@ export default {
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          this.menu.parentId = this.menu.parentId[this.menu.parentId.length - 1]
           this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
         } else {
           console.log('error submit!!')
@@ -411,7 +407,6 @@ export default {
       })
     },
     add () {
-      this.menu.parentId = this.menu.parentId[this.menu.parentId.length - 1]
       add(this.menu).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })
@@ -421,7 +416,6 @@ export default {
       })
     },
     edit () {
-      this.menu.parentId = this.menu.parentId[this.menu.parentId.length - 1]
       edit(this.menu).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })
@@ -445,20 +439,23 @@ export default {
         this.$nextTick(() => {
           // 赋值
           Object.assign(this.menu, val)
+          this.menu.parentId = val.parentId
+          this.selectMenu(this.menu.id)
         })
       }
       if (dialogType === DIALOG_TYPE.SHOW) {
         this.show = true
+        this.selectMenu()
       } else if (dialogType === DIALOG_TYPE.ADD) {
-        // 由于根节点是 1 JS 未转换字符串
-        this.menu.parentId = val.parentId + ''
+        this.menu.parentId = val.id ? val.id : ''
+        this.selectMenu()
       }
       this.selectPlatform()
-      this.selectMenu()
       this.dialogVisible = true
       this.dialogType = dialogType
     },
     closeDialog (formName) {
+      this.$refs[formName].resetFields()
       this.$nextTick(() => {
         this.menu = {
           id: null,

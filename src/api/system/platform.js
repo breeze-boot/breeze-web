@@ -24,11 +24,11 @@ export function list (data) {
  *
  * @returns {AxiosPromise}
  */
-export function del (data) {
+export function del (ids) {
   return request({
     url: servicePath.system + '/sys/platform/delete',
     method: 'delete',
-    data: data
+    data: ids
   })
 }
 

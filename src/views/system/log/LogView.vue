@@ -59,7 +59,8 @@
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
         <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
-        <el-button plain size="mini" type="danger" @click="del()">删除</el-button>
+        <el-button plain size="mini" type="danger" @click="del">删除</el-button>
+        <el-button plain size="mini" type="danger" @click="clear">清空全表</el-button>
       </div>
       <el-table
         ref="multipleTable"
@@ -157,9 +158,10 @@
 </template>
 
 <script>
-import { clean, del, list } from '@/api/system/log'
+import { clear, del, list } from '@/api/system/log'
 import ShowDialog from '@/components/dialog/log/ShowDialog'
 import { confirmAlert } from '@/utils/constant'
+import JSONBigInt from 'json-bigint'
 
 export default {
   name: 'LogView',
@@ -230,11 +232,24 @@ export default {
      */
     del () {
       confirmAlert(() => {
-        clean().then((rep) => {
+        const ids = []
+        this.multipleSelection.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        del(ids).then((rep) => {
           if (rep.code === 1) {
             this.reloadList()
-            this.$message.success('全部清空')
+            this.$message.success('删除成功')
           }
+        })
+      })
+    },
+    /**
+     * 清空
+     */
+    clear () {
+      confirmAlert(() => {
+        clear().then((rep) => {
+          this.reloadList()
+          this.$message.success('全部清空')
         })
       })
     },
@@ -245,9 +260,7 @@ export default {
      */
     delItem (index, rows, row) {
       confirmAlert(() => {
-        const ids = []
-        ids.push(row.id)
-        del(ids).then(rep => {
+        del([JSONBigInt.parse(row.id)]).then(rep => {
           if (rep.code === 1) {
             rows.splice(index, 1)
             this.$message.success('删除成功')

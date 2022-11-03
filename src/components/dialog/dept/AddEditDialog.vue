@@ -1,7 +1,17 @@
 <template>
-  <el-dialog :title="title" :visible.sync="dialogVisible" width="800px"
+  <el-dialog :title="title" :visible.sync="dialogVisible" width="600px"
              @close="closeDialog('ruleForm')">
     <el-form v-show="!show" ref="ruleForm" :model="dept" :rules="rules" size="mini">
+      <el-form-item class="parentId" :label-width="formLabelWidth" label="上级部门" prop="parentId">
+        <el-cascader
+          v-model="dept.parentId"
+          :options="deptOption"
+          :props="{ checkStrictly: true }"
+          filterable
+          clearable
+          :show-all-levels="false"
+        ></el-cascader>
+      </el-form-item>
       <el-form-item :label-width="formLabelWidth" label="部门名称" prop="deptName">
         <el-input v-model="dept.deptName" autocomplete="off" clearable></el-input>
       </el-form-item>
@@ -37,8 +47,8 @@
 </template>
 
 <script>
-import { DIALOG_TYPE } from '@/utils/constant'
-import { add, edit } from '@/api/system/dept'
+import { DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
+import { add, edit, selectDept } from '@/api/system/dept'
 import { Message } from 'element-ui'
 
 export default {
@@ -49,8 +59,10 @@ export default {
   data () {
     return {
       dialogVisible: false,
+      deptOption: [],
       dept: {
         id: null,
+        parentId: null,
         deptName: '',
         deptCode: ''
       },
@@ -77,9 +89,28 @@ export default {
     }
   },
   methods: {
+    selectDept (id) {
+      selectDept(id).then(res => {
+        if (res.code === 1 && res.data) {
+          this.deptOption = [{
+            value: '1111111111111111111',
+            label: '根节点',
+            children: res.data
+          }]
+          const treeTemp = filterTreeParentId(res.data, (tree) => {
+            console.log(JSON.stringify(tree))
+            return tree.id && tree.id === this.dept.parentId
+          }, 'id')
+          const tempArray = ['1111111111111111111']
+          treeTemp.map(id => tempArray.push(id))
+          this.dept.parentId = tempArray
+        }
+      })
+    },
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          this.dept.parentId = this.dept.parentId[this.dept.parentId.length - 1]
           this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
         } else {
           console.log('error submit!!')
@@ -113,16 +144,22 @@ export default {
      * flag 0 创建 1 修改 2 显示
      */
     showDialogVisible (val, dialogType) {
-      this.dialogVisible = true
       if (dialogType === DIALOG_TYPE.EDIT || dialogType === DIALOG_TYPE.SHOW) {
         this.$nextTick(() => {
           // 赋值
           Object.assign(this.dept, val)
+          this.dept.parentId = val.parentId
+          this.selectDept(this.dept.id)
         })
       }
       if (dialogType === DIALOG_TYPE.SHOW) {
         this.show = true
+        this.selectDept()
+      } else if (dialogType === DIALOG_TYPE.ADD) {
+        this.dept.parentId = val.id ? val.id : ''
+        this.selectDept()
       }
+      this.dialogVisible = true
       this.dialogType = dialogType
     },
     closeDialog (formName) {

@@ -193,7 +193,7 @@ export default {
      */
     delItem (rows, row) {
       confirmAlert(() => {
-        del([JSONBigInt.parse(row.id)]).then(rep => {
+        del(JSONBigInt.parse(row.id)).then(rep => {
           if (rep.code === 1) {
             this.deleteTreeTableData(rows, row)
           }

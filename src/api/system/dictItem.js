@@ -40,11 +40,11 @@ export function add (data) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function del (data) {
+export function del (ids) {
   return request({
     url: servicePath.system + '/sys/dictItem/delete',
     method: 'delete',
-    data: data
+    data: ids
   })
 }
 

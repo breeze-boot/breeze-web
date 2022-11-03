@@ -42,7 +42,7 @@ export function del (id) {
   return request({
     url: servicePath.system + '/sys/dept/delete',
     method: 'delete',
-    params: { id: id }
+    data: id
   })
 }
 
@@ -57,5 +57,22 @@ export function edit (data) {
     url: servicePath.system + '/sys/dept/edit',
     method: 'put',
     data: data
+  })
+}
+
+/**
+ * 部门下拉框
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function selectDept (id) {
+  return request({
+    url: servicePath.system + '/sys/common/selectDept',
+    method: 'get',
+    params: { id: id },
+    transformResponse: [(data) => {
+      return JSONBigInt2Str.parse(data)
+    }]
   })
 }

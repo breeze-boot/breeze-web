@@ -68,14 +68,14 @@ export function add (data) {
 /**
  * 删除
  *
- * @param data
+ * @param id
  * @returns {AxiosPromise}
  */
-export function del (data) {
+export function del (id) {
   return request({
     url: servicePath.system + '/sys/menu/delete',
     method: 'delete',
-    data: data
+    data: id
   })
 }
 
@@ -99,10 +99,11 @@ export function edit (data) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function selectMenu () {
+export function selectMenu (id) {
   return request({
     url: servicePath.system + '/sys/common/selectMenu',
     method: 'get',
+    params: { id: id },
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)
     }]

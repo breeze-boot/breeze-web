@@ -49,9 +49,10 @@
         <el-table-column
           fixed="right"
           label="操作"
-          width="150">
+          width="200">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
+            <el-button size="mini" type="text" @click="add(scope.row)">新建</el-button>
             <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
             <el-button size="mini" type="text" @click.native.prevent="delItem(tableData,scope.row)">删除
             </el-button>
@@ -113,7 +114,7 @@ export default {
      */
     delItem (rows, row) {
       confirmAlert(() => {
-        del([JSONBigInt.parse(row.id)]).then(rep => {
+        del(JSONBigInt.parse(row.id)).then(rep => {
           if (rep.code === 1) {
             this.deleteTreeTableData(rows, row)
           }
@@ -139,9 +140,9 @@ export default {
     handleSelectionChange (val) {
       this.multipleSelection = val
     },
-    add () {
+    add (val) {
       this.title = '创建部门'
-      this.$refs.addEditDialog.showDialogVisible({}, DIALOG_TYPE.ADD)
+      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.ADD)
     },
     edit (val) {
       this.title = '修改部门信息'
