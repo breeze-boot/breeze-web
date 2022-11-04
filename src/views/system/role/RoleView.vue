@@ -20,9 +20,8 @@
       <el-row :gutter="24">
         <el-col :md="19">
           <div style="margin-bottom: 10px; text-align: left;">
-            <el-button plain size="mini" type="primary" @click="add">新建</el-button>
-            <el-button plain size="mini" type="warning " @click="edit">修改</el-button>
-            <el-button plain size="mini" type="danger" @click="del">删除</el-button>
+            <el-button plain size="mini" type="primary" @click="create">新建</el-button>
+            <el-button plain size="mini" type="danger" @click="remove">删除</el-button>
             <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
             <el-button plain size="mini" @click="importInfo">导入</el-button>
           </div>
@@ -60,9 +59,10 @@
               label="操作"
               width="150">
               <template slot-scope="scope">
-                <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
-                <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
-                <el-button size="mini" type="text" @click.native.prevent="delItem(scope.$index, tableData,scope.row)">删除
+                <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
+                <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
+                <el-button size="mini" type="text"
+                           @click.native.prevent="removeItem(scope.$index, tableData,scope.row)">删除
                 </el-button>
               </template>
             </el-table-column>
@@ -95,16 +95,47 @@
         </el-col>
       </el-row>
     </el-main>
-    <add-edit-dialog
-      ref="addEditDialog"
-      :title="title"
-      @reloadList="reloadList"/>
+
+    <el-dialog :title="title" :visible.sync="dialogVisible" width="800px"
+               @close="closeDialog('ruleForm')">
+      <el-form ref="ruleForm" :model="role" :rules="rules" size="mini">
+        <el-form-item :label-width="formLabelWidth" label="角色名称" prop="roleName">
+          <el-input v-model="role.roleName" autocomplete="off" clearable></el-input>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="角色编码" prop="roleCode">
+          <el-input v-model="role.roleCode" autocomplete="off" clearable></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="mini" @click="resetForm()">取 消</el-button>
+        <el-button size="mini" type="primary" @click="submitForm('ruleForm')">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog :title="title" :visible.sync="dialogVisibleInfo" width="800px"
+               @close="closeInfoDialog">
+      <el-descriptions :column="1" border size="mini">
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-user"></i>
+            角色编码
+          </template>
+          {{ role.roleCode }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-tickets"></i>
+            角色名称
+          </template>
+          <el-tag size="small">{{ role.roleName }}</el-tag>
+        </el-descriptions-item>
+      </el-descriptions>
+    </el-dialog>
   </el-container>
 </template>
 
 <script>
-import AddEditDialog from '@/components/dialog/role/AddEditDialog'
-import { del, editPermission, list, listRolesPermission } from '@/api/system/role'
+import { add, del, edit, editPermission, list, listRolesPermission } from '@/api/system/role'
 import { listTreePermission } from '@/api/system/menu'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
@@ -112,7 +143,6 @@ import JSONBigInt from 'json-bigint'
 
 export default {
   name: 'RoleView',
-  components: { AddEditDialog },
   data: () => ({
     title: '',
     disabled: true,
@@ -130,13 +160,67 @@ export default {
       children: 'children',
       label: 'title'
     },
-    roleId: undefined
+    roleId: undefined,
+    dialogVisible: false,
+    dialogVisibleInfo: false,
+    role: {
+      id: undefined,
+      roleName: '',
+      roleCode: ''
+    },
+    roleInfo: {
+      id: undefined,
+      roleName: '',
+      roleCode: ''
+    },
+    // 默认是创建
+    dialogType: DIALOG_TYPE.ADD,
+    formLabelWidth: '80px',
+    rules: {
+      roleName: [
+        {
+          required: true,
+          message: '请输入角色名称',
+          trigger: 'blur'
+        }
+      ],
+      roleCode: [
+        {
+          required: true,
+          message: '请输入角色编码',
+          trigger: 'blur'
+        }
+      ]
+    }
   }),
   created () {
     this.reloadList()
     this.reloadListTreeMenu()
   },
   methods: {
+    reloadList () {
+      list(this.buildParam()).then((rep) => {
+        if (rep.code === 1) {
+          this.tableData = rep.data.records
+          this.searchForm.size = rep.data.size
+          this.searchForm.current = rep.data.current
+          this.total = rep.data.total
+        }
+      })
+    },
+    listRolesPermission (roleId) {
+      listRolesPermission(roleId).then((rep) => {
+        if (rep.code === 1) {
+          this.$nextTick(() => {
+            debugger
+            rep.data.forEach(data => {
+              this.$refs.roleTree.setChecked(data.menuId, true, false)
+            })
+          })
+          this.disabled = false
+        }
+      })
+    },
     submitPermission () {
       const checkedKeys = this.$refs.roleTree.getCheckedKeys()
       const halfCheckedKeys = this.$refs.roleTree.getHalfCheckedKeys()
@@ -151,45 +235,24 @@ export default {
         this.$message.warning('请先点击角色')
         return
       }
+      debugger
       editPermission({
         roleId: this.roleId,
         permissionIds: checkedKeys
       }).then(rep => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })
-          this.listSelectedTreeData(this.roleId)
+          this.listRolesPermission(this.roleId)
         }
       })
     },
     resetPermission () {
-      this.listSelectedTreeData(this.roleId)
+      this.listRolesPermission(this.roleId)
     },
     reloadListTreeMenu () {
       listTreePermission().then((rep) => {
         if (rep.code === 1) {
           this.roleTreeData = rep.data
-        }
-      })
-    },
-    reloadList () {
-      list(this.buildParam()).then((rep) => {
-        if (rep.code === 1) {
-          this.tableData = rep.data.records
-          this.searchForm.size = rep.data.size
-          this.searchForm.current = rep.data.current
-          this.total = rep.data.total
-        }
-      })
-    },
-    listSelectedTreeData (roleId) {
-      listRolesPermission(roleId).then((rep) => {
-        if (rep.code === 1) {
-          this.$nextTick(() => {
-            rep.data.forEach(data => {
-              this.$refs.roleTree.setChecked(data.menuId, true, false)
-            })
-          })
-          this.disabled = false
         }
       })
     },
@@ -207,7 +270,7 @@ export default {
     },
     rowClick (row, column, event) {
       this.roleId = row.id
-      this.listSelectedTreeData(row.id)
+      this.listRolesPermission(row.id)
     },
     buildParam () {
       return this.searchForm
@@ -216,10 +279,13 @@ export default {
       this.searchForm.roleName = ''
       this.searchForm.roleCode = ''
     },
+    handleSelectionChange (val) {
+      this.multipleSelection = val
+    },
     /**
      * 批量删除
      */
-    del () {
+    remove () {
       confirmAlert(() => {
         const ids = []
         this.multipleSelection.map((x) => ids.push(JSONBigInt.parse(x.id)))
@@ -236,7 +302,7 @@ export default {
      *
      * @param rows
      */
-    delItem (index, rows, row) {
+    removeItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(rep => {
           if (rep.code === 1) {
@@ -250,20 +316,62 @@ export default {
     },
     importInfo () {
     },
-    handleSelectionChange (val) {
-      this.multipleSelection = val
+    create () {
+      this.title = '创建角色'
+      this.dialogType = DIALOG_TYPE.ADD
+      this.dialogVisible = true
+    },
+    modify (val) {
+      this.title = '修改角色信息'
+      this.dialogType = DIALOG_TYPE.EDIT
+      this.dialogVisible = true
+      Object.assign(this.role, val)
+    },
+    info (val) {
+      this.title = '查看角色信息'
+      this.dialogType = DIALOG_TYPE.SHOW
+      this.dialogVisibleInfo = true
+      Object.assign(this.role, val)
+    },
+    closeDialog (formName) {
+      this.role.id = undefined
+      this.$refs[formName].resetFields()
+    },
+    closeInfoDialog () {
+      this.role = this.roleInfo
+    },
+    submitForm (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    resetForm () {
+      this.dialogVisible = false
     },
     add () {
-      this.title = '创建角色'
-      this.$refs.addEditDialog.showDialogVisible({}, DIALOG_TYPE.ADD)
+      add(this.role).then((rep) => {
+        if (rep.code === 1) {
+          Message.success({ message: rep.message })
+          this.dialogVisible = false
+          this.reloadList()
+          this.resetPermission()
+        }
+      })
     },
-    edit (val) {
-      this.title = '修改角色信息'
-      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.EDIT)
-    },
-    show (val) {
-      this.title = '查看角色信息'
-      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.SHOW)
+    edit () {
+      edit(this.role).then((rep) => {
+        if (rep.code === 1) {
+          Message.success({ message: rep.message })
+          this.dialogVisible = false
+          this.reloadList()
+          this.resetPermission()
+        }
+      })
     }
   }
 }

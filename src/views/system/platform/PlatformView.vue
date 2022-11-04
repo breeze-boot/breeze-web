@@ -18,8 +18,8 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button plain size="mini" type="primary" @click="add" v-has="['sys:platform:save']">新建</el-button>
-        <el-button plain size="mini" type="danger" @click="del" v-has="['sys:platform:delete']">删除</el-button>
+        <el-button plain size="mini" type="primary" @click="create" v-has="['sys:platform:save']">新建</el-button>
+        <el-button plain size="mini" type="danger" @click="remove" v-has="['sys:platform:delete']">删除</el-button>
         <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
         <el-button plain size="mini" @click="importInfo">导入</el-button>
       </div>
@@ -69,10 +69,10 @@
           label="操作"
           width="150">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
-            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
+            <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
             <el-button size="mini" type="text"
-                       @click.native.prevent="delItem(scope.$index, tableData,scope.row)">删除
+                       @click.native.prevent="removeItem(scope.$index, tableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
@@ -89,25 +89,65 @@
         </el-pagination>
       </div>
     </el-main>
-    <add-edit-dialog
-      ref="addEditDialog"
-      :title="title"
-      @reloadList="reloadList"/>
+
+    <el-dialog :title="title" :visible.sync="dialogVisible" width="800px"
+               @close="closeDialog('ruleForm')">
+      <el-form ref="ruleForm" :model="platform" :rules="rules" size="mini">
+        <el-form-item :label-width="formLabelWidth" label="平台名称" prop="platformName">
+          <el-input v-model="platform.platformName" autocomplete="off" clearable></el-input>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="平台标志" prop="platformCode">
+          <el-input v-model="platform.platformCode" autocomplete="off" clearable></el-input>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="描述" prop="description">
+          <el-input v-model="platform.description" autocomplete="off" clearable type="textarea"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="mini" @click="resetForm('ruleForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="submitForm('ruleForm')">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog :title="title" :visible.sync="dialogVisibleInfo" width="800px"
+               @close="closeInfoDialog">
+      <el-descriptions :column="2" border size="mini">
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-user"></i>
+            平台名称
+          </template>
+          {{ platform.platformName }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-tickets"></i>
+            平台编码
+          </template>
+          <el-tag size="small">{{ platform.platformCode }}</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-office-building"></i>
+            描述
+          </template>
+          {{ platform.description }}
+        </el-descriptions-item>
+      </el-descriptions>
+    </el-dialog>
+
   </el-container>
 </template>
 
 <script>
-import AddEditDialog from '@/components/dialog/platform/AddEditDialog'
-import { del, list } from '@/api/system/platform'
+import { add, del, edit, list } from '@/api/system/platform'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
+import { Message } from 'element-ui'
 
 export default {
   name: 'PlatformView',
-  components: { AddEditDialog },
   data: () => ({
-    title: '',
-    platformValue: {},
     multipleSelection: [],
     tableData: [],
     searchForm: {
@@ -116,7 +156,41 @@ export default {
       current: 1,
       size: 10
     },
-    total: 0
+    total: 0,
+    title: '',
+    dialogVisible: false,
+    dialogVisibleInfo: false,
+    // 默认是创建
+    dialogType: DIALOG_TYPE.ADD,
+    formLabelWidth: '80px',
+    platform: {
+      id: null,
+      platformName: '',
+      platformCode: '',
+      description: ''
+    },
+    platformInfo: {
+      id: null,
+      platformName: '',
+      platformCode: '',
+      description: ''
+    },
+    rules: {
+      platformName: [
+        {
+          required: true,
+          message: '请输入平台名称',
+          trigger: 'blur'
+        }
+      ],
+      platformCode: [
+        {
+          required: true,
+          message: '请输入平台编码',
+          trigger: 'blur'
+        }
+      ]
+    }
   }),
   created () {
     this.reloadList()
@@ -124,7 +198,6 @@ export default {
   methods: {
     reloadList () {
       list(this.buildParam()).then((rep) => {
-        console.log(rep)
         if (rep.code === 1) {
           this.tableData = rep.data.records
           this.searchForm.size = rep.data.size
@@ -132,6 +205,9 @@ export default {
           this.total = rep.data.total
         }
       })
+    },
+    buildParam () {
+      return this.searchForm
     },
     handleSizeChange (size) {
       this.searchForm.size = size
@@ -144,17 +220,17 @@ export default {
     search () {
       this.reloadList()
     },
-    buildParam () {
-      return this.searchForm
-    },
     reset () {
       this.searchForm.platformName = ''
       this.searchForm.platformCode = ''
     },
+    handleSelectionChange (val) {
+      this.multipleSelection = val
+    },
     /**
      * 批量删除
      */
-    del () {
+    remove () {
       confirmAlert(() => {
         const ids = []
         this.multipleSelection.map((x) => ids.push(JSONBigInt.parse(x.id)))
@@ -169,9 +245,11 @@ export default {
     /**
      * 删除行
      *
+     * @param index
      * @param rows
+     * @param row
      */
-    delItem (index, rows, row) {
+    removeItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(rep => {
           if (rep.code === 1) {
@@ -185,20 +263,66 @@ export default {
     },
     importInfo () {
     },
-    handleSelectionChange (val) {
-      this.multipleSelection = val
+    create () {
+      this.title = '创建平台'
+      this.dialogType = DIALOG_TYPE.ADD
+      this.dialogVisible = true
+    },
+    modify (val) {
+      this.title = '修改平台'
+      this.dialogType = DIALOG_TYPE.EDIT
+      this.dialogVisible = true
+      Object.assign(this.platform, val)
+    },
+    info (val) {
+      this.title = '查看信息'
+      this.dialogType = DIALOG_TYPE.SHOW
+      this.dialogVisibleInfo = true
+      Object.assign(this.platform, val)
+    },
+    closeDialog (formName) {
+      this.dialogVisible = false
+      this.platform.id = undefined
+      this.$refs[formName].resetFields()
+    },
+    closeInfoDialog () {
+      this.platform = this.platformInfo
+    },
+    /**
+     * 提交
+     * @param formName
+     */
+    submitForm (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    resetForm (formName) {
+      this.dialogVisible = false
+      this.$refs[formName].resetFields()
     },
     add () {
-      this.title = '创建平台'
-      this.$refs.addEditDialog.showDialogVisible({}, DIALOG_TYPE.ADD)
+      this.platform.id = undefined
+      add(this.platform).then((rep) => {
+        if (rep.code === 1) {
+          Message.success({ message: '添加成功' })
+          this.reloadList()
+        }
+      })
     },
-    edit (val) {
-      this.title = '修改平台'
-      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.EDIT)
-    },
-    show (val) {
-      this.title = '查看信息'
-      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.SHOW)
+    edit () {
+      edit(this.platform).then((rep) => {
+        if (rep.code === 1) {
+          Message.success({ message: '修改成功' })
+          this.dialogVisible = false
+          this.reloadList()
+        }
+      })
     }
   }
 }

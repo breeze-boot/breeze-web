@@ -93,7 +93,7 @@
 
     <el-dialog :title="title" :visible.sync="dialogVisible" width="800px"
                @close="closeDialog('dictRuleForm')">
-      <el-form ref="dictRuleForm" :model="dict" :rules="rules" size="mini">
+      <el-form ref="dictRuleForm" :model="dict" :rules="dictRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="字典名称" prop="dictName">
           <el-input v-model="dict.dictName" autocomplete="off" clearable></el-input>
         </el-form-item>
@@ -135,14 +135,54 @@
         </el-descriptions-item>
       </el-descriptions>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="closeInfoDialog">取 消</el-button>
+        <el-button size="mini" @click="resetForm">取 消</el-button>
       </div>
+    </el-dialog>
+
+    <el-dialog :title="title" :visible.sync="dialogVisibleDictItem" width="900px">
+      <div style="margin-bottom: 10px; text-align: left;">
+        <el-button plain size="mini" type="primary" @click="createDictItem">新建</el-button>
+        <el-button plain size="mini" type="danger" @click="removeDictItem">删除</el-button>
+      </div>
+      <el-table ref="multipleTable" :data="gridData" border height="200" size="mini" stripe style="width: 100%"
+                @selection-change="handleDictItemSelectionChange">
+        <el-table-column type="selection" width="55"></el-table-column>
+        <el-table-column v-if="false" label="ID" property="id" width="100"></el-table-column>
+        <el-table-column label="值" property="value"></el-table-column>
+        <el-table-column label="标签" property="label"></el-table-column>
+        <el-table-column fixed="right" label="操作" width="100">
+          <template slot-scope="scope">
+            <el-button size="mini" type="text" @click="modifyDictItem(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text"
+                       @click.native.prevent="removeDictItemRow(scope.$index, gridData,scope.row)">删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="mini" @click="closeDictItem">关 闭</el-button>
+      </div>
+      <el-dialog :title="title" :visible.sync="dialogVisibleDoDictItem" width="800px"
+                 @close="closeDialog('ruleForm')">
+        <el-form ref="ruleForm" :disabled="!show" :model="dictItem" :rules="rules" size="mini">
+          <el-form-item :label-width="formLabelWidth" label="字典标签" prop="label">
+            <el-input v-model="dictItem.label" autocomplete="off" clearable></el-input>
+          </el-form-item>
+          <el-form-item :label-width="formLabelWidth" label="字典值" prop="value">
+            <el-input v-model="dictItem.value" autocomplete="off" clearable></el-input>
+          </el-form-item>
+        </el-form>
+        <div v-if="show" slot="footer" class="dialog-footer">
+          <el-button size="mini" @click="resetForm()">取 消</el-button>
+          <el-button size="mini" type="primary" @click="submitForm('ruleForm')">确 定</el-button>
+        </div>
+      </el-dialog>
     </el-dialog>
   </el-container>
 </template>
 
 <script>
-import { add, del, edit, list, open } from '@/api/system/dict'
+import { add, del, delDictItem, edit, list, listDictItem, open } from '@/api/system/dict'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
@@ -163,6 +203,8 @@ export default {
     total: 0,
     dialogVisible: false,
     dialogVisibleInfo: false,
+    dialogVisibleDictItem: false,
+    dialogVisibleDoDictItem: false,
     dict: {
       id: null,
       dictName: '',
@@ -172,7 +214,7 @@ export default {
     // 默认是创建
     dialogType: DIALOG_TYPE.ADD,
     formLabelWidth: '80px',
-    rules: {
+    dictRules: {
       dictName: [
         {
           required: true,
@@ -184,6 +226,31 @@ export default {
         {
           required: true,
           message: '请输入字典编码',
+          trigger: 'blur'
+        }
+      ]
+    },
+    gridData: [],
+    rowData: {},
+    dictItem: {
+      id: undefined,
+      dictId: '',
+      label: '',
+      value: ''
+    },
+    show: true,
+    rules: {
+      label: [
+        {
+          required: true,
+          message: '请输入字典项名称',
+          trigger: 'blur'
+        }
+      ],
+      value: [
+        {
+          required: true,
+          message: '请输入字典项编码',
           trigger: 'blur'
         }
       ]
@@ -269,32 +336,28 @@ export default {
     importInfo () {
     },
     create () {
-      this.title = '创建字典'
+      this.title = '创建平台'
       this.dialogType = DIALOG_TYPE.ADD
       this.dialogVisible = true
     },
     modify (val) {
-      this.title = '修改字典'
+      this.title = '修改平台'
       this.dialogType = DIALOG_TYPE.EDIT
       this.dialogVisible = true
-      this.$nextTick(() => {
-        Object.assign(this.dict, val)
-      })
+      Object.assign(this.dict, val)
     },
     info (val) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.dialogVisibleInfo = true
-      this.$nextTick(() => {
-        Object.assign(this.dict, val)
-      })
+      Object.assign(this.dict, val)
     },
-    showDictDetail (row) {
-      this.$router.push({
-        name: 'dictItem',
-        path: '/dictItem',
-        params: row
-      })
+    showDictDetail (val) {
+      debugger
+      this.title = '查看字典项信息'
+      this.dialogType = DIALOG_TYPE.SHOW
+      this.dialogVisibleDictItem = true
+      this.reloadDictItemList(val.id)
     },
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
@@ -324,16 +387,97 @@ export default {
         }
       })
     },
-    closeInfoDialog () {
-    },
-    closeDialog () {
-      this.dict.id = undefined
+    resetForm () {
       this.dialogVisible = false
       this.dialogVisibleInfo = false
     },
-    resetForm (formName) {
-      this.closeDialog()
+    closeDialog (formName) {
+      this.dict.id = undefined
       this.$refs[formName].resetFields()
+    },
+    reloadDictItemList (id) {
+      listDictItem({ id: id }).then((rep) => {
+        if (rep.code === 1) {
+          this.gridData = rep.data
+          this.total = rep.data.total
+        }
+      })
+    },
+    handleDictItemSelectionChange (val) {
+      this.multipleSelection = val
+    },
+    createDictItem () {
+      this.title = '创建字典项'
+      this.dialogType = DIALOG_TYPE.ADD
+      this.dialogVisibleDictItem = true
+    },
+    modifyDictItem (val) {
+      this.title = '修改字典项'
+      this.dialogType = DIALOG_TYPE.SHOW
+      this.dialogVisibleDictItem = true
+      Object.assign(this.dict, val)
+    },
+    removeDictItem () {
+      confirmAlert(() => {
+        const ids = []
+        this.multipleSelection.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        delDictItem(ids).then(rep => {
+          if (rep.code === 1) {
+            this.reloadList()
+            this.$message.success('删除成功')
+            this.reloadDictItemList()
+          }
+        })
+      })
+    },
+    removeDictItemRow (index, rows, row) {
+      confirmAlert(() => {
+        delDictItem([JSONBigInt.parse(row.id)]).then(rep => {
+          if (rep.code === 1) {
+            rows.splice(index, 1)
+            this.$message.success('删除成功')
+            this.reloadDictItemList()
+          }
+        })
+      })
+    },
+    closeDictItem () {
+    },
+    submitDictItemForm (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    addDictItem () {
+      add(this.dictItem).then((rep) => {
+        if (rep.code === 1) {
+          Message.success({ message: rep.message })
+          this.dialogVisible = false
+          this.$emit('reloadList')
+        }
+      })
+    },
+    editDictItem () {
+      edit(this.dictItem).then((rep) => {
+        if (rep.code === 1) {
+          Message.success({ message: rep.message })
+          this.dialogVisible = false
+          this.$emit('reloadList')
+        }
+      })
+    },
+    resetDictItemForm () {
+      this.dialogVisibleDoDictItem = false
+    },
+    closeDoItemDialog (formName) {
+      this.dictItem.id = undefined
+      this.$refs[formName].resetFields()
+      this.show = true
     }
   }
 }

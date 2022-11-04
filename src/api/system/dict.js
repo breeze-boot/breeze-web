@@ -72,3 +72,62 @@ export function open (data) {
     data: data
   })
 }
+
+/**
+ * 列表
+ *
+ * @returns {AxiosPromise}
+ */
+export function listDictItem (data) {
+  return request({
+    url: servicePath.system + '/sys/dictItem/list',
+    method: 'post',
+    data: data,
+    // `transformResponse` 在传递给 then/catch 前，允许修改响应数据 注意 network中依然是丢失精度的数字，接收到数据后转换成的String
+    transformResponse: [(data) => {
+      return JSONBigInt2Str.parse(data)
+    }]
+  })
+}
+
+/**
+ * 添加
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function addDictItem (data) {
+  return request({
+    url: servicePath.system + '/sys/dictItem/save',
+    method: 'post',
+    data: data
+  })
+}
+
+/**
+ * 删除
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function delDictItem (ids) {
+  return request({
+    url: servicePath.system + '/sys/dictItem/delete',
+    method: 'delete',
+    data: ids
+  })
+}
+
+/**
+ * 修改
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function editDictItem (data) {
+  return request({
+    url: servicePath.system + '/sys/dictItem/edit',
+    method: 'put',
+    data: data
+  })
+}
