@@ -1,18 +1,18 @@
 <template>
   <el-container>
     <el-main>
-      <el-form :inline="true" :model="searchForm" class="demo-form-inline" size="mini">
+      <el-form ref="searchForm" :inline="true" :model="searchDictForm" class="demo-form-inline" size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
-            <el-form-item label="字典名称">
-              <el-input v-model="searchForm.dictName" clearable placeholder="字典名称"/>
+            <el-form-item label="字典名称" prop="dictName">
+              <el-input v-model="searchDictForm.dictName" clearable placeholder="字典名称"/>
             </el-form-item>
-            <el-form-item label="字典标志">
-              <el-input v-model="searchForm.dictCode" clearable placeholder="字典标志"/>
+            <el-form-item label="字典标志" prop="dictCode">
+              <el-input v-model="searchDictForm.dictCode" clearable placeholder="字典标志"/>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search">查询</el-button>
-              <el-button type="info" @click="reset">重置</el-button>
+              <el-button type="info" @click="searchReset">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
@@ -25,13 +25,13 @@
       </div>
       <el-table
         ref="multipleTable"
-        :data="tableData"
+        :data="dictTableData"
         border
         height="300"
         size="mini"
         stripe
         style="width: 100%"
-        @selection-change="handleSelectionChange">
+        @selection-change="dictHandleSelectionChange">
         <el-table-column
           type="selection"
           width="55">
@@ -72,7 +72,8 @@
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
             <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
-            <el-button size="mini" type="text" @click.native.prevent="removeItem(scope.$index, tableData,scope.row)">删除
+            <el-button size="mini" type="text"
+                       @click.native.prevent="removeItem(scope.$index, dictTableData,scope.row)">删除
             </el-button>
             <el-button size="mini" type="text" @click="showDictDetail(scope.row)">查看字典项</el-button>
           </template>
@@ -80,8 +81,8 @@
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchForm.current"
-          :page-size="searchForm.size"
+          :current-page="searchDictForm.current"
+          :page-size="searchDictForm.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -91,9 +92,9 @@
       </div>
     </el-main>
 
-    <el-dialog :title="title" :visible.sync="dialogVisible" width="800px"
-               @close="closeDialog('dictRuleForm')">
-      <el-form ref="dictRuleForm" :model="dict" :rules="rules" size="mini">
+    <el-dialog :title="title" :visible.sync="dictDialogVisible" width="800px"
+               @close="closeDictDialog('dictRuleForm')">
+      <el-form ref="dictRuleForm" :model="dict" :rules="dictRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="字典名称" prop="dictName">
           <el-input v-model="dict.dictName" autocomplete="off" clearable></el-input>
         </el-form-item>
@@ -112,12 +113,12 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetForm('dictRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitForm('dictRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="resetDictForm('dictRuleForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="submitDictForm('dictRuleForm')">确 定</el-button>
       </div>
     </el-dialog>
 
-    <el-dialog :title="title" :visible.sync="dialogVisibleInfo" width="800px">
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="800px" @close="closeInfoDialog">
       <el-descriptions :column="1" border size="mini">
         <el-descriptions-item>
           <template slot="label">
@@ -134,9 +135,6 @@
           <el-tag size="small">{{ dict.dictName }}</el-tag>
         </el-descriptions-item>
       </el-descriptions>
-      <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="closeInfoDialog">取 消</el-button>
-      </div>
     </el-dialog>
   </el-container>
 </template>
@@ -153,18 +151,24 @@ export default {
   data: () => ({
     title: '',
     multipleSelection: [],
-    tableData: [],
-    searchForm: {
+    dictTableData: [],
+    searchDictForm: {
       dictName: '',
       dictCode: '',
       current: 1,
       size: 10
     },
     total: 0,
-    dialogVisible: false,
-    dialogVisibleInfo: false,
+    dictDialogVisible: false,
+    infoDialogVisible: false,
     dict: {
-      id: null,
+      id: undefined,
+      dictName: '',
+      dictCode: '',
+      isOpen: 0
+    },
+    dictInfo: {
+      id: undefined,
       dictName: '',
       dictCode: '',
       isOpen: 0
@@ -172,7 +176,7 @@ export default {
     // 默认是创建
     dialogType: DIALOG_TYPE.ADD,
     formLabelWidth: '80px',
-    rules: {
+    dictRules: {
       dictName: [
         {
           required: true,
@@ -196,9 +200,9 @@ export default {
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
-          this.tableData = rep.data.records
-          this.searchForm.size = rep.data.size
-          this.searchForm.current = rep.data.current
+          this.dictTableData = rep.data.records
+          this.searchDictForm.size = rep.data.size
+          this.searchDictForm.current = rep.data.current
           this.total = rep.data.total
         }
       })
@@ -212,24 +216,23 @@ export default {
       })
     },
     handleSizeChange (size) {
-      this.searchForm.size = size
+      this.searchDictForm.size = size
       this.reloadList()
     },
     handleCurrentChange (current) {
-      this.searchForm.current = current
+      this.searchDictForm.current = current
       this.reloadList()
     },
     search () {
       this.reloadList()
     },
     buildParam () {
-      return this.searchForm
+      return this.searchDictForm
     },
-    reset () {
-      this.searchForm.dictName = ''
-      this.searchForm.dictCode = ''
+    searchReset () {
+      this.$refs.searchForm.resetFields()
     },
-    handleSelectionChange (val) {
+    dictHandleSelectionChange (val) {
       this.multipleSelection = val
     },
     /**
@@ -241,8 +244,8 @@ export default {
         this.multipleSelection.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then((rep) => {
           if (rep.code === 1) {
-            this.reloadList()
             this.$message.success('删除成功')
+            this.reloadList()
           }
         })
       })
@@ -271,12 +274,12 @@ export default {
     create () {
       this.title = '创建字典'
       this.dialogType = DIALOG_TYPE.ADD
-      this.dialogVisible = true
+      this.dictDialogVisible = true
     },
     modify (val) {
       this.title = '修改字典'
       this.dialogType = DIALOG_TYPE.EDIT
-      this.dialogVisible = true
+      this.dictDialogVisible = true
       this.$nextTick(() => {
         Object.assign(this.dict, val)
       })
@@ -284,7 +287,7 @@ export default {
     info (val) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
-      this.dialogVisibleInfo = true
+      this.infoDialogVisible = true
       this.$nextTick(() => {
         Object.assign(this.dict, val)
       })
@@ -296,7 +299,7 @@ export default {
         params: row
       })
     },
-    submitForm (formName) {
+    submitDictForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
@@ -310,7 +313,7 @@ export default {
       add(this.dict).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })
-          this.dialogVisible = false
+          this.dictDialogVisible = false
           this.reloadList()
         }
       })
@@ -319,20 +322,21 @@ export default {
       edit(this.dict).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })
-          this.dialogVisible = false
+          this.dictDialogVisible = false
           this.reloadList()
         }
       })
     },
     closeInfoDialog () {
+      this.dict = this.dictInfo
     },
-    closeDialog () {
+    closeDictDialog (formName) {
       this.dict.id = undefined
-      this.dialogVisible = false
-      this.dialogVisibleInfo = false
+      this.$refs[formName].resetFields()
     },
-    resetForm (formName) {
-      this.closeDialog()
+    resetDictForm (formName) {
+      this.dictDialogVisible = false
+      this.closeDictDialog()
       this.$refs[formName].resetFields()
     }
   }

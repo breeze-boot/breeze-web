@@ -1,14 +1,14 @@
 <template>
   <el-container>
     <el-main>
-      <el-form :inline="true" :model="searchForm" class="demo-form-inline" size="mini">
+      <el-form ref="searchForm" :inline="true" :model="searchLogForm" class="demo-form-inline" size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="系统模块" prop="systemModule">
-              <el-input v-model="searchForm.systemModule" clearable placeholder="系统模块"/>
+              <el-input v-model="searchLogForm.systemModule" clearable placeholder="系统模块"/>
             </el-form-item>
             <el-form-item label="操作类型" prop="doType">
-              <el-select v-model="searchForm.doType" placeholder="请选择">
+              <el-select v-model="searchLogForm.doType" placeholder="请选择">
                 <el-option
                   v-for="item in doTypeOption"
                   :key="item.value"
@@ -18,7 +18,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="日志类型" prop="logType">
-              <el-select v-model="searchForm.doType" placeholder="请选择">
+              <el-select v-model="searchLogForm.doType" placeholder="请选择">
                 <el-option
                   v-for="item in doTypeOption"
                   :key="item.value"
@@ -28,7 +28,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="结果" prop="result">
-              <el-select v-model="searchForm.result" placeholder="请选择">
+              <el-select v-model="searchLogForm.result" placeholder="请选择">
                 <el-option
                   v-for="item in resultOption"
                   :key="item.value"
@@ -38,11 +38,11 @@
               </el-select>
             </el-form-item>
             <el-form-item label="操作人员" prop="createBy">
-              <el-input v-model="searchForm.createBy" clearable placeholder="操作人员"/>
+              <el-input v-model="searchLogForm.createBy" clearable placeholder="操作人员"/>
             </el-form-item>
             <el-form-item label="日志时间" prop="searchDate">
               <el-date-picker
-                v-model="searchForm.logType"
+                v-model="searchLogForm.logType"
                 end-placeholder="结束日期"
                 range-separator="至"
                 size="mini"
@@ -64,13 +64,13 @@
       </div>
       <el-table
         ref="multipleTable"
-        :data="tableData"
+        :data="logTableData"
         border
         height="300"
         size="mini"
         stripe
         style="width: 100%"
-        @selection-change="handleSelectionChange">
+        @selection-change="logHandleSelectionChange">
         <el-table-column
           type="selection"
           width="55">
@@ -89,8 +89,8 @@
         <el-table-column
           label="日志标题"
           prop="logTitle"
-          width="180"
-          show-overflow-tooltip>
+          show-overflow-tooltip
+          width="180">
         </el-table-column>
         <el-table-column
           label="日志类型"
@@ -135,16 +135,17 @@
           label="操作"
           width="100">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
-            <el-button size="mini" type="text" @click.native.prevent="delItem(scope.$index, tableData,scope.row)">删除
+            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
+            <el-button size="mini" type="text" @click.native.prevent="removeItem(scope.$index, logTableData,scope.row)">
+              删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchForm.current"
-          :page-size="searchForm.size"
+          :current-page="searchLogForm.current"
+          :page-size="searchLogForm.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -153,29 +154,84 @@
         </el-pagination>
       </div>
     </el-main>
-    <show-dialog ref="showDialog"/>
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="800px">
+      <el-descriptions :column="1" border size="mini">
+        <el-descriptions-item>
+          <template slot="label">
+            系统模块
+          </template>
+          {{ log.systemModule }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            日志标题
+          </template>
+          {{ log.title }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            日志类型
+          </template>
+          {{ log.logType }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            操作类型
+          </template>
+          {{ log.doType }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            请求类型
+          </template>
+          {{ log.requestType }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            浏览器
+          </template>
+          {{ log.browser }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            IP
+          </template>
+          {{ log.ip }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            系统
+          </template>
+          {{ log.system }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            结果
+          </template>
+          {{ log.result }}
+        </el-descriptions-item>
+      </el-descriptions>
+    </el-dialog>
   </el-container>
 </template>
 
 <script>
 import { clear, del, list } from '@/api/system/log'
-import ShowDialog from '@/components/dialog/log/ShowDialog'
-import { confirmAlert } from '@/utils/constant'
+import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 
 export default {
   name: 'LogView',
-  components: { ShowDialog },
   data: () => ({
     title: '',
-    multipleSelection: [],
-    tableData: [],
+    multipleSelectionLogId: [],
+    logTableData: [],
     resultOption: [],
     doTypeOption: [{
       value: '1',
       label: '黄金糕'
     }],
-    searchForm: {
+    searchLogForm: {
       systemModule: '',
       doType: '',
       startDate: '',
@@ -186,7 +242,24 @@ export default {
       current: 1,
       size: 10
     },
-    total: 0
+    total: 0,
+    infoDialogVisible: false,
+    log: {
+      id: undefined,
+      systemModule: '',
+      logTitle: '',
+      logType: '',
+      doType: '',
+      requestType: '',
+      result: '',
+      browser: '',
+      system: '',
+      ip: '',
+      createBy: ''
+    },
+    // 默认是创建
+    dialogType: DIALOG_TYPE.ADD,
+    formLabelWidth: '80px'
   }),
   created () {
     this.reloadList()
@@ -195,35 +268,29 @@ export default {
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
-          this.tableData = rep.data.records
-          this.searchForm.size = rep.data.size
-          this.searchForm.current = rep.data.current
+          this.logTableData = rep.data.records
+          this.searchLogForm.size = rep.data.size
+          this.searchLogForm.current = rep.data.current
           this.total = rep.data.total
         }
       })
     },
     handleSizeChange (size) {
-      this.searchForm.size = size
+      this.searchLogForm.size = size
       this.reloadList()
     },
     handleCurrentChange (current) {
-      this.searchForm.current = current
+      this.searchLogForm.current = current
       this.reloadList()
     },
     search () {
       this.reloadList()
     },
     buildParam () {
-      return this.searchForm
+      return this.searchLogForm
     },
     reset () {
-      this.searchForm.logType = ''
-      this.searchForm.result = ''
-      this.searchForm.doType = ''
-      this.searchForm.createBy = ''
-      this.searchForm.searchDate = ''
-      this.searchForm.startDate = ''
-      this.searchForm.endDate = ''
+      this.$refs.searchLogForm.resetFields()
     },
     exportInfo () {
     },
@@ -233,11 +300,11 @@ export default {
     del () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelection.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        this.multipleSelectionLogId.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then((rep) => {
           if (rep.code === 1) {
-            this.reloadList()
             this.$message.success('删除成功')
+            this.reloadList()
           }
         })
       })
@@ -248,8 +315,8 @@ export default {
     clear () {
       confirmAlert(() => {
         clear().then((rep) => {
-          this.reloadList()
           this.$message.success('全部清空')
+          this.reloadList()
         })
       })
     },
@@ -258,7 +325,7 @@ export default {
      *
      * @param rows
      */
-    delItem (index, rows, row) {
+    removeItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(rep => {
           if (rep.code === 1) {
@@ -268,12 +335,14 @@ export default {
         })
       })
     },
-    handleSelectionChange (val) {
-      this.multipleSelection = val
+    logHandleSelectionChange (val) {
+      this.multipleSelectionLogId = val
     },
-    show (val) {
+    info (val) {
       this.title = '查看详情信息'
-      this.$refs.showDialog.showDialogVisible(val)
+      this.dialogType = DIALOG_TYPE.SHOW
+      this.infoDialogVisible = true
+      Object.assign(this.log, val)
     }
   }
 }

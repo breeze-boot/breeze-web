@@ -3,7 +3,7 @@
     <el-main>
       <el-row :gutter="24" style="height: 5.5vh;">
         <el-col :md="22">
-          <el-page-header @back="goBack" content="详情页面">
+          <el-page-header content="详情页面" @back="goBack">
           </el-page-header>
         </el-col>
       </el-row>
@@ -32,9 +32,9 @@
                 :data="roleTableData"
                 border
                 height="500"
+                row-key="id"
                 size="mini"
                 stripe
-                row-key="id"
                 style="width: 100%"
                 @row-click="rowClick"
                 @selection-change="handleSelectionChange">
@@ -63,7 +63,7 @@
                   :current-page="roleSearchForm.current"
                   :page-size="roleSearchForm.size"
                   :page-sizes="[10, 20, 50, 100]"
-                  :total="roleTotal"
+                  :total="total"
                   layout="total, sizes, prev, pager, next, jumper"
                   @size-change="handleSizeChange"
                   @current-change="handleCurrentChange">
@@ -74,9 +74,9 @@
         </el-col>
       </el-row>
       <el-row :gutter="24" style="height: 5.5vh;">
-        <el-col :offset="11" :md="12">
-          <el-button size="mini" @click="resetForm()">取 消</el-button>
-          <el-button size="mini" type="primary" @click="submitForm()">确 定</el-button>
+        <el-col :md="12" :offset="11">
+          <el-button size="mini" @click="resetUserRoleForm()">取 消</el-button>
+          <el-button size="mini" type="primary" @click="submitUserRoleForm()">确 定</el-button>
         </el-col>
       </el-row>
     </el-main>
@@ -91,7 +91,7 @@ export default {
   name: 'RoleView',
   data: () => ({
     disabled: true,
-    multipleSelection: [],
+    multipleSelectionUserRoleId: [],
     roleTableData: [],
     roleSearchForm: {
       roleName: '',
@@ -99,7 +99,7 @@ export default {
       current: 1,
       size: 10
     },
-    roleTotal: 0
+    total: 0
   }),
   created () {
     this.reloadList()
@@ -111,7 +111,7 @@ export default {
           this.roleTableData = rep.data.records
           this.roleSearchForm.size = rep.data.size
           this.roleSearchForm.current = rep.data.current
-          this.roleTotal = rep.data.total
+          this.total = rep.data.total
         }
       })
     },
@@ -137,13 +137,13 @@ export default {
       this.roleSearchForm.roleCode = ''
     },
     handleSelectionChange (val) {
-      this.multipleSelection = val
+      this.multipleSelectionUserRoleId = val
     },
     goBack () {
       this.$router.back()
     },
-    submitForm () {
-      if (this.multipleSelection.length === 0) {
+    submitUserRoleForm () {
+      if (this.multipleSelectionUserRoleId.length === 0) {
         this.$message.warning('选择用户的角色')
         return
       }
@@ -153,7 +153,7 @@ export default {
       }
       const temp = {
         username: this.$route.params.username,
-        roleId: this.multipleSelection.map(role => role.id)
+        roleId: this.multipleSelectionUserRoleId.map(role => role.id)
       }
       console.log(JSON.stringify(temp))
       userAddRole(temp).then(rep => {
@@ -162,7 +162,7 @@ export default {
         }
       })
     },
-    resetForm () {
+    resetUserRoleForm () {
 
     }
   }

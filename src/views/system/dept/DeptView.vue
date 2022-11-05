@@ -1,29 +1,29 @@
 <template>
   <el-container>
     <el-main>
-      <el-form :inline="true" :model="searchForm" class="demo-form-inline" size="mini">
+      <el-form ref="searchForm" :inline="true" :model="searchDeptForm" class="demo-form-inline" size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
-            <el-form-item label="部门名称">
-              <el-input v-model="searchForm.deptName" clearable placeholder="部门名称"/>
+            <el-form-item label="部门名称" prop="deptName">
+              <el-input v-model="searchDeptForm.deptName" clearable placeholder="部门名称"/>
             </el-form-item>
-            <el-form-item label="部门编号">
-              <el-input v-model="searchForm.deptCode" clearable placeholder="部门编号"/>
+            <el-form-item label="部门编号" prop="deptCode">
+              <el-input v-model="searchDeptForm.deptCode" clearable placeholder="部门编号"/>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="reset()">重置</el-button>
+              <el-button type="info" @click="searchReset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button plain size="mini" type="primary" @click="add">新建</el-button>
+        <el-button plain size="mini" type="primary" @click="create">新建</el-button>
         <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
         <el-button plain size="mini" @click="importInfo">导入</el-button>
       </div>
       <el-table
-        :data="tableData"
+        :data="deptTableData"
         :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
         border
         height="90%"
@@ -31,7 +31,7 @@
         size="mini"
         stripe
         style="width: 100%"
-        @selection-change="handleSelectionChange">
+        @selection-change="deptHandleSelectionChange">
         <el-table-column
           v-if="false"
           label="ID"
@@ -51,39 +51,117 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="show(scope.row)">查看</el-button>
-            <el-button size="mini" type="text" @click="add(scope.row)">新建</el-button>
-            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
-            <el-button size="mini" type="text" @click.native.prevent="delItem(tableData,scope.row)">删除
+            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
+            <el-button size="mini" type="text" @click="create(scope.row)">新建</el-button>
+            <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click.native.prevent="removeItem(deptTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-main>
-    <add-edit-dialog
-      ref="addEditDialog"
-      :title="title"
-      @reloadList="reloadList"/>
+
+    <el-dialog :title="title" :visible.sync="deptDialogVisible" width="600px"
+               @close="closeDialog('deptRuleForm')">
+      <el-form ref="deptRuleForm" :model="dept" :rules="deptRules" size="mini">
+        <el-form-item :label-width="formLabelWidth" class="parentId" label="上级部门" prop="parentId">
+          <el-cascader
+            v-model="dept.parentId"
+            :options="deptOption"
+            :props="{ checkStrictly: true }"
+            :show-all-levels="false"
+            clearable
+            filterable
+          ></el-cascader>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="部门名称" prop="deptName">
+          <el-input v-model="dept.deptName" autocomplete="off" clearable></el-input>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="部门编码" prop="deptCode">
+          <el-input v-model="dept.deptCode" autocomplete="off" clearable></el-input>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="描述" prop="isOpen">
+          <el-input v-model="dept.isOpen" autocomplete="off" clearable type="input"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="mini" @click="resetDeptForm('deptRuleForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="submitDeptForm('deptRuleForm')">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="600px" @close="closeInfoDialog">
+      <el-descriptions :column="1" border size="mini">
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-user"></i>
+            部门编码
+          </template>
+          {{ dept.deptCode }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-tickets"></i>
+            部门名称
+          </template>
+          <el-tag size="small">{{ dept.deptName }}</el-tag>
+        </el-descriptions-item>
+      </el-descriptions>
+    </el-dialog>
   </el-container>
 </template>
 
 <script>
-import AddEditDialog from '@/components/dialog/dept/AddEditDialog'
-import { del, list } from '@/api/system/dept'
-import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { add, del, edit, list, selectDept } from '@/api/system/dept'
+import { confirmAlert, DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
+import { Message } from 'element-ui'
 
 export default {
   name: 'DeptView',
-  components: { AddEditDialog },
   data: () => ({
     title: '',
     rowIndex: 0,
     multipleSelection: [],
-    tableData: [],
-    searchForm: {
+    deptTableData: [],
+    searchDeptForm: {
       deptName: '',
       deptCode: ''
+    },
+    deptDialogVisible: false,
+    infoDialogVisible: false,
+    deptOption: [],
+    dept: {
+      id: undefined,
+      parentId: null,
+      deptName: '',
+      deptCode: ''
+    },
+    deptInfo: {
+      id: undefined,
+      parentId: null,
+      deptName: '',
+      deptCode: ''
+    },
+    // 默认是创建
+    dialogType: DIALOG_TYPE.ADD,
+    formLabelWidth: '80px',
+    show: false,
+    deptRules: {
+      deptName: [
+        {
+          required: true,
+          message: '请输入部门名称',
+          trigger: 'blur'
+        }
+      ],
+      deptCode: [
+        {
+          required: true,
+          message: '请输入部门编码',
+          trigger: 'blur'
+        }
+      ]
     }
   }),
   created () {
@@ -93,26 +171,29 @@ export default {
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
-          this.tableData = rep.data
+          this.deptTableData = rep.data
         }
       })
     },
     buildParam () {
-      return this.searchForm
+      return this.searchDeptForm
     },
     search () {
       this.reloadList()
     },
-    reset () {
-      this.searchForm.deptName = ''
-      this.searchForm.deptCode = ''
+    searchReset () {
+      this.$refs.searchForm.resetFields()
+    },
+    deptHandleSelectionChange (val) {
+      this.multipleSelection = val
     },
     /**
      * 删除行
      *
      * @param rows
+     * @param row
      */
-    delItem (rows, row) {
+    removeItem (rows, row) {
       confirmAlert(() => {
         del(JSONBigInt.parse(row.id)).then(rep => {
           if (rep.code === 1) {
@@ -137,20 +218,86 @@ export default {
     },
     importInfo () {
     },
-    handleSelectionChange (val) {
-      this.multipleSelection = val
-    },
-    add (val) {
+    create (val) {
       this.title = '创建部门'
-      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.ADD)
+      // 赋值
+      this.dialogType = DIALOG_TYPE.ADD
+      this.dept.parentId = val.id ? val.id : ''
+      this.selectDept()
+      this.deptDialogVisible = true
     },
-    edit (val) {
+    modify (val) {
       this.title = '修改部门信息'
-      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.EDIT)
+      this.dialogType = DIALOG_TYPE.EDIT
+      Object.assign(this.dept, val)
+      this.dept.parentId = val.parentId
+      this.selectDept(this.dept.id)
+      this.deptDialogVisible = true
     },
-    show (val) {
+    info (val) {
       this.title = '查看部门信息'
-      this.$refs.addEditDialog.showDialogVisible(val, DIALOG_TYPE.SHOW)
+      this.dialogType = DIALOG_TYPE.SHOW
+      Object.assign(this.dept, val)
+      this.dept.parentId = val.parentId
+      this.selectDept(this.dept.id)
+      this.infoDialogVisible = true
+    },
+    selectDept (id) {
+      selectDept(id).then(res => {
+        if (res.code === 1 && res.data) {
+          this.deptOption = [{
+            value: '1111111111111111111',
+            label: '根节点',
+            children: res.data
+          }]
+          const treeTemp = filterTreeParentId(res.data, (tree) => {
+            return tree.id && tree.id === this.dept.parentId
+          }, 'id')
+          const tempArray = ['1111111111111111111']
+          treeTemp.map(id => tempArray.push(id))
+          this.dept.parentId = tempArray
+        }
+      })
+    },
+    submitDeptForm (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.dept.parentId = this.dept.parentId[this.dept.parentId.length - 1]
+          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    resetDeptForm (formName) {
+      this.deptDialogVisible = false
+      this.$refs[formName].resetFields()
+    },
+    add () {
+      add(this.dept).then((rep) => {
+        if (rep.code === 1) {
+          Message.success({ message: rep.message })
+          this.deptDialogVisible = false
+          this.reloadList()
+        }
+      })
+    },
+    edit () {
+      edit(this.dept).then((rep) => {
+        if (rep.code === 1) {
+          Message.success({ message: rep.message })
+          this.deptDialogVisible = false
+          this.reloadList()
+        }
+      })
+    },
+    closeInfoDialog () {
+      this.dept = this.deptInfo
+    },
+    closeDialog (formName) {
+      this.dept.id = undefined
+      this.$refs[formName].resetFields()
     }
   }
 }

@@ -10,9 +10,10 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function list (data) {
   return request({
-    url: servicePath.system + '/sys/dict/list',
+    url: servicePath.system + '/sys/dictItem/list',
     method: 'post',
     data: data,
+    // `transformResponse` 在传递给 then/catch 前，允许修改响应数据 注意 network中依然是丢失精度的数字，接收到数据后转换成的String
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)
     }]
@@ -27,7 +28,7 @@ export function list (data) {
  */
 export function add (data) {
   return request({
-    url: servicePath.system + '/sys/dict/save',
+    url: servicePath.system + '/sys/dictItem/save',
     method: 'post',
     data: data
   })
@@ -41,7 +42,7 @@ export function add (data) {
  */
 export function del (ids) {
   return request({
-    url: servicePath.system + '/sys/dict/delete',
+    url: servicePath.system + '/sys/dictItem/delete',
     method: 'delete',
     data: ids
   })
@@ -55,19 +56,7 @@ export function del (ids) {
  */
 export function edit (data) {
   return request({
-    url: servicePath.system + '/sys/dict/edit',
-    method: 'put',
-    data: data
-  })
-}
-
-/**
- * 开关
- * @returns {AxiosPromise}
- */
-export function open (data) {
-  return request({
-    url: servicePath.system + '/sys/dict/open',
+    url: servicePath.system + '/sys/dictItem/edit',
     method: 'put',
     data: data
   })
