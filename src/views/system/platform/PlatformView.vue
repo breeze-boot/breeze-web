@@ -147,51 +147,53 @@ import { Message } from 'element-ui'
 
 export default {
   name: 'PlatformView',
-  data: () => ({
-    multipleSelectionPlatformIds: [],
-    platformTableData: [],
-    searchPlatformForm: {
-      platformName: '',
-      platformCode: '',
-      current: 1,
-      size: 10
-    },
-    total: 0,
-    title: '',
-    platformDialogVisible: false,
-    infoDialogVisible: false,
-    // 默认是创建
-    dialogType: DIALOG_TYPE.ADD,
-    formLabelWidth: '80px',
-    platform: {
-      id: null,
-      platformName: '',
-      platformCode: '',
-      description: ''
-    },
-    platformInfo: {
-      id: null,
-      platformName: '',
-      platformCode: '',
-      description: ''
-    },
-    platformRules: {
-      platformName: [
-        {
-          required: true,
-          message: '请输入平台名称',
-          trigger: 'blur'
-        }
-      ],
-      platformCode: [
-        {
-          required: true,
-          message: '请输入平台编码',
-          trigger: 'blur'
-        }
-      ]
+  data () {
+    return {
+      multipleSelectionPlatformIds: [],
+      platformTableData: [],
+      searchPlatformForm: {
+        platformName: '',
+        platformCode: '',
+        current: 1,
+        size: 10
+      },
+      total: 0,
+      title: '',
+      platformDialogVisible: false,
+      infoDialogVisible: false,
+      // 默认是创建
+      dialogType: DIALOG_TYPE.ADD,
+      formLabelWidth: '80px',
+      platform: {
+        id: null,
+        platformName: '',
+        platformCode: '',
+        description: ''
+      },
+      platformInfo: {
+        id: null,
+        platformName: '',
+        platformCode: '',
+        description: ''
+      },
+      platformRules: {
+        platformName: [
+          {
+            required: true,
+            message: '请输入平台名称',
+            trigger: 'blur'
+          }
+        ],
+        platformCode: [
+          {
+            required: true,
+            message: '请输入平台编码',
+            trigger: 'blur'
+          }
+        ]
+      }
     }
-  }),
+  },
   created () {
     this.reloadList()
   },

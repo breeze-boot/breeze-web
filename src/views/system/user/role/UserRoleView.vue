@@ -89,18 +89,20 @@ import { userAddRole } from '@/api/system/user'
 
 export default {
   name: 'RoleView',
-  data: () => ({
-    disabled: true,
-    multipleSelectionUserRoleId: [],
-    roleTableData: [],
-    roleSearchForm: {
-      roleName: '',
-      roleCode: '',
-      current: 1,
-      size: 10
-    },
-    total: 0
-  }),
+  data () {
+    return {
+      disabled: true,
+      multipleSelectionUserRoleId: [],
+      roleTableData: [],
+      roleSearchForm: {
+        roleName: '',
+        roleCode: '',
+        current: 1,
+        size: 10
+      },
+      total: 0
+    }
+  },
   created () {
     this.reloadList()
   },

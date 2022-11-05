@@ -1,6 +1,6 @@
 <template>
   <i v-if="iconName && iconName.startsWith('el-icon')" :class="iconName"></i>
-  <svg v-else class="icon" :style="iconStyle" aria-hidden="true">
+  <svg v-else :style="iconStyle" aria-hidden="true" class="icon">
     <use :xlink:href="`#icon-${iconName}`" class="icon"/>
   </svg>
 </template>

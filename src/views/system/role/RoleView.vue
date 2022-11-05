@@ -143,56 +143,58 @@ import JSONBigInt from 'json-bigint'
 
 export default {
   name: 'RoleView',
-  data: () => ({
-    title: '',
-    disabled: true,
-    multipleSelectionRoleIds: [],
-    roleTableData: [],
-    searchRoleForm: {
-      roleName: '',
-      roleCode: '',
-      current: 1,
-      size: 10
-    },
-    total: 0,
-    roleTreeData: [],
-    roleTreeProps: {
-      children: 'children',
-      label: 'title'
-    },
-    roleId: undefined,
-    roleDialogVisible: false,
-    infoDialogVisible: false,
-    role: {
-      id: undefined,
-      roleName: '',
-      roleCode: ''
-    },
-    roleInfo: {
-      id: undefined,
-      roleName: '',
-      roleCode: ''
-    },
-    // 默认是创建
-    dialogType: DIALOG_TYPE.ADD,
-    formLabelWidth: '80px',
-    roleRules: {
-      roleName: [
-        {
-          required: true,
-          message: '请输入角色名称',
-          trigger: 'blur'
-        }
-      ],
-      roleCode: [
-        {
-          required: true,
-          message: '请输入角色编码',
-          trigger: 'blur'
-        }
-      ]
+  data () {
+    return {
+      title: '',
+      disabled: true,
+      multipleSelectionRoleIds: [],
+      roleTableData: [],
+      searchRoleForm: {
+        roleName: '',
+        roleCode: '',
+        current: 1,
+        size: 10
+      },
+      total: 0,
+      roleTreeData: [],
+      roleTreeProps: {
+        children: 'children',
+        label: 'title'
+      },
+      roleId: undefined,
+      roleDialogVisible: false,
+      infoDialogVisible: false,
+      role: {
+        id: undefined,
+        roleName: '',
+        roleCode: ''
+      },
+      roleInfo: {
+        id: undefined,
+        roleName: '',
+        roleCode: ''
+      },
+      // 默认是创建
+      dialogType: DIALOG_TYPE.ADD,
+      formLabelWidth: '80px',
+      roleRules: {
+        roleName: [
+          {
+            required: true,
+            message: '请输入角色名称',
+            trigger: 'blur'
+          }
+        ],
+        roleCode: [
+          {
+            required: true,
+            message: '请输入角色编码',
+            trigger: 'blur'
+          }
+        ]
+      }
     }
-  }),
+  },
   created () {
     this.reloadList()
     this.reloadListTreeMenu()

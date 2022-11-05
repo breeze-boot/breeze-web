@@ -362,194 +362,196 @@ import JSONBigInt from 'json-bigint'
 export default {
   name: 'UserView',
   components: {},
-  data: () => ({
-    title: '',
-    multipleSelectionUserId: [],
-    userTableData: [],
-    searchUserForm: {
-      username: '',
-      userCode: '',
-      phone: '',
-      current: 1,
-      size: 10
-    },
-    total: 0,
-    // 弹出框
-    restPasswordDialogVisible: false,
-    userDialogVisible: false,
-    infoDialogVisible: false,
-    userPassword: {
-      id: '',
-      password: ''
-    },
-    formLabelWidth: '80px',
-    resetPasswordRules: {
-      password: [
-        {
-          required: true,
-          validator: (rule, value, callback) => {
-            debugger
-            if (value === '') {
-              callback(new Error('请输入密码'))
-            } else {
+  data () {
+    return {
+      title: '',
+      multipleSelectionUserId: [],
+      userTableData: [],
+      searchUserForm: {
+        username: '',
+        userCode: '',
+        phone: '',
+        current: 1,
+        size: 10
+      },
+      total: 0,
+      // 弹出框
+      restPasswordDialogVisible: false,
+      userDialogVisible: false,
+      infoDialogVisible: false,
+      userPassword: {
+        id: '',
+        password: ''
+      },
+      formLabelWidth: '80px',
+      resetPasswordRules: {
+        password: [
+          {
+            required: true,
+            validator: (rule, value, callback) => {
               debugger
-              if (this.user.confirmPassword !== '') {
-                this.$refs.restPasswordRuleForm.validateField('confirmPassword')
+              if (value === '') {
+                callback(new Error('请输入密码'))
+              } else {
+                debugger
+                if (this.user.confirmPassword !== '') {
+                  this.$refs.restPasswordRuleForm.validateField('confirmPassword')
+                }
+                callback()
               }
-              callback()
-            }
-          },
-          trigger: 'blur'
-        }
-      ],
-      confirmPassword: [
-        {
-          required: true,
-          validator: (rule, value, callback) => {
-            if (value === '') {
-              callback(new Error('请再次输入密码'))
-            } else if (value !== this.user.password) {
-              callback(new Error('两次输入密码不一致!'))
-            } else {
-              callback()
-            }
-          },
-          trigger: 'blur'
-        }
-      ]
-    },
-    isEdit: false,
-    user: {
-      id: '',
-      // 头像的图片路径
-      avatar: '',
-      amountName: '',
-      password: '',
-      phone: '',
-      confirmPassword: '',
-      userCode: '',
-      username: '',
-      deptId: '',
-      roleId: '',
-      idCard: '',
-      email: '',
-      sex: 1,
-      isLock: 0
-    },
-    userInfo: {
-      id: '',
-      // 头像的图片路径
-      avatar: '',
-      amountName: '',
-      password: '',
-      phone: '',
-      confirmPassword: '',
-      userCode: '',
-      username: '',
-      deptId: '',
-      roleId: '',
-      idCard: '',
-      email: '',
-      sex: 1,
-      isLock: 0
-    },
-    deptOption: [
-      {
-        value: 1,
-        label: '董事长'
-      }
-    ],
-    roleOption: [
-      {
-        value: 1,
-        label: '超级管理员'
-      }
-    ],
-    // 默认是创建
-    dialogType: DIALOG_TYPE.ADD,
-    userRules: {
-      username: [
-        {
-          required: true,
-          message: '请输入用户名称',
-          trigger: 'blur'
-        }
-      ],
-      phone: [
-        {
-          required: true,
-          message: '请输入手机号',
-          trigger: 'blur'
-        }
-      ],
-      sex: [
-        {
-          required: true,
-          message: '请选择性别',
-          trigger: 'blur'
-        }
-      ],
-      password: [
-        {
-          required: true,
-          validator: (rule, value, callback) => {
-            if (value === '') {
-              callback(new Error('请输入密码'))
-            } else {
-              if (this.user.confirmPassword !== '') {
-                this.$refs.userRuleForm.validateField('confirmPassword')
+            },
+            trigger: 'blur'
+          }
+        ],
+        confirmPassword: [
+          {
+            required: true,
+            validator: (rule, value, callback) => {
+              if (value === '') {
+                callback(new Error('请再次输入密码'))
+              } else if (value !== this.user.password) {
+                callback(new Error('两次输入密码不一致!'))
+              } else {
+                callback()
               }
-              callback()
-            }
-          },
-          trigger: 'blur'
+            },
+            trigger: 'blur'
+          }
+        ]
+      },
+      isEdit: false,
+      user: {
+        id: '',
+        // 头像的图片路径
+        avatar: '',
+        amountName: '',
+        password: '',
+        phone: '',
+        confirmPassword: '',
+        userCode: '',
+        username: '',
+        deptId: '',
+        roleId: '',
+        idCard: '',
+        email: '',
+        sex: 1,
+        isLock: 0
+      },
+      userInfo: {
+        id: '',
+        // 头像的图片路径
+        avatar: '',
+        amountName: '',
+        password: '',
+        phone: '',
+        confirmPassword: '',
+        userCode: '',
+        username: '',
+        deptId: '',
+        roleId: '',
+        idCard: '',
+        email: '',
+        sex: 1,
+        isLock: 0
+      },
+      deptOption: [
+        {
+          value: 1,
+          label: '董事长'
         }
       ],
-      confirmPassword: [
+      roleOption: [
         {
-          required: true,
-          validator: (rule, value, callback) => {
-            if (value === '') {
-              callback(new Error('请再次输入密码'))
-            } else if (value !== this.user.password) {
-              callback(new Error('两次输入密码不一致!'))
-            } else {
-              callback()
-            }
-          },
-          trigger: 'blur'
+          value: 1,
+          label: '超级管理员'
         }
       ],
-      email: [
-        {
-          required: true,
-          message: '请输入邮箱账号',
-          trigger: 'blur'
-        }
-      ],
-      deptId: [
-        {
-          required: true,
-          message: '请选择部门',
-          trigger: 'blur'
-        }
-      ],
-      idCard: [
-        {
-          required: true,
-          message: '请输入身份证号',
-          trigger: 'blur'
-        }
-      ],
-      amountName: [
-        {
-          required: true,
-          message: '请输入登陆后展示的名称',
-          trigger: 'blur'
-        }
-      ]
+      // 默认是创建
+      dialogType: DIALOG_TYPE.ADD,
+      userRules: {
+        username: [
+          {
+            required: true,
+            message: '请输入用户名称',
+            trigger: 'blur'
+          }
+        ],
+        phone: [
+          {
+            required: true,
+            message: '请输入手机号',
+            trigger: 'blur'
+          }
+        ],
+        sex: [
+          {
+            required: true,
+            message: '请选择性别',
+            trigger: 'blur'
+          }
+        ],
+        password: [
+          {
+            required: true,
+            validator: (rule, value, callback) => {
+              if (value === '') {
+                callback(new Error('请输入密码'))
+              } else {
+                if (this.user.confirmPassword !== '') {
+                  this.$refs.userRuleForm.validateField('confirmPassword')
+                }
+                callback()
+              }
+            },
+            trigger: 'blur'
+          }
+        ],
+        confirmPassword: [
+          {
+            required: true,
+            validator: (rule, value, callback) => {
+              if (value === '') {
+                callback(new Error('请再次输入密码'))
+              } else if (value !== this.user.password) {
+                callback(new Error('两次输入密码不一致!'))
+              } else {
+                callback()
+              }
+            },
+            trigger: 'blur'
+          }
+        ],
+        email: [
+          {
+            required: true,
+            message: '请输入邮箱账号',
+            trigger: 'blur'
+          }
+        ],
+        deptId: [
+          {
+            required: true,
+            message: '请选择部门',
+            trigger: 'blur'
+          }
+        ],
+        idCard: [
+          {
+            required: true,
+            message: '请输入身份证号',
+            trigger: 'blur'
+          }
+        ],
+        amountName: [
+          {
+            required: true,
+            message: '请输入登陆后展示的名称',
+            trigger: 'blur'
+          }
+        ]
+      }
     }
-  }),
+  },
   created () {
     this.reloadList()
   },

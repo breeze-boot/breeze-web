@@ -181,14 +181,14 @@
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item class="parentId" :label-width="formLabelWidth" label="上级菜单" prop="parentId">
+        <el-form-item :label-width="formLabelWidth" class="parentId" label="上级菜单" prop="parentId">
           <el-cascader
             v-model="menu.parentId"
             :options="menuOption"
             :props="{ checkStrictly: true }"
-            filterable
-            clearable
             :show-all-levels="false"
+            clearable
+            filterable
           ></el-cascader>
         </el-form-item>
 
@@ -202,7 +202,7 @@
 
         <el-form-item v-if="menu.type === 0 || menu.type === 1" :label-width="formLabelWidth" label="组件图标"
                       prop="icon">
-          <el-button plain type="success" style="margin:0 10px" @click="showIconDialog">打开</el-button>
+          <el-button plain style="margin:0 10px" type="success" @click="showIconDialog">打开</el-button>
           <svg-icon :icon-name="menu.icon" style="font-size: 20px;"/>
           <span> {{ menu.icon }} </span>
         </el-form-item>
@@ -306,14 +306,14 @@
             父级元素
           </template>
           <el-cascader
-            disabled
             v-model="menu.parentId"
-            size="mini"
             :options="menuOption"
             :props="{ checkStrictly: true }"
-            filterable
-            clearable
             :show-all-levels="false"
+            clearable
+            disabled
+            filterable
+            size="mini"
           ></el-cascader>
         </el-descriptions-item>
         <el-descriptions-item>
@@ -355,8 +355,8 @@
       </el-descriptions>
     </el-dialog>
     <icon-dialog
-      @choiceIcon="choiceIcon"
-      ref="iconDialog"/>
+      ref="iconDialog"
+      @choiceIcon="choiceIcon"/>
   </el-container>
 </template>
 
@@ -372,148 +372,150 @@ export default {
   components: {
     IconDialog
   },
-  data: () => ({
-    title: '',
-    multipleSelectionMenuId: [],
-    menuTableData: [],
-    platformOptions: [{
-      value: '1564528653105573889',
-      label: '后台管理中心'
-    }],
-    searchMenuForm: {
-      platformId: '1564528653105573889',
-      name: '',
-      title: ''
-    },
-    menuDialogVisible: false,
-    infoDialogVisible: false,
-    menu: {
-      id: undefined,
-      platformId: '',
-      platformName: '',
-      name: '',
+  data () {
+    return {
       title: '',
-      icon: '',
-      sort: 0,
-      parentId: '1111111111111111111',
-      permission: '',
-      component: '',
-      href: 0,
-      keepAlive: 0,
-      hidden: 0,
-      type: 0,
-      path: ''
-    },
-    menuInfo: {
-      id: undefined,
-      platformId: '',
-      platformName: '',
-      name: '',
-      title: '',
-      icon: '',
-      sort: 0,
-      parentId: '1111111111111111111',
-      permission: '',
-      component: '',
-      href: 0,
-      keepAlive: 0,
-      hidden: 0,
-      type: 0,
-      path: ''
-    },
-    menuOption: [],
-    hrefOptions: [
-      {
-        label: 0,
-        name: '组件'
+      multipleSelectionMenuId: [],
+      menuTableData: [],
+      platformOptions: [{
+        value: '1564528653105573889',
+        label: '后台管理中心'
+      }],
+      searchMenuForm: {
+        platformId: '1564528653105573889',
+        name: '',
+        title: ''
       },
-      {
-        label: 1,
-        name: '外链'
+      menuDialogVisible: false,
+      infoDialogVisible: false,
+      menu: {
+        id: undefined,
+        platformId: '',
+        platformName: '',
+        name: '',
+        title: '',
+        icon: '',
+        sort: 0,
+        parentId: '1111111111111111111',
+        permission: '',
+        component: '',
+        href: 0,
+        keepAlive: 0,
+        hidden: 0,
+        type: 0,
+        path: ''
+      },
+      menuInfo: {
+        id: undefined,
+        platformId: '',
+        platformName: '',
+        name: '',
+        title: '',
+        icon: '',
+        sort: 0,
+        parentId: '1111111111111111111',
+        permission: '',
+        component: '',
+        href: 0,
+        keepAlive: 0,
+        hidden: 0,
+        type: 0,
+        path: ''
+      },
+      menuOption: [],
+      hrefOptions: [
+        {
+          label: 0,
+          name: '组件'
+        },
+        {
+          label: 1,
+          name: '外链'
+        }
+      ],
+      keepAliveOptions: [
+        {
+          label: 0,
+          name: '关闭缓存'
+        },
+        {
+          label: 1,
+          name: '开启缓存'
+        }
+      ],
+      hiddenOptions: [
+        {
+          label: 0,
+          name: '显示'
+        },
+        {
+          label: 1,
+          name: '隐藏'
+        }
+      ],
+      typeOptions: [
+        {
+          label: 0,
+          name: '文件夹'
+        },
+        {
+          label: 1,
+          name: '菜单'
+        },
+        {
+          label: 2,
+          name: '按钮'
+        }
+      ],
+      // 默认是创建
+      dialogType: DIALOG_TYPE.ADD,
+      formLabelWidth: '80px',
+      rules: {
+        platformId: [
+          {
+            required: true,
+            message: '请选择平台',
+            trigger: 'change'
+          }
+        ],
+        name: [
+          {
+            required: true,
+            message: '请输入菜单名称',
+            trigger: 'blur'
+          }
+        ],
+        title: [
+          {
+            required: true,
+            message: '请输入组件的标题',
+            trigger: 'blur'
+          }
+        ],
+        permission: [
+          {
+            required: true,
+            message: '请输入权限编码',
+            trigger: 'blur'
+          }
+        ],
+        path: [
+          {
+            required: true,
+            message: '请输入路径',
+            trigger: 'blur'
+          }
+        ],
+        component: [
+          {
+            required: true,
+            message: '请输入组件路径',
+            trigger: 'blur'
+          }
+        ]
       }
-    ],
-    keepAliveOptions: [
-      {
-        label: 0,
-        name: '关闭缓存'
-      },
-      {
-        label: 1,
-        name: '开启缓存'
-      }
-    ],
-    hiddenOptions: [
-      {
-        label: 0,
-        name: '显示'
-      },
-      {
-        label: 1,
-        name: '隐藏'
-      }
-    ],
-    typeOptions: [
-      {
-        label: 0,
-        name: '文件夹'
-      },
-      {
-        label: 1,
-        name: '菜单'
-      },
-      {
-        label: 2,
-        name: '按钮'
-      }
-    ],
-    // 默认是创建
-    dialogType: DIALOG_TYPE.ADD,
-    formLabelWidth: '80px',
-    rules: {
-      platformId: [
-        {
-          required: true,
-          message: '请选择平台',
-          trigger: 'change'
-        }
-      ],
-      name: [
-        {
-          required: true,
-          message: '请输入菜单名称',
-          trigger: 'blur'
-        }
-      ],
-      title: [
-        {
-          required: true,
-          message: '请输入组件的标题',
-          trigger: 'blur'
-        }
-      ],
-      permission: [
-        {
-          required: true,
-          message: '请输入权限编码',
-          trigger: 'blur'
-        }
-      ],
-      path: [
-        {
-          required: true,
-          message: '请输入路径',
-          trigger: 'blur'
-        }
-      ],
-      component: [
-        {
-          required: true,
-          message: '请输入组件路径',
-          trigger: 'blur'
-        }
-      ]
     }
-  }),
+  },
   mounted () {
     this.reloadList()
     this.selectPlatform()

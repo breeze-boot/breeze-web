@@ -1,12 +1,12 @@
 <template>
   <div id="tag">
     <el-tag
-      :key="tag.name"
-      size="medium"
       v-for="tag in this.getDynamicTags"
+      :key="tag.name"
       :closable="tag.name !== 'welcome'"
-      :effect="$route.name  !== tag.name ? 'plain' : 'dark'"
       :disable-transitions="false"
+      :effect="$route.name  !== tag.name ? 'plain' : 'dark'"
+      size="medium"
       @click="handleClick(tag)"
       @close="handleClose(tag)">
       {{ tag.title }}

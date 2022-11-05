@@ -148,51 +148,53 @@ import JSONBigInt from 'json-bigint'
 export default {
   name: 'DictView',
   components: {},
-  data: () => ({
-    title: '',
-    multipleSelection: [],
-    dictTableData: [],
-    searchDictForm: {
-      dictName: '',
-      dictCode: '',
-      current: 1,
-      size: 10
-    },
-    total: 0,
-    dictDialogVisible: false,
-    infoDialogVisible: false,
-    dict: {
-      id: undefined,
-      dictName: '',
-      dictCode: '',
-      isOpen: 0
-    },
-    dictInfo: {
-      id: undefined,
-      dictName: '',
-      dictCode: '',
-      isOpen: 0
-    },
-    // 默认是创建
-    dialogType: DIALOG_TYPE.ADD,
-    formLabelWidth: '80px',
-    dictRules: {
-      dictName: [
-        {
-          required: true,
-          message: '请输入字典名称',
-          trigger: 'blur'
-        }
-      ],
-      dictCode: [
-        {
-          required: true,
-          message: '请输入字典编码',
-          trigger: 'blur'
-        }
-      ]
+  data () {
+    return {
+      title: '',
+      multipleSelection: [],
+      dictTableData: [],
+      searchDictForm: {
+        dictName: '',
+        dictCode: '',
+        current: 1,
+        size: 10
+      },
+      total: 0,
+      dictDialogVisible: false,
+      infoDialogVisible: false,
+      dict: {
+        id: undefined,
+        dictName: '',
+        dictCode: '',
+        isOpen: 0
+      },
+      dictInfo: {
+        id: undefined,
+        dictName: '',
+        dictCode: '',
+        isOpen: 0
+      },
+      // 默认是创建
+      dialogType: DIALOG_TYPE.ADD,
+      formLabelWidth: '80px',
+      dictRules: {
+        dictName: [
+          {
+            required: true,
+            message: '请输入字典名称',
+            trigger: 'blur'
+          }
+        ],
+        dictCode: [
+          {
+            required: true,
+            message: '请输入字典编码',
+            trigger: 'blur'
+          }
+        ]
+      }
     }
-  }),
+  },
   created () {
     this.reloadList()
   },

@@ -222,45 +222,47 @@ import JSONBigInt from 'json-bigint'
 
 export default {
   name: 'LogView',
-  data: () => ({
-    title: '',
-    multipleSelectionLogId: [],
-    logTableData: [],
-    resultOption: [],
-    doTypeOption: [{
-      value: '1',
-      label: '黄金糕'
-    }],
-    searchLogForm: {
-      systemModule: '',
-      doType: '',
-      startDate: '',
-      searchDate: '',
-      result: '',
-      createBy: '',
-      logType: '',
-      current: 1,
-      size: 10
-    },
-    total: 0,
-    infoDialogVisible: false,
-    log: {
-      id: undefined,
-      systemModule: '',
-      logTitle: '',
-      logType: '',
-      doType: '',
-      requestType: '',
-      result: '',
-      browser: '',
-      system: '',
-      ip: '',
-      createBy: ''
-    },
-    // 默认是创建
-    dialogType: DIALOG_TYPE.ADD,
-    formLabelWidth: '80px'
-  }),
+  data () {
+    return {
+      title: '',
+      multipleSelectionLogId: [],
+      logTableData: [],
+      resultOption: [],
+      doTypeOption: [{
+        value: '1',
+        label: '黄金糕'
+      }],
+      searchLogForm: {
+        systemModule: '',
+        doType: '',
+        startDate: '',
+        searchDate: '',
+        result: '',
+        createBy: '',
+        logType: '',
+        current: 1,
+        size: 10
+      },
+      total: 0,
+      infoDialogVisible: false,
+      log: {
+        id: undefined,
+        systemModule: '',
+        logTitle: '',
+        logType: '',
+        doType: '',
+        requestType: '',
+        result: '',
+        browser: '',
+        system: '',
+        ip: '',
+        createBy: ''
+      },
+      // 默认是创建
+      dialogType: DIALOG_TYPE.ADD,
+      formLabelWidth: '80px'
+    }
+  },
   created () {
     this.reloadList()
   },

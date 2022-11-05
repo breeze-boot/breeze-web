@@ -119,51 +119,53 @@ import { Message } from 'element-ui'
 
 export default {
   name: 'DeptView',
-  data: () => ({
-    title: '',
-    rowIndex: 0,
-    multipleSelection: [],
-    deptTableData: [],
-    searchDeptForm: {
-      deptName: '',
-      deptCode: ''
-    },
-    deptDialogVisible: false,
-    infoDialogVisible: false,
-    deptOption: [],
-    dept: {
-      id: undefined,
-      parentId: null,
-      deptName: '',
-      deptCode: ''
-    },
-    deptInfo: {
-      id: undefined,
-      parentId: null,
-      deptName: '',
-      deptCode: ''
-    },
-    // 默认是创建
-    dialogType: DIALOG_TYPE.ADD,
-    formLabelWidth: '80px',
-    show: false,
-    deptRules: {
-      deptName: [
-        {
-          required: true,
-          message: '请输入部门名称',
-          trigger: 'blur'
-        }
-      ],
-      deptCode: [
-        {
-          required: true,
-          message: '请输入部门编码',
-          trigger: 'blur'
-        }
-      ]
+  data () {
+    return {
+      title: '',
+      rowIndex: 0,
+      multipleSelection: [],
+      deptTableData: [],
+      searchDeptForm: {
+        deptName: '',
+        deptCode: ''
+      },
+      deptDialogVisible: false,
+      infoDialogVisible: false,
+      deptOption: [],
+      dept: {
+        id: undefined,
+        parentId: null,
+        deptName: '',
+        deptCode: ''
+      },
+      deptInfo: {
+        id: undefined,
+        parentId: null,
+        deptName: '',
+        deptCode: ''
+      },
+      // 默认是创建
+      dialogType: DIALOG_TYPE.ADD,
+      formLabelWidth: '80px',
+      show: false,
+      deptRules: {
+        deptName: [
+          {
+            required: true,
+            message: '请输入部门名称',
+            trigger: 'blur'
+          }
+        ],
+        deptCode: [
+          {
+            required: true,
+            message: '请输入部门编码',
+            trigger: 'blur'
+          }
+        ]
+      }
     }
-  }),
+  },
   created () {
     this.reloadList()
   },

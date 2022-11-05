@@ -1,13 +1,13 @@
 <template>
-  <el-dialog title="图标" :visible.sync="iconDialogVisible" width="700px" top="250px"
-             :append-to-body="true"
+  <el-dialog :append-to-body="true" :visible.sync="iconDialogVisible" title="图标" top="250px"
+             width="700px"
              @close="closeDialog()">
-    <el-input size="mini" v-model="icon.name" clearable placeholder="请输入图标名称" @clear="filterIcon"
+    <el-input v-model="icon.name" clearable placeholder="请输入图标名称" size="mini" @clear="filterIcon"
               @input.native="filterIcon">
       <i slot="suffix" class="el-icon-search el-input__icon"/>
     </el-input>
     <div class="icon" style="border: 1px solid #eee;">
-      <div class="svg-icon" v-for="(item, index) in iconList" :key="index" @click="clickIcon(item)">
+      <div v-for="(item, index) in iconList" :key="index" class="svg-icon" @click="clickIcon(item)">
         <svg-icon :icon-name="item" style="font-size: 20px;"/>
         <div style="padding: 4px 6px 4px 2px; height: 2em; line-height: 2.5em;">{{ item }}
         </div>
@@ -59,7 +59,7 @@ export default {
 }
 </script>
 
-<style scoped lang="less">
+<style lang="less" scoped>
 .icon {
   padding: 10px;
   margin-top: 10px;

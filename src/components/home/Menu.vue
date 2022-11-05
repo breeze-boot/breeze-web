@@ -1,19 +1,19 @@
 <template>
   <el-container>
     <el-menu
-      router
-      class="el-menu-vertical"
       :collapse="!this.isCollapse"
       :collapse-transition="true"
       :default-active="this.getCurrentTagValue"
+      :unique-opened="true"
       active-text-color="#ffd04b"
       background-color="#093f6b"
-      :unique-opened="true"
+      class="el-menu-vertical"
+      router
       style="border-right: 1px solid #093f6b"
       text-color="#fff"
       @close="handleClose"
       @open="handleOpen">
-      <div class="logo" :style="{minWidth: this.collapseWhitespace  + 'px'}">
+      <div :style="{minWidth: this.collapseWhitespace  + 'px'}" class="logo">
         <img :style="{animationName: this.fadeIn, animationDuration: 0 + 's'}" alt=""
              src="../../assets/logo.png"/>
         <span v-show="this.isCollapse">通用管理系统</span>

@@ -49,67 +49,69 @@ import JSONBigInt from 'json-bigint'
 export default {
   name: 'DictView',
   components: {},
-  data: () => ({
-    title: '',
-    multipleSelection: [],
-    tableData: [],
-    searchForm: {
-      id: undefined,
-      value: '',
-      label: ''
-    },
-    total: 0,
-    dictItemDialogVisible: false,
-    dict: {
-      id: undefined,
-      value: '',
-      label: ''
-    },
-    // 默认是创建
-    dialogType: DIALOG_TYPE.ADD,
-    formLabelWidth: '80px',
-    dictRules: {
-      dictName: [
-        {
-          required: true,
-          message: '请输入字典名称',
-          trigger: 'blur'
-        }
-      ],
-      dictCode: [
-        {
-          required: true,
-          message: '请输入字典编码',
-          trigger: 'blur'
-        }
-      ]
-    },
-    dictItemTableData: [],
-    rowData: {},
-    dictItem: {
-      id: undefined,
-      dictId: '',
-      label: '',
-      value: ''
-    },
-    show: true,
-    rules: {
-      label: [
-        {
-          required: true,
-          message: '请输入字典项名称',
-          trigger: 'blur'
-        }
-      ],
-      value: [
-        {
-          required: true,
-          message: '请输入字典项编码',
-          trigger: 'blur'
-        }
-      ]
+  data () {
+    return {
+      title: '',
+      multipleSelection: [],
+      tableData: [],
+      searchForm: {
+        id: undefined,
+        value: '',
+        label: ''
+      },
+      total: 0,
+      dictItemDialogVisible: false,
+      dict: {
+        id: undefined,
+        value: '',
+        label: ''
+      },
+      // 默认是创建
+      dialogType: DIALOG_TYPE.ADD,
+      formLabelWidth: '80px',
+      dictRules: {
+        dictName: [
+          {
+            required: true,
+            message: '请输入字典名称',
+            trigger: 'blur'
+          }
+        ],
+        dictCode: [
+          {
+            required: true,
+            message: '请输入字典编码',
+            trigger: 'blur'
+          }
+        ]
+      },
+      dictItemTableData: [],
+      rowData: {},
+      dictItem: {
+        id: undefined,
+        dictId: '',
+        label: '',
+        value: ''
+      },
+      show: true,
+      rules: {
+        label: [
+          {
+            required: true,
+            message: '请输入字典项名称',
+            trigger: 'blur'
+          }
+        ],
+        value: [
+          {
+            required: true,
+            message: '请输入字典项编码',
+            trigger: 'blur'
+          }
+        ]
+      }
     }
-  }),
+  },
   created () {
     this.reloadList(this.buildParam())
   },
