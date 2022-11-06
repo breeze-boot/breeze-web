@@ -103,7 +103,7 @@ export default {
       total: 0
     }
   },
-  created () {
+  mounted () {
     this.reloadList()
   },
   methods: {
@@ -114,6 +114,19 @@ export default {
           this.roleSearchForm.size = rep.data.size
           this.roleSearchForm.current = rep.data.current
           this.total = rep.data.total
+          const rows = this.$route.params.roleIds
+          if (rows.length <= 0) {
+            return
+          }
+          this.$nextTick(() => {
+            rows.forEach(roleId => {
+              rep.data.records.forEach(x => {
+                if (x.id === roleId) {
+                  this.$refs.multipleTable.toggleRowSelection(x, true)
+                }
+              })
+            })
+          })
         }
       })
     },
