@@ -214,7 +214,6 @@ export default {
       listRolesPermission(roleId).then((rep) => {
         if (rep.code === 1) {
           this.$nextTick(() => {
-            debugger
             rep.data.forEach(data => {
               this.$refs.roleTree.setChecked(data.menuId, true, false)
             })

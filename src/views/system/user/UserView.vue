@@ -82,6 +82,17 @@
           label="角色"
           prop="roleNames"
           show-overflow-tooltip>
+          <template slot-scope="scope">
+            <el-tag
+              v-for="item in scope.row.sysRoles"
+              :key="item.id"
+              disable-transitions
+              size="mini"
+              style="margin: 0  5px"
+              type="success">
+              {{ item.roleName }}
+            </el-tag>
+          </template>
         </el-table-column>
         <el-table-column
           label="身份证"
@@ -211,18 +222,18 @@
         <el-form-item :label-width="formLabelWidth" label="展示名称" prop="amountName">
           <el-input v-model="user.amountName" autocomplete="off" clearable type="input"></el-input>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="部门" prop="deptId" style="text-align: left;">
-          <el-select v-model="user.deptId" filterable placeholder="请选择部门">
-            <el-option
-              v-for="item in deptOption"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
+        <el-form-item :label-width="formLabelWidth" class="dept" label="部门" prop="dept">
+          <el-cascader
+            v-model="user.deptId"
+            :options="deptOption"
+            :props="{ checkStrictly: true }"
+            :show-all-levels="false"
+            clearable
+            filterable
+          ></el-cascader>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="角色" prop="roleId" style="text-align: left;">
-          <el-select v-model="user.roleId" filterable placeholder="请选择用户角色">
+          <el-select v-model="user.roleIds" collapse-tags filterable multiple placeholder="请选择用户角色">
             <el-option
               v-for="item in roleOption"
               :key="item.value"
@@ -313,7 +324,7 @@
             <i class="el-icon-tickets"></i>
             用户角色
           </template>
-          <el-select v-model="user.roleId" :disabled="true" size="mini">
+          <el-select v-model="user.roleIds" :disabled="true" size="mini">
             <el-option
               v-for="item in roleOption"
               :key="item.value"
@@ -354,10 +365,11 @@
 </template>
 
 <script>
-import { add, del, edit, list, open, resetPass } from '@/api/system/user'
-import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { add, del, edit, list, open, resetPass, selectRole } from '@/api/system/user'
+import { confirmAlert, DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
 import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
+import { selectDept } from '@/api/system/dept'
 
 export default {
   name: 'UserView',
@@ -389,11 +401,9 @@ export default {
           {
             required: true,
             validator: (rule, value, callback) => {
-              debugger
               if (value === '') {
                 callback(new Error('请输入密码'))
               } else {
-                debugger
                 if (this.user.confirmPassword !== '') {
                   this.$refs.restPasswordRuleForm.validateField('confirmPassword')
                 }
@@ -431,7 +441,7 @@ export default {
         userCode: '',
         username: '',
         deptId: '',
-        roleId: '',
+        roleIds: [],
         idCard: '',
         email: '',
         sex: 1,
@@ -448,24 +458,14 @@ export default {
         userCode: '',
         username: '',
         deptId: '',
-        roleId: '',
+        roleIds: [],
         idCard: '',
         email: '',
         sex: 1,
         isLock: 0
       },
-      deptOption: [
-        {
-          value: 1,
-          label: '董事长'
-        }
-      ],
-      roleOption: [
-        {
-          value: 1,
-          label: '超级管理员'
-        }
-      ],
+      deptOption: [],
+      roleOption: [],
       // 默认是创建
       dialogType: DIALOG_TYPE.ADD,
       userRules: {
@@ -554,6 +554,8 @@ export default {
   },
   created () {
     this.reloadList()
+    this.selectDept()
+    this.selectRole()
   },
   methods: {
     goRoleView (row) {
@@ -566,10 +568,44 @@ export default {
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
+          rep.data.records.forEach(user => {
+            user.roleIds = []
+            user.sysRoles.forEach(role => {
+              user.roleIds.push(role.id)
+            })
+          })
           this.userTableData = rep.data.records
           this.searchUserForm.size = rep.data.size
           this.searchUserForm.current = rep.data.current
           this.total = rep.data.total
+        }
+      })
+    },
+    selectDept () {
+      selectDept().then(res => {
+        if (res.code === 1 && res.data) {
+          this.deptOption = [{
+            value: '1111111111111111111',
+            disabled: true,
+            label: '根节点',
+            children: res.data
+          }]
+          const treeTemp = filterTreeParentId(res.data, (tree) => {
+            return tree.id && tree.id === this.user.deptId
+          }, 'id')
+          const tempArray = ['1111111111111111111']
+          treeTemp.map(id => tempArray.push(id))
+          this.user.deptId = tempArray
+        }
+      })
+    },
+    selectRole (row) {
+      selectRole().then(rep => {
+        if (rep.code === 1) {
+          this.roleOption = rep.data
+          if (row) {
+            this.user.roleIds = row.sysRoles.map(role => role.id)
+          }
         }
       })
     },
@@ -649,12 +685,16 @@ export default {
     modify (val) {
       this.title = '修改用户'
       this.dialogType = DIALOG_TYPE.EDIT
+      this.selectDept()
+      this.selectRole(val)
       this.userDialogVisible = true
-      this.isEdit = true
+      this.isEdit = false
       Object.assign(this.user, val)
     },
     info (val) {
       this.title = '查看信息'
+      this.selectDept(val.deptId)
+      this.selectRole()
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
       Object.assign(this.user, val)
@@ -676,6 +716,7 @@ export default {
     submitUserForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          this.user.deptId = this.user.deptId[this.user.deptId.length - 1]
           this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
         } else {
           console.log('error submit!!')
@@ -684,6 +725,7 @@ export default {
       })
     },
     add () {
+      debugger
       add(this.user).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })

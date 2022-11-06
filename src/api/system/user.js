@@ -106,3 +106,18 @@ export function userAddRole (data) {
     data: data
   })
 }
+
+/**
+ * 角色下拉框
+ *
+ * @returns {AxiosPromise}
+ */
+export function selectRole () {
+  return request({
+    url: servicePath.system + '/sys/common/selectRole',
+    method: 'get',
+    transformResponse: [(data) => {
+      return JSONBigInt2Str.parse(data)
+    }]
+  })
+}
