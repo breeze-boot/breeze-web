@@ -1,6 +1,6 @@
 import { request, servicePath } from '@/utils/axios'
 
-export function jwtToken (data) {
+export function jwtLogin (data) {
   const dataObj = {
     username: data.username,
     password: data.password

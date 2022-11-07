@@ -214,6 +214,7 @@ export default {
       listRolesPermission(roleId).then((rep) => {
         if (rep.code === 1) {
           this.$nextTick(() => {
+            this.$refs.roleTree.setCheckedKeys([])
             rep.data.forEach(data => {
               this.$refs.roleTree.setChecked(data.menuId, true, false)
             })
@@ -324,13 +325,17 @@ export default {
       this.title = '修改角色信息'
       this.dialogType = DIALOG_TYPE.EDIT
       this.roleDialogVisible = true
-      Object.assign(this.role, val)
+      this.$nextTick(() => {
+        Object.assign(this.role, val)
+      })
     },
     info (val) {
       this.title = '查看角色信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
-      Object.assign(this.role, val)
+      this.$nextTick(() => {
+        Object.assign(this.role, val)
+      })
     },
     closeDialog (formName) {
       this.role.id = undefined

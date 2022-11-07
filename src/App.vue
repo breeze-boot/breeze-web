@@ -10,7 +10,7 @@ import { mapMutations } from 'vuex'
 export default {
   name: 'App',
   methods: {
-    ...mapMutations('menu', ['setTag'])
+    ...mapMutations('menu', ['setTag', 'setCurrentTagValue'])
   },
   watch: {
     /**
@@ -21,15 +21,17 @@ export default {
     $route (to, from) {
       const accessToken = localStorage.getItem('access_token')
       if (to.name !== 'login' && to.name !== 'home' && accessToken) {
+        debugger
         this.setTag({
           name: to.name,
           title: to.meta.title,
           hidden: to.meta.hidden
         })
-        // this.$store.commit('menu/addTab', {
-        //   name: to.name,
-        //   title: to.meta.title
-        // })
+        this.setCurrentTagValue({
+          name: to.name,
+          title: to.meta.title,
+          hidden: to.meta.hidden
+        })
       }
     }
   }

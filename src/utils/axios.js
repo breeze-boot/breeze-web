@@ -82,16 +82,19 @@ request.interceptors.response.use((success) => {
     return success.data
   }
 }, (error) => {
-  if (error.message.includes('timeout of')) {
+  if (error.message.includes('Unexpected')) {
+    Message.error({ message: '连接服务被拒绝' })
+  } else if (error.message.includes('timeout of')) {
     Message.error({ message: '请求超时' })
   } else if (error.response.status === 400) {
     Message.error({ message: '参数解析失败' })
   } else if (error.response.status === 404) {
     Message.error({ message: '请求地址不存在' })
   } else if (error.response.status === 401) {
+    debugger
     showErrorMsg(error.response, error.response.data.message)
     // TODO 重新登录
-  } else if (error.response.status === 402) {
+  } else if (error.response.status === 403) {
     showErrorMsg(error.response, error.response.data.message)
   }
   console.error(error.response.status)

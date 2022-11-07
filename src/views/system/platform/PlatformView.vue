@@ -51,7 +51,7 @@
           width="200">
         </el-table-column>
         <el-table-column
-          label="平台标志"
+          label="平台编码"
           prop="platformCode"
           show-overflow-tooltip>
         </el-table-column>
@@ -96,7 +96,7 @@
         <el-form-item :label-width="formLabelWidth" label="平台名称" prop="platformName">
           <el-input v-model="platform.platformName" autocomplete="off" clearable></el-input>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="平台标志" prop="platformCode">
+        <el-form-item :label-width="formLabelWidth" label="平台编码" prop="platformCode">
           <el-input v-model="platform.platformCode" autocomplete="off" clearable></el-input>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="描述" prop="description">
@@ -273,13 +273,17 @@ export default {
       this.title = '修改平台'
       this.dialogType = DIALOG_TYPE.EDIT
       this.platformDialogVisible = true
-      Object.assign(this.platform, val)
+      this.$nextTick(() => {
+        Object.assign(this.platform, val)
+      })
     },
     info (val) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
-      Object.assign(this.platform, val)
+      this.$nextTick(() => {
+        Object.assign(this.platform, val)
+      })
     },
     closePlatformDialog (formName) {
       this.platform.id = undefined

@@ -51,13 +51,8 @@
           width="200">
         </el-table-column>
         <el-table-column
-          label="租户标志"
+          label="租户编码"
           prop="tenantCode"
-          show-overflow-tooltip>
-        </el-table-column>
-        <el-table-column
-          label="描述"
-          prop="description"
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
@@ -270,13 +265,17 @@ export default {
       this.title = '修改租户'
       this.dialogType = DIALOG_TYPE.EDIT
       this.tenantDialogVisible = true
-      Object.assign(this.tenant, val)
+      this.$nextTick(() => {
+        Object.assign(this.tenant, val)
+      })
     },
     info (val) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
-      Object.assign(this.tenant, val)
+      this.$nextTick(() => {
+        Object.assign(this.tenant, val)
+      })
     },
     closeTenantDialog (formName) {
       this.tenant.id = undefined

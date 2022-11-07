@@ -123,8 +123,8 @@
       </el-table>
     </el-main>
     <el-dialog :title="title" :visible.sync="menuDialogVisible" width="800px"
-               @close="closeDialog('ruleForm')">
-      <el-form ref="ruleForm" :model="menu" :rules="rules" size="mini">
+               @close="closeDialog">
+      <el-form ref="menuRuleForm" :model="menu" :rules="rules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="平台" prop="platformId" style="text-align: left;">
           <el-select v-model="menu.platformId" placeholder="请选择所属的平台">
             <el-option
@@ -230,13 +230,13 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetForm()">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitForm('ruleForm')">确 定</el-button>
+        <el-button size="mini" @click="resetForm">取 消</el-button>
+        <el-button size="mini" type="primary" @click="submitForm('menuRuleForm')">确 定</el-button>
       </div>
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="800px"
-               @close="closeDialog('ruleForm')">
+               @close="closeInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item>
           <template slot="label">
@@ -390,7 +390,7 @@ export default {
       infoDialogVisible: false,
       menu: {
         id: undefined,
-        platformId: '',
+        platformId: '1564528653105573889',
         platformName: '',
         name: '',
         title: '',
@@ -407,7 +407,7 @@ export default {
       },
       menuInfo: {
         id: undefined,
-        platformId: '',
+        platformId: '1564528653105573889',
         platformName: '',
         name: '',
         title: '',
@@ -589,8 +589,10 @@ export default {
     create (val) {
       this.title = '创建菜单'
       this.dialogType = DIALOG_TYPE.ADD
-      this.menu.parentId = val.id ? val.id : ''
-      this.selectMenu()
+      this.$nextTick(() => {
+        this.menu.parentId = val.id ? val.id : ''
+        this.selectMenu()
+      })
       this.menuDialogVisible = true
     },
     clone () {
@@ -598,21 +600,23 @@ export default {
     },
     modify (val) {
       this.title = '修改菜单'
-      // 赋值
-      Object.assign(this.menu, val)
-      this.menu.parentId = val.parentId
-      this.selectMenu(this.menu.id)
-      this.selectPlatform()
+      this.$nextTick(() => {
+        Object.assign(this.menu, val)
+        this.menu.parentId = val.parentId
+        this.selectMenu(this.menu.id)
+        this.selectPlatform()
+      })
       this.menuDialogVisible = true
       this.dialogType = DIALOG_TYPE.EDIT
     },
     info (val) {
       this.title = '查看信息'
-      // 赋值
-      Object.assign(this.menu, val)
-      this.menu.parentId = val.parentId
-      this.selectMenu()
-      this.selectPlatform()
+      this.$nextTick(() => {
+        Object.assign(this.menu, val)
+        this.menu.parentId = val.parentId
+        this.selectMenu()
+        this.selectPlatform()
+      })
       this.infoDialogVisible = true
       this.dialogType = DIALOG_TYPE.SHOW
     },
@@ -669,12 +673,15 @@ export default {
     showIconDialog () {
       this.$refs.iconDialog.showIconDialog({})
     },
-    closeDialog (formName) {
-      this.$refs[formName].resetFields()
+    closeInfoDialog () {
       this.$nextTick(() => {
-        this.menu = this.menuInfo
+        Object.assign(this.menu, this.menuInfo)
       })
-      this.show = false
+    },
+    closeDialog () {
+      this.$nextTick(() => {
+        Object.assign(this.menu, this.menuInfo)
+      })
     },
     choiceIcon (val) {
       this.menu.icon = val

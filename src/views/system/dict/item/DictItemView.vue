@@ -191,7 +191,9 @@ export default {
       this.title = '修改字典项'
       this.dialogType = DIALOG_TYPE.SHOW
       this.dictItemDialogVisible = true
-      Object.assign(this.dictItem, val)
+      this.$nextTick(() => {
+        Object.assign(this.dictItem, val)
+      })
     },
     closeDictItemDialog (formName) {
       this.dictItem.id = undefined

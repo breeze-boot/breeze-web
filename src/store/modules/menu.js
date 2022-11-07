@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { filterTree } from '@/utils/constant'
-import router from '@/router/index'
 
 Vue.use(Vuex)
 
@@ -16,7 +15,6 @@ export default {
     }],
     menus: [],
     keepAliveMenus: [],
-    breads: [],
     isCollapse: true,
     fadeIn: 'fadeIn',
     collapseWhitespace: '200',
@@ -59,8 +57,6 @@ export default {
       state.dynamicTags.push(menu)
     },
     setCurrentTagValue (state, tag) {
-      router.push({ name: tag.name }).then(r => {
-      })
       state.currentTagValue = tag.name
     }
   },

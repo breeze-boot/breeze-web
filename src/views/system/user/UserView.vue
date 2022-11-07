@@ -232,7 +232,7 @@
             filterable
           ></el-cascader>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="角色" prop="roleId" style="text-align: left;">
+        <el-form-item :label-width="formLabelWidth" label="角色" prop="roleIds" style="text-align: left;">
           <el-select v-model="user.roleIds" collapse-tags filterable multiple placeholder="请选择用户角色">
             <el-option
               v-for="item in roleOption"
@@ -304,6 +304,20 @@
             展示名称
           </template>
           {{ user.amountName }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            <i class="el-icon-tickets"></i>
+            部门
+          </template>
+          <el-select v-model="user.deptId" :disabled="true" size="mini">
+            <el-option
+              v-for="item in deptOption"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
@@ -440,8 +454,9 @@ export default {
         confirmPassword: '',
         userCode: '',
         username: '',
-        deptId: '',
+        deptId: '1111111111111111111',
         roleIds: [],
+        sysRoles: [],
         idCard: '',
         email: '',
         sex: 1,
@@ -457,8 +472,9 @@ export default {
         confirmPassword: '',
         userCode: '',
         username: '',
-        deptId: '',
+        deptId: '1111111111111111111',
         roleIds: [],
+        sysRoles: [],
         idCard: '',
         email: '',
         sex: 1,
@@ -568,16 +584,20 @@ export default {
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
-          rep.data.records.forEach(user => {
-            user.roleIds = []
-            user.sysRoles.forEach(role => {
-              user.roleIds.push(role.id)
-            })
-          })
           this.userTableData = rep.data.records
           this.searchUserForm.size = rep.data.size
           this.searchUserForm.current = rep.data.current
           this.total = rep.data.total
+          debugger
+          if (this.isEdit) {
+            rep.data.records.forEach(user => {
+              const roleIds = []
+              user.sysRoles.forEach(role => {
+                roleIds.push(role.id)
+              })
+              user.roleIds = roleIds
+            })
+          }
         }
       })
     },
@@ -685,19 +705,23 @@ export default {
     modify (val) {
       this.title = '修改用户'
       this.dialogType = DIALOG_TYPE.EDIT
-      this.selectDept()
-      this.selectRole(val)
-      this.userDialogVisible = true
+      this.$nextTick(() => {
+        this.selectDept()
+        this.selectRole(val)
+        Object.assign(this.user, val)
+      })
       this.isEdit = false
-      Object.assign(this.user, val)
+      this.userDialogVisible = true
     },
     info (val) {
       this.title = '查看信息'
-      this.selectDept(val.deptId)
-      this.selectRole()
       this.dialogType = DIALOG_TYPE.SHOW
+      this.$nextTick(() => {
+        this.selectRole()
+        this.selectDept(val.deptId)
+        Object.assign(this.user, val)
+      })
       this.infoDialogVisible = true
-      Object.assign(this.user, val)
     },
     handleAvatarSuccess (res, file) {
       this.user.avatar = URL.createObjectURL(file.raw)
@@ -725,7 +749,6 @@ export default {
       })
     },
     add () {
-      debugger
       add(this.user).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })
@@ -754,14 +777,18 @@ export default {
     },
     resetPass (row) {
       this.restPasswordDialogVisible = true
-      Object.assign(this.userPassword, row)
+      this.$nextTick(() => {
+        Object.assign(this.userPassword, row)
+      })
     },
     closeRestPasswordDialog (formName) {
       this.user.id = undefined
       this.$refs[formName].resetFields()
     },
     closeUserInfoDialog () {
-      this.user = this.userInfo
+      this.$nextTick(() => {
+        this.user = this.userInfo
+      })
     },
     submitRestPasswordForm (formName) {
       this.$refs[formName].validate((valid) => {

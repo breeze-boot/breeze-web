@@ -51,7 +51,7 @@
           width="200">
         </el-table-column>
         <el-table-column
-          label="岗位标志"
+          label="岗位编码"
           prop="postCode"
           show-overflow-tooltip>
         </el-table-column>
@@ -98,6 +98,9 @@
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="岗位编码" prop="postCode">
           <el-input v-model="post.postCode" autocomplete="off" clearable></el-input>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="岗位描述" prop="description">
+          <el-input v-model="post.description" autocomplete="off" clearable type="textarea"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

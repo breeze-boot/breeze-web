@@ -170,7 +170,6 @@ export default {
         username: this.$route.params.username,
         roleId: this.multipleSelectionUserRoleId.map(role => role.id)
       }
-      console.log(JSON.stringify(temp))
       userAddRole(temp).then(rep => {
         if (rep.code === 1) {
           this.$message.success('分配成功')

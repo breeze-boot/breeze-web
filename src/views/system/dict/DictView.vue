@@ -7,8 +7,8 @@
             <el-form-item label="字典名称" prop="dictName">
               <el-input v-model="searchDictForm.dictName" clearable placeholder="字典名称"/>
             </el-form-item>
-            <el-form-item label="字典标志" prop="dictCode">
-              <el-input v-model="searchDictForm.dictCode" clearable placeholder="字典标志"/>
+            <el-form-item label="字典编码" prop="dictCode">
+              <el-input v-model="searchDictForm.dictCode" clearable placeholder="字典编码"/>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search">查询</el-button>

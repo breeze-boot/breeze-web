@@ -7,15 +7,23 @@
     <div class="logout">
       <el-dropdown @command="handleCommand">
         <span class="el-dropdown-link">
-          <i class="el-icon-user-solid"/>
           <span> {{ this.getUsername }}</span>
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item command="logout">退出登录</el-dropdown-item>
-          <el-dropdown-item command="setting">系统设置</el-dropdown-item>
+          <el-dropdown-item command="setting">
+            <i class="el-icon-setting"/>平台设置
+          </el-dropdown-item>
+          <el-dropdown-item command="logout">
+            <i class="el-icon-switch-button"/>退出登录
+          </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+    <el-drawer
+      :direction="direction"
+      :visible.sync="drawer"
+      title="平台设置">
+    </el-drawer>
   </el-container>
 </template>
 
@@ -26,7 +34,10 @@ import 'animate.css'
 export default {
   name: 'Header',
   data () {
-    return {}
+    return {
+      drawer: false,
+      direction: 'rtl'
+    }
   },
   computed: {
     ...mapGetters('menu', ['fadeIn', 'isCollapse']),
@@ -41,9 +52,11 @@ export default {
           message: '退出成功',
           type: 'success'
         })
-        localStorage.removeItem('access_token')
+        localStorage.clear()
         this.$router.push('/')
+        return
       }
+      this.drawer = true
     },
     collapse () {
       const collapseWhitespace = !this.isCollapse ? 200 : 65
@@ -77,11 +90,11 @@ export default {
   }
 
   > .logout {
-    margin-right: 1%;
-    width: 5%;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-right: 1%;
+    width: 5%;
     height: 100%;
     color: #ffffff !important;
   }

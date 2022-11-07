@@ -16,7 +16,8 @@
 
 <script>
 
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
+import router from '@/router'
 
 export default {
   name: 'Tag',
@@ -27,9 +28,9 @@ export default {
     ...mapGetters('menu', ['getDynamicTags', 'getCurrentTagValue'])
   },
   methods: {
-    ...mapMutations('menu', ['setCurrentTagValue']),
     handleClick (tag) {
-      this.setCurrentTagValue(tag)
+      router.push({ name: tag.name }).then(r => {
+      })
     },
     handleClose (tag) {
       let index = this.getDynamicTags.findIndex((value, index, arr) => {
@@ -61,7 +62,7 @@ export default {
 }
 
 #tag .el-tag--plain {
-  background: #d3d3d3 !important;
+  background: #fcfcfc !important;
   //box-shadow: 1px 1px 10px #d7d7d7;
   border-radius: 3px;
   color: #4d4d4d !important;
@@ -76,8 +77,8 @@ export default {
 }
 
 #tag .el-tag--plain > .el-tag__close:hover {
-  background-color: #d3d3d3 !important;
-  color: #565656 !important;
+  background-color: #fcfcfc !important;
+  color: #4d4d4d !important;
 }
 
 #tag .el-tag--plain > .el-tag__close {

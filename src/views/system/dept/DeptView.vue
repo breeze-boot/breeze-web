@@ -80,9 +80,6 @@
         <el-form-item :label-width="formLabelWidth" label="部门编码" prop="deptCode">
           <el-input v-model="dept.deptCode" autocomplete="off" clearable></el-input>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="描述" prop="isOpen">
-          <el-input v-model="dept.isOpen" autocomplete="off" clearable type="input"></el-input>
-        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="mini" @click="resetDeptForm('deptRuleForm')">取 消</el-button>
@@ -231,17 +228,21 @@ export default {
     modify (val) {
       this.title = '修改部门信息'
       this.dialogType = DIALOG_TYPE.EDIT
-      Object.assign(this.dept, val)
-      this.dept.parentId = val.parentId
-      this.selectDept(this.dept.id)
+      this.$nextTick(() => {
+        Object.assign(this.dept, val)
+        this.dept.parentId = val.parentId
+        this.selectDept(this.dept.id)
+      })
       this.deptDialogVisible = true
     },
     info (val) {
       this.title = '查看部门信息'
       this.dialogType = DIALOG_TYPE.SHOW
-      Object.assign(this.dept, val)
-      this.dept.parentId = val.parentId
-      this.selectDept(this.dept.id)
+      this.$nextTick(() => {
+        Object.assign(this.dept, val)
+        this.dept.parentId = val.parentId
+        this.selectDept(this.dept.id)
+      })
       this.infoDialogVisible = true
     },
     selectDept (id) {

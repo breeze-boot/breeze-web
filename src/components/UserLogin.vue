@@ -42,7 +42,7 @@
 
 <script>
 import Verify from '@/components/verifition/Verify'
-import { jwtToken } from '@/api/system/login'
+import { jwtLogin } from '@/api/system/login'
 
 export default {
   name: 'userLogin',
@@ -76,14 +76,16 @@ export default {
   },
   methods: {
     success () {
-      jwtToken(this.userLogin).then((response) => {
-        if (response.code === 1) {
-          localStorage.setItem('access_token', response.data.access_token)
-          localStorage.setItem('permissions', response.data.permissions)
-          localStorage.setItem('user_info', JSON.stringify(response.data.user_info))
-          this.$store.commit('userInfo/setUserInfo')
-          const path = this.$route.query.redirect
-          this.$router.replace(path === '/' || path === undefined ? 'welcome' : path)
+      jwtLogin(this.userLogin).then((rep) => {
+        if (rep.code === 1) {
+          this.$nextTick(() => {
+            localStorage.setItem('access_token', rep.data.access_token)
+            localStorage.setItem('permissions', rep.data.permissions)
+            localStorage.setItem('user_info', JSON.stringify(rep.data.user_info))
+            this.$store.commit('userInfo/setUserInfo')
+            const path = this.$route.query.redirect
+            this.$router.replace(path === '/' || path === undefined ? 'welcome' : path)
+          })
         }
       })
     },

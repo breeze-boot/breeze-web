@@ -12,10 +12,10 @@
     <span slot="title">{{ menu.title }}</span>
   </el-menu-item>
   <el-menu-item v-else-if="menu && menu.href===1">
-    <a :href="menu.path" target="_blank">
+    <el-link :href="menu.path" style="color: #ffffff;" target="_blank" type="info">
       <svg-icon :icon-name="menu.icon" style="font-size: 20px;"/>
       <span>{{ menu.title }}</span>
-    </a>
+    </el-link>
   </el-menu-item>
 </template>
 
