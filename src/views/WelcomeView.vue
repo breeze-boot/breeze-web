@@ -4,6 +4,8 @@
     <svg aria-hidden="true" height="2em" width="2em">
       <use :xlink:href="'#icon-abc12312312'"/>
     </svg>
+    欢迎
+    <i class="iconfont icon-explain"></i>
   </el-container>
 </template>
 

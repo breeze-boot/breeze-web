@@ -117,14 +117,12 @@
       <el-descriptions :column="1" border size="mini">
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-user"></i>
             角色编码
           </template>
           {{ role.roleCode }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-tickets"></i>
             角色名称
           </template>
           <el-tag size="small">{{ role.roleName }}</el-tag>

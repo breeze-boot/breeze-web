@@ -106,21 +106,18 @@
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-user"></i>
             租户名称
           </template>
           {{ tenant.tenantName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-tickets"></i>
             租户编码
           </template>
           <el-tag size="small">{{ tenant.tenantCode }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-office-building"></i>
             描述
           </template>
           {{ tenant.description }}

@@ -122,6 +122,7 @@
         </el-table-column>
       </el-table>
     </el-main>
+
     <el-dialog :title="title" :visible.sync="menuDialogVisible" width="800px"
                @close="closeDialog">
       <el-form ref="menuRuleForm" :model="menu" :rules="rules" size="mini">
@@ -193,7 +194,7 @@
         </el-form-item>
 
         <el-form-item :label-width="formLabelWidth" label="排序" prop="sort" style="text-align: left;">
-          <el-input-number v-model="menu.sort" :max="10" :min="1" label="排序" @change="handleChangeSort"/>
+          <el-input-number v-model="menu.sort" :max="10" :min="1" :step="5" label="排序" @change="handleChangeSort"/>
         </el-form-item>
 
         <el-form-item :label-width="formLabelWidth" label="标题" prop="title">
@@ -240,38 +241,6 @@
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-user"></i>
-            菜单名称
-          </template>
-          {{ menu.title }}
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
-            路由名称
-          </template>
-          {{ menu.name }}
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            <i class="el-icon-mobile-phone"></i>
-            icon
-          </template>
-          <svg-icon :icon-name="menu.icon" style="font-size: 20px;"/>
-          <span>
-          {{ menu.icon }}
-        </span>
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            <i class="el-icon-chat-round"></i>
-            排序
-          </template>
-          {{ menu.sort }}
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
             平台名称
           </template>
           {{ menu.platformName }}
@@ -279,31 +248,41 @@
 
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-tickets"></i>
-            开启缓存
+            组件类型
           </template>
-          {{ menu.keepAlive }}
+          <el-tag
+            :type="menu.type === 0 ? 'primary' : (menu.type === 1 ? 'info' : 'warning')"
+            disable-transitions> {{ menu.type === 0 ? '文件夹' : (menu.type === 1 ? '菜单' : '按钮') }}
+          </el-tag>
         </el-descriptions-item>
 
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-tickets"></i>
-            开启缓存
-          </template>
-          {{ menu.keepAlive }}
-        </el-descriptions-item>
-
-        <el-descriptions-item>
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
             外链
           </template>
-          {{ menu.href }}
+          <el-tag
+            :type="menu.href === 0 ? 'primary' :  'info'"
+            disable-transitions> {{ menu.href === 0 ? '路由菜单' : '外部链接' }}
+          </el-tag>
         </el-descriptions-item>
+
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-tickets"></i>
-            父级元素
+            缓存
+          </template>
+          {{ menu.keepAlive === 0 ? '未开启' : '开启' }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template slot="label">
+            隐藏
+          </template>
+          {{ menu.hidden === 0 ? '显示在路由菜单' : '（隐藏）通过编程式路由跳转' }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template slot="label">
+            上级菜单
           </template>
           <el-cascader
             v-model="menu.parentId"
@@ -316,41 +295,54 @@
             size="mini"
           ></el-cascader>
         </el-descriptions-item>
+
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-tickets"></i>
+            排序
+          </template>
+          {{ menu.sort }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template slot="label">
+            标题
+          </template>
+          {{ menu.title }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template slot="label">
+            图标
+          </template>
+          <svg-icon :icon-name="menu.icon" style="font-size: 20px;"/>
+          <span>
+          {{ menu.icon }}
+        </span>
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template slot="label">
+            路由名称
+          </template>
+          {{ menu.name }}
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template slot="label">
+            组件路径
+          </template>
+          <el-tag v-if="menu.path && menu.path !== ''" type="primary"> {{ menu.path }}</el-tag>
+          <span v-else>{{ menu.path }}</span>
+        </el-descriptions-item>
+
+        <el-descriptions-item>
+          <template slot="label">
             权限编码
           </template>
           <el-tag v-if="menu.permission !== ''" type="primary">
             {{ menu.permission }}
           </el-tag>
           <span v-else>{{ menu.permission }}</span>
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            <i class="el-icon-user-solid"></i>
-            组件名称
-          </template>
-          <el-tag v-if="menu.component && menu.component === ''"> {{ menu.component }}</el-tag>
-          <span v-else>{{ menu.component }}</span>
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            <i class="el-icon-user-solid"></i>
-            组件路径
-          </template>
-          <el-tag v-if="menu.path && menu.path !== ''" type="primary"> {{ menu.path }}</el-tag>
-          <span v-else>{{ menu.path }}</span>
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            <i class="el-icon-unlock"></i>
-            组件类型
-          </template>
-          <el-tag
-            :type="menu.type === 0 ? 'primary' : (menu.type === 1 ? 'info' : 'danger')"
-            disable-transitions> {{ menu.type === 0 ? '文件夹' : (menu.type === 1 ? '菜单' : '按钮') }}
-          </el-tag>
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>

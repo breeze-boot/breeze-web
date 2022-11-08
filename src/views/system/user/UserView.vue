@@ -173,10 +173,10 @@
       <el-form ref="restPasswordRuleForm" :model="userPassword" :rules="resetPasswordRules" size="mini"
                style="padding-right: 15px;">
         <el-form-item :label-width="formLabelWidth" label="密码" prop="password">
-          <el-input v-model="userPassword.password" autocomplete="off" clearable type="password"/>
+          <el-input v-model="userPassword.password" autocomplete="off" clearable show-password type="password"/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="确认密码" prop="confirmPassword">
-          <el-input v-model="userPassword.confirmPassword" autocomplete="off" clearable
+          <el-input v-model="userPassword.confirmPassword" autocomplete="off" clearable show-password
                     type="password"/>
         </el-form-item>
       </el-form>
@@ -205,10 +205,11 @@
           <el-input v-model="user.username" autocomplete="off" clearable></el-input>
         </el-form-item>
         <el-form-item v-if="isEdit" :label-width="formLabelWidth" label="密码" prop="password">
-          <el-input v-model="user.password" autocomplete="off" clearable type="password"></el-input>
+          <el-input v-model="user.password" autocomplete="off" clearable show-password type="password"></el-input>
         </el-form-item>
         <el-form-item v-if="isEdit" :label-width="formLabelWidth" label="确认密码" prop="confirmPassword">
-          <el-input v-model="user.confirmPassword" autocomplete="off" clearable type="password"></el-input>
+          <el-input v-model="user.confirmPassword" autocomplete="off" clearable show-password
+                    type="password"></el-input>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="用户工号" prop="userCode">
           <el-input v-model="user.userCode" autocomplete="off" clearable></el-input>
@@ -272,84 +273,57 @@
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-user"></i>
             用户名
           </template>
           {{ user.username }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-tickets"></i>
             用户工号
           </template>
           <el-tag size="small">{{ user.userCode }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-mobile-phone"></i>
             手机号
           </template>
           {{ user.phone }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-chat-round"></i>
             E-mail
           </template>
           {{ user.email }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-tickets"></i>
             展示名称
           </template>
           {{ user.amountName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-tickets"></i>
             部门
           </template>
-          <el-select v-model="user.deptId" :disabled="true" size="mini">
-            <el-option
-              v-for="item in deptOption"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
+          <el-cascader
+            v-model="user.deptId"
+            :options="deptOption"
+            :props="{ checkStrictly: true }"
+            :show-all-levels="false"
+            clearable
+            disabled
+            filterable
+            size="mini"
+          ></el-cascader>
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-tickets"></i>
-            部门
-          </template>
-          <el-select v-model="user.deptId" :disabled="true" size="mini">
-            <el-option
-              v-for="item in deptOption"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            <i class="el-icon-tickets"></i>
             用户角色
           </template>
-          <el-select v-model="user.roleIds" :disabled="true" size="mini">
-            <el-option
-              v-for="item in roleOption"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
+          {{ user.roleNames }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-tickets"></i>
             性别
           </template>
           <el-tag :type="user.sex === 1 ? 'primary' : 'success'">
@@ -358,14 +332,12 @@
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-user-solid"></i>
             身份证
           </template>
           {{ user.idCard }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-unlock"></i>
             是否锁定
           </template>
           <el-tag
@@ -406,8 +378,9 @@ export default {
       userDialogVisible: false,
       infoDialogVisible: false,
       userPassword: {
-        id: '',
-        password: ''
+        id: null,
+        password: '',
+        confirmPassword: ''
       },
       formLabelWidth: '80px',
       resetPasswordRules: {
@@ -418,7 +391,7 @@ export default {
               if (value === '') {
                 callback(new Error('请输入密码'))
               } else {
-                if (this.user.confirmPassword !== '') {
+                if (this.userPassword.confirmPassword !== '') {
                   this.$refs.restPasswordRuleForm.validateField('confirmPassword')
                 }
                 callback()
@@ -433,7 +406,7 @@ export default {
             validator: (rule, value, callback) => {
               if (value === '') {
                 callback(new Error('请再次输入密码'))
-              } else if (value !== this.user.password) {
+              } else if (value !== this.userPassword.password) {
                 callback(new Error('两次输入密码不一致!'))
               } else {
                 callback()
@@ -456,6 +429,7 @@ export default {
         username: '',
         deptId: '1111111111111111111',
         roleIds: [],
+        roleNames: [],
         sysRoles: [],
         idCard: '',
         email: '',
@@ -474,6 +448,7 @@ export default {
         username: '',
         deptId: '1111111111111111111',
         roleIds: [],
+        roleNames: [],
         sysRoles: [],
         idCard: '',
         email: '',
@@ -588,16 +563,13 @@ export default {
           this.searchUserForm.size = rep.data.size
           this.searchUserForm.current = rep.data.current
           this.total = rep.data.total
-          debugger
-          if (this.isEdit) {
-            rep.data.records.forEach(user => {
-              const roleIds = []
-              user.sysRoles.forEach(role => {
-                roleIds.push(role.id)
-              })
-              user.roleIds = roleIds
+          rep.data.records.forEach(user => {
+            const roleIds = []
+            user.sysRoles.forEach(role => {
+              roleIds.push(role.id)
             })
-          }
+            user.roleIds = roleIds
+          })
         }
       })
     },
@@ -623,8 +595,10 @@ export default {
       selectRole().then(rep => {
         if (rep.code === 1) {
           this.roleOption = rep.data
+          // 修改和查看
           if (row) {
             this.user.roleIds = row.sysRoles.map(role => role.id)
+            this.user.roleNames = row.sysRoles.map(role => role.roleName).join(',')
           }
         }
       })
@@ -717,7 +691,7 @@ export default {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.$nextTick(() => {
-        this.selectRole()
+        this.selectRole(val)
         this.selectDept(val.deptId)
         Object.assign(this.user, val)
       })
@@ -793,7 +767,7 @@ export default {
     submitRestPasswordForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          resetPass(this.user).then(rep => {
+          resetPass(this.userPassword).then(rep => {
             if (rep.code === 1) {
               this.$message.success({ message: '重置成功' })
               this.restPasswordDialogVisible = false

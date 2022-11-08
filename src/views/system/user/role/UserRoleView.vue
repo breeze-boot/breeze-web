@@ -115,7 +115,7 @@ export default {
           this.roleSearchForm.current = rep.data.current
           this.total = rep.data.total
           const rows = this.$route.params.roleIds
-          if (rows.length <= 0) {
+          if (!rows) {
             return
           }
           this.$nextTick(() => {

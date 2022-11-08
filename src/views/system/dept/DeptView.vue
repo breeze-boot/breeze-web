@@ -91,14 +91,12 @@
       <el-descriptions :column="1" border size="mini">
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-user"></i>
             部门编码
           </template>
           {{ dept.deptCode }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-tickets"></i>
             部门名称
           </template>
           <el-tag size="small">{{ dept.deptName }}</el-tag>

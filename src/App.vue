@@ -21,12 +21,14 @@ export default {
     $route (to, from) {
       const accessToken = localStorage.getItem('access_token')
       if (to.name !== 'login' && to.name !== 'home' && accessToken) {
-        debugger
         this.setTag({
           name: to.name,
           title: to.meta.title,
           hidden: to.meta.hidden
         })
+        if (to.meta.hidden === 1) {
+          return
+        }
         this.setCurrentTagValue({
           name: to.name,
           title: to.meta.title,

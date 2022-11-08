@@ -20,8 +20,19 @@
           v-model="userLogin.password"
           auto-complete="false"
           placeholder="密码"
+          show-password
           type="password"
         ></el-input>
+      </el-form-item>
+      <el-form-item prop="tenant" size="mini" style="display: flex; width: 100%!important;">
+        <el-select v-model="userLogin.tenantId" placeholder="请选择租户">
+          <el-option
+            v-for="item in tenantOption"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button style="width: 100%" type="primary" @click="onSubmit"
@@ -43,6 +54,7 @@
 <script>
 import Verify from '@/components/verifition/Verify'
 import { jwtLogin } from '@/api/system/login'
+import { selectTenant } from '@/api/system/tenant'
 
 export default {
   name: 'userLogin',
@@ -56,6 +68,7 @@ export default {
         username: 'admin',
         password: '123456'
       },
+      tenantOption: [],
       rules: {
         username: [
           {
@@ -73,6 +86,13 @@ export default {
         ]
       }
     }
+  },
+  mounted () {
+    selectTenant().then(rep => {
+      if (rep.code === 1) {
+        this.tenantOption = rep.data
+      }
+    })
   },
   methods: {
     success () {

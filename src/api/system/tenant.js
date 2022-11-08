@@ -57,3 +57,16 @@ export function edit (data) {
     data: data
   })
 }
+
+/**
+ * 修改
+ *
+ * @returns {AxiosPromise}
+ */
+export function selectTenant (data) {
+  return request({
+    url: servicePath.system + '/sys/common/selectTenant',
+    method: 'get',
+    data: data
+  })
+}

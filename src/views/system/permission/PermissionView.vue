@@ -56,6 +56,22 @@
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
+          label="运算符"
+          prop="operator"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
+          label="自定义sql"
+          prop="sql"
+          show-overflow-tooltip
+          width="200">
+        </el-table-column>
+        <el-table-column
+          label="权限集"
+          prop="permissions"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
           label="描述"
           prop="description"
           show-overflow-tooltip>
@@ -90,7 +106,7 @@
       </div>
     </el-main>
 
-    <el-dialog :title="title" :visible.sync="permissionDialogVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="permissionDialogVisible" width="600px"
                @close="closePermissionDialog('permissionRuleForm')">
       <el-form ref="permissionRuleForm" :model="permission" :rules="permissionRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="数据权限名称" prop="permissionName">
@@ -98,6 +114,24 @@
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="数据权限编码" prop="permissionCode">
           <el-input v-model="permission.permissionCode" autocomplete="off" clearable></el-input>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="运算符" prop="operator">
+          <el-input v-model="permission.operator" autocomplete="off" clearable></el-input>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="自定义sql" prop="sql">
+          <el-input v-model="permission.sql" autocomplete="off" clearable></el-input>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="权限集" prop="permissions">
+          <el-form-item :label-width="formLabelWidth" class="dept" label="部门" prop="dept">
+            <el-cascader
+              v-model="permission.permissions"
+              :options="deptOption"
+              :props="{ checkStrictly: true }"
+              :show-all-levels="false"
+              clearable
+              filterable
+            ></el-cascader>
+          </el-form-item>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="描述" prop="description">
           <el-input v-model="permission.description" autocomplete="off" clearable type="textarea"></el-input>
@@ -109,26 +143,41 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="600px"
                @close="closeInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-user"></i>
             数据权限名称
           </template>
           {{ permission.permissionName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-tickets"></i>
             数据权限编码
           </template>
           <el-tag size="small">{{ permission.permissionCode }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-office-building"></i>
+            运算符
+          </template>
+          {{ permission.operator }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            自定义sql
+          </template>
+          {{ permission.sql }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            权限集
+          </template>
+          {{ permission.permissions }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
             描述
           </template>
           {{ permission.description }}
@@ -141,9 +190,10 @@
 
 <script>
 import { add, del, edit, list } from '@/api/system/permission'
-import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { confirmAlert, DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
+import { selectDept } from '@/api/system/dept'
 
 export default {
   name: 'PermissionView',
@@ -163,17 +213,22 @@ export default {
       infoDialogVisible: false,
       // 默认是创建
       dialogType: DIALOG_TYPE.ADD,
-      formLabelWidth: '80px',
+      formLabelWidth: '150px',
+      deptOption: [],
       permission: {
         id: null,
         permissionName: '',
         permissionCode: '',
+        sql: '',
+        permissions: '',
         description: ''
       },
       permissionInfo: {
         id: null,
         permissionName: '',
         permissionCode: '',
+        sql: '',
+        permissions: '',
         description: ''
       },
       permissionRules: {
@@ -188,6 +243,13 @@ export default {
           {
             required: true,
             message: '请输入数据权限编码',
+            trigger: 'blur'
+          }
+        ],
+        permissions: [
+          {
+            required: true,
+            message: '请输入权限集',
             trigger: 'blur'
           }
         ]
@@ -205,6 +267,24 @@ export default {
           this.searchPermissionForm.size = rep.data.size
           this.searchPermissionForm.current = rep.data.current
           this.total = rep.data.total
+        }
+      })
+    },
+    selectDept () {
+      selectDept().then(res => {
+        if (res.code === 1 && res.data) {
+          this.deptOption = [{
+            value: '1111111111111111111',
+            disabled: true,
+            label: '根节点',
+            children: res.data
+          }]
+          const treeTemp = filterTreeParentId(res.data, (tree) => {
+            return tree.id && tree.id === this.user.deptId
+          }, 'id')
+          const tempArray = ['1111111111111111111']
+          treeTemp.map(id => tempArray.push(id))
+          this.user.deptId = tempArray
         }
       })
     },
@@ -266,11 +346,13 @@ export default {
     },
     create () {
       this.title = '创建数据权限'
+      this.selectDept()
       this.dialogType = DIALOG_TYPE.ADD
       this.permissionDialogVisible = true
     },
     modify (val) {
       this.title = '修改数据权限'
+      this.selectDept()
       this.dialogType = DIALOG_TYPE.EDIT
       this.permissionDialogVisible = true
       this.$nextTick(() => {
@@ -279,6 +361,7 @@ export default {
     },
     info (val) {
       this.title = '查看信息'
+      this.selectDept()
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
       this.$nextTick(() => {

@@ -114,21 +114,18 @@
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-user"></i>
             岗位名称
           </template>
           {{ post.postName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-tickets"></i>
             岗位编码
           </template>
           <el-tag size="small">{{ post.postCode }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-office-building"></i>
             描述
           </template>
           {{ post.description }}

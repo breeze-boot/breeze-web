@@ -122,14 +122,12 @@
       <el-descriptions :column="1" border size="mini">
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-user"></i>
             字典编码
           </template>
           {{ dict.dictCode }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            <i class="el-icon-tickets"></i>
             部门名称
           </template>
           <el-tag size="small">{{ dict.dictName }}</el-tag>

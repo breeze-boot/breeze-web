@@ -10,7 +10,10 @@ export const request = axios.create({
   // 请求路径，基础接口路径 请求 9000 时经过/dev-api相当于请求 http://localhost:9000
   baseURL: process.env.VUE_APP_BASE_API,
   // 请求超时时间
-  timeout: 30000
+  timeout: 30000,
+  headers: {
+    tenantId: '1'
+  }
 })
 
 export const showErrorMsg = (success, msg) => {
@@ -42,11 +45,12 @@ export const servicePath = {
  * 请求拦截器
  */
 request.interceptors.request.use((config) => {
+  const authorization = localStorage.getItem('access_token')
   /**
    * 如果存在token，请求携带token
    */
-  if (localStorage.getItem('access_token') !== undefined) {
-    config.headers.Authorization = 'Bearer ' + localStorage.getItem('access_token')
+  if (authorization && authorization !== null) {
+    config.headers.Authorization = 'Bearer ' + authorization
   }
   loadingInstance = Loading.service({
     lock: true,
