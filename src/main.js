@@ -7,7 +7,7 @@ import ElementUI from 'element-ui'
 import svg from './assets/icon'
 import { has } from '@/utils/has-per'
 
-import '@/assets/fontclass/iconfont.css'
+import '@/assets/iconFont/index'
 
 Vue.use(ElementUI)
 

@@ -216,7 +216,7 @@
 </template>
 
 <script>
-import { clear, del, list } from '@/api/system/log'
+import { clear, del, list } from '@/api/sys/log'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 

@@ -351,11 +351,11 @@
 </template>
 
 <script>
-import { add, del, edit, list, open, resetPass, selectRole } from '@/api/system/user'
+import { add, del, edit, list, open, resetPass, selectRole } from '@/api/sys/user'
 import { confirmAlert, DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
 import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
-import { selectDept } from '@/api/system/dept'
+import { selectDept } from '@/api/sys/dept'
 
 export default {
   name: 'UserView',

@@ -189,11 +189,11 @@
 </template>
 
 <script>
-import { add, del, edit, list } from '@/api/system/permission'
+import { add, del, edit, list } from '@/api/sys/permission'
 import { confirmAlert, DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
-import { selectDept } from '@/api/system/dept'
+import { selectDept } from '@/api/sys/dept'
 
 export default {
   name: 'PermissionView',

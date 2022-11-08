@@ -53,8 +53,8 @@
 
 <script>
 import Verify from '@/components/verifition/Verify'
-import { jwtLogin } from '@/api/system/login'
-import { selectTenant } from '@/api/system/tenant'
+import { jwtLogin } from '@/api/sys/login'
+import { selectTenant } from '@/api/sys/tenant'
 
 export default {
   name: 'userLogin',

@@ -353,7 +353,7 @@
 </template>
 
 <script>
-import { add, del, edit, list, selectMenu, selectPlatform } from '@/api/system/menu'
+import { add, del, edit, list, selectMenu, selectPlatform } from '@/api/sys/menu'
 import { confirmAlert, DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import IconDialog from '@/components/svg/IconDialog'

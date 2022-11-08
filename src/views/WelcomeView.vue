@@ -5,7 +5,7 @@
       <use :xlink:href="'#icon-abc12312312'"/>
     </svg>
     欢迎
-    <i class="iconfont icon-explain"></i>
+    <i class="iconfont icon-export"></i>
   </el-container>
 </template>
 

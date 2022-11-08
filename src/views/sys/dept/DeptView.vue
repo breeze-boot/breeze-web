@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import { add, del, edit, list, selectDept } from '@/api/system/dept'
+import { add, del, edit, list, selectDept } from '@/api/sys/dept'
 import { confirmAlert, DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'

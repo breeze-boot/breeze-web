@@ -2,7 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from '@/store/index'
 
-import { listTreeMenu } from '@/api/system/menu'
+import { listTreeMenu } from '@/api/sys/menu'
 
 Vue.use(VueRouter)
 const originalPush = VueRouter.prototype.push

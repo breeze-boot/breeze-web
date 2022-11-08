@@ -137,7 +137,7 @@
 </template>
 
 <script>
-import { add, del, edit, list } from '@/api/system/platform'
+import { add, del, edit, list } from '@/api/sys/platform'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'

@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { add, del, edit, list } from '@/api/system/dictItem'
+import { add, del, edit, list } from '@/api/sys/dictItem'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'

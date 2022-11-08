@@ -1,14 +1,14 @@
 <template>
   <el-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchTenantForm" class="demo-form-inline" size="mini">
+      <el-form ref="searchForm" :inline="true" :model="searchPostForm" class="demo-form-inline" size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
-            <el-form-item label="租户名称" prop="tenantName">
-              <el-input v-model="searchTenantForm.tenantName" clearable placeholder="租户名称"/>
+            <el-form-item label="平台名称" prop="postName">
+              <el-input v-model="searchPostForm.postName" clearable placeholder="岗位名称"/>
             </el-form-item>
-            <el-form-item label="租户编码" prop="tenantCode">
-              <el-input v-model="searchTenantForm.tenantCode" clearable placeholder="租户编码"/>
+            <el-form-item label="岗位编码" prop="postCode">
+              <el-input v-model="searchPostForm.postCode" clearable placeholder="岗位编码"/>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search()">查询</el-button>
@@ -18,14 +18,14 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:tenant:save']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:tenant:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
+        <el-button v-has="['sys:post:save']" plain size="mini" type="primary" @click="create">新建</el-button>
+        <el-button v-has="['sys:post:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
         <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
         <el-button plain size="mini" @click="importInfo">导入</el-button>
       </div>
       <el-table
         ref="multipleTable"
-        :data="tenantTableData"
+        :data="postTableData"
         border
         empty-text="无数据"
         height="500"
@@ -33,7 +33,7 @@
         size="mini"
         stripe
         style="width: 100%"
-        @selection-change="tenantHandleSelectionChange">
+        @selection-change="postHandleSelectionChange">
         <el-table-column
           type="selection"
           width="55">
@@ -45,14 +45,19 @@
           width="200">
         </el-table-column>
         <el-table-column
-          label="租户名称"
-          prop="tenantName"
+          label="岗位名称"
+          prop="postName"
           show-overflow-tooltip
           width="200">
         </el-table-column>
         <el-table-column
-          label="租户编码"
-          prop="tenantCode"
+          label="岗位编码"
+          prop="postCode"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
+          label="描述"
+          prop="description"
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
@@ -67,15 +72,15 @@
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
             <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
             <el-button size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, tenantTableData,scope.row)">删除
+                       @click.native.prevent="removeItem(scope.$index, postTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchTenantForm.current"
-          :page-size="searchTenantForm.size"
+          :current-page="searchPostForm.current"
+          :page-size="searchPostForm.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -85,19 +90,22 @@
       </div>
     </el-main>
 
-    <el-dialog :title="title" :visible.sync="tenantDialogVisible" width="800px"
-               @close="closeTenantDialog('tenantRuleForm')">
-      <el-form ref="tenantRuleForm" :model="tenant" :rules="tenantRules" size="mini">
-        <el-form-item :label-width="formLabelWidth" label="租户名称" prop="tenantName">
-          <el-input v-model="tenant.tenantName" autocomplete="off" clearable></el-input>
+    <el-dialog :title="title" :visible.sync="postDialogVisible" width="800px"
+               @close="closePostDialog('postRuleForm')">
+      <el-form ref="postRuleForm" :model="post" :rules="postRules" size="mini">
+        <el-form-item :label-width="formLabelWidth" label="岗位名称" prop="postName">
+          <el-input v-model="post.postName" autocomplete="off" clearable></el-input>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="租户编码" prop="tenantCode">
-          <el-input v-model="tenant.tenantCode" autocomplete="off" clearable></el-input>
+        <el-form-item :label-width="formLabelWidth" label="岗位编码" prop="postCode">
+          <el-input v-model="post.postCode" autocomplete="off" clearable></el-input>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="岗位描述" prop="description">
+          <el-input v-model="post.description" autocomplete="off" clearable type="textarea"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetTenantForm('tenantRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitTenantForm('tenantRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="resetPostForm('postRuleForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="submitPostForm('postRuleForm')">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -106,21 +114,21 @@
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item>
           <template slot="label">
-            租户名称
+            岗位名称
           </template>
-          {{ tenant.tenantName }}
+          {{ post.postName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            租户编码
+            岗位编码
           </template>
-          <el-tag size="small">{{ tenant.tenantCode }}</el-tag>
+          <el-tag size="small">{{ post.postCode }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             描述
           </template>
-          {{ tenant.description }}
+          {{ post.description }}
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -129,54 +137,54 @@
 </template>
 
 <script>
-import { add, del, edit, list } from '@/api/system/tenant'
+import { add, del, edit, list } from '@/api/sys/post'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
 
 export default {
-  name: 'TenantView',
+  name: 'PostView',
   data () {
     return {
-      multipleSelectionTenantIds: [],
-      tenantTableData: [],
-      searchTenantForm: {
-        tenantName: '',
-        tenantCode: '',
+      multipleSelectionPostIds: [],
+      postTableData: [],
+      searchPostForm: {
+        postName: '',
+        postCode: '',
         current: 1,
         size: 10
       },
       total: 0,
       title: '',
-      tenantDialogVisible: false,
+      postDialogVisible: false,
       infoDialogVisible: false,
       // 默认是创建
       dialogType: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
-      tenant: {
+      post: {
         id: null,
-        tenantName: '',
-        tenantCode: '',
+        postName: '',
+        postCode: '',
         description: ''
       },
-      tenantInfo: {
+      postInfo: {
         id: null,
-        tenantName: '',
-        tenantCode: '',
+        postName: '',
+        postCode: '',
         description: ''
       },
-      tenantRules: {
-        tenantName: [
+      postRules: {
+        postName: [
           {
             required: true,
-            message: '请输入租户名称',
+            message: '请输入岗位名称',
             trigger: 'blur'
           }
         ],
-        tenantCode: [
+        postCode: [
           {
             required: true,
-            message: '请输入租户编码',
+            message: '请输入岗位编码',
             trigger: 'blur'
           }
         ]
@@ -190,22 +198,22 @@ export default {
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
-          this.tenantTableData = rep.data.records
-          this.searchTenantForm.size = rep.data.size
-          this.searchTenantForm.current = rep.data.current
+          this.postTableData = rep.data.records
+          this.searchPostForm.size = rep.data.size
+          this.searchPostForm.current = rep.data.current
           this.total = rep.data.total
         }
       })
     },
     buildParam () {
-      return this.searchTenantForm
+      return this.searchPostForm
     },
     handleSizeChange (size) {
-      this.searchTenantForm.size = size
+      this.searchPostForm.size = size
       this.reloadList()
     },
     handleCurrentChange (current) {
-      this.searchTenantForm.current = current
+      this.searchPostForm.current = current
       this.reloadList()
     },
     search () {
@@ -214,8 +222,8 @@ export default {
     searchReset () {
       this.$refs.searchForm.resetFields()
     },
-    tenantHandleSelectionChange (val) {
-      this.multipleSelectionTenantIds = val
+    postHandleSelectionChange (val) {
+      this.multipleSelectionPostIds = val
     },
     /**
      * 批量删除
@@ -223,7 +231,7 @@ export default {
     remove () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelectionTenantIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        this.multipleSelectionPostIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(rep => {
           if (rep.code === 1) {
             this.$message.success('删除成功')
@@ -254,38 +262,34 @@ export default {
     importInfo () {
     },
     create () {
-      this.title = '创建租户'
+      this.title = '创建岗位'
       this.dialogType = DIALOG_TYPE.ADD
-      this.tenantDialogVisible = true
+      this.postDialogVisible = true
     },
     modify (val) {
-      this.title = '修改租户'
+      this.title = '修改岗位'
       this.dialogType = DIALOG_TYPE.EDIT
-      this.tenantDialogVisible = true
-      this.$nextTick(() => {
-        Object.assign(this.tenant, val)
-      })
+      this.postDialogVisible = true
+      Object.assign(this.post, val)
     },
     info (val) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
-      this.$nextTick(() => {
-        Object.assign(this.tenant, val)
-      })
+      Object.assign(this.post, val)
     },
-    closeTenantDialog (formName) {
-      this.tenant.id = undefined
+    closePostDialog (formName) {
+      this.post.id = undefined
       this.$refs[formName].resetFields()
     },
     closeInfoDialog () {
-      this.tenant = this.tenantInfo
+      this.post = this.postInfo
     },
     /**
      * 提交
      * @param formName
      */
-    submitTenantForm (formName) {
+    submitPostForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
@@ -295,25 +299,25 @@ export default {
         }
       })
     },
-    resetTenantForm (formName) {
-      this.tenantDialogVisible = false
+    resetPostForm (formName) {
+      this.postDialogVisible = false
       this.$refs[formName].resetFields()
     },
     add () {
-      this.tenant.id = undefined
-      add(this.tenant).then((rep) => {
+      this.post.id = undefined
+      add(this.post).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '添加成功' })
-          this.tenantDialogVisible = false
+          this.postDialogVisible = false
           this.reloadList()
         }
       })
     },
     edit () {
-      edit(this.tenant).then((rep) => {
+      edit(this.post).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '修改成功' })
-          this.tenantDialogVisible = false
+          this.postDialogVisible = false
           this.reloadList()
         }
       })

@@ -84,8 +84,8 @@
 </template>
 
 <script>
-import { list } from '@/api/system/role'
-import { userAddRole } from '@/api/system/user'
+import { list } from '@/api/sys/role'
+import { userAddRole } from '@/api/sys/user'
 
 export default {
   name: 'RoleView',

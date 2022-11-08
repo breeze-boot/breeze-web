@@ -133,8 +133,8 @@
 </template>
 
 <script>
-import { add, del, edit, editPermission, list, listRolesPermission } from '@/api/system/role'
-import { listTreePermission } from '@/api/system/menu'
+import { add, del, edit, editPermission, list, listRolesPermission } from '@/api/sys/role'
+import { listTreePermission } from '@/api/sys/menu'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
