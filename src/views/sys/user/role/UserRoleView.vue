@@ -3,7 +3,7 @@
     <el-main>
       <el-row :gutter="24" style="height: 5.5vh;">
         <el-col :md="22">
-          <el-page-header content="详情页面" @back="goBack">
+          <el-page-header content="角色分配" @back="goBack">
           </el-page-header>
         </el-col>
       </el-row>

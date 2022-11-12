@@ -79,6 +79,11 @@
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
+          label="岗位"
+          prop="postName"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
           label="角色"
           prop="roleNames"
           show-overflow-tooltip>
@@ -204,10 +209,10 @@
         <el-form-item :label-width="formLabelWidth" label="用户名" prop="username">
           <el-input v-model="user.username" autocomplete="off" clearable></el-input>
         </el-form-item>
-        <el-form-item v-if="isEdit" :label-width="formLabelWidth" label="密码" prop="password">
+        <el-form-item v-if="isAdd" :label-width="formLabelWidth" label="密码" prop="password">
           <el-input v-model="user.password" autocomplete="off" clearable show-password type="password"></el-input>
         </el-form-item>
-        <el-form-item v-if="isEdit" :label-width="formLabelWidth" label="确认密码" prop="confirmPassword">
+        <el-form-item v-if="isAdd" :label-width="formLabelWidth" label="确认密码" prop="confirmPassword">
           <el-input v-model="user.confirmPassword" autocomplete="off" clearable show-password
                     type="password"></el-input>
         </el-form-item>
@@ -223,7 +228,7 @@
         <el-form-item :label-width="formLabelWidth" label="展示名称" prop="amountName">
           <el-input v-model="user.amountName" autocomplete="off" clearable type="input"></el-input>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" class="dept" label="部门" prop="dept">
+        <el-form-item :label-width="formLabelWidth" class="dept" label="部门" prop="deptId">
           <el-cascader
             v-model="user.deptId"
             :options="deptOption"
@@ -231,9 +236,9 @@
             :show-all-levels="false"
             clearable
             filterable
-          ></el-cascader>
+          />
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="岗位" prop="postId" style="text-align: left;">
+        <el-form-item :label-width="formLabelWidth" label="岗位" style="text-align: left;">
           <el-select v-model="user.postId" collapse-tags filterable placeholder="请选择岗位">
             <el-option
               v-for="item in postOption"
@@ -330,6 +335,14 @@
           <template slot="label">
             岗位
           </template>
+          <el-select v-model="user.postId" collapse-tags disabled filterable placeholder="请选择岗位" size="mini">
+            <el-option
+              v-for="item in postOption"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
@@ -431,7 +444,7 @@ export default {
           }
         ]
       },
-      isEdit: false,
+      isAdd: true,
       user: {
         id: '',
         // 头像的图片路径
@@ -442,7 +455,7 @@ export default {
         confirmPassword: '',
         userCode: '',
         username: '',
-        deptId: '1111111111111111111',
+        deptId: '',
         postId: '',
         roleIds: [],
         roleNames: [],
@@ -462,7 +475,7 @@ export default {
         confirmPassword: '',
         userCode: '',
         username: '',
-        deptId: '1111111111111111111',
+        deptId: '',
         postId: '',
         roleIds: [],
         roleNames: [],
@@ -537,13 +550,6 @@ export default {
             trigger: 'blur'
           }
         ],
-        deptId: [
-          {
-            required: true,
-            message: '请选择部门',
-            trigger: 'blur'
-          }
-        ],
         idCard: [
           {
             required: true,
@@ -606,14 +612,21 @@ export default {
           }, 'id')
           const tempArray = ['1111111111111111111']
           treeTemp.map(id => tempArray.push(id))
-          this.user.deptId = tempArray
+          debugger
+          if (!this.isAdd) {
+            this.user.deptId = tempArray
+          }
         }
       })
     },
-    selectPost () {
+    selectPost (row) {
       selectPost().then(rep => {
         if (rep.code === 1) {
           this.postOption = rep.data
+          // 修改和查看
+          if (!this.isAdd) {
+            this.user.postId = row.postId
+          }
         }
       })
     },
@@ -622,7 +635,7 @@ export default {
         if (rep.code === 1) {
           this.roleOption = rep.data
           // 修改和查看
-          if (row) {
+          if (!this.isAdd) {
             this.user.roleIds = row.sysRoles.map(role => role.id)
             this.user.roleNames = row.sysRoles.map(role => role.roleName).join(',')
           }
@@ -699,18 +712,19 @@ export default {
     create () {
       this.title = '创建用户'
       this.dialogType = DIALOG_TYPE.ADD
-      this.isEdit = true
+      this.isAdd = true
       this.userDialogVisible = true
     },
     modify (val) {
       this.title = '修改用户'
       this.dialogType = DIALOG_TYPE.EDIT
+      this.isAdd = false
       this.$nextTick(() => {
         this.selectDept()
         this.selectRole(val)
+        this.selectPost(val)
         Object.assign(this.user, val)
       })
-      this.isEdit = false
       this.userDialogVisible = true
     },
     info (val) {
@@ -737,7 +751,7 @@ export default {
       }
       return isJPG && isLt2M
     },
-    submitUserForm (formName) {
+    submitUserForm: function (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.user.deptId = this.user.deptId[this.user.deptId.length - 1]
@@ -773,7 +787,7 @@ export default {
     closeUserDialog (formName) {
       this.user.id = undefined
       this.$refs[formName].resetFields()
-      this.isEdit = false
+      this.isAdd = false
     },
     resetPass (row) {
       this.restPasswordDialogVisible = true
