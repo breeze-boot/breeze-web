@@ -25,7 +25,7 @@ export default {
     return {}
   },
   computed: {
-    ...mapState('menu', ['dynamicTags'])
+    ...mapState('tag', ['dynamicTags'])
   },
   methods: {
     handleClick (tag) {

@@ -45,7 +45,8 @@ export default {
     return {}
   },
   computed: {
-    ...mapState('menu', ['isCollapse', 'fadeIn', 'collapseWhitespace', 'currentTabValue']),
+    ...mapState('menu', ['isCollapse', 'fadeIn', 'collapseWhitespace']),
+    ...mapState('tabs', ['currentTabValue']),
     ...mapGetters('menu', ['getMenus'])
   },
   methods: {

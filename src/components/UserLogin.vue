@@ -56,6 +56,8 @@ import Verify from '@/components/verifition/Verify'
 import { selectTenant } from '@/api/sys/tenant'
 import { mapMutations } from 'vuex'
 import { jwtLogin } from '@/api/sys/login'
+import { listTreeMenu } from '@/api/sys/menu'
+import { convertMenus } from '@/router/remote-dy-route'
 
 export default {
   name: 'userLogin',
@@ -96,23 +98,36 @@ export default {
     })
   },
   methods: {
+    ...mapMutations('menu', ['setMenus']),
     ...mapMutations('userInfo', ['setUserInfo']),
     success () {
       jwtLogin(this.userLogin).then((rep) => {
         if (rep.code === 1) {
-          debugger
           localStorage.setItem('access_token', rep.data.access_token)
           localStorage.setItem('permissions', rep.data.permissions)
           this.setUserInfo(rep.data.user_info)
           // 获取路由
-          // loadRoute()
-          this.$nextTick(() => {
-            const path = this.$route.query.redirect
-            console.log('=========0=======')
-            this.$router.replace(path === '/' || path === undefined ? 'welcome' : path)
-            console.log('=========1=======')
-          })
+          this.loadRoute()
         }
+      })
+    },
+    /**
+     * 获取菜单完成后跳转首页
+     *
+     * @param context
+     */
+    loadRoute () {
+      listTreeMenu({
+        platformCode: 'managementCenter'
+      }).then(rep => {
+        if (rep.code === 0) {
+          return
+        }
+        // 动态绑定路由
+        convertMenus(rep.data)
+        this.setMenus(rep.data)
+        const path = this.$route.query.redirect
+        this.$router.replace(path === '/' || path === undefined ? 'welcome' : path)
       })
     },
     onSubmit () {

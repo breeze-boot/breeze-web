@@ -25,7 +25,6 @@ export default {
       if (!state.userInfo) {
         state.userInfo = JSON.parse(localStorage.getItem('user_info'))
       }
-      console.log(state.userInfo)
       return state.userInfo.username
     }
   }

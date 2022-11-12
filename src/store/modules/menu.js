@@ -7,21 +7,6 @@ Vue.use(Vuex)
 export default {
   namespaced: true,
   state: {
-    // Tag
-    currentTagValue: 'welcome',
-    dynamicTags: [{
-      title: '欢迎',
-      name: 'welcome',
-      hidden: 0
-    }],
-    // Tab
-    currentTabValue: 'welcome',
-    dynamicTabs: [{
-      title: '欢迎',
-      name: 'welcome',
-      hidden: 0
-    }],
-    // 菜单
     menus: [],
     keepAliveMenus: [],
     isCollapse: true,
@@ -53,42 +38,11 @@ export default {
     isLoadMenu (state, isLoadMenu) {
       state.isLoadMenu = isLoadMenu
     },
-    setTag (state, menu) {
-      if (state.hidden === 0) {
-        if (menu.name === 'welcome') {
-          menu.title = '欢迎'
-        }
-        state.currentTagValue = menu.name
-      }
-      if (state.dynamicTags.filter((item) => item.name === menu.name).length > 0) {
-        return
-      }
-      state.dynamicTags.push(menu)
-    },
-    setCurrentTagValue (state, name) {
-      state.currentTagValue = name
-    },
-    setTab (state, menu) {
-      if (state.hidden === 0) {
-        if (menu.name === 'welcome') {
-          menu.title = '欢迎'
-        }
-        state.currentTagValue = menu.name
-      }
-      if (state.dynamicTabs.filter((item) => item.name === menu.name).length > 0) {
-        return
-      }
-      state.dynamicTabs.push(menu)
-    },
-    setCurrentTabValue (state, name) {
-      state.currentTabValue = name
-    }
-  },
-  actions: {
     clearMenus (state) {
       state.menus = []
     }
   },
+  actions: {},
   getters: {
     getMenus (state) {
       const result = []

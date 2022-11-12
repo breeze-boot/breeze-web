@@ -10,7 +10,8 @@ import { mapMutations } from 'vuex'
 export default {
   name: 'App',
   methods: {
-    ...mapMutations('menu', ['setTag', 'setCurrentTagValue', 'setTab', 'setCurrentTabValue'])
+    ...mapMutations('tag', ['setTag', 'setCurrentTagValue']),
+    ...mapMutations('tabs', ['setTab', 'setCurrentTabValue'])
   },
   watch: {
     /**

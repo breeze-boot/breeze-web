@@ -9,7 +9,7 @@
       </el-header>
       <el-main style="padding: 1px 20px;">
         <div class="tag" @mousewheel="wheel">
-          <Tag/>
+          <Tag v-show="false"/>
           <Tabs/>
         </div>
         <keep-alive :include="keepAlive">

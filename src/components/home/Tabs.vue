@@ -2,13 +2,13 @@
   <div>
     <el-tabs
       v-model="currentTabValue"
-      closable
       @tab-remove="removeTab">
       <el-tab-pane
-        v-for="(item, index) in dynamicTabs"
+        v-for="(tab, index) in dynamicTabs"
+        :closable="tab.name !== 'welcome'"
         :key="index"
-        :label="item.title"
-        :name="item.name">
+        :label="tab.title"
+        :name="tab.name">
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -24,21 +24,19 @@ export default {
   computed: {
     currentTabValue: {
       get () {
-        return this.$store.state.menu.currentTabValue
+        return this.$store.state.tabs.currentTabValue
       },
       set (currentTabValue) {
-        debugger
         this.$router.push(currentTabValue)
-        this.$store.state.menu.currentTabValue = currentTabValue
+        this.$store.state.tabs.currentTabValue = currentTabValue
       }
     },
     dynamicTabs: {
       get () {
-        return this.$store.state.menu.dynamicTabs
+        return this.$store.state.tabs.dynamicTabs
       },
       set (dynamicTabs) {
-        debugger
-        this.$store.state.menu.dynamicTabs = dynamicTabs
+        this.$store.state.tabs.dynamicTabs = dynamicTabs
       }
     }
   },
