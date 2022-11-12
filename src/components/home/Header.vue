@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import 'animate.css'
 
 export default {
@@ -40,20 +40,25 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('menu', ['fadeIn', 'isCollapse']),
+    ...mapState('menu', ['fadeIn', 'isCollapse']),
     ...mapGetters('userInfo', ['getUsername'])
   },
   methods: {
     ...mapMutations('menu', ['setCollapse', 'setCollapseWhitespace', 'setFadeIn']),
+    ...mapActions('menu', ['clearMenus']),
+    ...mapActions('userInfo', ['clearUserInfo']),
     handleCommand (command) {
       if (command === 'logout') {
+        // 只要去登录页 直接清除
+        localStorage.clear()
+        this.clearMenus()
+        this.clearUserInfo()
+        this.$router.push('/')
         this.$message({
           showClose: true,
           message: '退出成功',
           type: 'success'
         })
-        localStorage.clear()
-        this.$router.push('/')
         return
       }
       this.drawer = true

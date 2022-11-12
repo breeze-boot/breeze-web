@@ -10,6 +10,7 @@
       <el-main style="padding: 1px 20px;">
         <div class="tag" @mousewheel="wheel">
           <Tag/>
+          <Tabs/>
         </div>
         <keep-alive :include="keepAlive">
           <router-view
@@ -25,11 +26,13 @@
 <script>
 import Header from '@/components/home/Header'
 import Menu from '@/components/home/Menu'
+import Tabs from '@/components/home/Tabs'
 import Tag from '@/components/home/Tag'
 
 export default {
   name: 'HomeView',
   components: {
+    Tabs,
     Tag,
     Header,
     Menu

@@ -1,7 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import router from '@/router/index'
-import store from '@/store/index'
 
 Vue.use(Vuex)
 
@@ -11,18 +9,23 @@ export default {
     userInfo: undefined
   },
   mutations: {
-    setUserInfo (state) {
-      state.userInfo = JSON.parse(localStorage.getItem('user_info'))
+    setUserInfo (state, userInfo) {
+      localStorage.setItem('user_info', JSON.stringify(userInfo))
+      state.userInfo = userInfo
     }
   },
-  actions: {},
+  actions: {
+    clearUserInfo (state) {
+      state.userInfo = undefined
+    }
+  },
   getters: {
     getUsername (state) {
-      store.commit('userInfo/setUserInfo')
+      console.log(state.userInfo)
       if (!state.userInfo) {
-        router.replace('/').then(r => {
-        })
+        state.userInfo = JSON.parse(localStorage.getItem('user_info'))
       }
+      console.log(state.userInfo)
       return state.userInfo.username
     }
   }

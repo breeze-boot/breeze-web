@@ -49,7 +49,7 @@ request.interceptors.request.use((config) => {
   /**
    * 如果存在token，请求携带token
    */
-  if (authorization && authorization !== null) {
+  if (authorization) {
     config.headers.Authorization = 'Bearer ' + authorization
   }
   loadingInstance = Loading.service({
@@ -67,9 +67,6 @@ request.interceptors.request.use((config) => {
  * 响应拦截器
  */
 request.interceptors.response.use((success) => {
-  /**
-   * 判断业务逻辑错误
-   */
   if (success.status && success.status === 200) {
     if (success.data.code === 2 && success.data.message) {
       // 警告
@@ -88,14 +85,13 @@ request.interceptors.response.use((success) => {
 }, (error) => {
   if (error.message.includes('Unexpected')) {
     Message.error({ message: '连接服务被拒绝' })
-  } else if (error.message.includes('timeout of')) {
+  } else if (error.message.includes('timeout')) {
     Message.error({ message: '请求超时' })
   } else if (error.response.status === 400) {
     Message.error({ message: '参数解析失败' })
   } else if (error.response.status === 404) {
     Message.error({ message: '请求地址不存在' })
   } else if (error.response.status === 401) {
-    debugger
     showErrorMsg(error.response, error.response.data.message)
     // TODO 重新登录
   } else if (error.response.status === 403) {

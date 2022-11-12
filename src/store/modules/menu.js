@@ -7,12 +7,21 @@ Vue.use(Vuex)
 export default {
   namespaced: true,
   state: {
+    // Tag
     currentTagValue: 'welcome',
     dynamicTags: [{
       title: '欢迎',
       name: 'welcome',
       hidden: 0
     }],
+    // Tab
+    currentTabValue: 'welcome',
+    dynamicTabs: [{
+      title: '欢迎',
+      name: 'welcome',
+      hidden: 0
+    }],
+    // 菜单
     menus: [],
     keepAliveMenus: [],
     isCollapse: true,
@@ -56,31 +65,35 @@ export default {
       }
       state.dynamicTags.push(menu)
     },
-    setCurrentTagValue (state, tag) {
-      state.currentTagValue = tag.name
+    setCurrentTagValue (state, name) {
+      state.currentTagValue = name
+    },
+    setTab (state, menu) {
+      if (state.hidden === 0) {
+        if (menu.name === 'welcome') {
+          menu.title = '欢迎'
+        }
+        state.currentTagValue = menu.name
+      }
+      if (state.dynamicTabs.filter((item) => item.name === menu.name).length > 0) {
+        return
+      }
+      state.dynamicTabs.push(menu)
+    },
+    setCurrentTabValue (state, name) {
+      state.currentTabValue = name
     }
   },
-  actions: {},
+  actions: {
+    clearMenus (state) {
+      state.menus = []
+    }
+  },
   getters: {
-    menus (state) {
+    getMenus (state) {
       const result = []
       filterTree(state.menus, result, (tree) => tree.hidden === 1)
       return result
-    },
-    fadeIn (state) {
-      return state.fadeIn
-    },
-    collapseWhitespace (state) {
-      return state.collapseWhitespace
-    },
-    isCollapse (state) {
-      return state.isCollapse
-    },
-    getDynamicTags (state) {
-      return state.dynamicTags
-    },
-    getCurrentTagValue (state) {
-      return state.currentTagValue
     }
   }
 }

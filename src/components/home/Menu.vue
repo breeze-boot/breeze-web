@@ -3,7 +3,7 @@
     <el-menu
       :collapse="!this.isCollapse"
       :collapse-transition="true"
-      :default-active="this.getCurrentTagValue"
+      :default-active="this.currentTabValue"
       :unique-opened="true"
       active-text-color="#ffd04b"
       background-color="#093f6b"
@@ -24,7 +24,7 @@
         <i class="el-icon-s-home"></i>
         <span slot="title">欢迎</span>
       </el-menu-item>
-      <menu-item v-for="menu in this.menus"
+      <menu-item v-for="menu in this.getMenus"
                  :key="menu.id"
                  :menu="menu"/>
     </el-menu>
@@ -34,7 +34,7 @@
 <script>
 
 import MenuItem from '@/components/home/MenuItem'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapState } from 'vuex'
 
 export default {
   name: 'Menu',
@@ -45,27 +45,8 @@ export default {
     return {}
   },
   computed: {
-    // 使用 mapState
-    // ...mapState('menu', ['isCollapse', 'menus'])
-    // 使用 mapGetters
-    ...mapGetters('menu', ['isCollapse', 'menus', 'fadeIn', 'collapseWhitespace', 'getCurrentTagValue'])
-
-    // isCollapse: {
-    //   get () {
-    //     return this.$store.state.menu.isCollapse
-    //   },
-    //   set (isCollapse) {
-    //     this.$store.state.menu.isCollapse = isCollapse
-    //   }
-    // },
-    // menus: {
-    //   get () {
-    //     return this.$store.state.menu.menus
-    //   },
-    //   set (menus) {
-    //     this.$store.state.menu.menus = menus
-    //   }
-    // }
+    ...mapState('menu', ['isCollapse', 'fadeIn', 'collapseWhitespace', 'currentTabValue']),
+    ...mapGetters('menu', ['getMenus'])
   },
   methods: {
     handleOpen (key, keyPath) {

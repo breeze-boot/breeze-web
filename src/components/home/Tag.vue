@@ -1,7 +1,7 @@
 <template>
   <div id="tag">
     <el-tag
-      v-for="tag in this.getDynamicTags"
+      v-for="tag in this.dynamicTags"
       :key="tag.name"
       :closable="tag.name !== 'welcome'"
       :disable-transitions="false"
@@ -16,7 +16,7 @@
 
 <script>
 
-import { mapGetters } from 'vuex'
+import { mapState } from 'vuex'
 import router from '@/router'
 
 export default {
@@ -25,7 +25,7 @@ export default {
     return {}
   },
   computed: {
-    ...mapGetters('menu', ['getDynamicTags', 'getCurrentTagValue'])
+    ...mapState('menu', ['dynamicTags'])
   },
   methods: {
     handleClick (tag) {
@@ -33,14 +33,14 @@ export default {
       })
     },
     handleClose (tag) {
-      let index = this.getDynamicTags.findIndex((value, index, arr) => {
+      let index = this.dynamicTags.findIndex((value, index, arr) => {
         return value.name === tag.name
       })
-      this.getDynamicTags.splice(index, 1)
-      if (this.getDynamicTags.length === index) {
+      this.dynamicTags.splice(index, 1)
+      if (this.dynamicTags.length === index) {
         --index
       }
-      this.$router.push({ name: this.getDynamicTags[index].name })
+      this.$router.push({ name: this.dynamicTags[index].name })
     }
   }
 }
