@@ -42,7 +42,6 @@ export const setMenu = (menus) => {
     if (route) {
       store.commit('menu/setKeepAliveMenus', menus)
       router.addRoute('home', route)
-      console.log(menu.name)
     }
     if (!menu.children) {
       return

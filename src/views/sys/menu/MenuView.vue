@@ -549,6 +549,7 @@ export default {
      */
     delItem (rows, row) {
       confirmAlert(() => {
+        debugger
         del(JSONBigInt.parse(row.id)).then(rep => {
           if (rep.code === 1) {
             this.deleteTreeTableData(rows, row)

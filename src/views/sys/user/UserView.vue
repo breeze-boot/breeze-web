@@ -233,6 +233,16 @@
             filterable
           ></el-cascader>
         </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="岗位" prop="postId" style="text-align: left;">
+          <el-select v-model="user.postId" collapse-tags filterable placeholder="请选择岗位">
+            <el-option
+              v-for="item in postOption"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="角色" prop="roleIds" style="text-align: left;">
           <el-select v-model="user.roleIds" collapse-tags filterable multiple placeholder="请选择用户角色">
             <el-option
@@ -318,6 +328,11 @@
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
+            岗位
+          </template>
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
             用户角色
           </template>
           {{ user.roleNames }}
@@ -351,7 +366,7 @@
 </template>
 
 <script>
-import { add, del, edit, list, open, resetPass, selectRole } from '@/api/sys/user'
+import { add, del, edit, list, open, resetPass, selectPost, selectRole } from '@/api/sys/user'
 import { confirmAlert, DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
 import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
@@ -428,6 +443,7 @@ export default {
         userCode: '',
         username: '',
         deptId: '1111111111111111111',
+        postId: '',
         roleIds: [],
         roleNames: [],
         sysRoles: [],
@@ -447,6 +463,7 @@ export default {
         userCode: '',
         username: '',
         deptId: '1111111111111111111',
+        postId: '',
         roleIds: [],
         roleNames: [],
         sysRoles: [],
@@ -456,6 +473,7 @@ export default {
         isLock: 0
       },
       deptOption: [],
+      postOption: [],
       roleOption: [],
       // 默认是创建
       dialogType: DIALOG_TYPE.ADD,
@@ -547,6 +565,7 @@ export default {
     this.reloadList()
     this.selectDept()
     this.selectRole()
+    this.selectPost()
   },
   methods: {
     goRoleView (row) {
@@ -588,6 +607,13 @@ export default {
           const tempArray = ['1111111111111111111']
           treeTemp.map(id => tempArray.push(id))
           this.user.deptId = tempArray
+        }
+      })
+    },
+    selectPost () {
+      selectPost().then(rep => {
+        if (rep.code === 1) {
+          this.postOption = rep.data
         }
       })
     },

@@ -15,7 +15,7 @@
         <keep-alive :include="keepAlive">
           <router-view
             :key="key"
-            :style="{animationName: 'fadIn', animationDuration: 1 + 's'}"
+            :style="{animationName: 'fadeIn', animationDuration: 0 + 's'}"
             class="router-main"/>
         </keep-alive>
       </el-main>

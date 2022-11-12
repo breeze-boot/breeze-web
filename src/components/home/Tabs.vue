@@ -17,7 +17,6 @@
 <script>
 
 import router from '@/router'
-import { mapState } from 'vuex'
 
 export default {
   name: 'Tabs',
@@ -25,7 +24,14 @@ export default {
     return {}
   },
   computed: {
-    ...mapState('menu', ['currentMenu']),
+    currentMenu: {
+      get () {
+        return this.$store.state.tabs.currentMenu
+      },
+      set (currentMenu) {
+        this.$store.state.tabs.currentMenu = currentMenu
+      }
+    },
     currentTabValue: {
       get () {
         return this.$store.state.tabs.currentTabValue

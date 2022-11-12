@@ -121,3 +121,18 @@ export function selectRole () {
     }]
   })
 }
+
+/**
+ * 岗位下拉框
+ *
+ * @returns {AxiosPromise}
+ */
+export function selectPost () {
+  return request({
+    url: servicePath.system + '/sys/common/selectPost',
+    method: 'get',
+    transformResponse: [(data) => {
+      return JSONBigInt2Str.parse(data)
+    }]
+  })
+}
