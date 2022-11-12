@@ -54,10 +54,8 @@
 <script>
 import Verify from '@/components/verifition/Verify'
 import { selectTenant } from '@/api/sys/tenant'
-import { mapMutations } from 'vuex'
+import { mapActions, mapMutations } from 'vuex'
 import { jwtLogin } from '@/api/sys/login'
-import { listTreeMenu } from '@/api/sys/menu'
-import { convertMenus } from '@/router/remote-dy-route'
 
 export default {
   name: 'userLogin',
@@ -99,6 +97,7 @@ export default {
   },
   methods: {
     ...mapMutations('menu', ['setMenus']),
+    ...mapActions('menu', ['loadRoute']),
     ...mapMutations('userInfo', ['setUserInfo']),
     success () {
       jwtLogin(this.userLogin).then((rep) => {
@@ -109,25 +108,6 @@ export default {
           // 获取路由
           this.loadRoute()
         }
-      })
-    },
-    /**
-     * 获取菜单完成后跳转首页
-     *
-     * @param context
-     */
-    loadRoute () {
-      listTreeMenu({
-        platformCode: 'managementCenter'
-      }).then(rep => {
-        if (rep.code === 0) {
-          return
-        }
-        // 动态绑定路由
-        convertMenus(rep.data)
-        this.setMenus(rep.data)
-        const path = this.$route.query.redirect
-        this.$router.replace(path === '/' || path === undefined ? 'welcome' : path)
       })
     },
     onSubmit () {

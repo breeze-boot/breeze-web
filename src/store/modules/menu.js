@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { filterTree } from '@/utils/constant'
+import { listTreeMenu } from '@/api/sys/menu'
+import { convertMenus } from '@/router/remote-dy-route'
+import router from '@/router/index'
 
 Vue.use(Vuex)
 
@@ -42,7 +45,30 @@ export default {
       state.menus = []
     }
   },
-  actions: {},
+  actions: {
+    /**
+     * 获取菜单完成后跳转首页
+     *
+     * @param context
+     */
+    loadRoute (context) {
+      listTreeMenu({
+        platformCode: 'managementCenter'
+      }).then(rep => {
+        if (rep.code === 0) {
+          return
+        }
+        // 动态绑定路由
+        if (context.state.menus.length > 0) {
+          convertMenus(rep.data)
+        }
+        context.state.menus = rep.data
+        const path = router.app._route.query.redirect
+        debugger
+        router.replace(path === '/' || path === undefined ? 'welcome' : path)
+      })
+    }
+  },
   getters: {
     getMenus (state) {
       const result = []

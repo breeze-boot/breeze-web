@@ -44,8 +44,7 @@ export default {
     ...mapGetters('userInfo', ['getUsername'])
   },
   methods: {
-    ...mapMutations('menu', ['setCollapse', 'setCollapseWhitespace', 'setFadeIn']),
-    ...mapActions('menu', ['clearMenus']),
+    ...mapMutations('menu', ['setCollapse', 'setCollapseWhitespace', 'setFadeIn', 'clearMenus']),
     ...mapActions('userInfo', ['clearUserInfo']),
     handleCommand (command) {
       if (command === 'logout') {
