@@ -12,6 +12,7 @@ export default {
   state: {
     menus: [],
     keepAliveMenus: [],
+    currentMenu: 'welcome',
     isCollapse: true,
     fadeIn: 'fadeIn',
     collapseWhitespace: '200',
@@ -59,12 +60,11 @@ export default {
           return
         }
         // 动态绑定路由
-        if (context.state.menus.length > 0) {
+        if (context.state.menus.length === 0 || !context.state.isLoadMenu) {
           convertMenus(rep.data)
         }
         context.state.menus = rep.data
         const path = router.app._route.query.redirect
-        debugger
         router.replace(path === '/' || path === undefined ? 'welcome' : path)
       })
     }

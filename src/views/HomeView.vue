@@ -10,7 +10,7 @@
       <el-main style="padding: 1px 20px;">
         <div class="tag" @mousewheel="wheel">
           <Tag v-show="false"/>
-          <Tabs/>
+          <Tabs v-show="true"/>
         </div>
         <keep-alive :include="keepAlive">
           <router-view

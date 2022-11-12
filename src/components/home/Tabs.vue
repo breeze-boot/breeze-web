@@ -5,8 +5,8 @@
       @tab-remove="removeTab">
       <el-tab-pane
         v-for="(tab, index) in dynamicTabs"
-        :closable="tab.name !== 'welcome'"
         :key="index"
+        :closable="tab.name !== 'welcome'"
         :label="tab.title"
         :name="tab.name">
       </el-tab-pane>
@@ -16,18 +16,23 @@
 
 <script>
 
+import router from '@/router'
+import { mapState } from 'vuex'
+
 export default {
   name: 'Tabs',
   data () {
     return {}
   },
   computed: {
+    ...mapState('menu', ['currentMenu']),
     currentTabValue: {
       get () {
         return this.$store.state.tabs.currentTabValue
       },
       set (currentTabValue) {
-        this.$router.push(currentTabValue)
+        router.push({ name: currentTabValue })
+        this.currentMenu = currentTabValue
         this.$store.state.tabs.currentTabValue = currentTabValue
       }
     },

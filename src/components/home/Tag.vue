@@ -25,12 +25,13 @@ export default {
     return {}
   },
   computed: {
-    ...mapState('tag', ['dynamicTags'])
+    ...mapState('tag', ['dynamicTags']),
+    ...mapState('menu', ['currentMenu'])
   },
   methods: {
     handleClick (tag) {
-      router.push({ name: tag.name }).then(r => {
-      })
+      this.currentMenu = tag.name
+      router.push({ name: tag.name })
     },
     handleClose (tag) {
       let index = this.dynamicTags.findIndex((value, index, arr) => {

@@ -22,19 +22,13 @@ export default {
     $route (to, from) {
       const accessToken = localStorage.getItem('access_token')
       if (to.name !== 'login' && to.name !== 'home' && accessToken) {
-        this.setTab({
+        const menu = {
           name: to.name,
           title: to.meta.title,
           hidden: to.meta.hidden
-        })
-        this.setTag({
-          name: to.name,
-          title: to.meta.title,
-          hidden: to.meta.hidden
-        })
-        if (to.meta.hidden === 1) {
-          return
         }
+        this.setTab(menu)
+        this.setTag(menu)
         this.setCurrentTabValue(to.name)
         this.setCurrentTagValue(to.name)
       }

@@ -3,7 +3,7 @@
     <el-menu
       :collapse="!this.isCollapse"
       :collapse-transition="true"
-      :default-active="this.currentTabValue"
+      :default-active="this.currentMenu"
       :unique-opened="true"
       active-text-color="#ffd04b"
       background-color="#093f6b"
@@ -45,8 +45,7 @@ export default {
     return {}
   },
   computed: {
-    ...mapState('menu', ['isCollapse', 'fadeIn', 'collapseWhitespace']),
-    ...mapState('tabs', ['currentTabValue']),
+    ...mapState('menu', ['isCollapse', 'fadeIn', 'collapseWhitespace', 'currentMenu']),
     ...mapGetters('menu', ['getMenus'])
   },
   methods: {
