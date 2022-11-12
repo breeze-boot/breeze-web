@@ -42,6 +42,12 @@ export default {
     isLoadMenu (state, isLoadMenu) {
       state.isLoadMenu = isLoadMenu
     },
+    setCurrentMenu (state, menu) {
+      if (menu.hidden === 1) {
+        return
+      }
+      state.currentMenu = menu.name
+    },
     clearMenus (state) {
       state.menus = []
     }

@@ -11,6 +11,7 @@ export default {
   name: 'App',
   methods: {
     ...mapMutations('tag', ['setTag', 'setCurrentTagValue']),
+    ...mapMutations('menu', ['setCurrentMenu']),
     ...mapMutations('tabs', ['setTab', 'setCurrentTabValue'])
   },
   watch: {
@@ -29,6 +30,7 @@ export default {
         }
         this.setTab(menu)
         this.setTag(menu)
+        this.setCurrentMenu(menu)
         this.setCurrentTabValue(to.name)
         this.setCurrentTagValue(to.name)
       }

@@ -24,21 +24,12 @@ export default {
     return {}
   },
   computed: {
-    currentMenu: {
-      get () {
-        return this.$store.state.tabs.currentMenu
-      },
-      set (currentMenu) {
-        this.$store.state.tabs.currentMenu = currentMenu
-      }
-    },
     currentTabValue: {
       get () {
         return this.$store.state.tabs.currentTabValue
       },
       set (currentTabValue) {
         router.push({ name: currentTabValue })
-        this.currentMenu = currentTabValue
         this.$store.state.tabs.currentTabValue = currentTabValue
       }
     },

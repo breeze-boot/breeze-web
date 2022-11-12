@@ -121,17 +121,15 @@
         <el-form-item :label-width="formLabelWidth" label="自定义sql" prop="sql">
           <el-input v-model="permission.sql" autocomplete="off" clearable></el-input>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="权限集" prop="permissions">
-          <el-form-item :label-width="formLabelWidth" class="dept" label="部门" prop="dept">
-            <el-cascader
-              v-model="permission.permissions"
-              :options="deptOption"
-              :props="{ checkStrictly: true }"
-              :show-all-levels="false"
-              clearable
-              filterable
-            ></el-cascader>
-          </el-form-item>
+        <el-form-item :label-width="formLabelWidth" class="dept" label="部门" prop="dept">
+          <el-cascader
+            v-model="permission.permissions"
+            :options="deptOption"
+            :props="{ checkStrictly: true }"
+            :show-all-levels="false"
+            clearable
+            filterable
+          ></el-cascader>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="描述" prop="description">
           <el-input v-model="permission.description" autocomplete="off" clearable type="textarea"></el-input>
