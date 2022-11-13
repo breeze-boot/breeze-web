@@ -26,11 +26,12 @@ export default {
   computed: {
     currentTabValue: {
       get () {
-        return this.$store.state.tabs.currentTabValue
+        debugger
+        return this.$store.getters['tabs/getCurrentTabValue']
       },
       set (currentTabValue) {
         router.push({ name: currentTabValue })
-        this.$store.state.tabs.currentTabValue = currentTabValue
+        // this.$store.commit('tabs/setCurrentTabValue', currentTabValue)
       }
     },
     dynamicTabs: {

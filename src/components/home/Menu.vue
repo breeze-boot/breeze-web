@@ -46,8 +46,7 @@ export default {
   },
   computed: {
     ...mapState('menu', ['isCollapse', 'fadeIn', 'collapseWhitespace', 'currentMenu']),
-    ...mapGetters('menu', ['getMenus']),
-    ...mapGetters('menu', ['getCurrentMenu'])
+    ...mapGetters('menu', ['getMenus'])
   },
   methods: {
     handleOpen (key, keyPath) {

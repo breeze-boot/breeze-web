@@ -286,7 +286,7 @@ export default {
       permissionTableSqlDiyData: [],
       checkStrictly: false,
       multiple: false,
-      emitPath: true,
+      emitPath: false,
       searchPermissionForm: {
         permissionName: '',
         permissionCode: '',
@@ -428,7 +428,7 @@ export default {
       if (val === '1' || val === '2') {
         this.checkStrictly = true
         this.multiple = false
-        this.emitPath = true
+        this.emitPath = false
       } else if (val === '4') {
         this.checkStrictly = true
         this.multiple = true
@@ -598,18 +598,20 @@ export default {
     submitPermissionForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          const temp = []
-          this.permission.permissions.forEach(p => {
-            debugger
-            if ((typeof p) === 'object') {
-              p.forEach(a => {
-                temp.push(a)
-              })
-            } else {
-              temp.push(p)
-            }
-          })
-          this.permission.permissions = temp
+          debugger
+          if ((typeof this.permission.permissions) === 'object') {
+            const temp = []
+            this.permission.permissions.forEach(p => {
+              if ((typeof p) === 'object') {
+                p.forEach(a => {
+                  temp.push(a)
+                })
+              } else {
+                temp.push(p)
+              }
+            })
+            this.permission.permissions = temp
+          }
           this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
         } else {
           console.log('error submit!!')

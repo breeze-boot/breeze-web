@@ -70,7 +70,11 @@ export default {
           convertMenus(rep.data)
         }
         context.state.menus = rep.data
-        const path = router.app._route.query.redirect
+        let path = router.app._route.query.redirect
+        const name = localStorage.getItem('current_tag_name')
+        if (!path && name) {
+          path = name
+        }
         router.replace(path === '/' || path === undefined ? 'welcome' : path)
       })
     }

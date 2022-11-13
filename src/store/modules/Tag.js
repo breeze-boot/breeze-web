@@ -20,6 +20,7 @@ export default {
           menu.title = '欢迎'
         }
         state.currentTagValue = menu.name
+        localStorage.setItem('current_tag_name', menu.name)
       }
       const tags = state.dynamicTags.filter((item) => item.name === menu.name)
       if (tags.length > 0) {
@@ -28,9 +29,18 @@ export default {
       state.dynamicTags.push(menu)
     },
     setCurrentTagValue (state, name) {
+      localStorage.setItem('current_tag_name', name)
       state.currentTagValue = name
     }
   },
   actions: {},
-  getters: {}
+  getters: {
+    getCurrentTagValue (state) {
+      debugger
+      if (!state.currentTagValue) {
+        state.currentTabValue = localStorage.getItem('current_tag_name')
+      }
+      return state.currentTabValue
+    }
+  }
 }
