@@ -82,10 +82,10 @@
         </el-col>
         <el-col :md="5">
           <el-tree ref="roleTree"
+                   :check-strictly="true"
                    :data="roleTreeData"
                    :props="roleTreeProps"
                    node-key="id"
-                   :check-strictly="true"
                    show-checkbox
                    style="height: 560px; overflow-y:scroll; border: #e1e1e1 1px solid; margin-top:37px;">
           </el-tree>
