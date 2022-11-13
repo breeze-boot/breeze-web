@@ -111,14 +111,17 @@
       </div>
     </el-main>
 
-    <el-dialog :title="title" :visible.sync="permissionDialogVisible" width="600px"
+    <el-dialog :title="title" :visible.sync="permissionDialogVisible" width="800px"
                @close="closePermissionDialog('permissionRuleForm')">
       <el-form ref="permissionRuleForm" :model="permission" :rules="permissionRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="数据权限名称" prop="permissionName">
-          <el-input v-model="permission.permissionName" autocomplete="off" clearable></el-input>
+          <el-input
+            v-model="permission.permissionName" autocomplete="off"
+            clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="数据权限编码" prop="permissionCode">
-          <el-input v-model="permission.permissionCode" autocomplete="off" clearable></el-input>
+          <el-input v-model="permission.permissionCode"
+                    autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="运算符" prop="operator">
           <el-radio-group v-model="permission.operator">
@@ -128,14 +131,13 @@
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="权限类别" prop="permissionType">
           <el-radio-group v-model="permission.permissionType" @change="handlerPermissionTypeChange">
-            <el-radio-button label="1">本级部门和下属部门</el-radio-button>
-            <el-radio-button label="2">本级部门</el-radio-button>
-            <el-radio-button label="4">自定义部门</el-radio-button>
-            <el-radio-button label="999999">自定义</el-radio-button>
+            <el-radio-button v-for="item in permissionTypeOption" :key="item.label" :label="item.label">
+              {{ item.value }}
+            </el-radio-button>
           </el-radio-group>
         </el-form-item>
         <el-form-item
-          v-if="permission.permissionType === '1' || permission.permissionType === '2' || permission.permissionType === '4'"
+          v-if="permission.permissionType === 'DEPT_AND_LOWER_LEVEL' || permission.permissionType === 'DEPT_LEVEL' || permission.permissionType === 'DIY_DEPT'"
           :label-width="formLabelWidth" class="dept" label="部门"
           prop="dept">
           <el-cascader
@@ -152,11 +154,11 @@
           <el-input v-model="permission.description" autocomplete="off" clearable type="textarea"/>
         </el-form-item>
         <el-form-item
-          v-if="permission.permissionType === '999999'"
+          v-if="permission.permissionType === 'DIY'"
           :label-width="formLabelWidth" label="自定义SQL" prop="strSql">
           <el-button @click="diySql">设置</el-button>
           <el-table
-            v-if="permission.permissionType === '999999'"
+            v-if="permission.permissionType === 'DIY'"
             :data="permissionTableSqlDiyData" border
             size="mini"
             style="margin-top: 10px">
@@ -304,14 +306,37 @@ export default {
       deptOption: [],
       tableOption: [],
       columnOption: [],
+      permissionTypeOption: [
+        {
+          value: '全部',
+          label: 'ALL'
+        }, {
+          value: '自己',
+          label: 'OWN'
+        }, {
+          value: '本级以及下属部门',
+          label: 'DEPT_AND_LOWER_LEVEL'
+        }, {
+          value: '本级部门',
+          label: 'DEPT_LEVEL'
+        }, {
+          value: '自定义部门',
+          label: 'DIY_DEPT'
+        }, {
+          value: '自定义',
+          label: 'DIY'
+        }
+      ],
       compareOption: [
         {
           value: '>',
           label: '大于'
-        }, {
+        },
+        {
           value: '>=',
           label: '大于等于'
-        }, {
+        },
+        {
           value: '<',
           label: '小于'
         },
@@ -347,7 +372,7 @@ export default {
         permissionName: '',
         permissionCode: '',
         operator: 'OR',
-        permissionType: '0',
+        permissionType: '',
         strSql: '',
         permissions: '',
         description: '',
@@ -358,7 +383,7 @@ export default {
         permissionName: '',
         permissionCode: '',
         operator: 'OR',
-        permissionType: '0',
+        permissionType: '',
         strSql: '',
         permissions: '',
         description: '',
@@ -425,19 +450,30 @@ export default {
   methods: {
     handlerPermissionTypeChange (val) {
       this.permission.permissions = []
-      if (val === '1' || val === '2') {
+      if (val === 'DEPT_AND_LOWER_LEVEL' || val === 'DEPT_LEVEL') {
         this.checkStrictly = true
         this.multiple = false
         this.emitPath = false
-      } else if (val === '4') {
+      } else if (val === 'DIY_DEPT') {
         this.checkStrictly = true
         this.multiple = true
         this.emitPath = false
+      } else if (val === 'ALL' || val === 'OWN') {
+        debugger
       } else {
         this.checkStrictly = true
         this.multiple = true
         this.emitPath = true
       }
+    },
+    getName (label) {
+      let value = ''
+      this.permissionTypeOption.forEach(p => {
+        if (p.label === label) {
+          value = p.value
+        }
+      })
+      return value
     },
     reloadList () {
       list(this.buildParam()).then((rep) => {
@@ -551,7 +587,7 @@ export default {
       })
     },
     diySql () {
-      this.title = 'Diy权限'
+      this.title = 'DIY权限'
       this.permissionDiyDialogVisible = true
       this.selectTable()
     },
@@ -566,7 +602,6 @@ export default {
       this.permission = this.permissionInfo
     },
     closePermissionDiyDialog (formName) {
-      debugger
       this.$refs[formName].resetFields()
     },
     /**
@@ -611,6 +646,8 @@ export default {
               }
             })
             this.permission.permissions = temp
+          } else {
+            this.permission.permissions = [this.permission.permissions]
           }
           this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
         } else {
