@@ -186,7 +186,7 @@
           <el-cascader
             v-model="menu.parentId"
             :options="menuOption"
-            :props="{ checkStrictly: true }"
+            :props="{ checkStrictly: true, emitPath: false }"
             :show-all-levels="false"
             clearable
             filterable
@@ -287,7 +287,7 @@
           <el-cascader
             v-model="menu.parentId"
             :options="menuOption"
-            :props="{ checkStrictly: true }"
+            :props="{ checkStrictly: true, emitPath: false }"
             :show-all-levels="false"
             clearable
             disabled

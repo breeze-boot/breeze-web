@@ -89,3 +89,30 @@ export function edit (data) {
     data: data
   })
 }
+
+/**
+ *查询表名
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function selectTable () {
+  return request({
+    url: servicePath.system + '/sys/common/selectTable',
+    method: 'get'
+  })
+}
+
+/**
+ * 查询列名
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function selectColumn (tableName) {
+  return request({
+    url: servicePath.system + '/sys/common/selectColumn',
+    method: 'get',
+    params: { tableName: tableName }
+  })
+}

@@ -56,6 +56,11 @@
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
+          label="数据权限类型"
+          prop="permissionType"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
           label="运算符"
           prop="operator"
           show-overflow-tooltip>
@@ -116,28 +121,108 @@
           <el-input v-model="permission.permissionCode" autocomplete="off" clearable></el-input>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="运算符" prop="operator">
-          <el-input v-model="permission.operator" autocomplete="off" clearable></el-input>
+          <el-radio-group v-model="permission.operator">
+            <el-radio-button label="AND">AND</el-radio-button>
+            <el-radio-button label="OR">OR</el-radio-button>
+          </el-radio-group>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="自定义sql" prop="sql">
-          <el-input v-model="permission.sql" autocomplete="off" clearable></el-input>
+        <el-form-item :label-width="formLabelWidth" label="权限类别" prop="permissionType">
+          <el-radio-group v-model="permission.permissionType" @change="handlerPermissionTypeChange">
+            <el-radio-button label="1">本级部门和下属部门</el-radio-button>
+            <el-radio-button label="2">本级部门</el-radio-button>
+            <el-radio-button label="4">自定义部门</el-radio-button>
+            <el-radio-button label="999999">自定义</el-radio-button>
+          </el-radio-group>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" class="dept" label="部门" prop="dept">
+        <el-form-item
+          v-if="permission.permissionType === '1' || permission.permissionType === '2' || permission.permissionType === '4'"
+          :label-width="formLabelWidth" class="dept" label="部门"
+          prop="dept">
           <el-cascader
             v-model="permission.permissions"
             :options="deptOption"
-            :props="{ checkStrictly: true }"
+            :props="{  checkStrictly: checkStrictly, multiple: multiple, emitPath: emitPath }"
             :show-all-levels="false"
             clearable
-            filterable
+            collapse-tags
+            size="mini"
           ></el-cascader>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="描述" prop="description">
-          <el-input v-model="permission.description" autocomplete="off" clearable type="textarea"></el-input>
+          <el-input v-model="permission.description" autocomplete="off" clearable type="textarea"/>
+        </el-form-item>
+        <el-form-item
+          v-if="permission.permissionType === '999999'"
+          :label-width="formLabelWidth" label="自定义SQL" prop="sql">
+          <el-button @click="divSql">设置</el-button>
+          <el-table
+            v-if="permission.permissionType === '999999'"
+            :data="permissionTableSqlDivData" border
+            size="mini"
+            style="margin-top: 10px">
+            <el-table-column
+              label="字段"
+              prop="column"
+              width="180">
+            </el-table-column>
+            <el-table-column
+              label="比较"
+              prop="compare"
+              width="180">
+            </el-table-column>
+            <el-table-column
+              label="参数"
+              prop="conditions">
+            </el-table-column>
+          </el-table>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="mini" @click="resetPermissionForm('permissionRuleForm')">取 消</el-button>
         <el-button size="mini" type="primary" @click="submitPermissionForm('permissionRuleForm')">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog :title="title" :visible.sync="permissionDivDialogVisible" width="600px"
+               @close="closePermissionDivDialog('permissionDivRuleForm')">
+      <el-form ref="permissionDivRuleForm" :model="permissionDiv" :rules="permissionDivRules" size="mini">
+        <el-form-item :label-width="formLabelWidth" label="表名" prop="name">
+          <el-select v-model="permissionDiv.name" collapse-tags filterable placeholder="请选择表名" @change=handleTable>
+            <el-option
+              v-for="item in tableOption"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="字段" prop="column">
+          <el-select v-model="permissionDiv.column" collapse-tags filterable placeholder="请选择字段">
+            <el-option
+              v-for="item in columnOption"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="比较" prop="compare">
+          <el-select v-model="permissionDiv.compare" collapse-tags filterable placeholder="请选择比较">
+            <el-option
+              v-for="item in compareOption"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="参数" prop="conditions">
+          <el-input v-model="permissionDiv.conditions" clearable placeholder="请输入条件参数"/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="mini" @click="resetDivPermissionForm('permissionDivRuleForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="submitDivPermissionForm('permissionDivRuleForm')">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -182,13 +267,12 @@
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
-
   </el-container>
 </template>
 
 <script>
-import { add, del, edit, list } from '@/api/sys/permission'
-import { confirmAlert, DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
+import { add, del, edit, list, selectColumn, selectTable } from '@/api/sys/permission'
+import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
 import { selectDept } from '@/api/sys/dept'
@@ -199,6 +283,10 @@ export default {
     return {
       multipleSelectionPermissionIds: [],
       permissionTableData: [],
+      permissionTableSqlDivData: [],
+      checkStrictly: false,
+      multiple: false,
+      emitPath: true,
       searchPermissionForm: {
         permissionName: '',
         permissionCode: '',
@@ -209,25 +297,72 @@ export default {
       title: '',
       permissionDialogVisible: false,
       infoDialogVisible: false,
+      permissionDivDialogVisible: false,
       // 默认是创建
       dialogType: DIALOG_TYPE.ADD,
-      formLabelWidth: '150px',
+      formLabelWidth: '110px',
       deptOption: [],
+      tableOption: [],
+      columnOption: [],
+      compareOption: [
+        {
+          value: '>',
+          label: '大于'
+        }, {
+          value: '>=',
+          label: '大于等于'
+        }, {
+          value: '<',
+          label: '小于'
+        },
+        {
+          value: '<=',
+          label: '小于等于'
+        },
+        {
+          value: '!=',
+          label: '不等于'
+        },
+        {
+          value: '=',
+          label: '等于'
+        },
+        {
+          value: 'IS NOT NULL',
+          label: '不等于空'
+        },
+        {
+          value: 'IS NULL',
+          label: '等于空'
+        }
+      ],
+      permissionDiv: {
+        name: '',
+        column: '',
+        conditions: '',
+        compare: ''
+      },
       permission: {
         id: null,
         permissionName: '',
         permissionCode: '',
+        operator: 'OR',
+        permissionType: '0',
         sql: '',
         permissions: '',
-        description: ''
+        description: '',
+        permissionDiv: []
       },
       permissionInfo: {
         id: null,
         permissionName: '',
         permissionCode: '',
+        operator: 'OR',
+        permissionType: '0',
         sql: '',
         permissions: '',
-        description: ''
+        description: '',
+        permissionDiv: []
       },
       permissionRules: {
         permissionName: [
@@ -251,6 +386,36 @@ export default {
             trigger: 'blur'
           }
         ]
+      },
+      permissionDivRules: {
+        name: [
+          {
+            required: true,
+            message: '请选择表名',
+            trigger: 'change'
+          }
+        ],
+        column: [
+          {
+            required: true,
+            message: '请选择字段名',
+            trigger: 'change'
+          }
+        ],
+        compare: [
+          {
+            required: true,
+            message: '请选择比较方法',
+            trigger: 'change'
+          }
+        ],
+        conditions: [
+          {
+            required: true,
+            message: '请输入比较条件',
+            trigger: 'blur'
+          }
+        ]
       }
     }
   },
@@ -258,6 +423,22 @@ export default {
     this.reloadList()
   },
   methods: {
+    handlerPermissionTypeChange (val) {
+      this.permission.permissions = []
+      if (val === '1' || val === '2') {
+        this.checkStrictly = true
+        this.multiple = false
+        this.emitPath = true
+      } else if (val === '4') {
+        this.checkStrictly = true
+        this.multiple = true
+        this.emitPath = false
+      } else {
+        this.checkStrictly = true
+        this.multiple = true
+        this.emitPath = true
+      }
+    },
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
@@ -271,18 +452,21 @@ export default {
     selectDept () {
       selectDept().then(res => {
         if (res.code === 1 && res.data) {
-          this.deptOption = [{
-            value: '1111111111111111111',
-            disabled: true,
-            label: '根节点',
-            children: res.data
-          }]
-          const treeTemp = filterTreeParentId(res.data, (tree) => {
-            return tree.id && tree.id === this.user.deptId
-          }, 'id')
-          const tempArray = ['1111111111111111111']
-          treeTemp.map(id => tempArray.push(id))
-          this.user.deptId = tempArray
+          this.deptOption = res.data
+        }
+      })
+    },
+    selectTable () {
+      selectTable().then(rep => {
+        if (rep.code === 1 && rep.data) {
+          this.tableOption = rep.data
+        }
+      })
+    },
+    selectColumn (tableName) {
+      selectColumn(tableName).then(rep => {
+        if (rep.code === 1 && rep.data) {
+          this.columnOption = rep.data
         }
       })
     },
@@ -366,12 +550,46 @@ export default {
         Object.assign(this.permission, val)
       })
     },
+    divSql () {
+      this.title = 'DIV权限'
+      this.permissionDivDialogVisible = true
+      this.selectTable()
+    },
+    handleTable (val) {
+      this.selectColumn(val)
+    },
     closePermissionDialog (formName) {
       this.permission.id = undefined
       this.$refs[formName].resetFields()
     },
     closeInfoDialog () {
       this.permission = this.permissionInfo
+    },
+    closePermissionDivDialog (formName) {
+      debugger
+      this.$refs[formName].resetFields()
+    },
+    /**
+     * 提交
+     * @param formName
+     */
+    submitDivPermissionForm (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          const temp = {}
+          Object.assign(temp, this.permissionDiv)
+          this.permissionTableSqlDivData.push(temp)
+          this.permission.permissionDiv = this.permissionTableSqlDivData
+          this.permissionDivDialogVisible = false
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    resetDivPermissionForm (formName) {
+      this.permissionDivDialogVisible = false
+      this.$refs[formName].resetFields()
     },
     /**
      * 提交

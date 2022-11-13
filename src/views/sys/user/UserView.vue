@@ -232,7 +232,7 @@
           <el-cascader
             v-model="user.deptId"
             :options="deptOption"
-            :props="{ checkStrictly: true }"
+            :props="{ checkStrictly: true, emitPath: false }"
             :show-all-levels="false"
             clearable
             filterable
@@ -323,7 +323,7 @@
           <el-cascader
             v-model="user.deptId"
             :options="deptOption"
-            :props="{ checkStrictly: true }"
+            :props="{ checkStrictly: true, emitPath: false }"
             :show-all-levels="false"
             clearable
             disabled

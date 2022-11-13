@@ -68,7 +68,7 @@
           <el-cascader
             v-model="dept.parentId"
             :options="deptOption"
-            :props="{ checkStrictly: true }"
+            :props="{ checkStrictly: true, emitPath: false }"
             :show-all-levels="false"
             clearable
             filterable
