@@ -108,7 +108,7 @@
 
 <script>
 import { add, del, edit, list, selectDept } from '@/api/sys/dept'
-import { confirmAlert, DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
+import { confirmAlert, DIALOG_TYPE, filterTreeParentId, ROOT } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
 
@@ -247,14 +247,14 @@ export default {
       selectDept(id).then(res => {
         if (res.code === 1 && res.data) {
           this.deptOption = [{
-            value: '1111111111111111111',
+            value: ROOT,
             label: '根节点',
             children: res.data
           }]
           const treeTemp = filterTreeParentId(res.data, (tree) => {
             return tree.id && tree.id === this.dept.parentId
           }, 'id')
-          const tempArray = ['1111111111111111111']
+          const tempArray = [ROOT]
           treeTemp.map(id => tempArray.push(id))
           this.dept.parentId = tempArray
         }

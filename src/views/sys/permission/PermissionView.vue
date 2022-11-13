@@ -67,7 +67,7 @@
         </el-table-column>
         <el-table-column
           label="自定义sql"
-          prop="sql"
+          prop="strSql"
           show-overflow-tooltip
           width="200">
         </el-table-column>
@@ -153,11 +153,11 @@
         </el-form-item>
         <el-form-item
           v-if="permission.permissionType === '999999'"
-          :label-width="formLabelWidth" label="自定义SQL" prop="sql">
-          <el-button @click="divSql">设置</el-button>
+          :label-width="formLabelWidth" label="自定义SQL" prop="strSql">
+          <el-button @click="diySql">设置</el-button>
           <el-table
             v-if="permission.permissionType === '999999'"
-            :data="permissionTableSqlDivData" border
+            :data="permissionTableSqlDiyData" border
             size="mini"
             style="margin-top: 10px">
             <el-table-column
@@ -183,11 +183,11 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="title" :visible.sync="permissionDivDialogVisible" width="600px"
-               @close="closePermissionDivDialog('permissionDivRuleForm')">
-      <el-form ref="permissionDivRuleForm" :model="permissionDiv" :rules="permissionDivRules" size="mini">
+    <el-dialog :title="title" :visible.sync="permissionDiyDialogVisible" width="600px"
+               @close="closePermissionDiyDialog('permissionDiyRuleForm')">
+      <el-form ref="permissionDiyRuleForm" :model="permissionDiy" :rules="permissionDiyRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="表名" prop="name">
-          <el-select v-model="permissionDiv.name" collapse-tags filterable placeholder="请选择表名" @change=handleTable>
+          <el-select v-model="permissionDiy.name" collapse-tags filterable placeholder="请选择表名" @change=handleTable>
             <el-option
               v-for="item in tableOption"
               :key="item.value"
@@ -197,7 +197,7 @@
           </el-select>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="字段" prop="column">
-          <el-select v-model="permissionDiv.column" collapse-tags filterable placeholder="请选择字段">
+          <el-select v-model="permissionDiy.column" collapse-tags filterable placeholder="请选择字段">
             <el-option
               v-for="item in columnOption"
               :key="item.value"
@@ -207,7 +207,7 @@
           </el-select>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="比较" prop="compare">
-          <el-select v-model="permissionDiv.compare" collapse-tags filterable placeholder="请选择比较">
+          <el-select v-model="permissionDiy.compare" collapse-tags filterable placeholder="请选择比较">
             <el-option
               v-for="item in compareOption"
               :key="item.value"
@@ -217,12 +217,12 @@
           </el-select>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="参数" prop="conditions">
-          <el-input v-model="permissionDiv.conditions" clearable placeholder="请输入条件参数"/>
+          <el-input v-model="permissionDiy.conditions" clearable placeholder="请输入条件参数"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetDivPermissionForm('permissionDivRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitDivPermissionForm('permissionDivRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="resetDiyPermissionForm('permissionDiyRuleForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="submitDiyPermissionForm('permissionDiyRuleForm')">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -251,7 +251,7 @@
           <template slot="label">
             自定义sql
           </template>
-          {{ permission.sql }}
+          {{ permission.strSql }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
@@ -283,7 +283,7 @@ export default {
     return {
       multipleSelectionPermissionIds: [],
       permissionTableData: [],
-      permissionTableSqlDivData: [],
+      permissionTableSqlDiyData: [],
       checkStrictly: false,
       multiple: false,
       emitPath: true,
@@ -297,7 +297,7 @@ export default {
       title: '',
       permissionDialogVisible: false,
       infoDialogVisible: false,
-      permissionDivDialogVisible: false,
+      permissionDiyDialogVisible: false,
       // 默认是创建
       dialogType: DIALOG_TYPE.ADD,
       formLabelWidth: '110px',
@@ -336,7 +336,7 @@ export default {
           label: '等于空'
         }
       ],
-      permissionDiv: {
+      permissionDiy: {
         name: '',
         column: '',
         conditions: '',
@@ -348,10 +348,10 @@ export default {
         permissionCode: '',
         operator: 'OR',
         permissionType: '0',
-        sql: '',
+        strSql: '',
         permissions: '',
         description: '',
-        permissionDiv: []
+        permissionDiy: []
       },
       permissionInfo: {
         id: null,
@@ -359,10 +359,10 @@ export default {
         permissionCode: '',
         operator: 'OR',
         permissionType: '0',
-        sql: '',
+        strSql: '',
         permissions: '',
         description: '',
-        permissionDiv: []
+        permissionDiy: []
       },
       permissionRules: {
         permissionName: [
@@ -387,7 +387,7 @@ export default {
           }
         ]
       },
-      permissionDivRules: {
+      permissionDiyRules: {
         name: [
           {
             required: true,
@@ -550,9 +550,9 @@ export default {
         Object.assign(this.permission, val)
       })
     },
-    divSql () {
-      this.title = 'DIV权限'
-      this.permissionDivDialogVisible = true
+    diySql () {
+      this.title = 'Diy权限'
+      this.permissionDiyDialogVisible = true
       this.selectTable()
     },
     handleTable (val) {
@@ -565,7 +565,7 @@ export default {
     closeInfoDialog () {
       this.permission = this.permissionInfo
     },
-    closePermissionDivDialog (formName) {
+    closePermissionDiyDialog (formName) {
       debugger
       this.$refs[formName].resetFields()
     },
@@ -573,22 +573,22 @@ export default {
      * 提交
      * @param formName
      */
-    submitDivPermissionForm (formName) {
+    submitDiyPermissionForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           const temp = {}
-          Object.assign(temp, this.permissionDiv)
-          this.permissionTableSqlDivData.push(temp)
-          this.permission.permissionDiv = this.permissionTableSqlDivData
-          this.permissionDivDialogVisible = false
+          Object.assign(temp, this.permissionDiy)
+          this.permissionTableSqlDiyData.push(temp)
+          this.permission.permissionDiy = this.permissionTableSqlDiyData
+          this.permissionDiyDialogVisible = false
         } else {
           console.log('error submit!!')
           return false
         }
       })
     },
-    resetDivPermissionForm (formName) {
-      this.permissionDivDialogVisible = false
+    resetDiyPermissionForm (formName) {
+      this.permissionDiyDialogVisible = false
       this.$refs[formName].resetFields()
     },
     /**
@@ -598,6 +598,18 @@ export default {
     submitPermissionForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          const temp = []
+          this.permission.permissions.forEach(p => {
+            debugger
+            if ((typeof p) === 'object') {
+              p.forEach(a => {
+                temp.push(a)
+              })
+            } else {
+              temp.push(p)
+            }
+          })
+          this.permission.permissions = temp
           this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
         } else {
           console.log('error submit!!')

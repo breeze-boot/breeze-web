@@ -380,7 +380,7 @@
 
 <script>
 import { add, del, edit, list, open, resetPass, selectPost, selectRole } from '@/api/sys/user'
-import { confirmAlert, DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
+import { confirmAlert, DIALOG_TYPE, filterTreeParentId, ROOT } from '@/utils/constant'
 import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
 import { selectDept } from '@/api/sys/dept'
@@ -602,7 +602,7 @@ export default {
       selectDept().then(res => {
         if (res.code === 1 && res.data) {
           this.deptOption = [{
-            value: '1111111111111111111',
+            value: ROOT,
             disabled: true,
             label: '根节点',
             children: res.data
@@ -610,7 +610,7 @@ export default {
           const treeTemp = filterTreeParentId(res.data, (tree) => {
             return tree.id && tree.id === this.user.deptId
           }, 'id')
-          const tempArray = ['1111111111111111111']
+          const tempArray = [ROOT]
           treeTemp.map(id => tempArray.push(id))
           debugger
           if (!this.isAdd) {

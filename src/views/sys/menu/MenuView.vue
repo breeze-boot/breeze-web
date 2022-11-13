@@ -354,7 +354,7 @@
 
 <script>
 import { add, del, edit, list, selectMenu, selectPlatform } from '@/api/sys/menu'
-import { confirmAlert, DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
+import { confirmAlert, DIALOG_TYPE, filterTreeParentId, ROOT } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import IconDialog from '@/components/svg/IconDialog'
 import { Message } from 'element-ui'
@@ -388,7 +388,7 @@ export default {
         title: '',
         icon: '',
         sort: 0,
-        parentId: '1111111111111111111',
+        parentId: ROOT,
         permission: '',
         component: '',
         href: 0,
@@ -405,7 +405,7 @@ export default {
         title: '',
         icon: '',
         sort: 0,
-        parentId: '1111111111111111111',
+        parentId: ROOT,
         permission: '',
         component: '',
         href: 0,

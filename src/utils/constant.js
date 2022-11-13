@@ -1,5 +1,6 @@
 import Vue from 'vue'
 
+export const ROOT = '1111111111111111111'
 export const DIALOG_TYPE = {
   ADD: {
     desc: '添加',
