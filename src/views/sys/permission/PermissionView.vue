@@ -115,9 +115,7 @@
                @close="closePermissionDialog('permissionRuleForm')">
       <el-form ref="permissionRuleForm" :model="permission" :rules="permissionRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="数据权限名称" prop="permissionName">
-          <el-input
-            v-model="permission.permissionName" autocomplete="off"
-            clearable/>
+          <el-input v-model="permission.permissionName" autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="数据权限编码" prop="permissionCode">
           <el-input v-model="permission.permissionCode"
@@ -633,7 +631,6 @@ export default {
     submitPermissionForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          debugger
           if ((typeof this.permission.permissions) === 'object') {
             const temp = []
             this.permission.permissions.forEach(p => {

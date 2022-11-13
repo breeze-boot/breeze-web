@@ -232,7 +232,7 @@
           <el-cascader
             v-model="user.deptId"
             :options="deptOption"
-            :props="{ checkStrictly: true, emitPath: false }"
+            :props="{ checkStrictly: true }"
             :show-all-levels="false"
             clearable
             filterable
@@ -323,7 +323,7 @@
           <el-cascader
             v-model="user.deptId"
             :options="deptOption"
-            :props="{ checkStrictly: true, emitPath: false }"
+            :props="{ checkStrictly: true }"
             :show-all-levels="false"
             clearable
             disabled
@@ -380,7 +380,7 @@
 
 <script>
 import { add, del, edit, list, open, resetPass, selectPost, selectRole } from '@/api/sys/user'
-import { confirmAlert, DIALOG_TYPE, filterTreeParentId, ROOT } from '@/utils/constant'
+import { confirmAlert, DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
 import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
 import { selectDept } from '@/api/sys/dept'
@@ -598,21 +598,15 @@ export default {
         }
       })
     },
-    selectDept () {
+    selectDept (row) {
       selectDept().then(res => {
         if (res.code === 1 && res.data) {
-          this.deptOption = [{
-            value: ROOT,
-            disabled: true,
-            label: '根节点',
-            children: res.data
-          }]
+          this.deptOption = res.data
           const treeTemp = filterTreeParentId(res.data, (tree) => {
             return tree.id && tree.id === this.user.deptId
           }, 'id')
-          const tempArray = [ROOT]
+          const tempArray = []
           treeTemp.map(id => tempArray.push(id))
-          debugger
           if (!this.isAdd) {
             this.user.deptId = tempArray
           }
@@ -636,7 +630,9 @@ export default {
           this.roleOption = rep.data
           // 修改和查看
           if (!this.isAdd) {
+            // 角色分配回显
             this.user.roleIds = row.sysRoles.map(role => role.id)
+            // 展示
             this.user.roleNames = row.sysRoles.map(role => role.roleName).join(',')
           }
         }
@@ -715,15 +711,15 @@ export default {
       this.isAdd = true
       this.userDialogVisible = true
     },
-    modify (val) {
+    modify (row) {
       this.title = '修改用户'
       this.dialogType = DIALOG_TYPE.EDIT
       this.isAdd = false
       this.$nextTick(() => {
-        this.selectDept()
-        this.selectRole(val)
-        this.selectPost(val)
-        Object.assign(this.user, val)
+        this.selectDept(row)
+        this.selectRole(row)
+        this.selectPost(row)
+        Object.assign(this.user, row)
       })
       this.userDialogVisible = true
     },

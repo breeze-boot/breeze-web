@@ -186,7 +186,7 @@
           <el-cascader
             v-model="menu.parentId"
             :options="menuOption"
-            :props="{ checkStrictly: true, emitPath: false }"
+            :props="{ checkStrictly: true }"
             :show-all-levels="false"
             clearable
             filterable
@@ -287,7 +287,7 @@
           <el-cascader
             v-model="menu.parentId"
             :options="menuOption"
-            :props="{ checkStrictly: true, emitPath: false }"
+            :props="{ checkStrictly: true }"
             :show-all-levels="false"
             clearable
             disabled
@@ -549,7 +549,6 @@ export default {
      */
     delItem (rows, row) {
       confirmAlert(() => {
-        debugger
         del(JSONBigInt.parse(row.id)).then(rep => {
           if (rep.code === 1) {
             this.deleteTreeTableData(rows, row)
@@ -619,14 +618,14 @@ export default {
       selectMenu(id).then(res => {
         if (res.code === 1 && res.data) {
           this.menuOption = [{
-            value: '1111111111111111111',
+            value: ROOT,
             label: '根节点',
             children: res.data
           }]
           const treeTemp = filterTreeParentId(res.data, (tree) => {
             return tree.id && tree.id === this.menu.parentId
           }, 'id')
-          const tempArray = ['1111111111111111111']
+          const tempArray = [ROOT]
           treeTemp.map(id => tempArray.push(id))
           this.menu.parentId = tempArray
         }

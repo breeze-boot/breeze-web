@@ -36,7 +36,6 @@ export default {
   actions: {},
   getters: {
     getCurrentTagValue (state) {
-      debugger
       if (!state.currentTagValue) {
         state.currentTabValue = localStorage.getItem('current_tag_name')
       }

@@ -26,7 +26,6 @@ export default {
   computed: {
     currentTabValue: {
       get () {
-        debugger
         return this.$store.getters['tabs/getCurrentTabValue']
       },
       set (currentTabValue) {
