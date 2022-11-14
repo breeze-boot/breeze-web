@@ -276,20 +276,20 @@ export default {
       this.dialogType = DIALOG_TYPE.ADD
       this.dictDialogVisible = true
     },
-    modify (val) {
+    modify (row) {
       this.title = '修改字典'
       this.dialogType = DIALOG_TYPE.EDIT
       this.dictDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.dict, val)
+        Object.assign(this.dict, row)
       })
     },
-    info (val) {
+    info (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.dict, val)
+        Object.assign(this.dict, row)
       })
     },
     showDictDetail (row) {

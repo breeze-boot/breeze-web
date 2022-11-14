@@ -266,17 +266,21 @@ export default {
       this.dialogType = DIALOG_TYPE.ADD
       this.postDialogVisible = true
     },
-    modify (val) {
+    modify (row) {
       this.title = '修改岗位'
       this.dialogType = DIALOG_TYPE.EDIT
       this.postDialogVisible = true
-      Object.assign(this.post, val)
+      this.$nextTick(() => {
+        Object.assign(this.post, row)
+      })
     },
-    info (val) {
+    info (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
-      Object.assign(this.post, val)
+      this.$nextTick(() => {
+        Object.assign(this.post, row)
+      })
     },
     closePostDialog (formName) {
       this.post.id = undefined

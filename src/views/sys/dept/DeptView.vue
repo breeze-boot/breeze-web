@@ -215,30 +215,30 @@ export default {
     },
     importInfo () {
     },
-    create (val) {
+    create (row) {
       this.title = '创建部门'
       // 赋值
       this.dialogType = DIALOG_TYPE.ADD
-      this.dept.parentId = val.id ? val.id : ''
+      this.dept.parentId = row.id ? row.id : ''
       this.selectDept()
       this.deptDialogVisible = true
     },
-    modify (val) {
+    modify (row) {
       this.title = '修改部门信息'
       this.dialogType = DIALOG_TYPE.EDIT
       this.$nextTick(() => {
-        Object.assign(this.dept, val)
-        this.dept.parentId = val.parentId
+        Object.assign(this.dept, row)
+        this.dept.parentId = row.parentId
         this.selectDept(this.dept.id)
       })
       this.deptDialogVisible = true
     },
-    info (val) {
+    info (row) {
       this.title = '查看部门信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.$nextTick(() => {
-        Object.assign(this.dept, val)
-        this.dept.parentId = val.parentId
+        Object.assign(this.dept, row)
+        this.dept.parentId = row.parentId
         this.selectDept(this.dept.id)
       })
       this.infoDialogVisible = true

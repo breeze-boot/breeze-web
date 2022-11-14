@@ -320,20 +320,20 @@ export default {
       this.dialogType = DIALOG_TYPE.ADD
       this.roleDialogVisible = true
     },
-    modify (val) {
+    modify (row) {
       this.title = '修改角色信息'
       this.dialogType = DIALOG_TYPE.EDIT
       this.roleDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.role, val)
+        Object.assign(this.role, row)
       })
     },
-    info (val) {
+    info (row) {
       this.title = '查看角色信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.role, val)
+        Object.assign(this.role, row)
       })
     },
     closeDialog (formName) {

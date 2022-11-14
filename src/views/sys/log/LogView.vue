@@ -340,11 +340,13 @@ export default {
     logHandleSelectionChange (val) {
       this.multipleSelectionLogId = val
     },
-    info (val) {
+    info (row) {
       this.title = '查看详情信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
-      Object.assign(this.log, val)
+      this.$nextTick(() => {
+        Object.assign(this.log, row)
+      })
     }
   }
 }

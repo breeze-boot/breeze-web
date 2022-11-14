@@ -258,20 +258,20 @@ export default {
       this.dialogType = DIALOG_TYPE.ADD
       this.tenantDialogVisible = true
     },
-    modify (val) {
+    modify (row) {
       this.title = '修改租户'
       this.dialogType = DIALOG_TYPE.EDIT
       this.tenantDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.tenant, val)
+        Object.assign(this.tenant, row)
       })
     },
-    info (val) {
+    info (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.tenant, val)
+        Object.assign(this.tenant, row)
       })
     },
     closeTenantDialog (formName) {

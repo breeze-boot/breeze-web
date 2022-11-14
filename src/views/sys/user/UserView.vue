@@ -598,7 +598,7 @@ export default {
         }
       })
     },
-    selectDept (row) {
+    selectDept () {
       selectDept().then(res => {
         if (res.code === 1 && res.data) {
           this.deptOption = res.data
@@ -716,20 +716,20 @@ export default {
       this.dialogType = DIALOG_TYPE.EDIT
       this.isAdd = false
       this.$nextTick(() => {
-        this.selectDept(row)
+        this.selectDept()
         this.selectRole(row)
         this.selectPost(row)
         Object.assign(this.user, row)
       })
       this.userDialogVisible = true
     },
-    info (val) {
+    info (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.$nextTick(() => {
-        this.selectRole(val)
-        this.selectDept(val.deptId)
-        Object.assign(this.user, val)
+        this.selectRole(row)
+        this.selectDept(row.deptId)
+        Object.assign(this.user, row)
       })
       this.infoDialogVisible = true
     },

@@ -88,6 +88,9 @@ export default {
       }
     }
   },
+  created () {
+    localStorage.clear()
+  },
   mounted () {
     selectTenant().then(rep => {
       if (rep.code === 1) {

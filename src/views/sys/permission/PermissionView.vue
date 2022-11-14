@@ -566,22 +566,22 @@ export default {
       this.dialogType = DIALOG_TYPE.ADD
       this.permissionDialogVisible = true
     },
-    modify (val) {
+    modify (row) {
       this.title = '修改数据权限'
       this.selectDept()
       this.dialogType = DIALOG_TYPE.EDIT
       this.permissionDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.permission, val)
+        Object.assign(this.permission, row)
       })
     },
-    info (val) {
+    info (row) {
       this.title = '查看信息'
       this.selectDept()
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.permission, val)
+        Object.assign(this.permission, row)
       })
     },
     diySql () {

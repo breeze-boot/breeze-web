@@ -266,20 +266,20 @@ export default {
       this.dialogType = DIALOG_TYPE.ADD
       this.platformDialogVisible = true
     },
-    modify (val) {
+    modify (row) {
       this.title = '修改平台'
       this.dialogType = DIALOG_TYPE.EDIT
       this.platformDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.platform, val)
+        Object.assign(this.platform, row)
       })
     },
-    info (val) {
+    info (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.platform, val)
+        Object.assign(this.platform, row)
       })
     },
     closePlatformDialog (formName) {

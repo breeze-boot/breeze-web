@@ -187,12 +187,12 @@ export default {
       this.dialogType = DIALOG_TYPE.ADD
       this.dictItemDialogVisible = true
     },
-    modify (val) {
+    modify (row) {
       this.title = '修改字典项'
       this.dialogType = DIALOG_TYPE.SHOW
       this.dictItemDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.dictItem, val)
+        Object.assign(this.dictItem, row)
       })
     },
     closeDictItemDialog (formName) {

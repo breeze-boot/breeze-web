@@ -590,22 +590,22 @@ export default {
     clone () {
       this.title = '创建菜单'
     },
-    modify (val) {
+    modify (row) {
       this.title = '修改菜单'
       this.$nextTick(() => {
-        Object.assign(this.menu, val)
-        this.menu.parentId = val.parentId
+        Object.assign(this.menu, row)
+        this.menu.parentId = row.parentId
         this.selectMenu(this.menu.id)
         this.selectPlatform()
       })
       this.menuDialogVisible = true
       this.dialogType = DIALOG_TYPE.EDIT
     },
-    info (val) {
+    info (row) {
       this.title = '查看信息'
       this.$nextTick(() => {
-        Object.assign(this.menu, val)
-        this.menu.parentId = val.parentId
+        Object.assign(this.menu, row)
+        this.menu.parentId = row.parentId
         this.selectMenu()
         this.selectPlatform()
       })
