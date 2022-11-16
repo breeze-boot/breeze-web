@@ -50,6 +50,12 @@ export default {
   },
   mounted () {
   },
+  created () {
+    this.$initWebSocket()
+  },
+  destroyed () {
+    this.$closeWebsocket()
+  },
   methods: {
     wheel (e) {
       const a = document.getElementById('tag')

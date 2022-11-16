@@ -9,6 +9,9 @@ import { mapMutations } from 'vuex'
 
 export default {
   name: 'App',
+  data () {
+    return {}
+  },
   methods: {
     ...mapMutations('tag', ['setTag', 'setCurrentTagValue']),
     ...mapMutations('menu', ['setCurrentMenu']),
