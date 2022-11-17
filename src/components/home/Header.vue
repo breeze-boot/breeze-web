@@ -58,6 +58,7 @@ export default {
           message: '退出成功',
           type: 'success'
         })
+        this.$closeWebsocket()
         return
       }
       this.drawer = true

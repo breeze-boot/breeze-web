@@ -17,6 +17,8 @@ export default {
     ...mapMutations('menu', ['setCurrentMenu']),
     ...mapMutations('tabs', ['setTab', 'setCurrentTabValue'])
   },
+  created () {
+  },
   watch: {
     /**
      * 监听

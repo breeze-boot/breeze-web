@@ -50,11 +50,7 @@ export default {
   },
   mounted () {
   },
-  created () {
-    this.$initWebSocket()
-  },
   destroyed () {
-    this.$closeWebsocket()
   },
   methods: {
     wheel (e) {

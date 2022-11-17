@@ -110,6 +110,7 @@ export default {
           this.setUserInfo(rep.data.user_info)
           // 获取路由
           this.loadRoute()
+          this.$initWebSocket()
         }
       })
     },
