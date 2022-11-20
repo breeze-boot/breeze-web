@@ -134,7 +134,7 @@
 </template>
 
 <script>
-import { del, editPermission, list, listRolesPermission, modify, save } from '@/api/sys/role'
+import { del, list, listRolesPermission, modify, modifyPermission, save } from '@/api/sys/role'
 import { listTreePermission } from '@/api/sys/menu'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
@@ -236,7 +236,7 @@ export default {
         this.$message.warning('请先点击角色')
         return
       }
-      editPermission({
+      modifyPermission({
         roleId: this.roleId,
         permissionIds: checkedKeys
       }).then(rep => {

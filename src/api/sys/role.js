@@ -42,9 +42,9 @@ export function listRolesPermission (roleId) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function editPermission (data) {
+export function modifyPermission (data) {
   return request({
-    url: servicePath.system + '/sys/role/editPermission',
+    url: servicePath.system + '/sys/role/modifyPermission',
     method: 'put',
     data: data
   })
