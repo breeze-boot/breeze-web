@@ -31,3 +31,42 @@ export function del (ids) {
     data: ids
   })
 }
+
+/**
+ * 下载
+ *
+ * @returns {AxiosPromise}
+ */
+export function download (ids) {
+  return request({
+    url: servicePath.system + '/sys/file/download',
+    method: 'delete',
+    data: ids
+  })
+}
+
+/**
+ * 文件上传
+ *
+ * @returns {AxiosPromise}
+ */
+export function upload (ids) {
+  return request({
+    url: servicePath.system + '/sys/file/upload',
+    method: 'POST',
+    data: ids
+  })
+}
+
+/**
+ * 图片预览
+ *
+ * @returns {AxiosPromise}
+ */
+export function preview (ids) {
+  return request({
+    url: servicePath.system + '/sys/file/preview',
+    method: 'delete',
+    data: ids
+  })
+}

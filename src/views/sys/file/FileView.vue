@@ -64,6 +64,11 @@
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
+          label="存储方式"
+          prop="ossStyle"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
           label="存储路径"
           prop="path"
           show-overflow-tooltip>
@@ -77,6 +82,8 @@
           label="操作"
           width="150">
           <template slot-scope="scope">
+            <el-button size="mini" type="text" @click="preview(scope.row)">预览</el-button>
+            <el-button size="mini" type="text" @click="download(scope.row)">下载</el-button>
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
             <el-button size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, fileTableData,scope.row)">删除
@@ -250,6 +257,10 @@ export default {
       this.$nextTick(() => {
         Object.assign(this.file, row)
       })
+    },
+    preview (row) {
+    },
+    download (row) {
     },
     closeInfoDialog () {
       this.file = this.fileInfo
