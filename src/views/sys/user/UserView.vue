@@ -141,7 +141,7 @@
           width="220">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
             <el-button size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, userTableData,scope.row)">删除
             </el-button>
@@ -379,7 +379,7 @@
 </template>
 
 <script>
-import { add, del, edit, list, open, resetPass, selectPost, selectRole } from '@/api/sys/user'
+import { del, list, modify, open, resetPass, save, selectPost, selectRole } from '@/api/sys/user'
 import { confirmAlert, DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
 import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
@@ -712,7 +712,7 @@ export default {
       this.isAdd = true
       this.userDialogVisible = true
     },
-    modify (row) {
+    edit (row) {
       this.title = '修改用户'
       this.dialogType = DIALOG_TYPE.EDIT
       this.isAdd = false
@@ -752,15 +752,15 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.user.deptId = this.user.deptId[this.user.deptId.length - 1]
-          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
+          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
         } else {
           console.log('error submit!!')
           return false
         }
       })
     },
-    add () {
-      add(this.user).then((rep) => {
+    save () {
+      save(this.user).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })
           this.userDialogVisible = false
@@ -768,8 +768,8 @@ export default {
         }
       })
     },
-    edit () {
-      edit(this.user).then((rep) => {
+    modify () {
+      modify(this.user).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })
           this.userDialogVisible = false

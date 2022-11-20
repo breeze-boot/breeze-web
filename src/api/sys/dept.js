@@ -24,7 +24,7 @@ export function listDept (data) {
  * 添加
  * @returns {AxiosPromise}
  */
-export function add (data) {
+export function save (data) {
   return request({
     url: servicePath.system + '/sys/dept/save',
     method: 'post',
@@ -52,9 +52,9 @@ export function del (id) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function edit (data) {
+export function modify (data) {
   return request({
-    url: servicePath.system + '/sys/dept/edit',
+    url: servicePath.system + '/sys/dept/modify',
     method: 'put',
     data: data
   })

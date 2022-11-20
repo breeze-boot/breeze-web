@@ -57,7 +57,7 @@ export function list (data) {
  * 添加
  * @returns {AxiosPromise}
  */
-export function add (data) {
+export function save (data) {
   return request({
     url: servicePath.system + '/sys/menu/save',
     method: 'post',
@@ -85,9 +85,9 @@ export function del (id) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function edit (data) {
+export function modify (data) {
   return request({
-    url: servicePath.system + '/sys/menu/edit',
+    url: servicePath.system + '/sys/menu/modify',
     method: 'put',
     data: data
   })

@@ -53,7 +53,7 @@
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
             <el-button size="mini" type="text" @click="create(scope.row)">新建</el-button>
-            <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
             <el-button size="mini" type="text" @click.native.prevent="removeItem(deptTableData,scope.row)">删除
             </el-button>
           </template>
@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import { add, del, edit, listDept, selectDept } from '@/api/sys/dept'
+import { del, listDept, modify, save, selectDept } from '@/api/sys/dept'
 import { confirmAlert, DIALOG_TYPE, filterTreeParentId, ROOT } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
@@ -223,7 +223,7 @@ export default {
       this.selectDept()
       this.deptDialogVisible = true
     },
-    modify (row) {
+    edit (row) {
       this.title = '修改部门信息'
       this.dialogType = DIALOG_TYPE.EDIT
       this.$nextTick(() => {
@@ -264,7 +264,7 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.dept.parentId = this.dept.parentId[this.dept.parentId.length - 1]
-          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
+          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
         } else {
           console.log('error submit!!')
           return false
@@ -275,8 +275,8 @@ export default {
       this.deptDialogVisible = false
       this.$refs[formName].resetFields()
     },
-    add () {
-      add(this.dept).then((rep) => {
+    save () {
+      save(this.dept).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })
           this.deptDialogVisible = false
@@ -284,8 +284,8 @@ export default {
         }
       })
     },
-    edit () {
-      edit(this.dept).then((rep) => {
+    modify () {
+      modify(this.dept).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })
           this.deptDialogVisible = false

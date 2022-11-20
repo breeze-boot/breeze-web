@@ -115,7 +115,7 @@
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
             <el-button size="mini" type="text" @click="create(scope.row)">新建</el-button>
-            <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
             <el-button size="mini" type="text" @click.native.prevent="delItem(menuTableData,scope.row)">删除
             </el-button>
           </template>
@@ -353,7 +353,7 @@
 </template>
 
 <script>
-import { add, del, edit, list, selectMenu, selectPlatform } from '@/api/sys/menu'
+import { del, list, modify, save, selectMenu, selectPlatform } from '@/api/sys/menu'
 import { confirmAlert, DIALOG_TYPE, filterTreeParentId, ROOT } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import IconDialog from '@/components/svg/IconDialog'
@@ -578,11 +578,11 @@ export default {
         this.$refs.menuTable.doLayout()
       })
     },
-    create (val) {
+    create (row) {
       this.title = '创建菜单'
       this.dialogType = DIALOG_TYPE.ADD
       this.$nextTick(() => {
-        this.menu.parentId = val.id ? val.id : ''
+        this.menu.parentId = row.id ? row.id : ''
         this.selectMenu()
       })
       this.menuDialogVisible = true
@@ -590,7 +590,7 @@ export default {
     clone () {
       this.title = '创建菜单'
     },
-    modify (row) {
+    edit (row) {
       this.title = '修改菜单'
       this.$nextTick(() => {
         Object.assign(this.menu, row)
@@ -635,14 +635,14 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.menu.parentId = this.menu.parentId[this.menu.parentId.length - 1]
-          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
+          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
         } else {
           console.log('error submit!!')
         }
       })
     },
-    add () {
-      add(this.menu).then((rep) => {
+    save () {
+      save(this.menu).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })
           this.menuDialogVisible = false
@@ -650,8 +650,8 @@ export default {
         }
       })
     },
-    edit () {
-      edit(this.menu).then((rep) => {
+    modify () {
+      modify(this.menu).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })
           this.menuDialogVisible = false

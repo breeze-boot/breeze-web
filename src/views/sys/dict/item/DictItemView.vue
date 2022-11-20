@@ -13,7 +13,7 @@
         <el-table-column label="标签" property="label"></el-table-column>
         <el-table-column fixed="right" label="操作" width="100">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
             <el-button size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, dictItemTableData,scope.row)">删除
             </el-button>
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { add, del, edit, list } from '@/api/sys/dictItem'
+import { del, list, modify, save } from '@/api/sys/dictItem'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
@@ -188,7 +188,7 @@ export default {
       this.dialogType = DIALOG_TYPE.ADD
       this.dictItemDialogVisible = true
     },
-    modify (row) {
+    edit (row) {
       this.title = '修改字典项'
       this.dialogType = DIALOG_TYPE.SHOW
       this.dictItemDialogVisible = true
@@ -203,7 +203,7 @@ export default {
     submitDictItemForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
+          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
         } else {
           console.log('error submit!!')
           return false
@@ -214,8 +214,8 @@ export default {
       this.dictItemDialogVisible = false
       this.$refs[formName].resetFields()
     },
-    add () {
-      add(this.dictItem).then((rep) => {
+    save () {
+      save(this.dictItem).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })
           this.dictItemDialogVisible = false
@@ -223,8 +223,8 @@ export default {
         }
       })
     },
-    edit () {
-      edit(this.dictItem).then((rep) => {
+    modify () {
+      modify(this.dictItem).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })
           this.dictItemDialogVisible = false

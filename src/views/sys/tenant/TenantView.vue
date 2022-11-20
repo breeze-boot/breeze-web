@@ -65,7 +65,7 @@
           width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
             <el-button size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, tenantTableData,scope.row)">删除
             </el-button>
@@ -129,7 +129,7 @@
 </template>
 
 <script>
-import { add, del, edit, list } from '@/api/sys/tenant'
+import { del, list, modify, save } from '@/api/sys/tenant'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
@@ -259,7 +259,7 @@ export default {
       this.dialogType = DIALOG_TYPE.ADD
       this.tenantDialogVisible = true
     },
-    modify (row) {
+    edit (row) {
       this.title = '修改租户'
       this.dialogType = DIALOG_TYPE.EDIT
       this.tenantDialogVisible = true
@@ -289,7 +289,7 @@ export default {
     submitTenantForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
+          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
         } else {
           console.log('error submit!!')
           return false
@@ -300,9 +300,9 @@ export default {
       this.tenantDialogVisible = false
       this.$refs[formName].resetFields()
     },
-    add () {
+    save () {
       this.tenant.id = undefined
-      add(this.tenant).then((rep) => {
+      save(this.tenant).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '添加成功' })
           this.tenantDialogVisible = false
@@ -310,8 +310,8 @@ export default {
         }
       })
     },
-    edit () {
-      edit(this.tenant).then((rep) => {
+    modify () {
+      modify(this.tenant).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '修改成功' })
           this.tenantDialogVisible = false

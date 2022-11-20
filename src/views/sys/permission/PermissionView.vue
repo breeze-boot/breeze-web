@@ -91,7 +91,7 @@
           width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
             <el-button size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, permissionTableData,scope.row)">删除
             </el-button>
@@ -271,7 +271,7 @@
 </template>
 
 <script>
-import { add, del, edit, list, selectColumn, selectTable } from '@/api/sys/permission'
+import { del, list, modify, save, selectColumn, selectTable } from '@/api/sys/permission'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
@@ -567,7 +567,7 @@ export default {
       this.dialogType = DIALOG_TYPE.ADD
       this.permissionDialogVisible = true
     },
-    modify (row) {
+    edit (row) {
       this.title = '修改数据权限'
       this.selectDept()
       this.dialogType = DIALOG_TYPE.EDIT
@@ -647,7 +647,7 @@ export default {
           } else {
             this.permission.permissions = [this.permission.permissions]
           }
-          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
+          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
         } else {
           console.log('error submit!!')
           return false
@@ -658,9 +658,9 @@ export default {
       this.permissionDialogVisible = false
       this.$refs[formName].resetFields()
     },
-    add () {
+    save () {
       this.permission.id = undefined
-      add(this.permission).then((rep) => {
+      save(this.permission).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '添加成功' })
           this.permissionDialogVisible = false
@@ -668,8 +668,8 @@ export default {
         }
       })
     },
-    edit () {
-      edit(this.permission).then((rep) => {
+    modify () {
+      modify(this.permission).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '修改成功' })
           this.permissionDialogVisible = false

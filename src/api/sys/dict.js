@@ -25,7 +25,7 @@ export function list (data) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function add (data) {
+export function save (data) {
   return request({
     url: servicePath.system + '/sys/dict/save',
     method: 'post',
@@ -53,9 +53,9 @@ export function del (ids) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function edit (data) {
+export function modify (data) {
   return request({
-    url: servicePath.system + '/sys/dict/edit',
+    url: servicePath.system + '/sys/dict/modify',
     method: 'put',
     data: data
   })

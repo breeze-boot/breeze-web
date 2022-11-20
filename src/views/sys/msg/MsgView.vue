@@ -70,7 +70,7 @@
           width="250">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
             <el-button size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, msgTableData,scope.row)">删除
             </el-button>
@@ -188,7 +188,7 @@
 </template>
 
 <script>
-import { add, del, edit, list } from '@/api/sys/msg'
+import { del, list, modify, save } from '@/api/sys/msg'
 import { listDept } from '@/api/sys/dept'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
@@ -371,7 +371,7 @@ export default {
       this.dialogType = DIALOG_TYPE.ADD
       this.msgDialogVisible = true
     },
-    modify (row) {
+    edit (row) {
       this.title = '修改消息'
       this.dialogType = DIALOG_TYPE.EDIT
       this.msgDialogVisible = true
@@ -403,7 +403,7 @@ export default {
     submitMsgForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
+          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
         } else {
           console.log('error submit!!')
           return false
@@ -414,9 +414,9 @@ export default {
       this.msgDialogVisible = false
       this.$refs[formName].resetFields()
     },
-    add () {
+    save () {
       this.msg.id = undefined
-      add(this.msg).then((rep) => {
+      save(this.msg).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '添加成功' })
           this.msgDialogVisible = false
@@ -424,8 +424,8 @@ export default {
         }
       })
     },
-    edit () {
-      edit(this.msg).then((rep) => {
+    modify () {
+      modify(this.msg).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '修改成功' })
           this.msgDialogVisible = false

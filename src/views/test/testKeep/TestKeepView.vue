@@ -66,7 +66,7 @@ export default {
         }
       })
     },
-    add () {
+    save () {
     },
     resetForm () {
     }

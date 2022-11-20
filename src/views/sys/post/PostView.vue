@@ -70,7 +70,7 @@
           width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
             <el-button size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, postTableData,scope.row)">删除
             </el-button>
@@ -137,7 +137,7 @@
 </template>
 
 <script>
-import { add, del, edit, list } from '@/api/sys/post'
+import { del, list, modify, save } from '@/api/sys/post'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
@@ -267,7 +267,7 @@ export default {
       this.dialogType = DIALOG_TYPE.ADD
       this.postDialogVisible = true
     },
-    modify (row) {
+    edit (row) {
       this.title = '修改岗位'
       this.dialogType = DIALOG_TYPE.EDIT
       this.postDialogVisible = true
@@ -297,7 +297,7 @@ export default {
     submitPostForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
+          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
         } else {
           console.log('error submit!!')
           return false
@@ -308,9 +308,9 @@ export default {
       this.postDialogVisible = false
       this.$refs[formName].resetFields()
     },
-    add () {
+    save () {
       this.post.id = undefined
-      add(this.post).then((rep) => {
+      save(this.post).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '添加成功' })
           this.postDialogVisible = false
@@ -318,8 +318,8 @@ export default {
         }
       })
     },
-    edit () {
-      edit(this.post).then((rep) => {
+    modify () {
+      modify(this.post).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '修改成功' })
           this.postDialogVisible = false

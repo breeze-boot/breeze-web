@@ -70,7 +70,7 @@
           width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
             <el-button size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, platformTableData,scope.row)">删除
             </el-button>
@@ -137,7 +137,7 @@
 </template>
 
 <script>
-import { add, del, edit, list } from '@/api/sys/platform'
+import { del, list, modify, save } from '@/api/sys/platform'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
@@ -267,7 +267,7 @@ export default {
       this.dialogType = DIALOG_TYPE.ADD
       this.platformDialogVisible = true
     },
-    modify (row) {
+    edit (row) {
       this.title = '修改平台'
       this.dialogType = DIALOG_TYPE.EDIT
       this.platformDialogVisible = true
@@ -297,7 +297,7 @@ export default {
     submitPlatformForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
+          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
         } else {
           console.log('error submit!!')
           return false
@@ -308,9 +308,9 @@ export default {
       this.platformDialogVisible = false
       this.$refs[formName].resetFields()
     },
-    add () {
+    save () {
       this.platform.id = undefined
-      add(this.platform).then((rep) => {
+      save(this.platform).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '添加成功' })
           this.platformDialogVisible = false
@@ -318,8 +318,8 @@ export default {
         }
       })
     },
-    edit () {
-      edit(this.platform).then((rep) => {
+    modify () {
+      modify(this.platform).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '修改成功' })
           this.platformDialogVisible = false

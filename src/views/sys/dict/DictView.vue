@@ -71,7 +71,7 @@
           width="200">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
             <el-button size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, dictTableData,scope.row)">删除
             </el-button>
@@ -138,7 +138,7 @@
 </template>
 
 <script>
-import { add, del, edit, list, open } from '@/api/sys/dict'
+import { del, list, modify, open, save } from '@/api/sys/dict'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
@@ -277,7 +277,7 @@ export default {
       this.dialogType = DIALOG_TYPE.ADD
       this.dictDialogVisible = true
     },
-    modify (row) {
+    edit (row) {
       this.title = '修改字典'
       this.dialogType = DIALOG_TYPE.EDIT
       this.dictDialogVisible = true
@@ -303,15 +303,15 @@ export default {
     submitDictForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
+          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
         } else {
           console.log('error submit!!')
           return false
         }
       })
     },
-    add () {
-      add(this.dict).then((rep) => {
+    save () {
+      save(this.dict).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })
           this.dictDialogVisible = false
@@ -319,8 +319,8 @@ export default {
         }
       })
     },
-    edit () {
-      edit(this.dict).then((rep) => {
+    modify () {
+      modify(this.dict).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: rep.message })
           this.dictDialogVisible = false

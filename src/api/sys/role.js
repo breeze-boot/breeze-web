@@ -54,7 +54,7 @@ export function editPermission (data) {
  * 添加
  * @returns {AxiosPromise}
  */
-export function add (data) {
+export function save (data) {
   return request({
     url: servicePath.system + '/sys/role/save',
     method: 'post',
@@ -82,9 +82,9 @@ export function del (ids) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function edit (data) {
+export function modify (data) {
   return request({
-    url: servicePath.system + '/sys/role/edit',
+    url: servicePath.system + '/sys/role/modify',
     method: 'put',
     data: data
   })

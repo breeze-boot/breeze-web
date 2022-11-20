@@ -37,7 +37,7 @@ export function del (ids) {
  *
  * @returns {AxiosPromise}
  */
-export function add (data) {
+export function save (data) {
   return request({
     url: servicePath.system + '/sys/post/save',
     method: 'post',
@@ -50,9 +50,9 @@ export function add (data) {
  *
  * @returns {AxiosPromise}
  */
-export function edit (data) {
+export function modify (data) {
   return request({
-    url: servicePath.system + '/sys/post/edit',
+    url: servicePath.system + '/sys/post/modify',
     method: 'put',
     data: data
   })
