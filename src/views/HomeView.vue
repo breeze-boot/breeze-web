@@ -12,9 +12,9 @@
           <Tag v-show="false"/>
           <Tabs v-show="true"/>
         </div>
-        <keep-alive :include="keepAlive">
+        <keep-alive :include="this.$store.state.menu.keepAliveMenus">
           <router-view
-            :key="key"
+            :key="this.$route.fullPath"
             :style="{animationName: 'fadeIn', animationDuration: 0 + 's'}"
             class="router-main"/>
         </keep-alive>
@@ -40,17 +40,11 @@ export default {
   data () {
     return {}
   },
-  computed: {
-    keepAlive () {
-      return this.$store.state.menu.keepAliveMenus
-    },
-    key () {
-      return this.$route.fullPath
-    }
-  },
-  mounted () {
+  created () {
+    this.$initWebSocket()
   },
   destroyed () {
+    this.$closeWebsocket()
   },
   methods: {
     wheel (e) {

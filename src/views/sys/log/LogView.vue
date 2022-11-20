@@ -332,6 +332,7 @@ export default {
         del([JSONBigInt.parse(row.id)]).then(rep => {
           if (rep.code === 1) {
             rows.splice(index, 1)
+            this.reloadList()
             this.$message.success('删除成功')
           }
         })

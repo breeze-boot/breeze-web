@@ -1,14 +1,20 @@
 <template>
   <el-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchPlatformForm" class="demo-form-inline" size="mini">
+      <el-form ref="searchForm" :inline="true" :model="searchFileForm" class="demo-form-inline" size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
-            <el-form-item label="平台名称" prop="platformName">
-              <el-input v-model="searchPlatformForm.platformName" clearable placeholder="平台名称"/>
+            <el-form-item label="原始文件名称" prop="originalFileName">
+              <el-input v-model="searchFileForm.originalFileName" clearable placeholder="原始文件名称"/>
             </el-form-item>
-            <el-form-item label="平台编码" prop="platformCode">
-              <el-input v-model="searchPlatformForm.platformCode" clearable placeholder="平台编码"/>
+            <el-form-item label="新文件名称" prop="newFileName">
+              <el-input v-model="searchFileForm.newFileName" clearable placeholder="新文件名称"/>
+            </el-form-item>
+            <el-form-item label="创建人ID" prop="createBy">
+              <el-input v-model="searchFileForm.createBy" clearable placeholder="创建人ID"/>
+            </el-form-item>
+            <el-form-item label="创建人" prop="createName">
+              <el-input v-model="searchFileForm.createName" clearable placeholder="创建人"/>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search()">查询</el-button>
@@ -18,14 +24,13 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:platform:save']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:platform:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
+        <el-button v-has="['sys:file:save']" plain size="mini" type="primary" @click="create">新建</el-button>
+        <el-button v-has="['sys:file:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
         <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
-        <el-button plain size="mini" @click="importInfo">导入</el-button>
       </div>
       <el-table
         ref="multipleTable"
-        :data="platformTableData"
+        :data="fileTableData"
         border
         empty-text="无数据"
         height="500"
@@ -33,7 +38,7 @@
         size="mini"
         stripe
         style="width: 100%"
-        @selection-change="platformHandleSelectionChange">
+        @selection-change="fileHandleSelectionChange">
         <el-table-column
           type="selection"
           width="55">
@@ -45,19 +50,24 @@
           width="200">
         </el-table-column>
         <el-table-column
-          label="平台名称"
-          prop="platformName"
+          label="原始文件名称"
+          prop="originalFileName"
           show-overflow-tooltip
           width="200">
         </el-table-column>
         <el-table-column
-          label="平台编码"
-          prop="platformCode"
+          label="新文件名称"
+          prop="newFileName"
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
-          label="描述"
-          prop="description"
+          label="创建人ID"
+          prop="createBy"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
+          label="存储路径"
+          prop="path"
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
@@ -72,15 +82,15 @@
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
             <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
             <el-button size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, platformTableData,scope.row)">删除
+                       @click.native.prevent="removeItem(scope.$index, fileTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchPlatformForm.current"
-          :page-size="searchPlatformForm.size"
+          :current-page="searchFileForm.current"
+          :page-size="searchFileForm.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -90,45 +100,60 @@
       </div>
     </el-main>
 
-    <el-dialog :title="title" :visible.sync="platformDialogVisible" width="800px"
-               @close="closePlatformDialog('platformRuleForm')">
-      <el-form ref="platformRuleForm" :model="platform" :rules="platformRules" size="mini">
-        <el-form-item :label-width="formLabelWidth" label="平台名称" prop="platformName">
-          <el-input v-model="platform.platformName" autocomplete="off" clearable></el-input>
+    <el-dialog :title="title" :visible.sync="fileDialogVisible" width="800px"
+               @close="closeFileDialog('fileRuleForm')">
+      <el-form ref="fileRuleForm" :model="file" :rules="fileRules" size="mini">
+        <el-form-item :label-width="formLabelWidth" label="原始文件名称" prop="originalFileName">
+          <el-input v-model="file.originalFileName" autocomplete="off" clearable></el-input>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="平台编码" prop="platformCode">
-          <el-input v-model="platform.platformCode" autocomplete="off" clearable></el-input>
+        <el-form-item :label-width="formLabelWidth" label="新文件名称" prop="FileCode">
+          <el-input v-model="file.newFileName" autocomplete="off" clearable></el-input>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="描述" prop="description">
-          <el-input v-model="platform.description" autocomplete="off" clearable type="textarea"></el-input>
+        <el-form-item :label-width="formLabelWidth" label="创建人" prop="createBy">
+          <el-input v-model="file.createBy" autocomplete="off" clearable></el-input>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="创建人" prop="createBy">
+          <el-input v-model="file.createBy" autocomplete="off" clearable></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetPlatformForm('platformRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitPlatformForm('platformRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="resetFileForm('fileRuleForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="submitFileForm('fileRuleForm')">确 定</el-button>
       </div>
     </el-dialog>
 
-    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="950px"
                @close="closeInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item>
           <template slot="label">
-            平台名称
+            原始文件名称
           </template>
-          {{ platform.platformName }}
+          {{ file.originalFileName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            平台编码
+            新文件名称
           </template>
-          <el-tag size="small">{{ platform.platformCode }}</el-tag>
+          <el-tag size="small">{{ file.newFileName }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            描述
+            存储路径
           </template>
-          {{ platform.description }}
+          {{ file.path }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            创建人ID
+          </template>
+          {{ file.createBy }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            创建人
+          </template>
+          {{ file.createName }}
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -137,54 +162,57 @@
 </template>
 
 <script>
-import { add, del, edit, list } from '@/api/sys/platform'
+import { add, del, edit, list } from '@/api/sys/file'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
 
 export default {
-  name: 'PlatformView',
+  name: 'FileView',
   data () {
     return {
-      multipleSelectionPlatformIds: [],
-      platformTableData: [],
-      searchPlatformForm: {
-        platformName: '',
-        platformCode: '',
-        current: 1,
+      multipleSelectionFileIds: [],
+      fileTableData: [],
+      searchFileForm: {
+        originalFileName: '',
+        newFileName: '',
+        createBy: '',
+        createName: '',
         size: 10
       },
       total: 0,
       title: '',
-      platformDialogVisible: false,
+      fileDialogVisible: false,
       infoDialogVisible: false,
       // 默认是创建
       dialogType: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
-      platform: {
+      file: {
         id: null,
-        platformName: '',
-        platformCode: '',
-        description: ''
+        originalFileName: '',
+        newFileName: '',
+        createBy: '',
+        createName: ''
       },
-      platformInfo: {
+      fileInfo: {
         id: null,
-        platformName: '',
-        platformCode: '',
-        description: ''
+        originalFileName: '',
+        newFileName: '',
+        createBy: '',
+        createName: ''
       },
-      platformRules: {
-        platformName: [
+      fileRules: {
+        originalFileName: [
           {
             required: true,
-            message: '请输入平台名称',
+            message: '请输入文件名称',
             trigger: 'blur'
           }
         ],
-        platformCode: [
+        newFileName: [
           {
             required: true,
-            message: '请输入平台编码',
+            message: '请输入文件编码',
             trigger: 'blur'
           }
         ]
@@ -198,22 +226,22 @@ export default {
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
-          this.platformTableData = rep.data.records
-          this.searchPlatformForm.size = rep.data.size
-          this.searchPlatformForm.current = rep.data.current
+          this.fileTableData = rep.data.records
+          this.searchFileForm.size = rep.data.size
+          this.searchFileForm.current = rep.data.current
           this.total = rep.data.total
         }
       })
     },
     buildParam () {
-      return this.searchPlatformForm
+      return this.searchFileForm
     },
     handleSizeChange (size) {
-      this.searchPlatformForm.size = size
+      this.searchFileForm.size = size
       this.reloadList()
     },
     handleCurrentChange (current) {
-      this.searchPlatformForm.current = current
+      this.searchFileForm.current = current
       this.reloadList()
     },
     search () {
@@ -222,8 +250,8 @@ export default {
     searchReset () {
       this.$refs.searchForm.resetFields()
     },
-    platformHandleSelectionChange (val) {
-      this.multipleSelectionPlatformIds = val
+    fileHandleSelectionChange (val) {
+      this.multipleSelectionFileIds = val
     },
     /**
      * 批量删除
@@ -231,7 +259,7 @@ export default {
     remove () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelectionPlatformIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        this.multipleSelectionFileIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(rep => {
           if (rep.code === 1) {
             this.$message.success('删除成功')
@@ -252,27 +280,25 @@ export default {
         del([JSONBigInt.parse(row.id)]).then(rep => {
           if (rep.code === 1) {
             rows.splice(index, 1)
-            this.reloadList()
             this.$message.success('删除成功')
+            this.reloadList()
           }
         })
       })
     },
     exportInfo () {
     },
-    importInfo () {
-    },
     create () {
-      this.title = '创建平台'
+      this.title = '创建文件'
       this.dialogType = DIALOG_TYPE.ADD
-      this.platformDialogVisible = true
+      this.fileDialogVisible = true
     },
     modify (row) {
-      this.title = '修改平台'
+      this.title = '修改文件'
       this.dialogType = DIALOG_TYPE.EDIT
-      this.platformDialogVisible = true
+      this.fileDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.platform, row)
+        Object.assign(this.file, row)
       })
     },
     info (row) {
@@ -280,21 +306,21 @@ export default {
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.platform, row)
+        Object.assign(this.file, row)
       })
     },
-    closePlatformDialog (formName) {
-      this.platform.id = undefined
+    closeFileDialog (formName) {
+      this.file.id = undefined
       this.$refs[formName].resetFields()
     },
     closeInfoDialog () {
-      this.platform = this.platformInfo
+      this.file = this.fileInfo
     },
     /**
      * 提交
      * @param formName
      */
-    submitPlatformForm (formName) {
+    submitFileForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
@@ -304,25 +330,25 @@ export default {
         }
       })
     },
-    resetPlatformForm (formName) {
-      this.platformDialogVisible = false
+    resetFileForm (formName) {
+      this.fileDialogVisible = false
       this.$refs[formName].resetFields()
     },
     add () {
-      this.platform.id = undefined
-      add(this.platform).then((rep) => {
+      this.file.id = undefined
+      add(this.file).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '添加成功' })
-          this.platformDialogVisible = false
+          this.fileDialogVisible = false
           this.reloadList()
         }
       })
     },
     edit () {
-      edit(this.platform).then((rep) => {
+      edit(this.file).then((rep) => {
         if (rep.code === 1) {
           Message.success({ message: '修改成功' })
-          this.platformDialogVisible = false
+          this.fileDialogVisible = false
           this.reloadList()
         }
       })

@@ -1,35 +1,32 @@
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
-
-export let reConnectTime = null
-const stompClient = null
+import store from '@/store/index'
 
 const subscribeTopic = () => {
-  stompClient.subscribe('/topic/msg', (res) => {
+  store.state.userInfo.stompClient.subscribe('/topic/msg', (res) => {
     const row = JSON.parse(res.body)
     console.log('topic => {}', row)
   })
 }
-
 const subscribe = () => {
-  stompClient.subscribe('/user/queue/userMsg', (res) => {
+  store.state.userInfo.stompClient.subscribe('/user/queue/userMsg', (res) => {
     const row = JSON.parse(res.body)
     console.log('user => {}', row)
   })
 }
 
 const sendMsg = (msg) => {
-  stompClient.send('/msg/sendMsg', {}, JSON.stringify(msg))
+  store.state.userInfo.stompClient.send('/msg/sendMsg', {}, JSON.stringify(msg))
 }
 
 export const initWebSocket = () => {
   const socket = new SockJS(process.env.VUE_APP_SERVICE_URI + '/ws')
-  const stompClient = Stomp.over(socket)
+  store.state.userInfo.stompClient = Stomp.over(socket)
   const header = {
     Authorization: localStorage.getItem('access_token'),
     username: 'admin'
   }
-  stompClient.connect(header,
+  store.state.userInfo.stompClient.connect(header,
     () => {
       subscribeTopic()
       subscribe()
@@ -39,13 +36,13 @@ export const initWebSocket = () => {
     (err) => {
       // 监听错误信息并且发起重连
       console.error('socketErrorMsg : ', err)
-      if (reConnectTime) {
-        clearInterval(reConnectTime)
+      if (store.state.userInfo.reConnectTime) {
+        clearInterval(store.state.userInfo.store.state.userInfo.reConnectTime)
       }
       // 重新连接一次
-      reConnectTime = setTimeout(() => {
+      store.state.userInfo.reConnectTime = setTimeout(() => {
         console.log('重新连接>>>>>>>>>>')
-        this.$initWebSocket()
+        initWebSocket()
       }, 60000)
     }
   )
@@ -53,19 +50,29 @@ export const initWebSocket = () => {
 export default {
   install (Vue, options) {
     Vue.prototype.$initWebSocket = initWebSocket
-    Vue.prototype.$sendMsg = (msg) => {
-      stompClient.send('/msg/sendMsg', {}, JSON.stringify(msg))
-    }
     Vue.prototype.$closeWebsocket = () => {
-      clearInterval(reConnectTime)
-      if (stompClient !== null) {
-        stompClient.disconnect(() => {
+      clearInterval(store.state.userInfo.reConnectTime)
+      if (store.state.userInfo.stompClient !== null) {
+        store.state.userInfo.stompClient.disconnect(() => {
           console.log('关闭连接')
         })
       }
     }
+    Vue.prototype.$sendMsg = sendMsg
     Vue.prototype.$sendUserMsg = (msg) => {
-      stompClient.send('/msg/sendUserMsg', {}, JSON.stringify(msg))
+      store.state.userInfo.stompClient.send('/msg/sendUserMsg', {}, JSON.stringify(msg))
+    }
+    Vue.prototype.$subscribeTopic = () => {
+      store.state.userInfo.stompClient.subscribe('/topic/msg', (res) => {
+        const row = JSON.parse(res.body)
+        console.log('topic => {}', row)
+      })
+    }
+    Vue.prototype.$subscribe = () => {
+      store.state.userInfo.stompClient.subscribe('/user/queue/userMsg', (res) => {
+        const row = JSON.parse(res.body)
+        console.log('user => {}', row)
+      })
     }
   }
 }
