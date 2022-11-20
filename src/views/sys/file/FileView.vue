@@ -24,9 +24,7 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:file:save']" plain size="mini" type="primary" @click="create">新建</el-button>
         <el-button v-has="['sys:file:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
-        <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
       </div>
       <el-table
         ref="multipleTable"
@@ -80,7 +78,6 @@
           width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
             <el-button size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, fileTableData,scope.row)">删除
             </el-button>
@@ -99,28 +96,6 @@
         </el-pagination>
       </div>
     </el-main>
-
-    <el-dialog :title="title" :visible.sync="fileDialogVisible" width="800px"
-               @close="closeFileDialog('fileRuleForm')">
-      <el-form ref="fileRuleForm" :model="file" :rules="fileRules" size="mini">
-        <el-form-item :label-width="formLabelWidth" label="原始文件名称" prop="originalFileName">
-          <el-input v-model="file.originalFileName" autocomplete="off" clearable></el-input>
-        </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="新文件名称" prop="FileCode">
-          <el-input v-model="file.newFileName" autocomplete="off" clearable></el-input>
-        </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="创建人" prop="createBy">
-          <el-input v-model="file.createBy" autocomplete="off" clearable></el-input>
-        </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="创建人" prop="createBy">
-          <el-input v-model="file.createBy" autocomplete="off" clearable></el-input>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetFileForm('fileRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitFileForm('fileRuleForm')">确 定</el-button>
-      </div>
-    </el-dialog>
 
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="950px"
                @close="closeInfoDialog">
@@ -162,10 +137,9 @@
 </template>
 
 <script>
-import { add, del, edit, list } from '@/api/sys/file'
+import { del, list } from '@/api/sys/file'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
-import { Message } from 'element-ui'
 
 export default {
   name: 'FileView',
@@ -182,7 +156,6 @@ export default {
       },
       total: 0,
       title: '',
-      fileDialogVisible: false,
       infoDialogVisible: false,
       // 默认是创建
       dialogType: DIALOG_TYPE.ADD,
@@ -200,22 +173,6 @@ export default {
         newFileName: '',
         createBy: '',
         createName: ''
-      },
-      fileRules: {
-        originalFileName: [
-          {
-            required: true,
-            message: '请输入文件名称',
-            trigger: 'blur'
-          }
-        ],
-        newFileName: [
-          {
-            required: true,
-            message: '请输入文件编码',
-            trigger: 'blur'
-          }
-        ]
       }
     }
   },
@@ -286,21 +243,6 @@ export default {
         })
       })
     },
-    exportInfo () {
-    },
-    create () {
-      this.title = '创建文件'
-      this.dialogType = DIALOG_TYPE.ADD
-      this.fileDialogVisible = true
-    },
-    modify (row) {
-      this.title = '修改文件'
-      this.dialogType = DIALOG_TYPE.EDIT
-      this.fileDialogVisible = true
-      this.$nextTick(() => {
-        Object.assign(this.file, row)
-      })
-    },
     info (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
@@ -309,49 +251,8 @@ export default {
         Object.assign(this.file, row)
       })
     },
-    closeFileDialog (formName) {
-      this.file.id = undefined
-      this.$refs[formName].resetFields()
-    },
     closeInfoDialog () {
       this.file = this.fileInfo
-    },
-    /**
-     * 提交
-     * @param formName
-     */
-    submitFileForm (formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.add() : this.edit()
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
-    },
-    resetFileForm (formName) {
-      this.fileDialogVisible = false
-      this.$refs[formName].resetFields()
-    },
-    add () {
-      this.file.id = undefined
-      add(this.file).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: '添加成功' })
-          this.fileDialogVisible = false
-          this.reloadList()
-        }
-      })
-    },
-    edit () {
-      edit(this.file).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: '修改成功' })
-          this.fileDialogVisible = false
-          this.reloadList()
-        }
-      })
     }
   }
 }
