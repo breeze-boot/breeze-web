@@ -31,29 +31,3 @@ export function del (ids) {
     data: ids
   })
 }
-
-/**
- * 新增
- *
- * @returns {AxiosPromise}
- */
-export function add (data) {
-  return request({
-    url: servicePath.system + '/sys/file/save',
-    method: 'post',
-    data: data
-  })
-}
-
-/**
- * 修改
- *
- * @returns {AxiosPromise}
- */
-export function edit (data) {
-  return request({
-    url: servicePath.system + '/sys/file/edit',
-    method: 'put',
-    data: data
-  })
-}
