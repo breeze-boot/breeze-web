@@ -194,7 +194,7 @@ export default {
       }
     }
   },
-  created () {
+  mounted () {
     this.reloadList()
     this.reloadListTreeMenu()
   },

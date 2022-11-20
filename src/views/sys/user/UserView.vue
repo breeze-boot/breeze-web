@@ -567,7 +567,7 @@ export default {
       }
     }
   },
-  created () {
+  mounted () {
     this.reloadList()
     this.selectDept()
     this.selectRole()

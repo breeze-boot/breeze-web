@@ -43,7 +43,7 @@ export default {
   }
 }
 </script>
-<style>
+<style lang="less">
 * {
   padding: 0;
   margin: 0;
@@ -66,5 +66,4 @@ export default {
   background: rgba(0, 0, 0, .15);
   transition: color .2s ease;
 }
-
 </style>

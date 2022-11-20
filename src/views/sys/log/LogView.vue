@@ -263,7 +263,7 @@ export default {
       formLabelWidth: '80px'
     }
   },
-  created () {
+  mounted () {
     this.reloadList()
   },
   methods: {

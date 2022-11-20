@@ -193,7 +193,7 @@ export default {
       }
     }
   },
-  created () {
+  mounted () {
     this.reloadList()
   },
   methods: {

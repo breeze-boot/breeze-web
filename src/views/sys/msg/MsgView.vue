@@ -24,7 +24,7 @@
         <el-button plain size="mini" @click="importInfo">导入</el-button>
       </div>
       <el-table
-        ref="multipleTable"
+        ref="deptTable"
         :data="msgTableData"
         border
         empty-text="无数据"
@@ -67,13 +67,24 @@
         <el-table-column
           fixed="right"
           label="操作"
-          width="150">
+          width="250">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
             <el-button size="mini" type="text" @click="modify(scope.row)">编辑</el-button>
             <el-button size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, msgTableData,scope.row)">删除
             </el-button>
+            <el-dropdown size="mini" style="margin-left: 5px;" trigger="click" type="primary">
+              <span class="el-dropdown-link">
+                信息发布
+                <i class="el-icon-arrow-down el-icon--right"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item command="2" @click.native="sendAll(scope.row)">全部</el-dropdown-item>
+                <el-dropdown-item command="1" @click.native="sendToUser(scope.row)">指定人</el-dropdown-item>
+                <el-dropdown-item command="1" @click.native="sendToDept(scope.row)">指定部门</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -133,21 +144,77 @@
       </el-descriptions>
     </el-dialog>
 
+    <el-dialog :title="title" :visible.sync="sendDeptMsgDialogVisible" width="700px"
+               @close="closeSendMsgDialog">
+      <el-main>
+        <el-table
+          ref="deptTable"
+          :data="deptTableData"
+          :tree-props="{children: 'children', hasChildren: 'children.length>0'}"
+          border
+          highlight-current-row
+          row-key="id"
+          size="mini"
+          stripe
+          style="width: 100%"
+          @selection-change="deptHandleSelectionChange">
+          <el-table-column
+            type="selection"
+            width="55">
+          </el-table-column>
+          <el-table-column
+            v-if="false"
+            label="ID"
+            prop="id"
+            width="200">
+          </el-table-column>
+          <el-table-column
+            label="部门名称"
+            prop="deptName">
+          </el-table-column>
+          <el-table-column
+            label="部门编码"
+            prop="deptCode">
+          </el-table-column>
+        </el-table>
+      </el-main>
+    </el-dialog>
+
+    <el-dialog :title="title" :visible.sync="sendUserMsgDialogVisible" width="700px"
+               @close="closeSendMsgDialog">
+    </el-dialog>
+
   </el-container>
 </template>
 
 <script>
 import { add, del, edit, list } from '@/api/sys/msg'
+import { listDept } from '@/api/sys/dept'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
 
+const generateData = _ => {
+  const data = []
+  const cities = ['上海', '北京', '广州', '深圳', '南京', '西安', '成都']
+  const pinyin = ['shanghai', 'beijing', 'guangzhou', 'shenzhen', 'nanjing', 'xian', 'chengdu']
+  cities.forEach((city, index) => {
+    data.push({
+      label: city,
+      key: index,
+      pinyin: pinyin[index]
+    })
+  })
+  return data
+}
 export default {
   name: 'MsgView',
   data () {
     return {
       multipleSelectionMsgIds: [],
+      multipleSelectionDeptIds: [],
       msgTableData: [],
+      deptTableData: [],
       searchMsgForm: {
         msgTitle: '',
         msgCode: '',
@@ -157,6 +224,8 @@ export default {
       total: 0,
       title: '',
       msgDialogVisible: false,
+      sendUserMsgDialogVisible: false,
+      sendDeptMsgDialogVisible: true,
       infoDialogVisible: false,
       // 默认是创建
       dialogType: DIALOG_TYPE.ADD,
@@ -195,13 +264,26 @@ export default {
             trigger: 'blur'
           }
         ]
+      },
+      transferUserData: generateData(),
+      value: [],
+      filterMethod (query, item) {
+        return item.pinyin.indexOf(query) > -1
       }
     }
   },
-  created () {
+  mounted () {
     this.reloadList()
+    this.reloadDeptList()
   },
   methods: {
+    reloadDeptList () {
+      listDept({}).then((rep) => {
+        if (rep.code === 1) {
+          this.deptTableData = rep.data
+        }
+      })
+    },
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
@@ -229,8 +311,11 @@ export default {
     searchReset () {
       this.$refs.searchForm.resetFields()
     },
-    msgHandleSelectionChange (val) {
-      this.multipleSelectionMsgIds = val
+    deptHandleSelectionChange (row) {
+      this.multipleSelectionDeptIds = row
+    },
+    msgHandleSelectionChange (row) {
+      this.multipleSelectionMsgIds = row
     },
     /**
      * 批量删除
@@ -269,6 +354,18 @@ export default {
     },
     importInfo () {
     },
+    sendToUser (row) {
+      this.sendUserMsgDialogVisible = true
+      this.title = '接收人'
+    },
+    sendAll (row) {
+      debugger
+    },
+    sendToDept (row) {
+      this.sendDeptMsgDialogVisible = true
+      this.title = '接收部门'
+      this.reloadDeptList()
+    },
     create () {
       this.title = '创建消息'
       this.dialogType = DIALOG_TYPE.ADD
@@ -296,6 +393,8 @@ export default {
     },
     closeInfoDialog () {
       this.msg = this.msgInfo
+    },
+    closeSendMsgDialog () {
     },
     /**
      * 提交
@@ -337,3 +436,22 @@ export default {
   }
 }
 </script>
+
+<style lang="less">
+.el-dropdown {
+  font-size: 0.5rem;
+
+  i {
+    font-size: 0.5rem;
+  }
+}
+
+.el-dropdown-menu__item {
+  font-size: 0.5rem;
+}
+
+.el-dropdown-link {
+  cursor: pointer;
+  color: #409EFF;
+}
+</style>

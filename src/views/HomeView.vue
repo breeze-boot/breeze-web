@@ -77,22 +77,4 @@ export default {
   height: 83vh;
   box-shadow: 1px 1px 5px #eee;
 }
-
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0);
-  border-radius: 0;
-}
-
-::-webkit-scrollbar {
-  -webkit-appearance: none;
-  width: 0px;
-  height: 0;
-}
-
-::-webkit-scrollbar-thumb {
-  cursor: pointer;
-  border-radius: 5px;
-  background: rgba(255, 255, 255, 0);
-  transition: color .2s ease;
-}
 </style>

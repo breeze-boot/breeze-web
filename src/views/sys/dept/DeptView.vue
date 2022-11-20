@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import { add, del, edit, list, selectDept } from '@/api/sys/dept'
+import { add, del, edit, listDept, selectDept } from '@/api/sys/dept'
 import { confirmAlert, DIALOG_TYPE, filterTreeParentId, ROOT } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
@@ -161,12 +161,12 @@ export default {
       }
     }
   },
-  created () {
+  mounted () {
     this.reloadList()
   },
   methods: {
     reloadList () {
-      list(this.buildParam()).then((rep) => {
+      listDept(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
           this.deptTableData = rep.data
         }
