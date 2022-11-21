@@ -37,11 +37,12 @@ export function del (ids) {
  *
  * @returns {AxiosPromise}
  */
-export function download (ids) {
+export function download (id) {
   return request({
     url: servicePath.system + '/sys/file/download',
-    method: 'delete',
-    data: ids
+    method: 'get',
+    params: { fileId: id },
+    responseType: 'blob'
   })
 }
 
@@ -50,11 +51,11 @@ export function download (ids) {
  *
  * @returns {AxiosPromise}
  */
-export function upload (ids) {
+export function upload (data) {
   return request({
     url: servicePath.system + '/sys/file/upload',
     method: 'POST',
-    data: ids
+    data: data
   })
 }
 
@@ -63,10 +64,10 @@ export function upload (ids) {
  *
  * @returns {AxiosPromise}
  */
-export function preview (ids) {
+export function preview (id) {
   return request({
     url: servicePath.system + '/sys/file/preview',
-    method: 'delete',
-    data: ids
+    method: 'get',
+    params: { fileId: id }
   })
 }

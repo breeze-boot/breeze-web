@@ -66,21 +66,25 @@ request.interceptors.request.use((config) => {
 /**
  * 响应拦截器
  */
-request.interceptors.response.use((success) => {
-  if (success.status && success.status === 200) {
-    if (success.data.code === 2 && success.data.message) {
+request.interceptors.response.use((response) => {
+  if (response.status && response.status === 200) {
+    debugger
+    if (response.headers.responsetype === 'blob' || response.headers['content-disposition']) {
+      return response
+    }
+    if (response.data.code === 2 && response.data.message) {
       // 警告
-      showWaringMsg(success, success.data.message)
-    } else if (success.data.code === 0 && success.data.message) {
+      showWaringMsg(response, response.data.message)
+    } else if (response.data.code === 0 && response.data.message) {
       // 错误
-      showErrorMsg(success, '系统异常')
-    } else if (success.data.code === 500) {
-      console.error(success)
-      showErrorMsg(success, '服务异常')
-      return success.data
+      showErrorMsg(response, '系统异常')
+    } else if (response.data.code === 500) {
+      console.error(response)
+      showErrorMsg(response, '服务异常')
+      return response.data
     }
     loadingInstance.close()
-    return success.data
+    return response.data
   }
 }, (error) => {
   if (error.message.includes('Unexpected')) {

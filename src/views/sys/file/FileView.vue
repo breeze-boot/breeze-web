@@ -24,6 +24,7 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
+        <el-button v-has="['sys:file:create']" plain size="mini" type="primary" @click="create">添加</el-button>
         <el-button v-has="['sys:file:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
       </div>
       <el-table
@@ -80,11 +81,12 @@
         <el-table-column
           fixed="right"
           label="操作"
-          width="150">
+          width="200">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="preview(scope.row)">预览</el-button>
             <el-button size="mini" type="text" @click="download(scope.row)">下载</el-button>
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
+            <el-button size="mini" type="text" @click="edit(scope.row)">更新</el-button>
             <el-button size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, fileTableData,scope.row)">删除
             </el-button>
@@ -104,6 +106,18 @@
       </div>
     </el-main>
 
+    <el-dialog :title="title" :visible.sync="addDialogVisible" width="100px"
+               @close="closeInfoDialog">
+      <el-upload
+        action="http://127.0.0.1/sys/file/upload"
+        class="upload-demo"
+        drag
+        multiple>
+        <i class="el-icon-upload"></i>
+        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+      </el-upload>
+    </el-dialog>
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="950px"
                @close="closeInfoDialog">
       <el-descriptions :column="2" border size="mini">
@@ -144,9 +158,10 @@
 </template>
 
 <script>
-import { del, list } from '@/api/sys/file'
+import { del, download, list, preview } from '@/api/sys/file'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
+import { saveAs } from 'file-saver'
 
 export default {
   name: 'FileView',
@@ -163,6 +178,7 @@ export default {
       },
       total: 0,
       title: '',
+      addDialogVisible: false,
       infoDialogVisible: false,
       // 默认是创建
       dialogType: DIALOG_TYPE.ADD,
@@ -258,9 +274,35 @@ export default {
         Object.assign(this.file, row)
       })
     },
+    edit (row) {
+      this.title = '重新上传文件'
+      this.dialogType = DIALOG_TYPE.EDIT
+      this.infoDialogVisible = true
+      this.$nextTick(() => {
+        Object.assign(this.file, row)
+      })
+    },
+    create () {
+      this.title = '上传文件'
+      this.dialogType = DIALOG_TYPE.ADD
+      this.addDialogVisible = true
+    },
     preview (row) {
+      preview(row.id).then(rep => {
+        if (rep.code === 1) {
+          debugger
+        }
+      })
     },
     download (row) {
+      debugger
+      download(row.id).then(res => {
+        debugger
+        const blob = new Blob([res.data])
+        saveAs(blob, '21312.jpeg')
+      }).catch(err => {
+        console.log(err)
+      })
     },
     closeInfoDialog () {
       this.file = this.fileInfo
