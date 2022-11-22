@@ -359,7 +359,6 @@ export default {
       this.title = '接收人'
     },
     sendAll (row) {
-      debugger
     },
     sendToDept (row) {
       this.sendDeptMsgDialogVisible = true

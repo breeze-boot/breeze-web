@@ -24,7 +24,7 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:file:create']" plain size="mini" type="primary" @click="create">添加</el-button>
+        <el-button v-has="['sys:file:upload']" plain size="mini" type="primary" @click="create">新建</el-button>
         <el-button v-has="['sys:file:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
       </div>
       <el-table
@@ -46,6 +46,12 @@
           v-if="false"
           label="ID"
           prop="id"
+          width="200">
+        </el-table-column>
+        <el-table-column
+          label="标题"
+          prop="title"
+          show-overflow-tooltip
           width="200">
         </el-table-column>
         <el-table-column
@@ -106,21 +112,45 @@
       </div>
     </el-main>
 
-    <el-dialog :title="title" :visible.sync="addDialogVisible" width="100px"
-               @close="closeInfoDialog">
-      <el-upload
-        action="http://127.0.0.1/sys/file/upload"
-        class="upload-demo"
-        drag
-        multiple>
-        <i class="el-icon-upload"></i>
-        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-      </el-upload>
+    <el-dialog :title="title" :visible.sync="previewDialogVisible" width="500px"
+               @close="closeUploadDialog">
+      <el-main>
+        <el-image
+          :preview-src-list="[imgUrl]"
+          :src="imgUrl"
+          style="width: 400px;">
+        </el-image>
+      </el-main>
     </el-dialog>
+
+    <el-dialog :title="title" :visible.sync="uploadDialogVisible" width="400px"
+               @close="closeUploadDialog">
+      <el-form ref="uploadFileFrom" :model="file" label-width="0">
+        <el-form-item style="margin-bottom: 10px;">
+          <el-input v-model="file.title" placeholder="请输入文件标题"></el-input>
+        </el-form-item>
+        <el-upload
+          :http-request="uploadImage"
+          :show-file-list="false"
+          action=""
+          class="upload-demo"
+          drag
+          multiple>
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        </el-upload>
+      </el-form>
+    </el-dialog>
+
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="950px"
                @close="closeInfoDialog">
       <el-descriptions :column="2" border size="mini">
+        <el-descriptions-item>
+          <template slot="label">
+            标题
+          </template>
+          {{ file.title }}
+        </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             原始文件名称
@@ -131,7 +161,9 @@
           <template slot="label">
             新文件名称
           </template>
-          <el-tag size="small">{{ file.newFileName }}</el-tag>
+          <el-tag size="small">
+            {{ file.newFileName }}
+          </el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
@@ -153,12 +185,11 @@
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
-
   </el-container>
 </template>
 
 <script>
-import { del, download, list, preview } from '@/api/sys/file'
+import { del, download, list, preview, upload } from '@/api/sys/file'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { saveAs } from 'file-saver'
@@ -169,6 +200,7 @@ export default {
     return {
       multipleSelectionFileIds: [],
       fileTableData: [],
+      imgUrl: '',
       searchFileForm: {
         originalFileName: '',
         newFileName: '',
@@ -178,24 +210,19 @@ export default {
       },
       total: 0,
       title: '',
-      addDialogVisible: false,
+      uploadDialogVisible: false,
+      previewDialogVisible: false,
       infoDialogVisible: false,
       // 默认是创建
       dialogType: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
       file: {
         id: null,
-        originalFileName: '',
-        newFileName: '',
-        createBy: '',
-        createName: ''
+        title: ''
       },
       fileInfo: {
         id: null,
-        originalFileName: '',
-        newFileName: '',
-        createBy: '',
-        createName: ''
+        title: ''
       }
     }
   },
@@ -266,6 +293,18 @@ export default {
         })
       })
     },
+    uploadImage (param) {
+      const formData = new FormData()
+      formData.append('file', param.file)
+      formData.append('ossStyle', 0)
+      formData.append('title', this.file.title)
+      upload(formData).then(rep => {
+        this.uploadDialogVisible = false
+        this.reloadList()
+      }).catch(e => {
+        console.error('图片上传失败', e)
+      })
+    },
     info (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
@@ -277,7 +316,7 @@ export default {
     edit (row) {
       this.title = '重新上传文件'
       this.dialogType = DIALOG_TYPE.EDIT
-      this.infoDialogVisible = true
+      this.uploadDialogVisible = true
       this.$nextTick(() => {
         Object.assign(this.file, row)
       })
@@ -285,24 +324,26 @@ export default {
     create () {
       this.title = '上传文件'
       this.dialogType = DIALOG_TYPE.ADD
-      this.addDialogVisible = true
+      this.uploadDialogVisible = true
     },
     preview (row) {
       preview(row.id).then(rep => {
         if (rep.code === 1) {
-          debugger
+          this.previewDialogVisible = true
+          this.imgUrl = rep.data
         }
       })
     },
     download (row) {
-      debugger
-      download(row.id).then(res => {
-        debugger
-        const blob = new Blob([res.data])
-        saveAs(blob, '21312.jpeg')
+      download(row.id).then(rep => {
+        const blob = new Blob([rep.data])
+        saveAs(blob, rep.data.originalFileName)
       }).catch(err => {
         console.log(err)
       })
+    },
+    closeUploadDialog () {
+      this.file = this.fileInfo
     },
     closeInfoDialog () {
       this.file = this.fileInfo

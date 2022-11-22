@@ -68,8 +68,9 @@ request.interceptors.request.use((config) => {
  */
 request.interceptors.response.use((response) => {
   if (response.status && response.status === 200) {
-    debugger
-    if (response.headers.responsetype === 'blob' || response.headers['content-disposition']) {
+    if (response.headers['content-disposition']) {
+      response.data.originalFileName = response.headers['original-file-name']
+      loadingInstance.close()
       return response
     }
     if (response.data.code === 2 && response.data.message) {
