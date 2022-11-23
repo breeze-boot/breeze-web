@@ -147,36 +147,6 @@
     <el-dialog :title="title" :visible.sync="sendDeptMsgDialogVisible" width="700px"
                @close="closeSendMsgDialog">
       <el-main>
-        <el-table
-          ref="deptTable"
-          :data="deptTableData"
-          :tree-props="{children: 'children', hasChildren: 'children.length>0'}"
-          border
-          highlight-current-row
-          row-key="id"
-          size="mini"
-          stripe
-          style="width: 100%"
-          @selection-change="deptHandleSelectionChange">
-          <el-table-column
-            type="selection"
-            width="55">
-          </el-table-column>
-          <el-table-column
-            v-if="false"
-            label="ID"
-            prop="id"
-            width="200">
-          </el-table-column>
-          <el-table-column
-            label="部门名称"
-            prop="deptName">
-          </el-table-column>
-          <el-table-column
-            label="部门编码"
-            prop="deptCode">
-          </el-table-column>
-        </el-table>
       </el-main>
     </el-dialog>
 
@@ -189,7 +159,6 @@
 
 <script>
 import { del, list, modify, save } from '@/api/sys/msg'
-import { listDept } from '@/api/sys/dept'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
@@ -274,16 +243,8 @@ export default {
   },
   mounted () {
     this.reloadList()
-    this.reloadDeptList()
   },
   methods: {
-    reloadDeptList () {
-      listDept({}).then((rep) => {
-        if (rep.code === 1) {
-          this.deptTableData = rep.data
-        }
-      })
-    },
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {

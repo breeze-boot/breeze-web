@@ -9,7 +9,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  * @param data
  * @returns {AxiosPromise}
  */
-export function listDept (data) {
+export function list (data) {
   return request({
     url: servicePath.system + '/sys/dept/list',
     method: 'post',

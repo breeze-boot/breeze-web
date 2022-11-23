@@ -16,11 +16,22 @@
 
 <script>
 
+import JSONBigInt from 'json-bigint'
+
 export default {
   name: 'WelcomeView',
   methods: {
     halo () {
-      this.$sendUserMsg({ halo: 'halo admin' })
+      this.$sendMsg('/msg/sendDeptUserMsg', {
+        deptIds: [
+          JSONBigInt.parse('1565314987957145600')
+        ],
+        userIds: [
+          1
+        ],
+        type: 1,
+        msgId: JSONBigInt.parse('1594154596111454210')
+      })
     }
   }
 }

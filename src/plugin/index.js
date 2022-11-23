@@ -1,22 +1,34 @@
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import store from '@/store/index'
+import Notification from 'element-ui'
 
 const subscribeTopic = () => {
   store.state.userInfo.stompClient.subscribe('/topic/msg', (res) => {
     const row = JSON.parse(res.body)
-    console.log('topic => {}', row)
+    console.log('user => {}', row)
+    Notification.Notification({
+      title: '提示',
+      message: row.data,
+      duration: 0
+    })
   })
 }
 const subscribe = () => {
   store.state.userInfo.stompClient.subscribe('/user/queue/userMsg', (res) => {
+    debugger
     const row = JSON.parse(res.body)
     console.log('user => {}', row)
+    Notification.Notification({
+      title: '提示',
+      message: row.data,
+      duration: 0
+    })
   })
 }
 
-const sendMsg = (msg) => {
-  store.state.userInfo.stompClient.send('/msg/sendMsg', {}, JSON.stringify(msg))
+const sendMsg = (url, msg) => {
+  store.state.userInfo.stompClient.send(url, {}, JSON.stringify(msg))
 }
 
 export const initWebSocket = () => {
@@ -24,14 +36,14 @@ export const initWebSocket = () => {
   store.state.userInfo.stompClient = Stomp.over(socket)
   const header = {
     Authorization: localStorage.getItem('access_token'),
-    username: 'admin'
+    username: JSON.parse(localStorage.getItem('user_info')).username
   }
   store.state.userInfo.stompClient.connect(header,
     () => {
       subscribeTopic()
       subscribe()
       // 发送信息
-      sendMsg({ halo: 'Halo' })
+      sendMsg('/msg/sendMsg', 'halo')
     },
     (err) => {
       // 监听错误信息并且发起重连
@@ -59,20 +71,5 @@ export default {
       }
     }
     Vue.prototype.$sendMsg = sendMsg
-    Vue.prototype.$sendUserMsg = (msg) => {
-      store.state.userInfo.stompClient.send('/msg/sendUserMsg', {}, JSON.stringify(msg))
-    }
-    Vue.prototype.$subscribeTopic = () => {
-      store.state.userInfo.stompClient.subscribe('/topic/msg', (res) => {
-        const row = JSON.parse(res.body)
-        console.log('topic => {}', row)
-      })
-    }
-    Vue.prototype.$subscribe = () => {
-      store.state.userInfo.stompClient.subscribe('/user/queue/userMsg', (res) => {
-        const row = JSON.parse(res.body)
-        console.log('user => {}', row)
-      })
-    }
   }
 }

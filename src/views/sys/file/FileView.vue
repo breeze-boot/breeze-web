@@ -296,7 +296,7 @@ export default {
     uploadImage (param) {
       const formData = new FormData()
       formData.append('file', param.file)
-      formData.append('ossStyle', 0)
+      formData.append('ossStyle', 1)
       formData.append('title', this.file.title)
       upload(formData).then(rep => {
         this.uploadDialogVisible = false
