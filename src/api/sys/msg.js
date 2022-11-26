@@ -57,3 +57,34 @@ export function modify (data) {
     data: data
   })
 }
+
+/**
+ * 用户列表
+ *
+ * @returns {AxiosPromise}
+ */
+export function selectUser () {
+  return request({
+    url: servicePath.system + '/sys/common/selectUser',
+    method: 'get',
+    transformResponse: [(data) => {
+      return JSONBigInt2Str.parse(data)
+    }]
+  })
+}
+
+/**
+ * 部门下的用户列表
+ *
+ * @returns {AxiosPromise}
+ */
+export function listUserByDeptId (data) {
+  return request({
+    url: servicePath.system + '/listUserByDeptId',
+    method: 'post',
+    data: data,
+    transformResponse: [(data) => {
+      return JSONBigInt2Str.parse(data)
+    }]
+  })
+}

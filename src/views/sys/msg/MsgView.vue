@@ -56,6 +56,16 @@
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
+          label="消息类型"
+          prop="msgType"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
+          label="消息级别"
+          prop="msgLevel"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
           label="内容"
           prop="content"
           show-overflow-tooltip>
@@ -110,6 +120,20 @@
         <el-form-item :label-width="formLabelWidth" label="消息编码" prop="msgCode">
           <el-input v-model="msg.msgCode" autocomplete="off" clearable></el-input>
         </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="消息类型" prop="msgType">
+          <el-radio-group v-model="msg.msgType">
+            <el-radio-button v-for="item in msgTypeOption" :key="item.label" :label="item.label">
+              {{ item.value }}
+            </el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="消息等级" prop="msgLevel">
+          <el-radio-group v-model="msg.msgLevel">
+            <el-radio-button v-for="item in msgLevelOption" :key="item.label" :label="item.label">
+              {{ item.value }}
+            </el-radio-button>
+          </el-radio-group>
+        </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="内容" prop="content">
           <el-input v-model="msg.content" autocomplete="off" clearable type="textarea"></el-input>
         </el-form-item>
@@ -137,6 +161,26 @@
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
+            消息类型
+          </template>
+          <el-radio-group v-model="msg.msgType" size="mini">
+            <el-radio-button v-for="item in msgTypeOption" :key="item.label" :label="item.label">
+              {{ item.value }}
+            </el-radio-button>
+          </el-radio-group>
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            消息等级
+          </template>
+          <el-radio-group v-model="msg.msgLevel" size="mini">
+            <el-radio-button v-for="item in msgLevelOption" :key="item.label" :label="item.label">
+              {{ item.value }}
+            </el-radio-button>
+          </el-radio-group>
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
             内容
           </template>
           {{ msg.content }}
@@ -144,46 +188,142 @@
       </el-descriptions>
     </el-dialog>
 
-    <el-dialog :title="title" :visible.sync="sendDeptMsgDialogVisible" width="700px"
+    <el-dialog :title="title" :visible.sync="sendDeptMsgDialogVisible" width="1200px"
+               @close="closeSendMsgDialog">
+      <el-form ref="deptRuleForm" :model="sendMsgData" :rules="sendMsgDataRules" size="mini"
+               style="padding-right: 15px;">
+        <el-form-item :label-width="formLabelWidth" label="选择方式" prop="sendMsgType">
+          <el-radio-group v-model="sendMsgData.sendMsgType" size="mini">
+            <el-radio-button v-for="item in sendMsgTypeOption" :key="item.label" :label="item.label">
+              {{ item.value }}
+            </el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item v-if="sendMsgData.sendMsgType === '2'" :label-width="formLabelWidth" label="部门" prop="deptId">
+          <el-cascader
+            v-model="sendMsgData.deptId"
+            :options="deptOption"
+            :props="{ multiple: true, checkStrictly: true }"
+            :show-all-levels="false"
+            collapse-tags
+            @change="handleChangeDept"/>
+        </el-form-item>
+        <el-form-item v-if="sendMsgData.sendMsgType=== '1'" :label-width="formLabelWidth" label="部门" prop="deptId">
+          <el-cascader
+            v-model="sendMsgData.deptId"
+            :options="deptOption"
+            :props="{ checkStrictly: true }"
+            :show-all-levels="false"
+            @change="handleChangeDept"
+          />
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="用户数据">
+          <el-table
+            ref="multipleTable"
+            :data="sendMsgData.userTableData"
+            border
+            empty-text="无数据"
+            height="300"
+            max-height="500"
+            size="mini"
+            stripe
+            style="width: 100%">
+            <el-table-column
+              v-if="false"
+              label="ID"
+              prop="id"
+              width="200">
+            </el-table-column>
+            <el-table-column
+              label="展示名称"
+              prop="amountName"
+              show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column
+              label="用户编号"
+              prop="userCode"
+              show-overflow-tooltip
+              width="180">
+            </el-table-column>
+            <el-table-column
+              label="用户名"
+              prop="username"
+              show-overflow-tooltip
+              width="180">
+            </el-table-column>
+            <el-table-column
+              label="部门"
+              prop="deptName"
+              show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column
+              label="岗位"
+              prop="postName"
+              show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column
+              label="身份证"
+              prop="idCard"
+              show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column
+              label="用户邮箱"
+              prop="email"
+              show-overflow-tooltip>
+            </el-table-column>
+            <el-table-column
+              fixed="right"
+              label="操作"
+              width="120">
+              <template slot-scope="scope">
+                <el-button size="mini" type="text"
+                           @click.native.prevent="removeUserItem(scope.$index, sendMsgData.userTableData,scope.row)">删除
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="mini" @click="closeSendMsgDialog">取 消</el-button>
+        <el-button size="mini" type="primary" @click="sendMsg">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <el-dialog :title="title" :visible.sync="sendUserMsgDialogVisible" width="760px"
                @close="closeSendMsgDialog">
       <el-main>
+        <el-transfer
+          v-model="sendMsgData.users"
+          :button-texts="['用户','接收人']"
+          :data="sendMsgData.transferUserData"
+          :filter-method="filterMethod"
+          :titles="['系统用户', '接收方']"
+          filter-placeholder="请输入用户名"
+          filterable>
+        </el-transfer>
       </el-main>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="mini" @click="closeSendMsgDialog">取 消</el-button>
+        <el-button size="mini" type="primary" @click="sendMsg">确 定</el-button>
+      </div>
     </el-dialog>
-
-    <el-dialog :title="title" :visible.sync="sendUserMsgDialogVisible" width="700px"
-               @close="closeSendMsgDialog">
-    </el-dialog>
-
   </el-container>
 </template>
 
 <script>
-import { del, list, modify, save } from '@/api/sys/msg'
+import { del, list, listUserByDeptId, modify, save, selectUser } from '@/api/sys/msg'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
+import { selectDept } from '@/api/sys/dept'
 
-const generateData = _ => {
-  const data = []
-  const cities = ['上海', '北京', '广州', '深圳', '南京', '西安', '成都']
-  const pinyin = ['shanghai', 'beijing', 'guangzhou', 'shenzhen', 'nanjing', 'xian', 'chengdu']
-  cities.forEach((city, index) => {
-    data.push({
-      label: city,
-      key: index,
-      pinyin: pinyin[index]
-    })
-  })
-  return data
-}
 export default {
   name: 'MsgView',
   data () {
     return {
       multipleSelectionMsgIds: [],
-      multipleSelectionDeptIds: [],
       msgTableData: [],
-      deptTableData: [],
       searchMsgForm: {
         msgTitle: '',
         msgCode: '',
@@ -194,7 +334,7 @@ export default {
       title: '',
       msgDialogVisible: false,
       sendUserMsgDialogVisible: false,
-      sendDeptMsgDialogVisible: true,
+      sendDeptMsgDialogVisible: false,
       infoDialogVisible: false,
       // 默认是创建
       dialogType: DIALOG_TYPE.ADD,
@@ -203,12 +343,16 @@ export default {
         id: null,
         msgTitle: '',
         msgCode: '',
+        msgType: 2,
+        msgLevel: '',
         content: ''
       },
       msgInfo: {
         id: null,
         msgTitle: '',
         msgCode: '',
+        msgType: 2,
+        msgLevel: '',
         content: ''
       },
       msgRules: {
@@ -234,10 +378,55 @@ export default {
           }
         ]
       },
-      transferUserData: generateData(),
-      value: [],
+      deptOption: [],
+      sendMsgTypeOption: [
+        {
+          value: '部门的用户',
+          label: '1'
+        },
+        {
+          value: '自定义部门的用户',
+          label: '2'
+        }
+      ],
+      msgTypeOption: [
+        {
+          value: '公告',
+          label: '1'
+        },
+        {
+          value: '消息',
+          label: '2'
+        }
+      ],
+      msgLevelOption: [
+        {
+          value: '紧急',
+          label: 'danger'
+        },
+        {
+          value: '警告',
+          label: 'warning'
+        },
+        {
+          value: '正常',
+          label: 'success'
+        },
+        {
+          value: '一般',
+          label: 'info'
+        }
+      ],
+      sendMsgDataRules: {},
+      sendMsgData: {
+        msgId: '',
+        sendMsgType: '1',
+        userTableData: [],
+        transferUserData: [],
+        users: []
+      },
       filterMethod (query, item) {
-        return item.pinyin.indexOf(query) > -1
+        return item.label.indexOf(query) > -1
       }
     }
   },
@@ -245,6 +434,51 @@ export default {
     this.reloadList()
   },
   methods: {
+    handleChangeDept () {
+      // 去查询部门下的用户
+      const deptIds = []
+      this.sendMsgData.deptId.forEach(data => {
+        if (typeof data === 'string') {
+          deptIds.push(JSONBigInt.parse(data))
+          return
+        }
+        data.forEach(a => {
+          deptIds.push(JSONBigInt.parse(a))
+        })
+      })
+      this.sendMsgData.userTableData = []
+      this.sendMsgData.users = []
+      listUserByDeptId(deptIds).then((rep) => {
+        if (rep.code === 1) {
+          this.sendMsgData.userTableData = rep.data
+          const userIds = []
+          this.sendMsgData.userTableData.forEach(row => {
+            userIds.push(JSONBigInt.parse(row.id))
+          })
+          this.sendMsgData.users = userIds
+        }
+      })
+    },
+    reloadUserData () {
+      selectUser().then((rep) => {
+        if (rep.code === 1) {
+          rep.data.forEach((user, index) => {
+            this.sendMsgData.transferUserData.push({
+              label: user.username,
+              key: user.id,
+              index: index
+            })
+          })
+        }
+      })
+    },
+    selectDept () {
+      selectDept().then(res => {
+        if (res.code === 1 && res.data) {
+          this.deptOption = res.data
+        }
+      })
+    },
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
@@ -271,9 +505,6 @@ export default {
     },
     searchReset () {
       this.$refs.searchForm.resetFields()
-    },
-    deptHandleSelectionChange (row) {
-      this.multipleSelectionDeptIds = row
     },
     msgHandleSelectionChange (row) {
       this.multipleSelectionMsgIds = row
@@ -317,14 +548,37 @@ export default {
     },
     sendToUser (row) {
       this.sendUserMsgDialogVisible = true
+      this.reloadUserData()
       this.title = '接收人'
+      this.sendMsgData.msgId = row.id
+    },
+    removeUserItem (index, rows, row) {
+      confirmAlert(() => {
+        rows.splice(index, 1)
+        this.sendMsgData.users.splice(index, 1)
+        this.$message.success('删除成功')
+      })
+    },
+    sendMsg () {
+      if (this.sendMsgData.users.length === 0) {
+        Message.warning({ message: '还未选择发送信息的用户' })
+        return
+      }
+      this.$sendMsg('/msg/sendMsgToUser',
+        {
+          msgId: this.sendMsgData.msgId,
+          userIds: this.sendMsgData.users
+        }
+      )
     },
     sendAll (row) {
+      this.$sendMsg('/msg/sendMsg', row.id)
     },
     sendToDept (row) {
       this.sendDeptMsgDialogVisible = true
+      this.selectDept()
       this.title = '接收部门'
-      this.reloadDeptList()
+      this.sendMsgData.msgId = row.id
     },
     create () {
       this.title = '创建消息'
@@ -355,6 +609,13 @@ export default {
       this.msg = this.msgInfo
     },
     closeSendMsgDialog () {
+      this.sendMsgData = {
+        msgId: '',
+        transferUserData: [],
+        userTableData: [],
+        users: []
+      }
+      this.sendUserMsgDialogVisible = false
     },
     /**
      * 提交

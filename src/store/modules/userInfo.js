@@ -6,9 +6,7 @@ Vue.use(Vuex)
 export default {
   namespaced: true,
   state: {
-    userInfo: undefined,
-    stompClient: null,
-    reConnectTime: null
+    userInfo: undefined
   },
   mutations: {
     setUserInfo (state, userInfo) {
@@ -27,16 +25,6 @@ export default {
         state.userInfo = JSON.parse(localStorage.getItem('user_info'))
       }
       return state.userInfo.username
-    },
-    getStompClient (state) {
-      if (state.stompClient) {
-        return state.userInfo.stompClient
-      }
-    },
-    getReConnectTime (state) {
-      if (state.reConnectTime) {
-        return state.userInfo.reConnectTime
-      }
     }
   }
 }

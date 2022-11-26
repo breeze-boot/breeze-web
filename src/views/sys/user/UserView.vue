@@ -27,7 +27,7 @@
         <el-button plain size="mini" @click="importInfo">导入</el-button>
       </div>
       <el-table
-        ref="multipleTable"
+        ref="userTable"
         :data="userTableData"
         border
         empty-text="无数据"

@@ -4,7 +4,13 @@
       <i v-show="this.isCollapse" class="el-icon-s-fold"/>
       <i v-show="!this.isCollapse" class="el-icon-s-unfold"/>
     </div>
-    <div class="logout">
+
+    <div class="group">
+      <div class="message">
+        <el-badge class="item" is-dot>
+          <i class="el-icon-message-solid" style="cursor: pointer;" @click="showMsgBox"></i>
+        </el-badge>
+      </div>
       <el-dropdown @command="handleCommand">
         <span class="el-dropdown-link">
           <span> {{ this.getUsername }}</span>
@@ -21,8 +27,38 @@
     </div>
     <el-drawer
       :direction="direction"
-      :visible.sync="drawer"
+      :visible.sync="settingDrawer"
       title="平台设置">
+    </el-drawer>
+    <el-drawer
+      :direction="direction"
+      :size="'20%'"
+      :visible.sync="msgDrawer"
+      :with-header="false">
+      <el-main>
+        <transition v-for="(item , index) in this.getMsg" :key="index" :index="index" name="el-fade-in">
+          <div class="msg-content">
+            <div
+              :style="{ color: item.msgLevel === 'info' ? '#909399' :
+                          (item.msgLevel === 'warning'? '#E6A23C' :
+                                  (item.msgLevel === 'danger'? '#F56C6C':'#67C23A'))}"
+              class="msg-title">
+              {{ item.msgTitle }}
+            </div>
+            <div class="msg">
+              <h1 class="msg-cursor">
+                查看详情
+              </h1>
+              <h1 class="msg-cursor" @click="closeMsg(item)">
+                关闭
+              </h1>
+              <h1 class="msg-cursor">
+                已读
+              </h1>
+            </div>
+          </div>
+        </transition>
+      </el-main>
     </el-drawer>
   </el-container>
 </template>
@@ -35,15 +71,18 @@ export default {
   name: 'Header',
   data () {
     return {
-      drawer: false,
+      settingDrawer: false,
+      msgDrawer: false,
       direction: 'rtl'
     }
   },
   computed: {
     ...mapState('menu', ['fadeIn', 'isCollapse']),
-    ...mapGetters('userInfo', ['getUsername'])
+    ...mapGetters('userInfo', ['getUsername']),
+    ...mapGetters('msg', ['getMsg'])
   },
   methods: {
+    ...mapActions('msg', ['closeMsgCard']),
     ...mapMutations('menu', ['setCollapse', 'setCollapseWhitespace', 'setFadeIn', 'clearMenus']),
     ...mapActions('userInfo', ['clearUserInfo']),
     handleCommand (command) {
@@ -58,10 +97,13 @@ export default {
           message: '退出成功',
           type: 'success'
         })
-        this.$closeWebsocket()
+        this.closeWebsocket()
         return
       }
-      this.drawer = true
+      this.settingDrawer = true
+    },
+    closeMsg (msg) {
+      this.closeMsgCard(msg)
     },
     collapse () {
       const collapseWhitespace = !this.isCollapse ? 200 : 65
@@ -69,6 +111,9 @@ export default {
       this.setCollapse(!this.isCollapse)
       this.setFadeIn(this.fadeIn === 'fadeOut' ? 'fadeIn' : 'fadeOut')
       this.setCollapseWhitespace(collapseWhitespace)
+    },
+    showMsgBox () {
+      this.msgDrawer = true
     }
   }
 }
@@ -94,14 +139,59 @@ export default {
     justify-content: center;
   }
 
-  > .logout {
+  > .group {
     display: flex;
     align-items: center;
     justify-content: center;
     margin-right: 1%;
-    width: 5%;
+    width: 8%;
     height: 100%;
-    color: #ffffff !important;
+
+    .message {
+      height: auto;
+      width: auto;
+      margin: 0 1vw;
+    }
+  }
+
+  .msg-content {
+    height: 11vh;
+    padding: 14px 26px 14px 13px;
+    margin-top: 14px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    border: 1px solid #EBEEF5;
+    background-color: #FFFFFF;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    transition: opacity .3s, transform .3s, left .3s, right .3s, top .4s, bottom .3s;
+    overflow: hidden;
+
+    .msg-title {
+      line-height: 1;
+      white-space: nowrap;
+      box-sizing: border-box;
+      outline: 0;
+      display: block;
+      font-weight: bolder;
+      padding: 6px 13px;
+      font-size: 1rem;
+      border-radius: 3px;
+    }
+
+    .msg {
+      width: 100vw;
+      display: flex;
+      justify-items: center;
+      align-items: center;
+      font-weight: 500;
+
+      .msg-cursor {
+        cursor: pointer;
+        padding: 3px 13px;
+        margin-top: 30px;
+        font-size: 0.5rem;
+      }
+    }
   }
 }
 </style>
