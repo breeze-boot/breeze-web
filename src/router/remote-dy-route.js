@@ -53,6 +53,8 @@ export const setMenu = (menus) => {
 export const convertMenus = (menus) => {
   menus.forEach(menu => {
     if (!menu.children) {
+      const route = menuToRoute(menu)
+      router.addRoute('home', route)
       return
     }
     setMenu(menu.children)

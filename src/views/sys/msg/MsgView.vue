@@ -193,22 +193,23 @@
       <el-form ref="deptRuleForm" :model="sendMsgData" :rules="sendMsgDataRules" size="mini"
                style="padding-right: 15px;">
         <el-form-item :label-width="formLabelWidth" label="选择方式" prop="sendMsgType">
-          <el-radio-group v-model="sendMsgData.sendMsgType" size="mini">
+          <el-radio-group v-model="sendMsgData.sendMsgType" size="mini" @change="handleChangeSendData">
             <el-radio-button v-for="item in sendMsgTypeOption" :key="item.label" :label="item.label">
               {{ item.value }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
-        <el-form-item v-if="sendMsgData.sendMsgType === '2'" :label-width="formLabelWidth" label="部门" prop="deptId">
+        <el-form-item v-if="multipartDept" :label-width="formLabelWidth" label="部门"
+                      prop="multipleDeptId">
           <el-cascader
-            v-model="sendMsgData.deptId"
+            v-model="sendMsgData.multipleDeptId"
             :options="deptOption"
             :props="{ multiple: true, checkStrictly: true }"
             :show-all-levels="false"
             collapse-tags
-            @change="handleChangeDept"/>
+            @change="handleChangeMultipleDept"/>
         </el-form-item>
-        <el-form-item v-if="sendMsgData.sendMsgType=== '1'" :label-width="formLabelWidth" label="部门" prop="deptId">
+        <el-form-item v-if="!multipartDept" :label-width="formLabelWidth" label="部门" prop="deptId">
           <el-cascader
             v-model="sendMsgData.deptId"
             :options="deptOption"
@@ -417,8 +418,15 @@ export default {
           label: 'info'
         }
       ],
-      sendMsgDataRules: {},
+      sendMsgDataRules: {
+        multipleDeptId: [],
+        deptId: []
+      },
+      multipartDept: true,
       sendMsgData: {
+        preVal: undefined,
+        multipleDeptId: [],
+        deptId: [],
         msgId: '',
         sendMsgType: '1',
         userTableData: [],
@@ -434,20 +442,57 @@ export default {
     this.reloadList()
   },
   methods: {
-    handleChangeDept () {
+    handleChangeSendData (val) {
+      this.sendMsgData.userTableData = []
+      if (val === '2') {
+        this.multipartDept = true
+        this.$nextTick(() => {
+          this.sendMsgData.multipleDeptId = []
+        })
+      } else {
+        this.multipartDept = false
+        this.$nextTick(() => {
+          this.sendMsgData.deptId = []
+        })
+      }
+    },
+    handleChangeMultipleDept () {
+      this.sendMsgData.users = []
+      this.sendMsgData.userTableData = []
+      if (this.sendMsgData.multipleDeptId.length === 0) {
+        this.sendMsgData.userTableData = []
+        return
+      }
       // 去查询部门下的用户
       const deptIds = []
-      this.sendMsgData.deptId.forEach(data => {
-        if (typeof data === 'string') {
-          deptIds.push(JSONBigInt.parse(data))
-          return
-        }
+      this.sendMsgData.multipleDeptId.forEach(data => {
         data.forEach(a => {
           deptIds.push(JSONBigInt.parse(a))
         })
       })
+      listUserByDeptId(deptIds).then((rep) => {
+        if (rep.code === 1) {
+          this.sendMsgData.userTableData = rep.data
+          const userIds = []
+          this.sendMsgData.userTableData.forEach(row => {
+            userIds.push(JSONBigInt.parse(row.id))
+          })
+          this.sendMsgData.users = userIds
+        }
+      })
+    },
+    handleChangeDept () {
       this.sendMsgData.userTableData = []
       this.sendMsgData.users = []
+      if (this.sendMsgData.deptId.length === 0) {
+        this.sendMsgData.userTableData = []
+        return
+      }
+      // 去查询部门下的用户
+      const deptIds = []
+      this.sendMsgData.deptId.forEach(data => {
+        deptIds.push(JSONBigInt.parse(data))
+      })
       listUserByDeptId(deptIds).then((rep) => {
         if (rep.code === 1) {
           this.sendMsgData.userTableData = rep.data
@@ -560,6 +605,7 @@ export default {
       })
     },
     sendMsg () {
+      debugger
       if (this.sendMsgData.users.length === 0) {
         Message.warning({ message: '还未选择发送信息的用户' })
         return
@@ -613,9 +659,11 @@ export default {
         msgId: '',
         transferUserData: [],
         userTableData: [],
+        sendMsgType: 1,
         users: []
       }
       this.sendUserMsgDialogVisible = false
+      this.sendDeptMsgDialogVisible = false
     },
     /**
      * 提交
