@@ -199,7 +199,7 @@
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
-        <el-form-item v-if="multipartDept" :label-width="formLabelWidth" label="部门"
+        <el-form-item v-if="dept" :label-width="formLabelWidth" label="部门"
                       prop="multipleDeptId">
           <el-cascader
             v-model="sendMsgData.multipleDeptId"
@@ -209,7 +209,7 @@
             collapse-tags
             @change="handleChangeMultipleDept"/>
         </el-form-item>
-        <el-form-item v-if="!multipartDept" :label-width="formLabelWidth" label="部门" prop="deptId">
+        <el-form-item v-if="!dept" :label-width="formLabelWidth" label="部门" prop="deptId">
           <el-cascader
             v-model="sendMsgData.deptId"
             :options="deptOption"
@@ -224,8 +224,7 @@
             :data="sendMsgData.userTableData"
             border
             empty-text="无数据"
-            height="300"
-            max-height="500"
+            height="300" max-height="500"
             size="mini"
             stripe
             style="width: 100%">
@@ -422,7 +421,7 @@ export default {
         multipleDeptId: [],
         deptId: []
       },
-      multipartDept: true,
+      dept: false,
       sendMsgData: {
         preVal: undefined,
         multipleDeptId: [],
@@ -445,12 +444,12 @@ export default {
     handleChangeSendData (val) {
       this.sendMsgData.userTableData = []
       if (val === '2') {
-        this.multipartDept = true
+        this.dept = true
         this.$nextTick(() => {
           this.sendMsgData.multipleDeptId = []
         })
       } else {
-        this.multipartDept = false
+        this.dept = false
         this.$nextTick(() => {
           this.sendMsgData.deptId = []
         })
@@ -618,7 +617,7 @@ export default {
       )
     },
     sendAll (row) {
-      this.$sendMsg('/msg/sendMsg', row.id)
+      this.$sendMsg('/msg/sendBroadcastMsg', { msgId: row.id })
     },
     sendToDept (row) {
       this.sendDeptMsgDialogVisible = true

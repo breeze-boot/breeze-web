@@ -80,7 +80,7 @@ export function selectUser () {
  */
 export function listUserByDeptId (data) {
   return request({
-    url: servicePath.system + '/listUserByDeptId',
+    url: servicePath.system + '/sys/user/listUserByDeptId',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
