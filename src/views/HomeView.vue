@@ -113,7 +113,7 @@ export default {
           dangerouslyUseHTMLString: true,
           position: 'top-right',
           offset: 20,
-          duration: 1000,
+          duration: 3000,
           showClose: false,
           onClick () {
           }

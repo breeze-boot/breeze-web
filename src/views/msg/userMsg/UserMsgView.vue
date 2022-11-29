@@ -77,7 +77,7 @@
         </el-table-column>
         <el-table-column
           label="已读"
-          prop="close">
+          prop="read">
         </el-table-column>
         <el-table-column
           fixed="right"
@@ -123,21 +123,25 @@
           <template slot="label">
             消息类型
           </template>
+          <el-tag size="small">{{ userMsg.msgType }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             消息等级
           </template>
+          <el-tag size="small">{{ userMsg.msgType }}</el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             消息发送人
           </template>
+          {{ userMsg.createName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             消息发送时间
           </template>
+          {{ userMsg.read }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
