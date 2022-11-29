@@ -52,7 +52,7 @@
               <h1 class="msg-cursor" @click="closeMsg(item)">
                 关闭
               </h1>
-              <h1 class="msg-cursor">
+              <h1 class="msg-cursor" @click="markReadMsg (item)">
                 已读
               </h1>
             </div>
@@ -82,7 +82,7 @@ export default {
     ...mapGetters('msg', ['getMsg'])
   },
   methods: {
-    ...mapActions('msg', ['closeMsgCard']),
+    ...mapActions('msg', ['closeMsgCard', 'markReadMsgCard']),
     ...mapMutations('menu', ['setCollapse', 'setCollapseWhitespace', 'setFadeIn', 'clearMenus']),
     ...mapActions('userInfo', ['clearUserInfo']),
     handleCommand (command) {
@@ -103,6 +103,9 @@ export default {
       this.settingDrawer = true
     },
     closeMsg (msg) {
+      this.closeMsgCard(msg)
+    },
+    markReadMsg (msg) {
       this.closeMsgCard(msg)
     },
     collapse () {

@@ -77,7 +77,7 @@
         </el-table-column>
         <el-table-column
           label="已读"
-          prop="read">
+          prop="markRead">
         </el-table-column>
         <el-table-column
           fixed="right"
@@ -141,13 +141,13 @@
           <template slot="label">
             消息发送时间
           </template>
-          {{ userMsg.read }}
+          {{ userMsg.createTime }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             消息状态
           </template>
-          {{ userMsg.read }}
+          {{ userMsg.markRead }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
@@ -193,7 +193,7 @@ export default {
         content: '',
         createBy: '',
         createTime: '',
-        read: ''
+        markRead: ''
       },
       userMsgInfo: {
         id: null,
@@ -204,7 +204,7 @@ export default {
         content: '',
         createBy: '',
         createTime: '',
-        read: ''
+        markRead: ''
       }
     }
   },

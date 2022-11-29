@@ -37,11 +37,10 @@ export function del (ids) {
  *
  * @returns {AxiosPromise}
  */
-export function close (data) {
+export function close (msgCode) {
   return request({
-    url: servicePath.system + '/sys/userMsg/close',
-    method: 'put',
-    data: data
+    url: servicePath.system + '/sys/userMsg/close/' + msgCode,
+    method: 'put'
   })
 }
 
@@ -50,10 +49,9 @@ export function close (data) {
  *
  * @returns {AxiosPromise}
  */
-export function read (data) {
+export function read (msgCode) {
   return request({
-    url: servicePath.system + '/sys/userMsg/read',
-    method: 'put',
-    data: data
+    url: servicePath.system + '/sys/userMsg/read/' + msgCode,
+    method: 'put'
   })
 }

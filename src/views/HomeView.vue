@@ -55,7 +55,7 @@ export default {
   },
   methods: {
     ...mapMutations('msg', ['pushMsg']),
-    ...mapActions('msg', ['closeMsgCard']),
+    ...mapActions('msg', ['closeMsgCard', 'markReadMsgCard']),
     initWebSocket () {
       const socket = new SockJS(process.env.VUE_APP_SERVICE_URI + '/ws')
       store.state.msg.stompClient = Stomp.over(socket)
@@ -145,18 +145,18 @@ export default {
         ])
       ])
     },
-    closeNotification (msg) {
-      this.notifications[msg.msgCode].close()
-      this.closeMsgCard(msg)
-      delete this.notifications[msg.msgCode]
-    },
     toShowDetail () {
       // 去详情列表
     },
     toClose (data) {
-      this.closeNotification(data)
+      this.notifications[data.msgCode].close()
+      this.closeMsgCard(data)
+      delete this.notifications[data.msgCode]
     },
-    toRead () {
+    toRead (data) {
+      this.notifications[data.msgCode].close()
+      this.markReadMsgCard(data)
+      delete this.notifications[data.msgCode]
     },
     wheel (e) {
       const a = document.getElementById('tag')

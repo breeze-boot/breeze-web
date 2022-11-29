@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { close, read } from '@/api/msg/userMsg'
 
 Vue.use(Vuex)
 
@@ -26,9 +27,22 @@ export default {
       // 更改状态 已关闭
     },
     closeMsgCard (context, msg) {
-      debugger
-      const result = context.state.msg.filter((tempMsg) => tempMsg.msgCode !== msg.msgCode)
-      context.state.msg = result
+      // 更改状态
+      close(msg.msgCode).then(rep => {
+        if (rep.code !== 1) {
+          return
+        }
+        context.state.msg = context.state.msg.filter((tempMsg) => tempMsg.msgCode !== msg.msgCode)
+      })
+    },
+    markReadMsgCard (context, msg) {
+      // 更改状态
+      read(msg.msgCode).then(rep => {
+        if (rep.code !== 1) {
+          return
+        }
+        context.state.msg = context.state.msg.filter((tempMsg) => tempMsg.msgCode !== msg.msgCode)
+      })
     }
   },
   getters: {
