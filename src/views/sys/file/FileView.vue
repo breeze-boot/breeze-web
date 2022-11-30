@@ -66,18 +66,21 @@
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
-          label="创建人ID"
-          prop="createBy"
-          show-overflow-tooltip>
-        </el-table-column>
-        <el-table-column
           label="存储方式"
           prop="ossStyle"
           show-overflow-tooltip>
+          <template slot-scope="scope">
+            {{ scope.row.ossStyle === 1 ? 'minio' : '本地磁盘' }}
+          </template>
         </el-table-column>
         <el-table-column
           label="存储路径"
           prop="path"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
+          label="创建人ID"
+          prop="createBy"
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
@@ -163,6 +166,14 @@
           </template>
           <el-tag size="small">
             {{ file.newFileName }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            存储方式
+          </template>
+          <el-tag size="small">
+            {{ file.ossStyle === 1 ? 'minio' : '本地磁盘' }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item>

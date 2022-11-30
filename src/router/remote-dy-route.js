@@ -36,27 +36,39 @@ const loadComponent = (component) => {
   return () => import(`@/views${component}`)
 }
 
-export const setMenu = (menus) => {
+/**
+ * @param menus
+ */
+export const filterRouteMenu = (menus) => {
   menus.forEach(menu => {
-    const route = menuToRoute(menu)
-    if (route) {
-      store.commit('menu/setKeepAliveMenus', menus)
-      router.addRoute('home', route)
-    }
+    addRoute(menu)
     if (!menu.children) {
       return
     }
-    setMenu(menu.children)
+    filterRouteMenu(menu.children)
   })
 }
 
+/**
+ * @param menus
+ */
 export const convertMenus = (menus) => {
   menus.forEach(menu => {
+    addRoute(menu)
     if (!menu.children) {
-      const route = menuToRoute(menu)
-      router.addRoute('home', route)
       return
     }
-    setMenu(menu.children)
+    filterRouteMenu(menu.children)
   })
+}
+
+const addRoute = (menu) => {
+  if (menu.type !== 1) {
+    return
+  }
+  const route = menuToRoute(menu)
+  if (route) {
+    store.commit('menu/setKeepAliveMenus', menu)
+    router.addRoute('home', route)
+  }
 }

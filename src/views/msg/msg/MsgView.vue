@@ -59,11 +59,21 @@
           label="消息类型"
           prop="msgType"
           show-overflow-tooltip>
+          <template slot-scope="scope">
+            {{ scope.row.msgType === 1 ? '公告' : '通知' }}
+          </template>
         </el-table-column>
         <el-table-column
           label="消息级别"
           prop="msgLevel"
           show-overflow-tooltip>
+          <template slot-scope="scope">
+            {{
+              scope.row.msgLevel === 'info' ? '一般' :
+                (scope.row.msgLevel === 'warning' ? '警告' :
+                  (scope.row.msgLevel === 'danger' ? '紧急' : '正常'))
+            }}
+          </template>
         </el-table-column>
         <el-table-column
           label="内容"
@@ -91,8 +101,8 @@
               </span>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item command="2" @click.native="sendAll(scope.row)">全部</el-dropdown-item>
-                <el-dropdown-item command="1" @click.native="sendToUser(scope.row)">指定人</el-dropdown-item>
-                <el-dropdown-item command="1" @click.native="sendToDept(scope.row)">指定部门</el-dropdown-item>
+                <el-dropdown-item command="1" @click.native="toAll(scope.row)">指定人</el-dropdown-item>
+                <el-dropdown-item command="1" @click.native="toDeptUser(scope.row)">指定部门</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </template>
@@ -163,27 +173,33 @@
           <template slot="label">
             消息类型
           </template>
-          <el-radio-group v-model="msg.msgType" size="mini">
-            <el-radio-button v-for="item in msgTypeOption" :key="item.label" :label="item.label">
-              {{ item.value }}
-            </el-radio-button>
-          </el-radio-group>
+          <el-tag size="small">
+            {{ msg.msgType === 1 ? '公告' : '通知' }}
+          </el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            消息等级
+            消息级别
           </template>
-          <el-radio-group v-model="msg.msgLevel" size="mini">
-            <el-radio-button v-for="item in msgLevelOption" :key="item.label" :label="item.label">
-              {{ item.value }}
-            </el-radio-button>
-          </el-radio-group>
+          <el-tag :type="msg.msgLevel" size="small">
+            {{
+              msg.msgLevel === 'info' ? '一般' :
+                (msg.msgLevel === 'warning' ? '警告' :
+                  (msg.msgLevel === 'danger' ? '紧急' : '正常'))
+            }}
+          </el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             内容
           </template>
           {{ msg.content }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            创建人
+          </template>
+          {{ msg.createName }}
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -199,7 +215,7 @@
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
-        <el-form-item v-if="dept" :label-width="formLabelWidth" label="部门"
+        <el-form-item v-show="dept" :label-width="formLabelWidth" label="部门"
                       prop="multipleDeptId">
           <el-cascader
             v-model="sendMsgData.multipleDeptId"
@@ -209,7 +225,7 @@
             collapse-tags
             @change="handleChangeMultipleDept"/>
         </el-form-item>
-        <el-form-item v-if="!dept" :label-width="formLabelWidth" label="部门" prop="deptId">
+        <el-form-item v-show="!dept" :label-width="formLabelWidth" label="部门" prop="deptId">
           <el-cascader
             v-model="sendMsgData.deptId"
             :options="deptOption"
@@ -286,7 +302,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="mini" @click="closeSendMsgDialog">取 消</el-button>
-        <el-button size="mini" type="primary" @click="sendMsg">确 定</el-button>
+        <el-button size="mini" type="primary" @click="sendMsgToUser">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -305,7 +321,7 @@
       </el-main>
       <div slot="footer" class="dialog-footer">
         <el-button size="mini" @click="closeSendMsgDialog">取 消</el-button>
-        <el-button size="mini" type="primary" @click="sendMsg">确 定</el-button>
+        <el-button size="mini" type="primary" @click="sendMsgToUser">确 定</el-button>
       </div>
     </el-dialog>
   </el-container>
@@ -423,7 +439,6 @@ export default {
       },
       dept: false,
       sendMsgData: {
-        preVal: undefined,
         multipleDeptId: [],
         deptId: [],
         msgId: '',
@@ -439,6 +454,7 @@ export default {
   },
   mounted () {
     this.reloadList()
+    this.selectDept()
   },
   methods: {
     handleChangeSendData (val) {
@@ -458,6 +474,9 @@ export default {
     handleChangeMultipleDept () {
       this.sendMsgData.users = []
       this.sendMsgData.userTableData = []
+      if (!this.sendMsgData.multipleDeptId) {
+        return
+      }
       if (this.sendMsgData.multipleDeptId.length === 0) {
         this.sendMsgData.userTableData = []
         return
@@ -483,6 +502,9 @@ export default {
     handleChangeDept () {
       this.sendMsgData.userTableData = []
       this.sendMsgData.users = []
+      if (!this.sendMsgData.deptId) {
+        return
+      }
       if (this.sendMsgData.deptId.length === 0) {
         this.sendMsgData.userTableData = []
         return
@@ -590,12 +612,6 @@ export default {
     },
     importInfo () {
     },
-    sendToUser (row) {
-      this.sendUserMsgDialogVisible = true
-      this.reloadUserData()
-      this.title = '接收人'
-      this.sendMsgData.msgId = row.id
-    },
     removeUserItem (index, rows, row) {
       confirmAlert(() => {
         rows.splice(index, 1)
@@ -603,7 +619,10 @@ export default {
         this.$message.success('删除成功')
       })
     },
-    sendMsg () {
+    sendAll (row) {
+      this.$sendMsg('/msg/sendBroadcastMsg', { msgId: row.id })
+    },
+    sendMsgToUser () {
       debugger
       if (this.sendMsgData.users.length === 0) {
         Message.warning({ message: '还未选择发送信息的用户' })
@@ -616,10 +635,13 @@ export default {
         }
       )
     },
-    sendAll (row) {
-      this.$sendMsg('/msg/sendBroadcastMsg', { msgId: row.id })
+    toAll (row) {
+      this.sendUserMsgDialogVisible = true
+      this.reloadUserData()
+      this.title = '接收人'
+      this.sendMsgData.msgId = row.id
     },
-    sendToDept (row) {
+    toDeptUser (row) {
       this.sendDeptMsgDialogVisible = true
       this.selectDept()
       this.title = '接收部门'
@@ -655,10 +677,12 @@ export default {
     },
     closeSendMsgDialog () {
       this.sendMsgData = {
+        multipleDeptId: [],
+        deptId: [],
         msgId: '',
-        transferUserData: [],
+        sendMsgType: '1',
         userTableData: [],
-        sendMsgType: 1,
+        transferUserData: [],
         users: []
       }
       this.sendUserMsgDialogVisible = false

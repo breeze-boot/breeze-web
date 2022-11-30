@@ -46,15 +46,9 @@
               {{ item.msgTitle }}
             </div>
             <div class="msg">
-              <h1 class="msg-cursor">
-                查看详情
-              </h1>
-              <h1 class="msg-cursor" @click="closeMsg(item)">
-                关闭
-              </h1>
-              <h1 class="msg-cursor" @click="markReadMsg (item)">
-                已读
-              </h1>
+              <h1 class="msg-cursor"> 查看详情 </h1>
+              <h1 class="msg-cursor" @click="closeMsg(item)"> 关闭 </h1>
+              <h1 class="msg-cursor" @click="markReadMsg (item)"> 已读 </h1>
             </div>
           </div>
         </transition>
@@ -82,9 +76,9 @@ export default {
     ...mapGetters('msg', ['getMsg'])
   },
   methods: {
-    ...mapActions('msg', ['closeMsgCard', 'markReadMsgCard']),
-    ...mapMutations('menu', ['setCollapse', 'setCollapseWhitespace', 'setFadeIn', 'clearMenus']),
+    ...mapActions('msg', ['closeMsgCard', 'markReadMsgCard', 'reloadMsg']),
     ...mapActions('userInfo', ['clearUserInfo']),
+    ...mapMutations('menu', ['setCollapse', 'setCollapseWhitespace', 'setFadeIn', 'clearMenus']),
     handleCommand (command) {
       if (command === 'logout') {
         // 只要去登录页 直接清除
@@ -97,7 +91,6 @@ export default {
           message: '退出成功',
           type: 'success'
         })
-        this.closeWebsocket()
         return
       }
       this.settingDrawer = true
@@ -117,6 +110,8 @@ export default {
     },
     showMsgBox () {
       this.msgDrawer = true
+      // 查询用户消息
+      this.reloadMsg({})
     }
   }
 }

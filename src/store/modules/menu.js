@@ -22,13 +22,12 @@ export default {
     setMenus (state, menus) {
       state.menus = menus
     },
-    setKeepAliveMenus (state, menus) {
+    setKeepAliveMenus (state, menu) {
       // 过滤出哪些路由需要缓存
-      state.keepAliveMenus = menus.filter((item) => {
-        return item.keepAlive === 1
-      }).map(m => {
-        return m.component.substr(m.component.lastIndexOf('/') + 1)
-      })
+      if (menu.keepAlive === 1) {
+        state.keepAliveMenus =
+          menu.component.substr(menu.component.lastIndexOf('/') + 1)
+      }
     },
     setCollapse (state, isCollapse) {
       state.isCollapse = isCollapse

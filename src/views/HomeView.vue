@@ -32,7 +32,7 @@ import SockJS from 'sockjs-client'
 import store from '@/store'
 import Stomp from 'stompjs'
 import Notification from 'element-ui'
-import { mapActions, mapMutations } from 'vuex'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'HomeView',
@@ -54,7 +54,6 @@ export default {
     this.closeWebsocket()
   },
   methods: {
-    ...mapMutations('msg', ['pushMsg']),
     ...mapActions('msg', ['closeMsgCard', 'markReadMsgCard']),
     initWebSocket () {
       const socket = new SockJS(process.env.VUE_APP_SERVICE_URI + '/ws')
@@ -97,13 +96,12 @@ export default {
       store.state.msg.stompClient.subscribe('/user/queue/userMsg', this.notice())
     },
     notice () {
-      const _this = this
+      // const _this = this
       return (response) => {
         const h = this.$createElement
         const rep = JSON.parse(response.body)
         const data = rep.data
         // 放到vuex
-        _this.pushMsg(data)
         data.msgLevel = data.msgLevel || 'info'
         console.debug('msg => {}', data)
         this.notifications[data.msgCode] = Notification.Notification({

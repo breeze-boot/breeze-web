@@ -152,11 +152,9 @@
           <el-input v-model="permission.description" autocomplete="off" clearable type="textarea"/>
         </el-form-item>
         <el-form-item
-          v-if="permission.permissionType === 'DIY'"
           :label-width="formLabelWidth" label="自定义SQL" prop="strSql">
           <el-button @click="diySql">设置</el-button>
           <el-table
-            v-if="permission.permissionType === 'DIY'"
             :data="permissionTableSqlDiyData" border
             size="mini"
             style="margin-top: 10px">
@@ -173,6 +171,22 @@
             <el-table-column
               label="参数"
               prop="conditions">
+            </el-table-column>
+            <el-table-column
+              v-if="this.permissionTableSqlDiyData.length > 1"
+              label="运算符"
+              prop="operator">
+              <template slot-scope="scope">
+                <el-radio-group v-model="scope.row.operator"
+                                :disabled="scope.$index === 0"
+                                size="mini"
+                                @change="operatorChange(scope.row.operator, scope.$index)">
+                  v-model="permission.operator">
+                  {{ scope.$index }}
+                  <el-radio-button label="AND">AND</el-radio-button>
+                  <el-radio-button label="OR">OR</el-radio-button>
+                </el-radio-group>
+              </template>
             </el-table-column>
           </el-table>
         </el-form-item>
@@ -320,9 +334,6 @@ export default {
         }, {
           value: '自定义部门',
           label: 'DIY_DEPT'
-        }, {
-          value: '自定义',
-          label: 'DIY'
         }
       ],
       compareOption: [
@@ -463,6 +474,8 @@ export default {
         this.multiple = true
         this.emitPath = true
       }
+    },
+    operatorChange (row, index) {
     },
     getName (label) {
       let value = ''

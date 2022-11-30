@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { close, read } from '@/api/msg/userMsg'
+import { close, listMsgByUsername, read } from '@/api/msg/userMsg'
 
 Vue.use(Vuex)
 
@@ -11,19 +11,27 @@ export default {
     stompClient: null,
     reConnectTime: null
   },
-  mutations: {
-    pushMsg (state, msg) {
-      // 去重
-      const result = state.msg.some(ele => ele.msgCode === msg.msgCode)
-      if (!result) {
-        state.msg.push(msg)
-      }
-    }
-  },
+  mutations: {},
   actions: {
-    clearMsg (state) {
-      state.msg = []
-      // 清除 redis 的数据
+    reloadMsg (context, msg) {
+      // 若去后台重新加载，清空本地的缓存
+      context.state.msg = []
+      listMsgByUsername().then(rep => {
+        debugger
+        if (rep.code !== 1) {
+          return
+        }
+        // 去重
+        const result = context.state.msg.some(ele => ele.msgCode === rep.data.msgCode)
+        if (!result) {
+          rep.data.forEach(msg => {
+            context.state.msg.push(msg)
+          })
+        }
+      })
+    },
+    clearMsg (context, msg) {
+      context.state.msg = []
       // 更改状态 已关闭
     },
     closeMsgCard (context, msg) {

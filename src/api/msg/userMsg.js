@@ -55,3 +55,18 @@ export function read (msgCode) {
     method: 'put'
   })
 }
+
+/**
+ * 标记已读
+ *
+ * @returns {AxiosPromise}
+ */
+export function listMsgByUsername () {
+  return request({
+    url: servicePath.system + '/sys/userMsg/listMsgByUsername',
+    method: 'get',
+    params: {
+      username: JSON.parse(localStorage.getItem('user_info')).username
+    }
+  })
+}

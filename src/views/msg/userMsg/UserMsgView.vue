@@ -4,11 +4,14 @@
       <el-form ref="searchForm" :inline="true" :model="searchUserMsgForm" class="demo-form-inline" size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
-            <el-form-item label="消息名称" prop="userMsgName">
-              <el-input v-model="searchUserMsgForm.userMsgName" clearable placeholder="消息名称"/>
+            <el-form-item label="消息标题" prop="msgTitle">
+              <el-input v-model="searchUserMsgForm.msgTitle" clearable placeholder="消息标题"/>
             </el-form-item>
-            <el-form-item label="消息编码" prop="userMsgCode">
-              <el-input v-model="searchUserMsgForm.userMsgCode" clearable placeholder="消息编码"/>
+            <el-form-item label="消息编码" prop="msgCode">
+              <el-input v-model="searchUserMsgForm.msgCode" clearable placeholder="消息编码"/>
+            </el-form-item>
+            <el-form-item label="消息接收人" prop="username">
+              <el-input v-model="searchUserMsgForm.username" clearable placeholder="消息接收人"/>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search()">查询</el-button>
@@ -56,11 +59,21 @@
           label="消息类型"
           prop="msgType"
           show-overflow-tooltip>
+          <template slot-scope="scope">
+            {{ scope.row.msgType === 1 ? '公告' : '通知' }}
+          </template>
         </el-table-column>
         <el-table-column
           label="消息级别"
           prop="msgLevel"
           show-overflow-tooltip>
+          <template slot-scope="scope">
+            {{
+              scope.row.msgLevel === 'info' ? '一般' :
+                (scope.row.msgLevel === 'warning' ? '警告' :
+                  (scope.row.msgLevel === 'danger' ? '紧急' : '正常'))
+            }}
+          </template>
         </el-table-column>
         <el-table-column
           label="内容"
@@ -72,12 +85,19 @@
           prop="createName">
         </el-table-column>
         <el-table-column
-          label="消息时间"
+          label="消息接收人"
+          prop="username">
+        </el-table-column>
+        <el-table-column
+          label="消息发送时间"
           prop="createTime">
         </el-table-column>
         <el-table-column
-          label="已读"
+          label="消息状态"
           prop="markRead">
+          <template slot-scope="scope">
+            {{ scope.row.markRead === 1 ? '已读' : '未读' }}
+          </template>
         </el-table-column>
         <el-table-column
           fixed="right"
@@ -123,19 +143,39 @@
           <template slot="label">
             消息类型
           </template>
-          <el-tag size="small">{{ userMsg.msgType }}</el-tag>
+          <el-tag size="small">
+            {{ userMsg.msgType === 1 ? '公告' : '通知' }}
+          </el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            消息等级
+            消息级别
           </template>
-          <el-tag size="small">{{ userMsg.msgType }}</el-tag>
+          <el-tag :type="userMsg.msgLevel" size="small">
+            {{
+              userMsg.msgLevel === 'info' ? '一般' :
+                (userMsg.msgLevel === 'warning' ? '警告' :
+                  (userMsg.msgLevel === 'danger' ? '紧急' : '正常'))
+            }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            内容
+          </template>
+          {{ userMsg.content }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             消息发送人
           </template>
           {{ userMsg.createName }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            消息接收人
+          </template>
+          {{ userMsg.username }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
@@ -147,13 +187,9 @@
           <template slot="label">
             消息状态
           </template>
-          {{ userMsg.markRead }}
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            内容
-          </template>
-          {{ userMsg.content }}
+          <el-tag size="small">
+            {{ userMsg.markRead === 1 ? '已读' : '未读' }}
+          </el-tag>
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -173,8 +209,9 @@ export default {
       multipleSelectionUserMsgIds: [],
       userMsgTableData: [],
       searchUserMsgForm: {
-        userMsgName: '',
-        userMsgCode: '',
+        msgTitle: '',
+        msgCode: '',
+        username: '',
         current: 1,
         size: 10
       },
