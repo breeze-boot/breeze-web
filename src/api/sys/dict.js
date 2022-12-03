@@ -72,3 +72,14 @@ export function open (data) {
     data: data
   })
 }
+
+/**
+ * 加载字典
+ * @returns {AxiosPromise}
+ */
+export function loadDict (dictCode) {
+  return request({
+    url: servicePath.system + '/sys/dict/loadDict/' + dictCode,
+    method: 'get'
+  })
+}

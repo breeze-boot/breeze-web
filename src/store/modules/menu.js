@@ -65,10 +65,10 @@ export default {
           return
         }
         // 动态绑定路由
-        if (context.state.menus.length === 0 || !context.state.isLoadMenu) {
+        if (context.rootGetters['menu/getMenus'].length === 0 || !context.rootGetters['menu/isLoadMenu']) {
           convertMenus(rep.data)
         }
-        context.state.menus = rep.data
+        context.commit('setMenus', rep.data)
         let path = router.app._route.query.redirect
         const name = localStorage.getItem('current_tag_name')
         if (!path && name) {
@@ -83,6 +83,9 @@ export default {
       const result = []
       filterTree(state.menus, result, (tree) => tree.hidden === 1)
       return result
+    },
+    isLoadMenu (state) {
+      return state.isLoadMenu
     }
   }
 }

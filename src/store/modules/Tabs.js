@@ -22,8 +22,8 @@ export default {
         state.currentTagValue = menu.name
         localStorage.setItem('current_tab_name', menu.name)
       }
-      const tabs = state.dynamicTabs.filter((item) => item.name === menu.name)
-      if (tabs.length > 0) {
+      const tabs = state.dynamicTabs.some((item) => item.name === menu.name)
+      if (tabs) {
         return
       }
       state.dynamicTabs.push(menu)

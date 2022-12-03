@@ -10,7 +10,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function list (data) {
   return request({
-    url: servicePath.system + '/sys/permission/list',
+    url: servicePath.system + '/sys/dataPermission/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -25,11 +25,11 @@ export function list (data) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function listPermission (permissionId) {
+export function listPermission (dataPermissionId) {
   return request({
-    url: servicePath.system + '/sys/permission/listPermission',
+    url: servicePath.system + '/sys/dataPermission/listPermission',
     method: 'get',
-    params: { permissionId: permissionId },
+    params: { dataPermissionId: dataPermissionId },
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)
     }]
@@ -44,7 +44,7 @@ export function listPermission (permissionId) {
  */
 export function editPermission (data) {
   return request({
-    url: servicePath.system + '/sys/permission/editPermission',
+    url: servicePath.system + '/sys/dataPermission/editPermission',
     method: 'put',
     data: data
   })
@@ -56,7 +56,7 @@ export function editPermission (data) {
  */
 export function save (data) {
   return request({
-    url: servicePath.system + '/sys/permission/save',
+    url: servicePath.system + '/sys/dataPermission/save',
     method: 'post',
     data: data
   })
@@ -70,7 +70,7 @@ export function save (data) {
  */
 export function del (ids) {
   return request({
-    url: servicePath.system + '/sys/permission/delete',
+    url: servicePath.system + '/sys/dataPermission/delete',
     method: 'delete',
     data: ids
   })
@@ -84,7 +84,7 @@ export function del (ids) {
  */
 export function modify (data) {
   return request({
-    url: servicePath.system + '/sys/permission/modify',
+    url: servicePath.system + '/sys/dataPermission/modify',
     method: 'put',
     data: data
   })

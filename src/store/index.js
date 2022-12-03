@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import menu from '@/store/modules/menu'
 import msg from '@/store/modules/msg'
+import dict from '@/store/modules/dict'
 import userInfo from '@/store/modules/userInfo'
 import tag from '@/store/modules/Tag'
 import tabs from '@/store/modules/Tabs'
@@ -14,6 +15,7 @@ export default new Vuex.Store({
     userInfo,
     msg,
     tag,
+    dict,
     tabs
   }
 })

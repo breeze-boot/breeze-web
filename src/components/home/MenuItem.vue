@@ -1,5 +1,5 @@
 <template>
-  <el-submenu v-if="menu.children && menu.children.length > 0" :index="menu.id" :popper-append-to-body=false>
+  <el-submenu v-if="menu.children && menu.children.length > 0" :index="menu.id" :popper-append-to-body=true>
     <template slot="title">
       <svg-icon :icon-name="menu.icon" style="font-size: 20px;"/>
       <span slot="title">{{ menu.title }}</span>

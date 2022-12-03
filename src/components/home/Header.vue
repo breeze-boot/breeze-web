@@ -111,7 +111,7 @@ export default {
     showMsgBox () {
       this.msgDrawer = true
       // 查询用户消息
-      this.reloadMsg({})
+      this.reloadMsg()
     }
   }
 }

@@ -285,14 +285,14 @@
 </template>
 
 <script>
-import { del, list, modify, save, selectColumn, selectTable } from '@/api/sys/permission'
+import { del, list, modify, save, selectColumn, selectTable } from '@/api/sys/dataPermission'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
 import { selectDept } from '@/api/sys/dept'
 
 export default {
-  name: 'PermissionView',
+  name: 'DataPermissionView',
   data () {
     return {
       multipleSelectionPermissionIds: [],

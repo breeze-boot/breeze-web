@@ -140,7 +140,8 @@ export default {
   background: rgba(236, 236, 236, 0.5);
   background-clip: padding-box;
   padding: 2vh 2vw;
-  min-width: 18vw;
+  width: 20vw;
+  min-width: 300px;
   border: 1px #bdbdbd solid;
   box-shadow: 0 0 5px #9b9b9b;
 }

@@ -11,27 +11,39 @@ export default {
     stompClient: null,
     reConnectTime: null
   },
-  mutations: {},
-  actions: {
-    reloadMsg (context, msg) {
-      // 若去后台重新加载，清空本地的缓存
-      context.state.msg = []
-      listMsgByUsername().then(rep => {
-        debugger
-        if (rep.code !== 1) {
-          return
-        }
+  mutations: {
+    setMsg (state, msgData) {
+      msgData.forEach(msg => {
         // 去重
-        const result = context.state.msg.some(ele => ele.msgCode === rep.data.msgCode)
+        const result = state.msg.some(ele => ele.msgCode === msg.msgCode)
         if (!result) {
-          rep.data.forEach(msg => {
-            context.state.msg.push(msg)
-          })
+          state.msg.push(msg)
         }
       })
     },
-    clearMsg (context, msg) {
+    clearMsg (state) {
+      state.msg = []
+    },
+    closeMsgCard (state, msg) {
+      state.msg = state.msg.filter((tempMsg) => tempMsg.msgCode !== msg.msgCode)
+    },
+    markReadMsgCard (state, msg) {
+      state.msg = state.msg.filter((tempMsg) => tempMsg.msgCode !== msg.msgCode)
+    }
+  },
+  actions: {
+    reloadMsg (context) {
+      // 若去后台重新加载，清空本地的缓存
       context.state.msg = []
+      listMsgByUsername().then(rep => {
+        if (rep.code !== 1) {
+          return
+        }
+        context.commit('setMsg', rep.data)
+      })
+    },
+    clearMsg (context) {
+      context.commit('clearMsg')
       // 更改状态 已关闭
     },
     closeMsgCard (context, msg) {
@@ -40,7 +52,7 @@ export default {
         if (rep.code !== 1) {
           return
         }
-        context.state.msg = context.state.msg.filter((tempMsg) => tempMsg.msgCode !== msg.msgCode)
+        context.commit('closeMsgCard', msg)
       })
     },
     markReadMsgCard (context, msg) {
@@ -49,7 +61,7 @@ export default {
         if (rep.code !== 1) {
           return
         }
-        context.state.msg = context.state.msg.filter((tempMsg) => tempMsg.msgCode !== msg.msgCode)
+        context.commit('markReadMsgCard', msg)
       })
     }
   },

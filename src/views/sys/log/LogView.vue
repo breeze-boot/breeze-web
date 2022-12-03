@@ -264,7 +264,9 @@ export default {
     }
   },
   mounted () {
-    this.reloadList()
+    this.$loadDict('0123123').then((dict) => {
+      this.reloadList()
+    })
   },
   methods: {
     reloadList () {
