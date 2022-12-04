@@ -5,7 +5,7 @@
       @tab-remove="removeTab">
       <el-tab-pane
         v-for="(tab, index) in dynamicTabs"
-        :key="index"
+        :key="tab.name + index"
         :closable="tab.name !== 'welcome'"
         :label="tab.title"
         :name="tab.name">

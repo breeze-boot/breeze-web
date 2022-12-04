@@ -20,11 +20,13 @@ export default {
   getters: {
     getDict (state) {
       return function (dictCode) {
-        debugger
-        return state.dict.filter(f => (f.dictCode === dictCode)).map(d => {
-          debugger
-          return d.dictValue
+        let temp = []
+        state.dict.forEach(dict => {
+          if (dict.dictCode === dictCode) {
+            temp = dict.dictValue
+          }
         })
+        return temp
       }
     }
   }

@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import { Message } from 'element-ui'
 
 export const ROOT = '1111111111111111111'
 export const DIALOG_TYPE = {
@@ -23,10 +24,9 @@ export const confirmAlert = (func) => {
     type: 'warning'
   }).then(() => {
     func()
-  }).catch(() => {
-    this.$message({
-      type: 'info',
-      message: '已取消删除'
+  }).catch((e) => {
+    Message.info({
+      message: '取消删除'
     })
   })
 }

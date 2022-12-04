@@ -79,20 +79,18 @@
           v-if="false"
           label="ID"
           prop="id"
-          width="200">
-        </el-table-column>
+          width="200"/>
         <el-table-column
           label="系统模块"
           prop="systemModule"
-          width="180">
-        </el-table-column>
+          width="180"/>
         <el-table-column
           label="日志标题"
           prop="logTitle"
           show-overflow-tooltip
-          width="180">
-        </el-table-column>
+          width="180"/>
         <el-table-column
+          :formatter="(row, column) => this.$searchDict(row, column, 'LOG_TYPE')"
           label="日志类型"
           prop="logType"
           show-overflow-tooltip>
@@ -264,7 +262,7 @@ export default {
     }
   },
   mounted () {
-    this.$loadDict('0123123').then((dict) => {
+    this.$loadDict('LOG_TYPE').then((dict) => {
       this.reloadList()
     })
   },

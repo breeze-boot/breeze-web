@@ -623,7 +623,6 @@ export default {
       this.$sendMsg('/msg/sendBroadcastMsg', { msgId: row.id })
     },
     sendMsgToUser () {
-      debugger
       if (this.sendMsgData.users.length === 0) {
         Message.warning({ message: '还未选择发送信息的用户' })
         return

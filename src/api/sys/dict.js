@@ -5,7 +5,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
 
 /**
  * 列表
- *
+ * @param data
  * @returns {AxiosPromise}
  */
 export function list (data) {
@@ -20,8 +20,7 @@ export function list (data) {
 }
 
 /**
- * 添加
- *
+ * 保存
  * @param data
  * @returns {AxiosPromise}
  */
@@ -35,8 +34,7 @@ export function save (data) {
 
 /**
  * 删除
- *
- * @param data
+ * @param ids
  * @returns {AxiosPromise}
  */
 export function del (ids) {
@@ -49,7 +47,6 @@ export function del (ids) {
 
 /**
  * 修改
- *
  * @param data
  * @returns {AxiosPromise}
  */
@@ -63,6 +60,7 @@ export function modify (data) {
 
 /**
  * 开关
+ * @param data
  * @returns {AxiosPromise}
  */
 export function open (data) {
@@ -74,12 +72,13 @@ export function open (data) {
 }
 
 /**
- * 加载字典
+ * 查询字典
+ * @param dictCode
  * @returns {AxiosPromise}
  */
-export function loadDict (dictCode) {
+export function listDict (dictCode) {
   return request({
-    url: servicePath.system + '/sys/dict/loadDict/' + dictCode,
+    url: servicePath.system + '/sys/dict/listDict/' + dictCode,
     method: 'get'
   })
 }

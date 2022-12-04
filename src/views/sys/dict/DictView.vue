@@ -27,10 +27,9 @@
         ref="multipleTable"
         :data="dictTableData"
         border
-        height="300"
+        height="500"
         size="mini"
         stripe
-        style="width: 100%"
         @selection-change="dictHandleSelectionChange">
         <el-table-column
           type="selection"
