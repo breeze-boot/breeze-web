@@ -39,10 +39,28 @@ export default {
     Vue.prototype.$sendMsg = sendMsg
     Vue.prototype.$loadDict = toListDict
     Vue.prototype.$searchDict = (row, column, key) => {
+      if (!row || !column) {
+        return
+      }
+      debugger
       const dict = store.getters['dict/getDict'](key)
       let label = ''
       dict.forEach(item => {
         if (item.value === row[column.property] + '') {
+          label = item.label
+        }
+      })
+      return label
+    }
+    Vue.prototype.$searchDescriptionsDict = (row, columnName, key) => {
+      if (!row || !columnName) {
+        return
+      }
+      debugger
+      const dict = store.getters['dict/getDict'](key)
+      let label = ''
+      dict.forEach(item => {
+        if (item.value === row[columnName] + '') {
           label = item.label
         }
       })

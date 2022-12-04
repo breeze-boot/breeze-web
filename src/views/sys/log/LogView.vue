@@ -160,19 +160,19 @@
           <template slot="label">
             日志标题
           </template>
-          {{ log.title }}
+          {{ log.logTitle }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             日志类型
           </template>
-          {{ log.logType }}
+          {{ this.$searchDescriptionsDict(log, 'logType', 'LOG_TYPE') }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             操作类型
           </template>
-          {{ log.doType }}
+          {{ this.$searchDescriptionsDict(log, 'doType', 'DO_TYPE') }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
@@ -202,7 +202,7 @@
           <template slot="label">
             结果
           </template>
-          {{ log.result }}
+          {{ this.$searchDescriptionsDict(log, 'result', 'RESULT') }}
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
