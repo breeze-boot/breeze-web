@@ -92,16 +92,19 @@
           show-overflow-tooltip
           width="250"/>
         <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'HREF')"
           label="外部链接"
           prop="href"
           show-overflow-tooltip
           width="100"/>
         <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'KEEPALIVE')"
           label="缓存"
           prop="keepAlie"
           show-overflow-tooltip
           width="100"/>
         <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'HIDDEN')"
           label="是否隐藏"
           prop="hidden"
           show-overflow-tooltip
@@ -474,11 +477,13 @@ export default {
       }
     }
   },
-  mounted () {
-    console.log(1)
+  created () {
     this.$toLoadDict(['HIDDEN', 'HREF', 'KEEPALIVE', 'MENU_TYPE']).then((dict) => {
-      this.reloadList()
+      console.log('菜单模块字典加载成功')
     })
+  },
+  mounted () {
+    this.reloadList()
     this.selectPlatform()
   },
   methods: {

@@ -19,8 +19,8 @@ export default {
   actions: {},
   getters: {
     getDict (state) {
-      let result = []
       return function (key) {
+        let result = []
         state.dict.forEach(dict => {
           if (dict.key === key) {
             result = dict.value
@@ -55,7 +55,6 @@ export default {
         let label = ''
         state.dict.forEach(dict => {
           if (dict.key === key) {
-            debugger
             dict.value.forEach(item => {
               if (item.value === row[columnName] + '') {
                 label = item.label
