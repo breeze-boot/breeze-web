@@ -66,13 +66,10 @@
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'OSS_STYLE')"
           label="存储方式"
           prop="ossStyle"
-          show-overflow-tooltip>
-          <template slot-scope="scope">
-            {{ scope.row.ossStyle === 1 ? 'minio' : '本地磁盘' }}
-          </template>
-        </el-table-column>
+          show-overflow-tooltip/>
         <el-table-column
           label="存储路径"
           prop="path"
@@ -173,7 +170,7 @@
             存储方式
           </template>
           <el-tag size="small">
-            {{ file.ossStyle === 1 ? 'minio' : '本地磁盘' }}
+            {{ this.getDescriptionsDictLabel()(file, 'ossStyle', 'OSS_STYLE') }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
@@ -204,6 +201,7 @@ import { del, download, list, preview, upload } from '@/api/sys/file'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { saveAs } from 'file-saver'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'FileView',
@@ -238,9 +236,12 @@ export default {
     }
   },
   mounted () {
-    this.reloadList()
+    this.$toLoadDict(['OSS_STYLE']).then((dict) => {
+      this.reloadList()
+    })
   },
   methods: {
+    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {

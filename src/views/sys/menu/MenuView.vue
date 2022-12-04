@@ -257,19 +257,17 @@
           <template slot="label">
             组件类型
           </template>
-          <el-tag
-            :type="menu.type === '0' ? 'primary' : (menu.type === '1' ? 'info' : 'warning')"
-            disable-transitions> {{ menu.type === '0' ? '文件夹' : (menu.type === '1' ? '菜单' : '按钮') }}
-          </el-tag>
+          {{ this.getDescriptionsDictLabel()(menu, 'type', 'MENU_TYPE') }}
         </el-descriptions-item>
 
         <el-descriptions-item>
           <template slot="label">
-            外链
+            外部链接
           </template>
           <el-tag
             :type="menu.href === '0' ? 'primary' :  'info'"
-            disable-transitions> {{ menu.href === '0' ? '路由菜单' : '外部链接' }}
+            disable-transitions>
+            {{ this.getDescriptionsDictLabel()(menu, 'href', 'HREF') }}
           </el-tag>
         </el-descriptions-item>
 
@@ -277,14 +275,14 @@
           <template slot="label">
             缓存
           </template>
-          {{ menu.keepAlive === '0' ? '未开启' : '开启' }}
+          {{ this.getDescriptionsDictLabel()(menu, 'keepAlive', 'KEEPALIVE') }}
         </el-descriptions-item>
 
         <el-descriptions-item>
           <template slot="label">
             隐藏
           </template>
-          {{ menu.hidden === '0' ? '显示在路由菜单' : '（隐藏）通过编程式路由跳转' }}
+          {{ this.getDescriptionsDictLabel()(menu, 'hidden', 'HIDDEN') }}
         </el-descriptions-item>
 
         <el-descriptions-item>
@@ -472,13 +470,10 @@ export default {
       }
     }
   },
-  created () {
-    this.$toLoadDict(['HIDDEN', 'HREF', 'KEEPALIVE', 'MENU_TYPE']).then((dict) => {
-      console.log('菜单模块字典加载成功')
-    })
-  },
   mounted () {
-    this.reloadList()
+    this.$toLoadDict(['HIDDEN', 'HREF', 'KEEPALIVE', 'MENU_TYPE']).then((dict) => {
+      this.reloadList()
+    })
     this.selectPlatform()
   },
   methods: {

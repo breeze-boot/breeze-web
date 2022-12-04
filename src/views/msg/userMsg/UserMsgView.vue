@@ -56,25 +56,14 @@
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'MSG_TYPE')"
           label="消息类型"
           prop="msgType"
-          show-overflow-tooltip>
-          <template slot-scope="scope">
-            {{ scope.row.msgType === 1 ? '公告' : '通知' }}
-          </template>
-        </el-table-column>
+          show-overflow-tooltip/>
         <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'MSG_LEVEL')"
           label="消息级别"
-          prop="msgLevel"
-          show-overflow-tooltip>
-          <template slot-scope="scope">
-            {{
-              scope.row.msgLevel === 'info' ? '一般' :
-                (scope.row.msgLevel === 'warning' ? '警告' :
-                  (scope.row.msgLevel === 'danger' ? '紧急' : '正常'))
-            }}
-          </template>
-        </el-table-column>
+          prop="msgLevel"/>
         <el-table-column
           label="内容"
           prop="content"
@@ -93,12 +82,9 @@
           prop="createTime">
         </el-table-column>
         <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'MARK_READ')"
           label="消息状态"
-          prop="markRead">
-          <template slot-scope="scope">
-            {{ scope.row.markRead === 1 ? '已读' : '未读' }}
-          </template>
-        </el-table-column>
+          prop="markRead"/>
         <el-table-column
           fixed="right"
           label="操作"
@@ -144,7 +130,7 @@
             消息类型
           </template>
           <el-tag size="small">
-            {{ userMsg.msgType === 1 ? '公告' : '通知' }}
+            {{ this.getDescriptionsDictLabel()(msg, 'userMsgType', 'MSG_TYPE') }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
@@ -152,11 +138,7 @@
             消息级别
           </template>
           <el-tag :type="userMsg.msgLevel" size="small">
-            {{
-              userMsg.msgLevel === 'info' ? '一般' :
-                (userMsg.msgLevel === 'warning' ? '警告' :
-                  (userMsg.msgLevel === 'danger' ? '紧急' : '正常'))
-            }}
+            {{ this.getDescriptionsDictLabel()(userMsg, 'msgLevel', 'MSG_LEVEL') }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
@@ -188,7 +170,7 @@
             消息状态
           </template>
           <el-tag size="small">
-            {{ userMsg.markRead === 1 ? '已读' : '未读' }}
+            {{ this.getDescriptionsDictLabel()(userMsg, 'markRead', 'MARK_READ') }}
           </el-tag>
         </el-descriptions-item>
       </el-descriptions>
@@ -201,6 +183,7 @@
 import { del, list } from '@/api/msg/userMsg'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'UserMsgView',
@@ -246,9 +229,12 @@ export default {
     }
   },
   mounted () {
-    this.reloadList()
+    this.$toLoadDict(['MSG_LEVEL', 'MSG_TYPE', 'MARK_READ']).then((dict) => {
+      this.reloadList()
+    })
   },
   methods: {
+    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {

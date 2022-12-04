@@ -56,24 +56,15 @@
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'MSG_TYPE')"
           label="消息类型"
           prop="msgType"
-          show-overflow-tooltip>
-          <template slot-scope="scope">
-            {{ scope.row.msgType === 1 ? '公告' : '通知' }}
-          </template>
-        </el-table-column>
+          show-overflow-tooltip/>
         <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'MSG_LEVEL')"
           label="消息级别"
           prop="msgLevel"
           show-overflow-tooltip>
-          <template slot-scope="scope">
-            {{
-              scope.row.msgLevel === 'info' ? '一般' :
-                (scope.row.msgLevel === 'warning' ? '警告' :
-                  (scope.row.msgLevel === 'danger' ? '紧急' : '正常'))
-            }}
-          </template>
         </el-table-column>
         <el-table-column
           label="内容"
@@ -132,15 +123,15 @@
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="消息类型" prop="msgType">
           <el-radio-group v-model="msg.msgType">
-            <el-radio-button v-for="item in msgTypeOption" :key="item.label" :label="item.label">
-              {{ item.value }}
+            <el-radio-button v-for="item in this.getDict()('MSG_TYPE')" :key="item.value" :label="item.value">
+              {{ item.label }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="消息等级" prop="msgLevel">
           <el-radio-group v-model="msg.msgLevel">
-            <el-radio-button v-for="item in msgLevelOption" :key="item.label" :label="item.label">
-              {{ item.value }}
+            <el-radio-button v-for="item in this.getDict()('MSG_LEVEL')" :key="item.value" :label="item.value">
+              {{ item.label }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
@@ -174,7 +165,7 @@
             消息类型
           </template>
           <el-tag size="small">
-            {{ msg.msgType === 1 ? '公告' : '通知' }}
+            {{ this.getDescriptionsDictLabel()(msg, 'msgType', 'MSG_TYPE') }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
@@ -182,11 +173,7 @@
             消息级别
           </template>
           <el-tag :type="msg.msgLevel" size="small">
-            {{
-              msg.msgLevel === 'info' ? '一般' :
-                (msg.msgLevel === 'warning' ? '警告' :
-                  (msg.msgLevel === 'danger' ? '紧急' : '正常'))
-            }}
+            {{ this.getDescriptionsDictLabel()(msg, 'msgLevel', 'MSG_LEVEL') }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
@@ -210,8 +197,8 @@
                style="padding-right: 15px;">
         <el-form-item :label-width="formLabelWidth" label="选择方式" prop="sendMsgType">
           <el-radio-group v-model="sendMsgData.sendMsgType" size="mini" @change="handleChangeSendData">
-            <el-radio-button v-for="item in sendMsgTypeOption" :key="item.label" :label="item.label">
-              {{ item.value }}
+            <el-radio-button v-for="item in this.getDict()('SEND_MSG_TYPE')" :key="item.value" :label="item.value">
+              {{ item.label }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
@@ -333,6 +320,7 @@ import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
 import { selectDept } from '@/api/sys/dept'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'MsgView',
@@ -359,16 +347,16 @@ export default {
         id: null,
         msgTitle: '',
         msgCode: '',
-        msgType: 2,
-        msgLevel: '',
+        msgType: '0',
+        msgLevel: 'info',
         content: ''
       },
       msgInfo: {
         id: null,
         msgTitle: '',
         msgCode: '',
-        msgType: 2,
-        msgLevel: '',
+        msgType: '0',
+        msgLevel: 'info',
         content: ''
       },
       msgRules: {
@@ -395,44 +383,6 @@ export default {
         ]
       },
       deptOption: [],
-      sendMsgTypeOption: [
-        {
-          value: '部门的用户',
-          label: '1'
-        },
-        {
-          value: '自定义部门的用户',
-          label: '2'
-        }
-      ],
-      msgTypeOption: [
-        {
-          value: '公告',
-          label: '1'
-        },
-        {
-          value: '消息',
-          label: '2'
-        }
-      ],
-      msgLevelOption: [
-        {
-          value: '紧急',
-          label: 'danger'
-        },
-        {
-          value: '警告',
-          label: 'warning'
-        },
-        {
-          value: '正常',
-          label: 'success'
-        },
-        {
-          value: '一般',
-          label: 'info'
-        }
-      ],
       sendMsgDataRules: {
         multipleDeptId: [],
         deptId: []
@@ -453,10 +403,13 @@ export default {
     }
   },
   mounted () {
-    this.reloadList()
+    this.$toLoadDict(['MSG_LEVEL', 'MSG_TYPE', 'SEND_MSG_TYPE']).then((dict) => {
+      this.reloadList()
+    })
     this.selectDept()
   },
   methods: {
+    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
     handleChangeSendData (val) {
       this.sendMsgData.userTableData = []
       if (val === '2') {

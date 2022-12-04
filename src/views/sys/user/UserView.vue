@@ -110,16 +110,9 @@
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'SEX')"
           label="性别"
-          prop="sex">
-          <template slot-scope="scope">
-            <el-tag
-              :type="scope.row.sex === 1 ? 'primary' : 'success'"
-              disable-transitions
-              size="mini">{{ scope.row.sex === 1 ? '男' : '女' }}
-            </el-tag>
-          </template>
-        </el-table-column>
+          prop="sex"/>
         <el-table-column
           label="是否锁定"
           prop="isLock">
@@ -296,7 +289,9 @@
           <template slot="label">
             用户工号
           </template>
-          <el-tag size="small">{{ user.userCode }}</el-tag>
+          <el-tag size="small">
+            {{ user.userCode }}
+          </el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
@@ -346,17 +341,15 @@
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            用户角色
+            性别
           </template>
-          {{ user.roleNames }}
+          {{ this.getDescriptionsDictLabel()(user, 'sex', 'SEX') }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            性别
+            用户角色
           </template>
-          <el-tag :type="user.sex === 1 ? 'primary' : 'success'">
-            {{ user.sex === 1 ? '男' : '女' }}
-          </el-tag>
+          {{ user.roleNames.length > 0 ? user.roleNames : '' }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
@@ -369,8 +362,9 @@
             是否锁定
           </template>
           <el-tag
-            :type="user.isLock === 1 ? 'primary' : 'danger'"
-            disable-transitions> {{ user.isLock === 1 ? '锁定' : '未锁定' }}
+            :type="user.isLock === 0 ? 'primary' : 'danger'"
+            disable-transitions>
+            {{ this.getDescriptionsDictLabel()(user, 'isLock', 'IS_LOCK') }}
           </el-tag>
         </el-descriptions-item>
       </el-descriptions>
@@ -384,6 +378,7 @@ import { confirmAlert, DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
 import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
 import { selectDept } from '@/api/sys/dept'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'UserView',
@@ -568,12 +563,15 @@ export default {
     }
   },
   mounted () {
-    this.reloadList()
+    this.$toLoadDict(['SEX', 'IS_LOCK']).then((dict) => {
+      this.reloadList()
+    })
     this.selectDept()
     this.selectRole()
     this.selectPost()
   },
   methods: {
+    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
     goRoleView (row) {
       this.$router.push({
         name: 'userRole',
