@@ -20,13 +20,13 @@ export default {
   getters: {
     getDict (state) {
       return function (dictCode) {
-        let temp = []
+        let item = []
         state.dict.forEach(dict => {
           if (dict.dictCode === dictCode) {
-            temp = dict.dictValue
+            item = dict.dictValue
           }
         })
-        return temp
+        return item
       }
     }
   }

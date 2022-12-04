@@ -7,7 +7,7 @@ const sendMsg = (url, msg) => {
 
 const toListDict = (dictCode) => {
   return new Promise(resolve => {
-    let dict = store.getters['dict/getDict'](dictCode)
+    const dict = store.getters['dict/getDict'](dictCode)
     if (dict && dict.length <= 0) {
       listDict(dictCode).then(rep => {
         if (rep.code === 0 || !rep.data) {
@@ -17,8 +17,7 @@ const toListDict = (dictCode) => {
           dictCode: dictCode,
           dictValue: rep.data
         })
-        dict = rep.data
-        resolve(dict)
+        resolve(rep.data)
       })
     } else {
       resolve(dict)
@@ -32,13 +31,13 @@ export default {
     Vue.prototype.$loadDict = toListDict
     Vue.prototype.$searchDict = (row, column, key) => {
       const dict = store.getters['dict/getDict'](key)
-      let temp = ''
-      dict.forEach(f => {
-        if (f.value === row[column.property] + '') {
-          temp = f.label
+      let label = ''
+      dict.forEach(item => {
+        if (item.value === row[column.property] + '') {
+          label = item.label
         }
       })
-      return temp
+      return label
     }
   }
 }
