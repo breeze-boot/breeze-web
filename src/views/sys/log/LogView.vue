@@ -90,12 +90,12 @@
           show-overflow-tooltip
           width="180"/>
         <el-table-column
-          :formatter="(row, column) => this.$searchDict(row, column, 'LOG_TYPE')"
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'LOG_TYPE')"
           label="日志类型"
           prop="logType"
           show-overflow-tooltip/>
         <el-table-column
-          :formatter="(row, column) => this.$searchDict(row, column, 'DO_TYPE')"
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'DO_TYPE')"
           label="操作类型"
           prop="doType"/>
         <el-table-column
@@ -104,7 +104,7 @@
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
-          :formatter="(row, column) => this.$searchDict(row, column, 'RESULT')"
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'RESULT')"
           label="执行结果"
           prop="result"
           show-overflow-tooltip/>
@@ -166,13 +166,13 @@
           <template slot="label">
             日志类型
           </template>
-          {{ this.$searchDescriptionsDict(log, 'logType', 'LOG_TYPE') }}
+          {{ this.getDescriptionsDictLabel()(log, 'logType', 'LOG_TYPE') }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             操作类型
           </template>
-          {{ this.$searchDescriptionsDict(log, 'doType', 'DO_TYPE') }}
+          {{ this.getDescriptionsDictLabel()(log, 'doType', 'DO_TYPE') }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
@@ -202,7 +202,7 @@
           <template slot="label">
             结果
           </template>
-          {{ this.$searchDescriptionsDict(log, 'result', 'RESULT') }}
+          {{ this.getDescriptionsDictLabel()(log, 'result', 'RESULT') }}
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -213,6 +213,7 @@
 import { clear, del, list } from '@/api/sys/log'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'LogView',
@@ -258,11 +259,12 @@ export default {
     }
   },
   mounted () {
-    this.$loadDict(['LOG_TYPE', 'DO_TYPE', 'RESULT']).then((dict) => {
+    this.$toLoadDict(['LOG_TYPE', 'DO_TYPE', 'RESULT']).then((dict) => {
       this.reloadList()
     })
   },
   methods: {
+    ...mapGetters('dict', ['getDescriptionsDictLabel', 'getTableDictLabel']),
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {

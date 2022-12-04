@@ -10,7 +10,6 @@ export default {
   },
   mutations: {
     setDict (state, dict) {
-      debugger
       if (state.dict.some(item => item.key === dict.key)) {
         return
       }
@@ -20,14 +19,51 @@ export default {
   actions: {},
   getters: {
     getDict (state) {
+      let result = []
       return function (key) {
-        let reuslt = []
         state.dict.forEach(dict => {
           if (dict.key === key) {
-            reuslt = dict.value
+            result = dict.value
           }
         })
-        return reuslt
+        return result
+      }
+    },
+    getTableDictLabel (state) {
+      return function (row, column, key) {
+        if (!row || !column) {
+          return
+        }
+        let label = ''
+        state.dict.forEach(dict => {
+          if (dict.key === key) {
+            dict.value.forEach(item => {
+              if (item.value === row[column.property] + '') {
+                label = item.label
+              }
+            })
+          }
+        })
+        return label
+      }
+    },
+    getDescriptionsDictLabel (state) {
+      return function (row, columnName, key) {
+        if (!row || !columnName) {
+          return
+        }
+        let label = ''
+        state.dict.forEach(dict => {
+          if (dict.key === key) {
+            debugger
+            dict.value.forEach(item => {
+              if (item.value === row[columnName] + '') {
+                label = item.label
+              }
+            })
+          }
+        })
+        return label
       }
     }
   }

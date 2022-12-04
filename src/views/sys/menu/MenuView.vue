@@ -38,7 +38,6 @@
         :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
         border
         empty-text="无数据"
-        height="90%"
         row-key="id"
         size="mini"
         stripe
@@ -48,29 +47,26 @@
           v-if="false"
           label="ID"
           prop="id"
-          width="200">
-        </el-table-column>
+          width="200"/>
         <el-table-column
           label="标题"
           prop="title"
           show-overflow-tooltip
-          width="180">
-        </el-table-column>
+          width="180"/>
         <el-table-column
           label="组件名称"
           prop="name"
-          show-overflow-tooltip>
-        </el-table-column>
+          show-overflow-tooltip/>
         <el-table-column
           label="排序"
           prop="sort"
           show-overflow-tooltip
-          width="50">
-        </el-table-column>
+          width="50"/>
         <el-table-column
           label="图标"
           prop="icon"
-          show-overflow-tooltip>
+          show-overflow-tooltip
+          width="200">
           <template slot-scope="scope">
             <svg-icon :icon-name="scope.row.icon" :icon-style="'margin-right: 0px;'" style="font-size: 20px;"/>
             <el-tag
@@ -85,19 +81,31 @@
         <el-table-column
           label="权限编码"
           prop="permission"
-          show-overflow-tooltip>
-        </el-table-column>
+          show-overflow-tooltip/>
         <el-table-column
           label="菜单路径"
           prop="path"
-          show-overflow-tooltip>
-        </el-table-column>
+          show-overflow-tooltip/>
         <el-table-column
           label="组件路径"
           prop="component"
           show-overflow-tooltip
-          width="250">
-        </el-table-column>
+          width="250"/>
+        <el-table-column
+          label="外部链接"
+          prop="href"
+          show-overflow-tooltip
+          width="100"/>
+        <el-table-column
+          label="缓存"
+          prop="keepAlie"
+          show-overflow-tooltip
+          width="100"/>
+        <el-table-column
+          label="是否隐藏"
+          prop="hidden"
+          show-overflow-tooltip
+          width="100"/>
         <el-table-column
           label="类型"
           prop="type"
@@ -152,10 +160,10 @@
         <el-form-item v-if="menu.type === 1" :label-width="formLabelWidth" label="外链" style="text-align: left;">
           <el-radio-group v-model="menu.href">
             <el-radio-button
-              v-for="item in hrefOptions"
-              :key="item.label"
+              v-for="item in this.getDict()('HREF')"
+              :key="item.value"
               :label="item.label">
-              {{ item.name }}
+              {{ item.label }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
@@ -163,10 +171,10 @@
         <el-form-item v-if="menu.type === 1" :label-width="formLabelWidth" label="缓存" style="text-align: left;">
           <el-radio-group v-model="menu.keepAlive">
             <el-radio-button
-              v-for="item in keepAliveOptions"
-              :key="item.label"
+              v-for="item in this.getDict()('KEEPALIVE')"
+              :key="item.value"
               :label="item.label">
-              {{ item.name }}
+              {{ item.label }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
@@ -358,6 +366,7 @@ import { confirmAlert, DIALOG_TYPE, filterTreeParentId, ROOT } from '@/utils/con
 import JSONBigInt from 'json-bigint'
 import IconDialog from '@/components/svg/IconDialog'
 import { Message } from 'element-ui'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'MenuView',
@@ -427,12 +436,12 @@ export default {
       ],
       keepAliveOptions: [
         {
-          label: 0,
-          name: '关闭缓存'
+          value: 0,
+          label: '关闭缓存'
         },
         {
-          label: 1,
-          name: '开启缓存'
+          value: 1,
+          label: '开启缓存'
         }
       ],
       hiddenOptions: [
@@ -509,10 +518,14 @@ export default {
     }
   },
   mounted () {
-    this.reloadList()
+    console.log(1)
+    this.$toLoadDict(['HIDDEN', 'HREF', 'KEEPALIVE', 'MENU_TYPE']).then((dict) => {
+      this.reloadList()
+    })
     this.selectPlatform()
   },
   methods: {
+    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel']),
     selectPlatform () {
       selectPlatform().then((rep) => {
         if (rep.code === 1) {
