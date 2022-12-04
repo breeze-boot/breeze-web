@@ -36,40 +36,9 @@ const toListDict = (dictCodes = []) => {
   })
 }
 
-const searchSingleDictList = (key) => {
-  return store.getters['dict/getDict'](key)
-}
-
 export default {
   install (Vue, options) {
     Vue.prototype.$sendMsg = sendMsg
     Vue.prototype.$toLoadDict = toListDict
-    Vue.prototype.$searchSingleDictList = searchSingleDictList
-    Vue.prototype.$searchDict = (row, column, key) => {
-      if (!row || !column) {
-        return
-      }
-      const dict = store.getters['dict/getDict'](key)
-      let label = ''
-      dict.forEach(item => {
-        if (item.value === row[column.property] + '') {
-          label = item.label
-        }
-      })
-      return label
-    }
-    Vue.prototype.$searchDescriptionsDict = (row, columnName, key) => {
-      if (!row || !columnName) {
-        return
-      }
-      const dict = store.getters['dict/getDict'](key)
-      let label = ''
-      dict.forEach(item => {
-        if (item.value === row[columnName] + '') {
-          label = item.label
-        }
-      })
-      return label
-    }
   }
 }

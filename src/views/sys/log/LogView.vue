@@ -10,7 +10,7 @@
             <el-form-item label="操作类型" prop="doType">
               <el-select v-model="searchLogForm.doType" placeholder="请选择">
                 <el-option
-                  v-for="item in doTypeOption"
+                  v-for="item in this.getDict()('DO_TYPE')"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value">
@@ -20,7 +20,7 @@
             <el-form-item label="日志类型" prop="logType">
               <el-select v-model="searchLogForm.doType" placeholder="请选择">
                 <el-option
-                  v-for="item in doTypeOption"
+                  v-for="item in this.getDict()('LOG_TYPE')"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value">
@@ -30,7 +30,7 @@
             <el-form-item label="结果" prop="result">
               <el-select v-model="searchLogForm.result" placeholder="请选择">
                 <el-option
-                  v-for="item in resultOption"
+                  v-for="item in this.getDict()('RESULT')"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value">
@@ -222,11 +222,6 @@ export default {
       title: '',
       multipleSelectionLogId: [],
       logTableData: [],
-      resultOption: [],
-      doTypeOption: [{
-        value: '1',
-        label: '黄金糕'
-      }],
       searchLogForm: {
         systemModule: '',
         doType: '',
@@ -264,7 +259,7 @@ export default {
     })
   },
   methods: {
-    ...mapGetters('dict', ['getDescriptionsDictLabel', 'getTableDictLabel']),
+    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {

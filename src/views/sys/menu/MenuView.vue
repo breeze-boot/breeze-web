@@ -112,7 +112,7 @@
           show-overflow-tooltip>
           <template slot-scope="scope">
             <el-tag :type="'success'">
-              {{ scope.row.type === 0 ? '文件夹' : (scope.row.type === 1 ? '菜单' : '按钮') }}
+              {{ scope.row.type === '0' ? '文件夹' : (scope.row.type === '1' ? '菜单' : '按钮') }}
             </el-tag>
           </template>
         </el-table-column>
@@ -144,48 +144,49 @@
             </el-option>
           </el-select>
         </el-form-item>
+
         <el-form-item :label-width="formLabelWidth" label="组件类型"
                       style="text-align: left;">
           <el-radio-group v-model="menu.type"
-                          @click="menu.type === 2 ? menu.href = 0 : menu.href = 1">
+                          @click="menu.type === '2' ? menu.href = 0 : menu.href = 1">
             <el-radio-button
-              v-for="item in typeOptions"
-              :key="item.label"
-              :label="item.label">
-              {{ item.name }}
+              v-for="item in this.getDict()('MENU_TYPE')"
+              :key="item.value"
+              :label="item.value">
+              {{ item.label }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item v-if="menu.type === 1" :label-width="formLabelWidth" label="外链" style="text-align: left;">
+        <el-form-item v-if="menu.type === '1'" :label-width="formLabelWidth" label="外链" style="text-align: left;">
           <el-radio-group v-model="menu.href">
             <el-radio-button
               v-for="item in this.getDict()('HREF')"
               :key="item.value"
-              :label="item.label">
+              :label="item.value">
               {{ item.label }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item v-if="menu.type === 1" :label-width="formLabelWidth" label="缓存" style="text-align: left;">
+        <el-form-item v-if="menu.type === '1'" :label-width="formLabelWidth" label="缓存" style="text-align: left;">
           <el-radio-group v-model="menu.keepAlive">
             <el-radio-button
               v-for="item in this.getDict()('KEEPALIVE')"
               :key="item.value"
-              :label="item.label">
+              :label="item.value">
               {{ item.label }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item v-if="menu.type === 1" :label-width="formLabelWidth" label="隐藏" style="text-align: left;">
+        <el-form-item v-if="menu.type === '1'" :label-width="formLabelWidth" label="隐藏" style="text-align: left;">
           <el-radio-group v-model="menu.hidden">
             <el-radio-button
-              v-for="item in hiddenOptions"
-              :key="item.label"
-              :label="item.label">
-              {{ item.name }}
+              v-for="item in this.getDict()('HIDDEN')"
+              :key="item.value"
+              :label="item.value">
+              {{ item.label }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
@@ -209,30 +210,30 @@
           <el-input v-model="menu.title" autocomplete="off" clearable placeholder="请输入组件显示的标题"></el-input>
         </el-form-item>
 
-        <el-form-item v-if="menu.type === 0 || menu.type === 1" :label-width="formLabelWidth" label="组件图标"
+        <el-form-item v-if="menu.type === '0' || menu.type === '1'" :label-width="formLabelWidth" label="组件图标"
                       prop="icon">
           <el-button plain style="margin:0 10px" type="success" @click="showIconDialog">打开</el-button>
           <svg-icon :icon-name="menu.icon" style="font-size: 20px;"/>
           <span> {{ menu.icon }} </span>
         </el-form-item>
 
-        <el-form-item v-if="menu.type === 0 || menu.type === 1" :label-width="formLabelWidth"
+        <el-form-item v-if="menu.type === '0' || menu.type === '1'" :label-width="formLabelWidth"
                       label="菜单路径"
                       prop="path">
           <el-input v-model="menu.path" autocomplete="off" clearable placeholder="请输入菜单路径"></el-input>
         </el-form-item>
 
-        <el-form-item v-if="menu.href === 0 && menu.type === 1" :label-width="formLabelWidth" label="组件名称"
+        <el-form-item v-if="menu.href === '0' && menu.type === '1'" :label-width="formLabelWidth" label="组件名称"
                       prop="name">
           <el-input v-model="menu.name" autocomplete="off" clearable placeholder="请输入组件名称"></el-input>
         </el-form-item>
 
-        <el-form-item v-if="menu.href === 0 && menu.type === 1" :label-width="formLabelWidth" label="组件路径"
+        <el-form-item v-if="menu.href === '0' && menu.type === '1'" :label-width="formLabelWidth" label="组件路径"
                       prop="component">
           <el-input v-model="menu.component" autocomplete="off" clearable placeholder="请输入组件路径"></el-input>
         </el-form-item>
 
-        <el-form-item v-if="menu.href === 0 && (menu.type === 1 || menu.type === 2)" :label-width="formLabelWidth"
+        <el-form-item v-if="menu.href === '0' && (menu.type === '1' || menu.type === '2')" :label-width="formLabelWidth"
                       label="权限编码"
                       prop="permission">
           <el-input v-model="menu.permission" autocomplete="off" clearable placeholder="请输入权限编码"></el-input>
@@ -259,8 +260,8 @@
             组件类型
           </template>
           <el-tag
-            :type="menu.type === 0 ? 'primary' : (menu.type === 1 ? 'info' : 'warning')"
-            disable-transitions> {{ menu.type === 0 ? '文件夹' : (menu.type === 1 ? '菜单' : '按钮') }}
+            :type="menu.type === '0' ? 'primary' : (menu.type === '1' ? 'info' : 'warning')"
+            disable-transitions> {{ menu.type === '0' ? '文件夹' : (menu.type === '1' ? '菜单' : '按钮') }}
           </el-tag>
         </el-descriptions-item>
 
@@ -269,8 +270,8 @@
             外链
           </template>
           <el-tag
-            :type="menu.href === 0 ? 'primary' :  'info'"
-            disable-transitions> {{ menu.href === 0 ? '路由菜单' : '外部链接' }}
+            :type="menu.href === '0' ? 'primary' :  'info'"
+            disable-transitions> {{ menu.href === '0' ? '路由菜单' : '外部链接' }}
           </el-tag>
         </el-descriptions-item>
 
@@ -278,14 +279,14 @@
           <template slot="label">
             缓存
           </template>
-          {{ menu.keepAlive === 0 ? '未开启' : '开启' }}
+          {{ menu.keepAlive === '0' ? '未开启' : '开启' }}
         </el-descriptions-item>
 
         <el-descriptions-item>
           <template slot="label">
             隐藏
           </template>
-          {{ menu.hidden === 0 ? '显示在路由菜单' : '（隐藏）通过编程式路由跳转' }}
+          {{ menu.hidden === '0' ? '显示在路由菜单' : '（隐藏）通过编程式路由跳转' }}
         </el-descriptions-item>
 
         <el-descriptions-item>
@@ -400,10 +401,10 @@ export default {
         parentId: ROOT,
         permission: '',
         component: '',
-        href: 0,
-        keepAlive: 0,
-        hidden: 0,
-        type: 0,
+        href: '0',
+        keepAlive: '0',
+        hidden: '0',
+        type: '0',
         path: ''
       },
       menuInfo: {
@@ -417,57 +418,13 @@ export default {
         parentId: ROOT,
         permission: '',
         component: '',
-        href: 0,
-        keepAlive: 0,
-        hidden: 0,
-        type: 0,
+        href: '0',
+        keepAlive: '0',
+        hidden: '0',
+        type: '0',
         path: ''
       },
       menuOption: [],
-      hrefOptions: [
-        {
-          label: 0,
-          name: '组件'
-        },
-        {
-          label: 1,
-          name: '外链'
-        }
-      ],
-      keepAliveOptions: [
-        {
-          value: 0,
-          label: '关闭缓存'
-        },
-        {
-          value: 1,
-          label: '开启缓存'
-        }
-      ],
-      hiddenOptions: [
-        {
-          label: 0,
-          name: '显示'
-        },
-        {
-          label: 1,
-          name: '隐藏'
-        }
-      ],
-      typeOptions: [
-        {
-          label: 0,
-          name: '文件夹'
-        },
-        {
-          label: 1,
-          name: '菜单'
-        },
-        {
-          label: 2,
-          name: '按钮'
-        }
-      ],
       // 默认是创建
       dialogType: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
@@ -525,7 +482,7 @@ export default {
     this.selectPlatform()
   },
   methods: {
-    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel']),
+    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
     selectPlatform () {
       selectPlatform().then((rep) => {
         if (rep.code === 1) {
@@ -656,7 +613,7 @@ export default {
     },
     save () {
       save(this.menu).then((rep) => {
-        if (rep.code === 1) {
+        if (rep.code === '1') {
           Message.success({ message: rep.message })
           this.menuDialogVisible = false
           this.reloadList()
