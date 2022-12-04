@@ -73,12 +73,13 @@ export function open (data) {
 
 /**
  * 查询字典
- * @param dictCode
+ * @param dictCodes
  * @returns {AxiosPromise}
  */
-export function listDict (dictCode) {
+export function listDict (dictCodes) {
   return request({
-    url: servicePath.system + '/sys/dict/listDict/' + dictCode,
-    method: 'get'
+    url: servicePath.system + '/sys/dict/listDict',
+    method: 'post',
+    data: dictCodes
   })
 }

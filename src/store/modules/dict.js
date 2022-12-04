@@ -10,7 +10,8 @@ export default {
   },
   mutations: {
     setDict (state, dict) {
-      if (state.dict.some(d => d.dictCode === dict.dictCode)) {
+      debugger
+      if (state.dict.some(item => item.key === dict.key)) {
         return
       }
       state.dict.push(dict)
@@ -19,14 +20,14 @@ export default {
   actions: {},
   getters: {
     getDict (state) {
-      return function (dictCode) {
-        let item = []
+      return function (key) {
+        let reuslt = []
         state.dict.forEach(dict => {
-          if (dict.dictCode === dictCode) {
-            item = dict.dictValue
+          if (dict.key === key) {
+            reuslt = dict.value
           }
         })
-        return item
+        return reuslt
       }
     }
   }

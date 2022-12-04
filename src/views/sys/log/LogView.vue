@@ -66,7 +66,7 @@
         ref="multipleTable"
         :data="logTableData"
         border
-        height="300"
+        height="500"
         size="mini"
         stripe
         style="width: 100%"
@@ -93,41 +93,37 @@
           :formatter="(row, column) => this.$searchDict(row, column, 'LOG_TYPE')"
           label="日志类型"
           prop="logType"
-          show-overflow-tooltip>
-        </el-table-column>
+          show-overflow-tooltip/>
         <el-table-column
+          :formatter="(row, column) => this.$searchDict(row, column, 'DO_TYPE')"
           label="操作类型"
-          prop="doType">
-        </el-table-column>
+          prop="doType"/>
         <el-table-column
           label="请求类型"
           prop="requestType"
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
+          :formatter="(row, column) => this.$searchDict(row, column, 'RESULT')"
           label="执行结果"
           prop="result"
-          show-overflow-tooltip>
-        </el-table-column>
+          show-overflow-tooltip/>
         <el-table-column
           label="浏览器"
           prop="browser"
-          show-overflow-tooltip>
-        </el-table-column>
+          show-overflow-tooltip/>
         <el-table-column
           label="IP"
           prop="ip"
-          show-overflow-tooltip>
-        </el-table-column>
+          show-overflow-tooltip/>
         <el-table-column
           label="系统"
           prop="system"
-          show-overflow-tooltip>
-        </el-table-column>
+          show-overflow-tooltip/>
         <el-table-column
           label="操作人"
-          prop="createBy">
-        </el-table-column>
+          prop="createBy"
+          show-overflow-tooltip/>
         <el-table-column
           fixed="right"
           label="操作"
@@ -262,7 +258,7 @@ export default {
     }
   },
   mounted () {
-    this.$loadDict('LOG_TYPE').then((dict) => {
+    this.$loadDict(['LOG_TYPE', 'DO_TYPE', 'RESULT']).then((dict) => {
       this.reloadList()
     })
   },
