@@ -100,7 +100,7 @@
         <el-table-column
           :formatter="(row, column) => this.getTableDictLabel()(row, column, 'KEEPALIVE')"
           label="缓存"
-          prop="keepAlie"
+          prop="keepAlive"
           show-overflow-tooltip
           width="100"/>
         <el-table-column
@@ -110,15 +110,10 @@
           show-overflow-tooltip
           width="100"/>
         <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'MENU_TYPE')"
           label="类型"
           prop="type"
-          show-overflow-tooltip>
-          <template slot-scope="scope">
-            <el-tag :type="'success'">
-              {{ scope.row.type === '0' ? '文件夹' : (scope.row.type === '1' ? '菜单' : '按钮') }}
-            </el-tag>
-          </template>
-        </el-table-column>
+          show-overflow-tooltip/>
         <el-table-column
           fixed="right"
           label="操作"
