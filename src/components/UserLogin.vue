@@ -24,8 +24,8 @@
           type="password"
         ></el-input>
       </el-form-item>
-      <el-form-item prop="tenant" size="mini" style="display: flex; width: 100%!important;">
-        <el-select v-model="userLogin.tenantId" placeholder="请选择租户">
+      <el-form-item id="tenant_select" prop="tenant" size="mini">
+        <el-select v-model="userLogin.tenantId" placeholder="请选择租户" @change="handleTenant">
           <el-option
             v-for="item in tenantOption"
             :key="item.value"
@@ -67,7 +67,8 @@ export default {
       loginBtn: '登录',
       userLogin: {
         username: 'admin',
-        password: '123456'
+        password: '123456',
+        tenantId: ''
       },
       tenantOption: [],
       rules: {
@@ -106,12 +107,15 @@ export default {
       jwtLogin(this.userLogin).then((rep) => {
         if (rep.code === 1) {
           localStorage.setItem('access_token', rep.data.access_token)
-          localStorage.setItem('permissions', rep.data.permissions)
+          localStorage.setItem('authorities', rep.data.user_info.authorities)
           this.setUserInfo(rep.data.user_info)
           // 获取路由
           this.loadRoute()
         }
       })
+    },
+    handleTenant () {
+      localStorage.setItem('B_TENANT_ID', this.userLogin.tenantId)
     },
     onSubmit () {
       this.$refs.userLogin.validate((valid) => {
@@ -131,7 +135,7 @@ export default {
   }
 }
 </script>
-<style scoped>
+<style lang="less">
 .userLogin {
   position: absolute;
   left: 50%;
@@ -144,12 +148,19 @@ export default {
   min-width: 300px;
   border: 1px #bdbdbd solid;
   box-shadow: 0 0 5px #9b9b9b;
+
+  h3 {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 10px 0;
+  }
 }
 
-.userLogin > h3 {
-  font-size: 1.5rem;
-  text-align: center;
-  margin-bottom: 20px;
-  padding: 10px 0;
+#tenant_select {
+  .el-select {
+    margin: 0 auto;
+    width: 100%;
+  }
 }
 </style>

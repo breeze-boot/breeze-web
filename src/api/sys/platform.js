@@ -39,7 +39,7 @@ export function del (ids) {
  */
 export function save (data) {
   return request({
-    url: servicePath.system + '/sys/platform/save',
+    url: servicePath.system + '/sys/platform/create',
     method: 'post',
     data: data
   })

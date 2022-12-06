@@ -12,7 +12,7 @@ export const request = axios.create({
   // 请求超时时间
   timeout: 30000,
   headers: {
-    tenantId: '1'
+    B_TENANT_ID: localStorage.getItem('B_TENANT_ID') || '1'
   }
 })
 

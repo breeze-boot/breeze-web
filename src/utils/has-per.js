@@ -17,7 +17,7 @@ const has = Vue.directive('has', {
  */
 const isHasPer = (array) => {
   // 获取用户按钮权限
-  const permissionsStr = localStorage.getItem('permissions')
+  const permissionsStr = localStorage.getItem('authorities')
   if (!permissionsStr) {
     return false
   }

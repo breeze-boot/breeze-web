@@ -28,9 +28,9 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
-        <el-button plain size="mini" @click="importInfo">导入</el-button>
+        <el-button v-has="['sys:menu:export']" plain size="mini" type="primary" @click="create">新建</el-button>
+        <el-button v-has="['sys:menu:export']" plain size="mini" type="info" @click="exportInfo">导出</el-button>
+        <el-button v-has="['sys:menu:export']" plain size="mini" @click="importInfo">导入</el-button>
       </div>
       <el-table
         ref="menuTable"
@@ -120,9 +120,10 @@
           width="200">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button size="mini" type="text" @click="create(scope.row)">新建</el-button>
-            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
-            <el-button size="mini" type="text" @click.native.prevent="delItem(menuTableData,scope.row)">删除
+            <el-button v-has="['sys:menu:create']" size="mini" type="text" @click="create(scope.row)">新建</el-button>
+            <el-button v-has="['sys:menu:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button v-has="['sys:menu:delete']" size="mini" type="text"
+                       @click.native.prevent="delItem(menuTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
@@ -608,7 +609,7 @@ export default {
     },
     save () {
       save(this.menu).then((rep) => {
-        if (rep.code === '1') {
+        if (rep.code === 1) {
           Message.success({ message: rep.message })
           this.menuDialogVisible = false
           this.reloadList()

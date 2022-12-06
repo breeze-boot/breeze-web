@@ -59,7 +59,7 @@ export function list (data) {
  */
 export function save (data) {
   return request({
-    url: servicePath.system + '/sys/menu/save',
+    url: servicePath.system + '/sys/menu/create',
     method: 'post',
     data: data
   })

@@ -26,7 +26,7 @@ export function list (data) {
  */
 export function save (data) {
   return request({
-    url: servicePath.system + '/sys/dept/save',
+    url: servicePath.system + '/sys/dept/create',
     method: 'post',
     data: data
   })

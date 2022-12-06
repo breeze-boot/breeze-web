@@ -2,8 +2,8 @@
   <el-container>
     <el-main>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button plain size="mini" type="danger" @click="remove">删除</el-button>
+        <el-button v-has="['sys:dict:create']" plain size="mini" type="primary" @click="create">新建</el-button>
+        <el-button v-has="['sys:dict:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
       </div>
       <el-table ref="multipleTable" :data="dictItemTableData" border height="200" size="mini" stripe style="width: 100%"
                 @selection-change="ditItemHandleSelectionChange">

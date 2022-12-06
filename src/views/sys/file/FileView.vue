@@ -89,11 +89,11 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="preview(scope.row)">预览</el-button>
-            <el-button size="mini" type="text" @click="download(scope.row)">下载</el-button>
-            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button size="mini" type="text" @click="edit(scope.row)">更新</el-button>
-            <el-button size="mini" type="text"
+            <el-button v-has="['sys:file:upload']" size="mini" type="text" @click="preview(scope.row)">预览</el-button>
+            <el-button v-has="['sys:file:upload']" size="mini" type="text" @click="download(scope.row)">下载</el-button>
+            <el-button v-has="['sys:file:upload']" size="mini" type="text" @click="info(scope.row)">查看</el-button>
+            <el-button v-has="['sys:file:upload']" size="mini" type="text" @click="edit(scope.row)">更新</el-button>
+            <el-button v-has="['sys:file:upload']" size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, fileTableData,scope.row)">删除
             </el-button>
           </template>

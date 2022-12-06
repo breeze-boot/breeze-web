@@ -28,7 +28,7 @@ export function list (data) {
  */
 export function save (data) {
   return request({
-    url: servicePath.system + '/sys/dictItem/save',
+    url: servicePath.system + '/sys/dictItem/create',
     method: 'post',
     data: data
   })

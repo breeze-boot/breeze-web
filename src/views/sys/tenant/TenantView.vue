@@ -18,10 +18,10 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:tenant:save']" plain size="mini" type="primary" @click="create">新建</el-button>
+        <el-button v-has="['sys:tenant:create']" plain size="mini" type="primary" @click="create">新建</el-button>
         <el-button v-has="['sys:tenant:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
-        <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
-        <el-button plain size="mini" @click="importInfo">导入</el-button>
+        <el-button v-has="['sys:tenant:export']" plain size="mini" type="info" @click="exportInfo">导出</el-button>
+        <el-button v-has="['sys:tenant:import']" plain size="mini" @click="importInfo">导入</el-button>
       </div>
       <el-table
         ref="multipleTable"
@@ -65,8 +65,8 @@
           width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
-            <el-button size="mini" type="text"
+            <el-button v-has="['sys:tenant:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button v-has="['sys:tenant:delete']" size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, tenantTableData,scope.row)">删除
             </el-button>
           </template>

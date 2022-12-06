@@ -58,9 +58,9 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
-        <el-button plain size="mini" type="danger" @click="del">删除</el-button>
-        <el-button plain size="mini" type="danger" @click="clear">清空全表</el-button>
+        <el-button v-has="['sys:log:export']" plain size="mini" type="info" @click="exportInfo">导出</el-button>
+        <el-button v-has="['sys:log:delete']" plain size="mini" type="danger" @click="del">删除</el-button>
+        <el-button v-has="['sys:log:clear']" plain size="mini" type="danger" @click="clear">清空全表</el-button>
       </div>
       <el-table
         ref="multipleTable"
@@ -130,7 +130,8 @@
           width="100">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button size="mini" type="text" @click.native.prevent="removeItem(scope.$index, logTableData,scope.row)">
+            <el-button v-has="['sys:log:delete']" size="mini" type="text"
+                       @click.native.prevent="removeItem(scope.$index, logTableData,scope.row)">
               删除
             </el-button>
           </template>

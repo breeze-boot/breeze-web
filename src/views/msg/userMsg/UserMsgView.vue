@@ -91,7 +91,7 @@
           width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button size="mini" type="text"
+            <el-button v-has="['sys:userMsg:delete']" size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, userMsgTableData,scope.row)">删除
             </el-button>
           </template>

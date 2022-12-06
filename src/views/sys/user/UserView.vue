@@ -21,10 +21,10 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button plain size="mini" type="danger" @click="remove">删除</el-button>
-        <el-button plain size="mini" type="info" @click="exportInfo">导出</el-button>
-        <el-button plain size="mini" @click="importInfo">导入</el-button>
+        <el-button v-has="['sys:user:save']" plain size="mini" type="primary" @click="create">新建</el-button>
+        <el-button v-has="['sys:user:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
+        <el-button v-has="['sys:user:export']" plain size="mini" type="info" @click="exportInfo">导出</el-button>
+        <el-button v-has="['sys:user:import']" plain size="mini" @click="importInfo">导入</el-button>
       </div>
       <el-table
         ref="userTable"
@@ -134,8 +134,8 @@
           width="220">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
-            <el-button size="mini" type="text"
+            <el-button v-has="['sys:user:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button v-has="['sys:user:delete']" size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, userTableData,scope.row)">删除
             </el-button>
             <el-dropdown size="mini" style="margin-left: 5px;" trigger="click" type="primary">
@@ -144,8 +144,9 @@
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </span>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="1" @click.native="resetPass(scope.row)">重置密码</el-dropdown-item>
-                <el-dropdown-item command="2" @click.native="goRoleView(scope.row)"
+                <el-dropdown-item v-has="['sys:user:resetPass']" command="1" @click.native="resetPass(scope.row)">重置密码
+                </el-dropdown-item>
+                <el-dropdown-item v-has="['sys:user:userSetRole']" command="2" @click.native="goRoleView(scope.row)"
                 >角色分配
                 </el-dropdown-item>
               </el-dropdown-menu>

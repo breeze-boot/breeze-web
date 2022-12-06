@@ -56,7 +56,7 @@ export function editPermission (data) {
  */
 export function save (data) {
   return request({
-    url: servicePath.system + '/sys/dataPermission/save',
+    url: servicePath.system + '/sys/dataPermission/create',
     method: 'post',
     data: data
   })
