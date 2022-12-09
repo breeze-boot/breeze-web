@@ -4,14 +4,11 @@
       <el-form ref="searchForm" :inline="true" :model="searchFileForm" class="demo-form-inline" size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
-            <el-form-item label="原始文件名称" prop="originalFileName">
+            <el-form-item label="原始名称" prop="originalFileName">
               <el-input v-model="searchFileForm.originalFileName" clearable placeholder="原始文件名称"/>
             </el-form-item>
-            <el-form-item label="新文件名称" prop="newFileName">
+            <el-form-item label="新名称" prop="newFileName">
               <el-input v-model="searchFileForm.newFileName" clearable placeholder="新文件名称"/>
-            </el-form-item>
-            <el-form-item label="创建人ID" prop="createBy">
-              <el-input v-model="searchFileForm.createBy" clearable placeholder="创建人ID"/>
             </el-form-item>
             <el-form-item label="创建人" prop="createName">
               <el-input v-model="searchFileForm.createName" clearable placeholder="创建人"/>
@@ -55,13 +52,13 @@
           width="200">
         </el-table-column>
         <el-table-column
-          label="原始文件名称"
+          label="原始名称"
           prop="originalFileName"
           show-overflow-tooltip
           width="200">
         </el-table-column>
         <el-table-column
-          label="新文件名称"
+          label="新名称"
           prop="newFileName"
           show-overflow-tooltip>
         </el-table-column>
@@ -125,9 +122,19 @@
 
     <el-dialog :title="title" :visible.sync="uploadDialogVisible" width="400px"
                @close="closeUploadDialog">
-      <el-form ref="uploadFileFrom" :model="file" label-width="0">
-        <el-form-item style="margin-bottom: 10px;">
+      <el-form ref="uploadFileFrom" :model="file" :rules="fileRules" label-width="0" size="mini">
+        <el-form-item prop="title">
           <el-input v-model="file.title" placeholder="请输入文件标题"></el-input>
+        </el-form-item>
+        <el-form-item prop="ossStyle" style="margin-bottom: 20px;">
+          <el-select v-model="file.ossStyle" placeholder="请选择存储位置">
+            <el-option
+              v-for="item in this.getDict()('OSS_STYLE')"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
         </el-form-item>
         <el-upload
           :http-request="uploadImage"
@@ -153,13 +160,13 @@
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            原始文件名称
+            原始名称
           </template>
           {{ file.originalFileName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            新文件名称
+            新名称
           </template>
           <el-tag size="small">
             {{ file.newFileName }}
@@ -227,11 +234,29 @@ export default {
       formLabelWidth: '80px',
       file: {
         id: null,
-        title: ''
+        title: '',
+        ossStyle: ''
       },
       fileInfo: {
         id: null,
-        title: ''
+        title: '',
+        ossStyle: ''
+      },
+      fileRules: {
+        title: [
+          {
+            required: true,
+            message: '请输入文件标题',
+            trigger: 'blur'
+          }
+        ],
+        ossStyle: [
+          {
+            required: true,
+            message: '请选择存储位置',
+            trigger: 'change'
+          }
+        ]
       }
     }
   },
@@ -307,9 +332,19 @@ export default {
     },
     uploadImage (param) {
       const formData = new FormData()
+      if (!this.file.title) {
+        this.$refs.uploadFileFrom.validate()
+        param.file = null
+        return
+      }
+      if (!this.file.ossStyle) {
+        this.$refs.uploadFileFrom.validate()
+        param.file = null
+        return
+      }
       formData.append('file', param.file)
-      formData.append('ossStyle', 0)
       formData.append('title', this.file.title)
+      formData.append('ossStyle', this.file.ossStyle)
       upload(formData).then(rep => {
         this.uploadDialogVisible = false
         this.reloadList()
