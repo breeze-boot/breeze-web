@@ -1,8 +1,8 @@
 <template>
   <el-container class="header">
     <div class="collapse" @click="collapse">
-      <i v-show="this.isCollapse" class="el-icon-s-fold"/>
-      <i v-show="!this.isCollapse" class="el-icon-s-unfold"/>
+      <i v-show="this.menuIsCollapse.isCollapse" class="el-icon-s-fold"/>
+      <i v-show="!this.menuIsCollapse.isCollapse" class="el-icon-s-unfold"/>
     </div>
 
     <div class="group">
@@ -60,6 +60,7 @@
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import 'animate.css'
+import { logout } from '@/api/sys/login'
 
 export default {
   name: 'Header',
@@ -71,25 +72,30 @@ export default {
     }
   },
   computed: {
-    ...mapState('menu', ['fadeIn', 'isCollapse']),
+    ...mapState('menu', ['menuIsCollapse']),
     ...mapGetters('userInfo', ['getUsername']),
     ...mapGetters('msg', ['getMsg'])
   },
   methods: {
     ...mapActions('msg', ['closeMsgCard', 'markReadMsgCard', 'reloadMsg']),
     ...mapActions('userInfo', ['clearUserInfo']),
-    ...mapMutations('menu', ['setCollapse', 'setCollapseWhitespace', 'setFadeIn', 'clearMenus']),
+    ...mapMutations('menu', ['setMenuIsCollapse', 'clearMenus']),
     handleCommand (command) {
       if (command === 'logout') {
-        // 只要去登录页 直接清除
-        localStorage.clear()
-        this.clearMenus()
-        this.clearUserInfo()
-        this.$router.push('/')
-        this.$message({
-          showClose: true,
-          message: '退出成功',
-          type: 'success'
+        const username = this.getUsername()
+        console.log(username)
+        logout(this.getUsername()).then(rep => {
+          if (rep.code === 1) {
+            localStorage.clear()
+            this.$router.push('/')
+            this.clearMenus()
+            this.clearUserInfo()
+            this.$message({
+              showClose: true,
+              message: '退出成功',
+              type: 'success'
+            })
+          }
         })
         return
       }
@@ -102,11 +108,13 @@ export default {
       this.closeMsgCard(msg)
     },
     collapse () {
-      const collapseWhitespace = !this.isCollapse ? 200 : 65
+      const collapseWhitespace = !this.menuIsCollapse.isCollapse ? 200 : 65
       // 设置 VUEX 中的值
-      this.setCollapse(!this.isCollapse)
-      this.setFadeIn(this.fadeIn === 'fadeOut' ? 'fadeIn' : 'fadeOut')
-      this.setCollapseWhitespace(collapseWhitespace)
+      this.setMenuIsCollapse({
+        collapseWhitespace: collapseWhitespace,
+        fadeIn: this.menuIsCollapse.fadeIn === 'fadeOut' ? 'fadeIn' : 'fadeOut',
+        isCollapse: !this.menuIsCollapse.isCollapse
+      })
     },
     showMsgBox () {
       this.msgDrawer = true

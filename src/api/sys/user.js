@@ -96,6 +96,17 @@ export function open (data) {
 }
 
 /**
+ * 导出
+ * @returns {AxiosPromise}
+ */
+export function exportInfo (data) {
+  return request({
+    url: servicePath.system + '/sys/user/export',
+    method: 'get'
+  })
+}
+
+/**
  * 用户分配角色
  * @returns {AxiosPromise}
  */

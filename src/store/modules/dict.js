@@ -34,7 +34,6 @@ export default {
         if (!row || !column) {
           return
         }
-        debugger
         let label = ''
         state.dict.forEach(dict => {
           if (dict.key === key) {
@@ -45,7 +44,6 @@ export default {
             })
           }
         })
-        debugger
         return label
       }
     },

@@ -6,7 +6,7 @@ Vue.use(Vuex)
 export default {
   namespaced: true,
   state: {
-    currentTabValue: 'welcome',
+    currentTabValue: localStorage.getItem('current_tab_name'),
     dynamicTabs: [{
       title: '欢迎',
       name: 'welcome',
@@ -36,9 +36,6 @@ export default {
   actions: {},
   getters: {
     getCurrentTabValue (state) {
-      if (!state.currentTabValue) {
-        state.currentTabValue = localStorage.getItem('current_tab_name')
-      }
       return state.currentTabValue
     }
   }

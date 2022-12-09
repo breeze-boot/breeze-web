@@ -6,7 +6,7 @@ Vue.use(Vuex)
 export default {
   namespaced: true,
   state: {
-    userInfo: undefined
+    userInfo: JSON.parse(localStorage.getItem('user_info'))
   },
   mutations: {
     setUserInfo (state, userInfo) {
@@ -21,9 +21,6 @@ export default {
   },
   getters: {
     getUsername (state) {
-      if (!state.userInfo) {
-        state.userInfo = JSON.parse(localStorage.getItem('user_info'))
-      }
       return state.userInfo.username
     }
   }

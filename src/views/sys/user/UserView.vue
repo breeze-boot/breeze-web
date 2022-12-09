@@ -374,12 +374,13 @@
 </template>
 
 <script>
-import { del, list, modify, open, resetPass, save, selectPost, selectRole } from '@/api/sys/user'
+import { del, exportInfo, list, modify, open, resetPass, save, selectPost, selectRole } from '@/api/sys/user'
 import { confirmAlert, DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
 import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
 import { selectDept } from '@/api/sys/dept'
 import { mapGetters } from 'vuex'
+import { saveAs } from 'file-saver'
 
 export default {
   name: 'UserView',
@@ -702,6 +703,12 @@ export default {
       })
     },
     exportInfo () {
+      exportInfo().then(rep => {
+        const blob = new Blob([rep.data])
+        saveAs(blob, rep.data.originalFileName)
+      }).catch(err => {
+        console.log(err)
+      })
     },
     importInfo () {
     },

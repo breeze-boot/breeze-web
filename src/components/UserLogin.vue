@@ -55,7 +55,7 @@
 import Verify from '@/components/verifition/Verify'
 import { selectTenant } from '@/api/sys/tenant'
 import { mapActions, mapMutations } from 'vuex'
-import { jwtLogin } from '@/api/sys/login'
+import { login } from '@/api/sys/login'
 
 export default {
   name: 'userLogin',
@@ -104,7 +104,7 @@ export default {
     ...mapActions('menu', ['loadRoute']),
     ...mapMutations('userInfo', ['setUserInfo']),
     success () {
-      jwtLogin(this.userLogin).then((rep) => {
+      login(this.userLogin).then((rep) => {
         if (rep.code === 1) {
           localStorage.setItem('access_token', rep.data.access_token)
           localStorage.setItem('authorities', rep.data.user_info.authorities)

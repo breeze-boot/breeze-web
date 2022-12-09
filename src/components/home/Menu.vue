@@ -1,7 +1,7 @@
 <template>
   <el-container>
     <el-menu
-      :collapse="!this.isCollapse"
+      :collapse="!this.menuIsCollapse.isCollapse"
       :collapse-transition="true"
       :default-active="this.currentMenu"
       :unique-opened="true"
@@ -13,10 +13,10 @@
       text-color="#fff"
       @close="handleClose"
       @open="handleOpen">
-      <div :style="{minWidth: this.collapseWhitespace  + 'px'}" class="logo">
-        <img :style="{animationName: this.fadeIn, animationDuration: 0 + 's'}" alt=""
+      <div :style="{minWidth: this.menuIsCollapse.collapseWhitespace  + 'px'}" class="logo">
+        <img :style="{animationName: this.menuIsCollapse.fadeIn, animationDuration: 0 + 's'}" alt=""
              src="../../assets/logo.png"/>
-        <span v-show="this.isCollapse">通用管理系统</span>
+        <span v-show="this.menuIsCollapse.isCollapse">通用管理系统</span>
       </div>
       <el-menu-item
         key="0"
@@ -45,7 +45,7 @@ export default {
     return {}
   },
   computed: {
-    ...mapState('menu', ['isCollapse', 'fadeIn', 'collapseWhitespace', 'currentMenu']),
+    ...mapState('menu', ['menuIsCollapse', 'currentMenu']),
     ...mapGetters('menu', ['getMenus'])
   },
   methods: {
@@ -67,8 +67,8 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 6vh;
   padding: 0;
+  height: 50px;
 
   span {
     text-align: center;

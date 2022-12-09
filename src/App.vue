@@ -14,8 +14,36 @@ export default {
   },
   methods: {
     ...mapMutations('tag', ['setTag', 'setCurrentTagValue']),
-    ...mapMutations('menu', ['setCurrentMenu']),
-    ...mapMutations('tabs', ['setTab', 'setCurrentTabValue'])
+    ...mapMutations('menu', ['setCurrentMenu', 'setMenuIsCollapse']),
+    ...mapMutations('tabs', ['setTab', 'setCurrentTabValue']),
+    reSize () {
+      debugger
+      const width = document.documentElement.clientWidth || document.body.clientWidth
+      if (width < 1024) {
+        // 设置 VUEX 中的值
+        this.setMenuIsCollapse({
+          collapseWhitespace: 65,
+          fadeIn: 'fadeOut',
+          isCollapse: false
+        })
+      } else {
+        // 设置 VUEX 中的值
+        this.setMenuIsCollapse({
+          collapseWhitespace: 200,
+          fadeIn: 'fadeIn',
+          isCollapse: true
+        })
+      }
+      // document.getElementsByTagName('html')[0].style['font-size'] = 18 + 'px'
+    }
+  },
+  mounted () {
+    window.onresize = () => {
+      // 当页面尺寸改变的时候生效
+      return this.reSize()
+    }
+  },
+  destroyed () {
   },
   created () {
   },

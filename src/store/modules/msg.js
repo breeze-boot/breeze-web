@@ -70,6 +70,7 @@ export default {
       if (state.msg) {
         return state.msg
       }
+      return ''
     }
   }
 }

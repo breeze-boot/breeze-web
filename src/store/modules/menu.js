@@ -12,10 +12,12 @@ export default {
   state: {
     menus: [],
     keepAliveMenus: [],
+    menuIsCollapse: {
+      isCollapse: true,
+      fadeIn: 'fadeIn',
+      collapseWhitespace: '200'
+    },
     currentMenu: 'welcome',
-    isCollapse: true,
-    fadeIn: 'fadeIn',
-    collapseWhitespace: '200',
     isLoadMenu: false
   },
   mutations: {
@@ -29,14 +31,10 @@ export default {
           menu.component.substr(menu.component.lastIndexOf('/') + 1)
       }
     },
-    setCollapse (state, isCollapse) {
-      state.isCollapse = isCollapse
-    },
-    setFadeIn (state, fadeIn) {
-      state.fadeIn = fadeIn
-    },
-    setCollapseWhitespace (state, collapseWhitespace) {
-      state.collapseWhitespace = collapseWhitespace
+    setMenuIsCollapse (state, menuIsCollapse) {
+      state.menuIsCollapse.collapseWhitespace = menuIsCollapse.collapseWhitespace
+      state.menuIsCollapse.isCollapse = menuIsCollapse.isCollapse
+      state.menuIsCollapse.fadeIn = menuIsCollapse.fadeIn
     },
     isLoadMenu (state, isLoadMenu) {
       state.isLoadMenu = isLoadMenu
@@ -67,8 +65,8 @@ export default {
         // 动态绑定路由
         if (context.rootGetters['menu/getMenus'].length === 0 || !context.rootGetters['menu/isLoadMenu']) {
           convertMenus(rep.data)
+          context.commit('setMenus', rep.data)
         }
-        context.commit('setMenus', rep.data)
         let path = router.app._route.query.redirect
         const name = localStorage.getItem('current_tag_name')
         if (!path && name) {
