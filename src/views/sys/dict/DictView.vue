@@ -1,7 +1,8 @@
 <template>
   <el-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchDictForm" class="demo-form-inline" size="mini">
+      <el-form ref="searchForm" :inline="true" :model="searchDictForm" class="demo-form-inline" label-width="80px"
+               size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="字典名称" prop="dictName">
