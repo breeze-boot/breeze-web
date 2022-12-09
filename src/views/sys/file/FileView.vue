@@ -348,7 +348,10 @@ export default {
     },
     download (row) {
       download(row.id).then(rep => {
-        const blob = new Blob([rep.data])
+        const blob = new Blob([rep.data],
+          {
+            type: 'image/jpeg'
+          })
         saveAs(blob, rep.data.originalFileName)
       }).catch(err => {
         console.log(err)
