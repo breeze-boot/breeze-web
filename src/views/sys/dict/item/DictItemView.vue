@@ -179,10 +179,6 @@ export default {
         })
       })
     },
-    exportInfo () {
-    },
-    importInfo () {
-    },
     create () {
       this.title = '创建字典项'
       this.dialogType = DIALOG_TYPE.ADD

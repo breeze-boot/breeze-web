@@ -21,8 +21,6 @@
       <div style="margin-bottom: 10px; text-align: left;">
         <el-button v-has="['sys:msg:create']" plain size="mini" type="primary" @click="create">新建</el-button>
         <el-button v-has="['sys:msg:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
-        <el-button v-has="['sys:msg:export']" plain size="mini" type="info" @click="exportInfo">导出</el-button>
-        <el-button v-has="['sys:msg:import']" plain size="mini" @click="importInfo">导入</el-button>
       </div>
       <el-table
         ref="deptTable"
@@ -561,10 +559,6 @@ export default {
           }
         })
       })
-    },
-    exportInfo () {
-    },
-    importInfo () {
     },
     removeUserItem (index, rows, row) {
       confirmAlert(() => {

@@ -21,10 +21,6 @@
       <div style="margin-bottom: 10px; text-align: left;">
         <el-button v-has="['sys:post:create']" plain size="mini" type="primary" @click="create">新建</el-button>
         <el-button v-has="['sys:post:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
-        <el-button v-has="['sys:post:export']" plain size="mini" type="info" @click="exportInfo">导出
-        </el-button>
-        <el-button v-has="['sys:post:import']" plain size="mini" @click="importInfo">导入
-        </el-button>
       </div>
       <el-table
         ref="multipleTable"
@@ -260,10 +256,6 @@ export default {
           }
         })
       })
-    },
-    exportInfo () {
-    },
-    importInfo () {
     },
     create () {
       this.title = '创建岗位'

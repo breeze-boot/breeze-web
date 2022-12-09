@@ -30,8 +30,6 @@
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
         <el-button v-has="['sys:menu:export']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:menu:export']" plain size="mini" type="info" @click="exportInfo">导出</el-button>
-        <el-button v-has="['sys:menu:export']" plain size="mini" @click="importInfo">导入</el-button>
       </div>
       <el-table
         ref="menuTable"
@@ -535,10 +533,7 @@ export default {
         }
       }
     },
-    exportInfo () {
-    },
-    importInfo () {
-    },
+
     menuHandleExpandChange (val) {
       this.multipleSelectionMenuId = val
       this.$nextTick(() => {

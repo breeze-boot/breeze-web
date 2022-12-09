@@ -21,10 +21,8 @@
       <el-row :gutter="24">
         <el-col :md="19">
           <div style="margin-bottom: 10px; text-align: left;">
-            <el-button v-has="['sys:role:export']" plain size="mini" type="primary" @click="create">新建</el-button>
-            <el-button v-has="['sys:role:export']" plain size="mini" type="danger" @click="remove">删除</el-button>
-            <el-button v-has="['sys:role:export']" plain size="mini" type="info" @click="exportInfo">导出</el-button>
-            <el-button v-has="['sys:role:export']" plain size="mini" @click="importInfo">导入</el-button>
+            <el-button v-has="['sys:role:create']" plain size="mini" type="primary" @click="create">新建</el-button>
+            <el-button v-has="['sys:role:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
           </div>
           <el-table
             ref="multipleTable"
@@ -312,10 +310,6 @@ export default {
           }
         })
       })
-    },
-    exportInfo () {
-    },
-    importInfo () {
     },
     create () {
       this.title = '创建角色'
