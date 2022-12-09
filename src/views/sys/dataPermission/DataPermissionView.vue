@@ -1,7 +1,8 @@
 <template>
   <el-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchPermissionForm" class="demo-form-inline" label-width="80px"
+      <el-form ref="searchForm" :inline="true" :model="searchPermissionForm" class="demo-form-inline"
+               label-width="100px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
@@ -72,7 +73,7 @@
         </el-table-column>
         <el-table-column
           label="权限集"
-          prop="permissions"
+          prop="dataPermissions"
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
@@ -121,7 +122,7 @@
           <el-input v-model="dataPermission.dataPermissionCode"
                     autocomplete="off" clearable/>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="运算符" prop="operator">
+        <el-form-item :label-width="formLabelWidth" label="通用运算符" prop="operator">
           <el-radio-group v-model="dataPermission.operator">
             <el-radio-button label="AND">AND</el-radio-button>
             <el-radio-button label="OR">OR</el-radio-button>
@@ -174,7 +175,7 @@
             </el-table-column>
             <el-table-column
               v-if="this.dataPermissionTableSqlDiyData.length > 1"
-              label="运算符"
+              label="SQL运算符"
               prop="operator">
               <template slot-scope="scope">
                 <el-radio-group v-model="scope.row.operator"
@@ -201,7 +202,8 @@
                @close="closePermissionDiyDialog('dataPermissionDiyRuleForm')">
       <el-form ref="dataPermissionDiyRuleForm" :model="dataPermissionDiy" :rules="dataPermissionDiyRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="表名" prop="name">
-          <el-select v-model="dataPermissionDiy.name" collapse-tags filterable placeholder="请选择表名" @change=handleTable>
+          <el-select v-model="dataPermissionDiy.name" :dsiabled="selectedTable" collapse-tags filterable
+                     placeholder="请选择表名" @change=handleTable>
             <el-option
               v-for="item in tableOption"
               :key="item.value"
@@ -301,6 +303,7 @@ export default {
       dataPermissionTableSqlDiyData: [],
       checkStrictly: false,
       multiple: false,
+      selectedTable: true,
       emitPath: false,
       searchPermissionForm: {
         dataPermissionName: '',
