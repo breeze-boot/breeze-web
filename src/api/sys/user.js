@@ -99,10 +99,11 @@ export function open (data) {
  * 导出
  * @returns {AxiosPromise}
  */
-export function exportInfo (data) {
+export function exportInfo () {
   return request({
     url: servicePath.system + '/sys/user/export',
-    method: 'get'
+    method: 'get',
+    responseType: 'blob'
   })
 }
 

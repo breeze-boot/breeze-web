@@ -704,7 +704,12 @@ export default {
     },
     exportInfo () {
       exportInfo().then(rep => {
-        const blob = new Blob([rep.data])
+        debugger
+        const blob = new Blob([rep.data],
+          {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            size: rep.data.size
+          })
         saveAs(blob, rep.data.originalFileName)
       }).catch(err => {
         console.log(err)
