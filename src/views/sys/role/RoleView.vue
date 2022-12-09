@@ -80,7 +80,7 @@
             </el-pagination>
           </div>
         </el-col>
-        <el-col :md="5">
+        <el-col :md="5" style="min-width: 10vw">
           <el-tree ref="roleTree"
                    :check-strictly="true"
                    :data="roleTreeData"
