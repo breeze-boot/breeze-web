@@ -91,7 +91,7 @@
           width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['sys:dataPermission:delete']" size="mini" type="text" @click="edit(scope.row)">编辑
+            <el-button v-has="['sys:dataPermission:modify']" size="mini" type="text" @click="edit(scope.row)">编辑
             </el-button>
             <el-button v-has="['sys:dataPermission:delete']" size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, dataPermissionTableData,scope.row)">删除
@@ -136,13 +136,47 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item
-          v-if="dataPermission.dataPermissionType === 'DEPT_AND_LOWER_LEVEL' || dataPermission.dataPermissionType === 'DEPT_LEVEL' || dataPermission.dataPermissionType === 'DIY_DEPT'"
-          :label-width="formLabelWidth" class="dept" label="部门"
+          v-if="dataPermission.dataPermissionType === 'DEPT_AND_LOWER_LEVEL'"
+          :label-width="formLabelWidth"
+          class="dept"
+          label="部门"
           prop="dept">
           <el-cascader
             v-model="dataPermission.dataPermissions"
             :options="deptOption"
-            :props="{  checkStrictly: checkStrictly, multiple: multiple, emitPath: emitPath }"
+            :props="{ checkStrictly: true,  emitPath: false }"
+            :show-all-levels="false"
+            clearable
+            collapse-tags
+            size="mini"
+          ></el-cascader>
+        </el-form-item>
+        <el-form-item
+          v-if=" dataPermission.dataPermissionType === 'DEPT_LEVEL'"
+          :label-width="formLabelWidth"
+          class="dept"
+          label="部门"
+          prop="dept">
+          <el-cascader
+            v-model="dataPermission.dataPermissions"
+            :options="deptOption"
+            :props="{ checkStrictly: true, emitPath: false }"
+            :show-all-levels="false"
+            clearable
+            collapse-tags
+            size="mini"
+          ></el-cascader>
+        </el-form-item>
+        <el-form-item
+          v-if=" dataPermission.dataPermissionType === 'DIY_DEPT'"
+          :label-width="formLabelWidth"
+          class="dept"
+          label="部门"
+          prop="dept">
+          <el-cascader
+            v-model="dataPermission.dataPermissions"
+            :options="deptOption"
+            :props="{ multiple: true, checkStrictly: true, emitPath: false}"
             :show-all-levels="false"
             clearable
             collapse-tags
@@ -156,7 +190,8 @@
           :label-width="formLabelWidth" label="自定义SQL" prop="strSql">
           <el-button @click="diySql">设置</el-button>
           <el-table
-            :data="dataPermissionTableSqlDiyData" border
+            :data="dataPermissionTableSqlDiyData"
+            border
             size="mini"
             style="margin-top: 10px">
             <el-table-column
@@ -193,7 +228,7 @@
               label="操作">
               <template slot-scope="scope">
                 <el-button size="mini" type="text"
-                           @click.native.prevent="removeSqlItem(scope.$index, dataPermissionTableSqlDiyData,  scope.row)">
+                           @click.native.prevent="removeSqlItem(scope.$index, dataPermissionTableSqlDiyData, scope.row)">
                   删除
                 </el-button>
               </template>
@@ -211,7 +246,7 @@
                @close="closePermissionDiyDialog('dataPermissionDiyRuleForm')">
       <el-form ref="dataPermissionDiyRuleForm" :model="dataPermissionDiy" :rules="dataPermissionDiyRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="表名" prop="name">
-          <el-select v-model="dataPermissionDiy.name" :dsiabled="selectedTable" collapse-tags filterable
+          <el-select v-model="dataPermissionDiy.name" :disabled="selectedTable" collapse-tags filterable
                      placeholder="请选择表名" @change=handleTable>
             <el-option
               v-for="item in tableOption"
@@ -257,39 +292,9 @@
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item>
           <template slot="label">
-            数据权限名称
+            SQL
           </template>
-          {{ dataPermission.dataPermissionName }}
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            数据权限编码
-          </template>
-          <el-tag size="small">{{ dataPermission.dataPermissionCode }}</el-tag>
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            运算符
-          </template>
-          {{ dataPermission.operator }}
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            自定义sql
-          </template>
-          {{ dataPermission.strSql }}
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            权限集
-          </template>
-          {{ dataPermission.dataPermissions }}
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            描述
-          </template>
-          {{ dataPermission.description }}
+          {{ dataPermission.divSql }}
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -310,10 +315,7 @@ export default {
       multipleSelectionPermissionIds: [],
       dataPermissionTableData: [],
       dataPermissionTableSqlDiyData: [],
-      checkStrictly: false,
-      multiple: false,
       selectedTable: true,
-      emitPath: false,
       searchPermissionForm: {
         dataPermissionName: '',
         dataPermissionCode: '',
@@ -472,32 +474,8 @@ export default {
   methods: {
     handlerPermissionTypeChange (val) {
       this.dataPermission.dataPermissions = []
-      if (val === 'DEPT_AND_LOWER_LEVEL' || val === 'DEPT_LEVEL') {
-        this.checkStrictly = true
-        this.multiple = false
-        this.emitPath = false
-      } else if (val === 'DIY_DEPT') {
-        this.checkStrictly = true
-        this.multiple = true
-        this.emitPath = false
-      } else if (val === 'ALL' || val === 'OWN') {
-        debugger
-      } else {
-        this.checkStrictly = true
-        this.multiple = true
-        this.emitPath = true
-      }
     },
     operatorChange (row, index) {
-    },
-    getName (label) {
-      let value = ''
-      this.dataPermissionTypeOption.forEach(p => {
-        if (p.label === label) {
-          value = p.value
-        }
-      })
-      return value
     },
     reloadList () {
       list(this.buildParam()).then((rep) => {
@@ -509,10 +487,17 @@ export default {
         }
       })
     },
-    selectDept () {
+    selectDept (row) {
       selectDept().then(res => {
         if (res.code === 1 && res.data) {
           this.deptOption = res.data
+          if (row.dataPermissions) {
+            if (row.dataPermissionType === 'DIY_DEPT') {
+              this.dataPermission.dataPermissions = row.dataPermissions.split(',')
+            } else {
+              this.dataPermission.dataPermissions = row.dataPermissions
+            }
+          }
         }
       })
     },
@@ -602,18 +587,19 @@ export default {
       this.dialogType = DIALOG_TYPE.ADD
       this.dataPermissionDialogVisible = true
     },
-    edit (row) {
+    edit: function (row) {
       this.title = '修改数据权限'
-      this.selectDept()
       this.dialogType = DIALOG_TYPE.EDIT
       this.dataPermissionDialogVisible = true
       this.$nextTick(() => {
         Object.assign(this.dataPermission, row)
+        this.handlerPermissionTypeChange(row.dataPermissionType)
+        this.selectDept(row)
       })
     },
     info (row) {
       this.title = '查看信息'
-      this.selectDept()
+      this.selectDept({})
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
       this.$nextTick(() => {
