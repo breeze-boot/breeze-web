@@ -161,13 +161,13 @@
             style="margin-top: 10px">
             <el-table-column
               label="字段"
-              prop="column"
+              prop="tableColumn"
               width="180">
             </el-table-column>
             <el-table-column
               label="比较"
               prop="compare"
-              width="180">
+              width="60">
             </el-table-column>
             <el-table-column
               label="参数"
@@ -187,6 +187,15 @@
                   <el-radio-button label="AND">AND</el-radio-button>
                   <el-radio-button label="OR">OR</el-radio-button>
                 </el-radio-group>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="操作">
+              <template slot-scope="scope">
+                <el-button size="mini" type="text"
+                           @click.native.prevent="removeSqlItem(scope.$index, dataPermissionTableSqlDiyData,  scope.row)">
+                  删除
+                </el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -212,8 +221,8 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="字段" prop="column">
-          <el-select v-model="dataPermissionDiy.column" collapse-tags filterable placeholder="请选择字段">
+        <el-form-item :label-width="formLabelWidth" label="字段" prop="tableColumn">
+          <el-select v-model="dataPermissionDiy.tableColumn" collapse-tags filterable placeholder="请选择字段">
             <el-option
               v-for="item in columnOption"
               :key="item.value"
@@ -376,7 +385,7 @@ export default {
       ],
       dataPermissionDiy: {
         name: '',
-        column: '',
+        tableColumn: '',
         conditions: '',
         compare: ''
       },
@@ -433,7 +442,7 @@ export default {
             trigger: 'change'
           }
         ],
-        column: [
+        tableColumn: [
           {
             required: true,
             message: '请选择字段名',
@@ -574,6 +583,19 @@ export default {
         })
       })
     },
+    /**
+     * 删除行
+     *
+     * @param index
+     * @param rows
+     * @param row
+     */
+    removeSqlItem (index, rows, row) {
+      confirmAlert(() => {
+        rows.splice(index, 1)
+        this.$message.success('删除成功')
+      })
+    },
     create () {
       this.title = '创建数据权限'
       this.selectDept()
@@ -608,6 +630,7 @@ export default {
     },
     closePermissionDialog (formName) {
       this.dataPermission.id = undefined
+      this.dataPermissionTableSqlDiyData = this.dataPermissionInfo.dataPermissionDiy
       this.$refs[formName].resetFields()
     },
     closeInfoDialog () {
