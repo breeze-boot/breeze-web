@@ -607,7 +607,7 @@ export default {
             return tree.id && tree.id === this.user.deptId
           }, 'id')
           const tempArray = []
-          treeTemp.map(id => tempArray.push(id))
+          treeTemp.forEach(id => tempArray.push(id))
           if (!this.isAdd) {
             this.user.deptId = tempArray
           }
@@ -741,7 +741,7 @@ export default {
       this.dialogType = DIALOG_TYPE.SHOW
       this.$nextTick(() => {
         this.selectRole(row)
-        this.selectDept(row.deptId)
+        this.selectDept()
         Object.assign(this.user, row)
       })
       this.infoDialogVisible = true
