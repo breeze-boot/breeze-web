@@ -77,14 +77,14 @@ export default {
     ...mapGetters('msg', ['getMsg'])
   },
   methods: {
+    ...mapGetters('userInfo', ['getUserInfo']),
     ...mapActions('msg', ['closeMsgCard', 'markReadMsgCard', 'reloadMsg']),
     ...mapActions('userInfo', ['clearUserInfo']),
     ...mapMutations('menu', ['setMenuIsCollapse', 'clearMenus']),
     handleCommand (command) {
       if (command === 'logout') {
-        const username = this.getUsername()
-        console.log(username)
-        logout(this.getUsername()).then(rep => {
+        const username = this.getUserInfo().username
+        logout({ username: username }).then(rep => {
           if (rep.code === 1) {
             localStorage.clear()
             this.$router.push('/')

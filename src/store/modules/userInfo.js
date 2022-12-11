@@ -22,6 +22,9 @@ export default {
   getters: {
     getUsername (state) {
       return state.userInfo.username
+    },
+    getUserInfo (state) {
+      return state.userInfo
     }
   }
 }

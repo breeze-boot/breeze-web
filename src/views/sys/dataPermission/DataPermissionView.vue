@@ -123,12 +123,6 @@
           <el-input v-model="dataPermission.dataPermissionCode"
                     autocomplete="off" clearable/>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="通用运算符" prop="operator">
-          <el-radio-group v-model="dataPermission.operator">
-            <el-radio-button label="AND">AND</el-radio-button>
-            <el-radio-button label="OR">OR</el-radio-button>
-          </el-radio-group>
-        </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="权限类别" prop="dataPermissionType">
           <el-radio-group v-model="dataPermission.dataPermissionType" @change="handlerPermissionTypeChange">
             <el-radio-button
@@ -172,7 +166,7 @@
           ></el-cascader>
         </el-form-item>
         <el-form-item
-          v-if=" dataPermission.dataPermissionType === 'DIY_DEPT'"
+          v-if="dataPermission.dataPermissionType === 'DIY_DEPT'"
           :label-width="formLabelWidth"
           class="dept"
           label="部门"
@@ -191,7 +185,10 @@
           <el-input v-model="dataPermission.description" autocomplete="off" clearable type="textarea"/>
         </el-form-item>
         <el-form-item
-          :label-width="formLabelWidth" label="自定义SQL" prop="strSql">
+          v-if="dataPermission.dataPermissionType === 'DEPT_LEVEL' || dataPermission.dataPermissionType === 'DEPT_AND_LOWER_LEVEL' || dataPermission.dataPermissionType === 'DIY_DEPT'"
+          :label-width="formLabelWidth"
+          label="自定义SQL"
+          prop="strSql">
           <el-button @click="diySql">设置</el-button>
           <el-table
             :data="dataPermission.dataPermissionTableSqlDiyData"
@@ -409,15 +406,7 @@ export default {
             required: true,
             message: '请选择比较方法',
             trigger: 'change'
-          }
-        ],
-        conditions: [
-          {
-            required: true,
-            message: '请输入比较条件',
-            trigger: 'blur'
-          }
-        ]
+          }]
       }
     }
   },
@@ -590,6 +579,7 @@ export default {
     submitDiyPermissionForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          debugger
           const temp = {}
           Object.assign(temp, this.dataPermissionDiy)
           this.dataPermission.dataPermissionTableSqlDiyData.push(temp)
