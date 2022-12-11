@@ -5,12 +5,13 @@
         <el-button v-has="['sys:dict:create']" plain size="mini" type="primary" @click="create">新建</el-button>
         <el-button v-has="['sys:dict:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
       </div>
-      <el-table ref="multipleTable" :data="dictItemTableData" border height="200" size="mini" stripe style="width: 100%"
-                @selection-change="ditItemHandleSelectionChange">
+      <el-table ref="multipleDictItemTable" :data="dictItemTableData" border height="400" size="mini" stripe
+                style="width: 100%"
+                @selection-change="dictItemHandleSelectionChange">
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column v-if="false" label="ID" property="id" width="100"></el-table-column>
-        <el-table-column label="值" property="value"></el-table-column>
-        <el-table-column label="标签" property="label"></el-table-column>
+        <el-table-column label="字典KEY" property="key"></el-table-column>
+        <el-table-column label="字典值" property="value"></el-table-column>
         <el-table-column fixed="right" label="操作" width="100">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
@@ -23,9 +24,9 @@
 
       <el-dialog :title="title" :visible.sync="dictItemDialogVisible" width="800px"
                  @close="closeDictItemDialog('dictItemRuleForm')">
-        <el-form ref="dictItemRuleForm" :model="dictItem" :rules="rules" size="mini">
-          <el-form-item :label-width="formLabelWidth" label="字典标签" prop="label">
-            <el-input v-model="dictItem.label" autocomplete="off" clearable></el-input>
+        <el-form ref="dictItemRuleForm" :model="dictItem" :rules="dictItemRules" size="mini">
+          <el-form-item :label-width="formLabelWidth" label="字典KEY" prop="key">
+            <el-input v-model="dictItem.key" autocomplete="off" clearable></el-input>
           </el-form-item>
           <el-form-item :label-width="formLabelWidth" label="字典值" prop="value">
             <el-input v-model="dictItem.value" autocomplete="off" clearable></el-input>
@@ -47,65 +48,41 @@ import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
 
 export default {
-  name: 'DictView',
+  name: 'DictItemView',
   components: {},
   data () {
     return {
       title: '',
       multipleSelection: [],
-      tableData: [],
+      dictItemTableData: [],
       searchForm: {
         id: undefined,
         value: '',
-        label: ''
+        key: ''
       },
       total: 0,
       dictItemDialogVisible: false,
-      dict: {
-        id: undefined,
-        value: '',
-        label: ''
-      },
       // 默认是创建
       dialogType: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
-      dictRules: {
-        dictName: [
-          {
-            required: true,
-            message: '请输入字典名称',
-            trigger: 'blur'
-          }
-        ],
-        dictCode: [
-          {
-            required: true,
-            message: '请输入字典编码',
-            trigger: 'blur'
-          }
-        ]
-      },
-      dictItemTableData: [],
-      rowData: {},
       dictItem: {
         id: undefined,
         dictId: '',
-        label: '',
+        key: '',
         value: ''
       },
-      show: true,
-      rules: {
-        label: [
+      dictItemRules: {
+        key: [
           {
             required: true,
-            message: '请输入字典项名称',
+            message: '请输入字典项的key',
             trigger: 'blur'
           }
         ],
         value: [
           {
             required: true,
-            message: '请输入字典项编码',
+            message: '请输入字典项值',
             trigger: 'blur'
           }
         ]
@@ -143,7 +120,7 @@ export default {
     reset () {
       this.$refs.restPasswordRuleForm.resetFields()
     },
-    ditItemHandleSelectionChange (val) {
+    dictItemHandleSelectionChange (val) {
       this.multipleSelection = val
     },
     /**

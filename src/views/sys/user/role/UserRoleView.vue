@@ -122,7 +122,7 @@ export default {
             rows.forEach(roleId => {
               rep.data.records.forEach(x => {
                 if (x.id === roleId) {
-                  this.$refs.multipleTable.toggleRowSelection(x, true)
+                  this.$refs.multipleDictItemTable.toggleRowSelection(x, true)
                 }
               })
             })

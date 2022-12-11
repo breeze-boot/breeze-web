@@ -12,9 +12,9 @@
               <el-select v-model="searchLogForm.doType" placeholder="请选择">
                 <el-option
                   v-for="item in this.getDict()('DO_TYPE')"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
+                  :key="item.key"
+                  :label="item.value"
+                  :value="item.key">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -22,9 +22,9 @@
               <el-select v-model="searchLogForm.doType" placeholder="请选择">
                 <el-option
                   v-for="item in this.getDict()('LOG_TYPE')"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
+                  :key="item.key"
+                  :label="item.value"
+                  :value="item.key">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -32,9 +32,9 @@
               <el-select v-model="searchLogForm.result" placeholder="请选择">
                 <el-option
                   v-for="item in this.getDict()('RESULT')"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
+                  :key="item.key"
+                  :label="item.value"
+                  :value="item.key">
                 </el-option>
               </el-select>
             </el-form-item>

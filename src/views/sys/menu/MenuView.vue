@@ -15,9 +15,9 @@
               <el-select v-model="searchMenuForm.platformId" placeholder="请选择平台">
                 <el-option
                   v-for="item in platformOptions"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
+                  :key="item.key"
+                  :label="item.value"
+                  :value="item.key">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -29,7 +29,7 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:menu:export']" plain size="mini" type="primary" @click="create">新建</el-button>
+        <el-button v-has="['sys:menu:create']" plain size="mini" type="primary" @click="create">新建</el-button>
       </div>
       <el-table
         ref="menuTable"
@@ -80,7 +80,8 @@
         <el-table-column
           label="权限编码"
           prop="permission"
-          show-overflow-tooltip/>
+          show-overflow-tooltip
+          width="120"/>
         <el-table-column
           label="菜单路径"
           prop="path"
@@ -136,9 +137,9 @@
           <el-select v-model="menu.platformId" placeholder="请选择所属的平台">
             <el-option
               v-for="item in platformOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              :key="item.key"
+              :label="item.value"
+              :value="item.key">
             </el-option>
           </el-select>
         </el-form-item>
@@ -149,9 +150,9 @@
                           @click="menu.type === '2' ? menu.href = 0 : menu.href = 1">
             <el-radio-button
               v-for="item in this.getDict()('MENU_TYPE')"
-              :key="item.value"
-              :label="item.value">
-              {{ item.label }}
+              :key="item.key"
+              :label="item.key">
+              {{ item.value }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
@@ -160,9 +161,9 @@
           <el-radio-group v-model="menu.href">
             <el-radio-button
               v-for="item in this.getDict()('HREF')"
-              :key="item.value"
-              :label="item.value">
-              {{ item.label }}
+              :key="item.key"
+              :label="item.key">
+              {{ item.value }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
@@ -171,9 +172,9 @@
           <el-radio-group v-model="menu.keepAlive">
             <el-radio-button
               v-for="item in this.getDict()('KEEPALIVE')"
-              :key="item.value"
-              :label="item.value">
-              {{ item.label }}
+              :key="item.key"
+              :label="item.key">
+              {{ item.value }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
@@ -182,9 +183,9 @@
           <el-radio-group v-model="menu.hidden">
             <el-radio-button
               v-for="item in this.getDict()('HIDDEN')"
-              :key="item.value"
-              :label="item.value">
-              {{ item.label }}
+              :key="item.key"
+              :label="item.key">
+              {{ item.value }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
@@ -193,7 +194,7 @@
           <el-cascader
             v-model="menu.parentId"
             :options="menuOption"
-            :props="{ checkStrictly: true }"
+            :props="{ checkStrictly: true, emitPath: false , value: 'key', label: 'value' }"
             :show-all-levels="false"
             clearable
             filterable
@@ -292,7 +293,7 @@
           <el-cascader
             v-model="menu.parentId"
             :options="menuOption"
-            :props="{ checkStrictly: true }"
+            :props="{ checkStrictly: true, emitPath: false , value: 'key', label: 'value' }"
             :show-all-levels="false"
             clearable
             disabled
@@ -359,7 +360,7 @@
 
 <script>
 import { del, list, modify, save, selectMenu, selectPlatform } from '@/api/sys/menu'
-import { confirmAlert, DIALOG_TYPE, filterTreeParentId, ROOT } from '@/utils/constant'
+import { confirmAlert, DIALOG_TYPE, ROOT } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import IconDialog from '@/components/svg/IconDialog'
 import { Message } from 'element-ui'
@@ -375,12 +376,9 @@ export default {
       title: '',
       multipleSelectionMenuId: [],
       menuTableData: [],
-      platformOptions: [{
-        value: '1564528653105573889',
-        label: '后台管理中心'
-      }],
+      platformOptions: [],
       searchMenuForm: {
-        platformId: '1564528653105573889',
+        platformId: ROOT,
         name: '',
         title: ''
       },
@@ -388,7 +386,7 @@ export default {
       infoDialogVisible: false,
       menu: {
         id: undefined,
-        platformId: '1564528653105573889',
+        platformId: ROOT,
         platformName: '',
         name: '',
         title: '',
@@ -405,7 +403,7 @@ export default {
       },
       menuInfo: {
         id: undefined,
-        platformId: '1564528653105573889',
+        platformId: ROOT,
         platformName: '',
         name: '',
         title: '',
@@ -471,10 +469,10 @@ export default {
     }
   },
   mounted () {
+    this.selectPlatform()
     this.$toLoadDict(['HIDDEN', 'HREF', 'KEEPALIVE', 'MENU_TYPE']).then((dict) => {
       this.reloadList()
     })
-    this.selectPlatform()
   },
   methods: {
     ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
@@ -533,7 +531,6 @@ export default {
         }
       }
     },
-
     menuHandleExpandChange (val) {
       this.multipleSelectionMenuId = val
       this.$nextTick(() => {
@@ -580,23 +577,16 @@ export default {
       selectMenu(id).then(res => {
         if (res.code === 1 && res.data) {
           this.menuOption = [{
-            value: ROOT,
-            label: '根节点',
+            key: ROOT,
+            value: '根节点',
             children: res.data
           }]
-          const treeTemp = filterTreeParentId(res.data, (tree) => {
-            return tree.id && tree.id === this.menu.parentId
-          }, 'id')
-          const tempArray = [ROOT]
-          treeTemp.map(id => tempArray.push(id))
-          this.menu.parentId = tempArray
         }
       })
     },
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.menu.parentId = this.menu.parentId[this.menu.parentId.length - 1]
           this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
         } else {
           console.log('error submit!!')

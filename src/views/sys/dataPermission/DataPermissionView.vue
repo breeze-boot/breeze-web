@@ -56,6 +56,7 @@
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'DATA_PERMISSION_TYPE')"
           label="数据权限类型"
           prop="dataPermissionType"
           show-overflow-tooltip>
@@ -130,7 +131,10 @@
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="权限类别" prop="dataPermissionType">
           <el-radio-group v-model="dataPermission.dataPermissionType" @change="handlerPermissionTypeChange">
-            <el-radio-button v-for="item in dataPermissionTypeOption" :key="item.label" :label="item.label">
+            <el-radio-button
+              v-for="item in this.getDict()('DATA_PERMISSION_TYPE')"
+              :key="item.key"
+              :label="item.key">
               {{ item.value }}
             </el-radio-button>
           </el-radio-group>
@@ -144,7 +148,7 @@
           <el-cascader
             v-model="dataPermission.dataPermissions"
             :options="deptOption"
-            :props="{ checkStrictly: true,  emitPath: false }"
+            :props="{ checkStrictly: true,  emitPath: false , value: 'key', label: 'value' }"
             :show-all-levels="false"
             clearable
             collapse-tags
@@ -152,7 +156,7 @@
           ></el-cascader>
         </el-form-item>
         <el-form-item
-          v-if=" dataPermission.dataPermissionType === 'DEPT_LEVEL'"
+          v-if="dataPermission.dataPermissionType === 'DEPT_LEVEL'"
           :label-width="formLabelWidth"
           class="dept"
           label="部门"
@@ -160,7 +164,7 @@
           <el-cascader
             v-model="dataPermission.dataPermissions"
             :options="deptOption"
-            :props="{ checkStrictly: true, emitPath: false }"
+            :props="{ checkStrictly: true, emitPath: false , value: 'key', label: 'value' }"
             :show-all-levels="false"
             clearable
             collapse-tags
@@ -176,7 +180,7 @@
           <el-cascader
             v-model="dataPermission.dataPermissions"
             :options="deptOption"
-            :props="{ multiple: true, checkStrictly: true, emitPath: false}"
+            :props="{ multiple: true, checkStrictly: true, emitPath: false, value: 'key', label: 'value' }"
             :show-all-levels="false"
             clearable
             collapse-tags
@@ -200,9 +204,10 @@
               width="180">
             </el-table-column>
             <el-table-column
+              :formatter="(row, column) => this.getTableDictLabel()(row, column, 'COMPARE')"
               label="比较"
               prop="compare"
-              width="60">
+              width="100">
             </el-table-column>
             <el-table-column
               label="参数"
@@ -248,9 +253,9 @@
                      placeholder="请选择表名" @change=handleTable>
             <el-option
               v-for="item in tableOption"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              :key="item.key"
+              :label="item.value"
+              :value="item.key">
             </el-option>
           </el-select>
         </el-form-item>
@@ -258,19 +263,19 @@
           <el-select v-model="dataPermissionDiy.tableColumn" collapse-tags filterable placeholder="请选择字段">
             <el-option
               v-for="item in columnOption"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              :key="item.key"
+              :label="item.value"
+              :value="item.key">
             </el-option>
           </el-select>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="比较" prop="compare">
           <el-select v-model="dataPermissionDiy.compare" collapse-tags filterable placeholder="请选择比较">
             <el-option
-              v-for="item in compareOption"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              v-for="item in this.getDict()('COMPARE')"
+              :key="item.key"
+              :label="item.value"
+              :value="item.key">
             </el-option>
           </el-select>
         </el-form-item>
@@ -305,6 +310,7 @@ import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
 import { selectDept } from '@/api/sys/dept'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'DataPermissionView',
@@ -330,58 +336,6 @@ export default {
       deptOption: [],
       tableOption: [],
       columnOption: [],
-      dataPermissionTypeOption: [
-        {
-          value: '全部',
-          label: 'ALL'
-        }, {
-          value: '自己',
-          label: 'OWN'
-        }, {
-          value: '本级以及下属部门',
-          label: 'DEPT_AND_LOWER_LEVEL'
-        }, {
-          value: '本级部门',
-          label: 'DEPT_LEVEL'
-        }, {
-          value: '自定义部门',
-          label: 'DIY_DEPT'
-        }
-      ],
-      compareOption: [
-        {
-          value: '>',
-          label: '大于'
-        },
-        {
-          value: '>=',
-          label: '大于等于'
-        },
-        {
-          value: '<',
-          label: '小于'
-        },
-        {
-          value: '<=',
-          label: '小于等于'
-        },
-        {
-          value: '!=',
-          label: '不等于'
-        },
-        {
-          value: '=',
-          label: '等于'
-        },
-        {
-          value: 'IS NOT NULL',
-          label: '不等于空'
-        },
-        {
-          value: 'IS NULL',
-          label: '等于空'
-        }
-      ],
       // 自定义sql的表单
       dataPermissionDiy: {
         id: null,
@@ -468,9 +422,12 @@ export default {
     }
   },
   mounted () {
-    this.reloadList()
+    this.$toLoadDict(['DATA_PERMISSION_TYPE', 'COMPARE']).then((dict) => {
+      this.reloadList()
+    })
   },
   methods: {
+    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
     handlerPermissionTypeChange (val) {
       this.dataPermission.dataPermissions = []
     },
@@ -616,7 +573,6 @@ export default {
       this.selectColumn(val)
     },
     closePermissionDialog (formName) {
-      debugger
       this.dataPermission.id = undefined
       this.dataPermission.dataPermissionTableSqlDiyData = this.dataPermissionInfo.dataPermissionTableSqlDiyData
       this.$refs[formName].resetFields()

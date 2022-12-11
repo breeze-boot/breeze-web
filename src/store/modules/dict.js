@@ -34,17 +34,17 @@ export default {
         if (!row || !column) {
           return
         }
-        let label = ''
+        let value = ''
         state.dict.forEach(dict => {
           if (dict.key === key) {
             dict.value.forEach(item => {
-              if (item.value === row[column.property] + '') {
-                label = item.label
+              if (item.key === row[column.property] + '') {
+                value = item.value
               }
             })
           }
         })
-        return label
+        return value
       }
     },
     getDescriptionsDictLabel (state) {
@@ -52,17 +52,17 @@ export default {
         if (!row || !columnName) {
           return
         }
-        let label = ''
+        let value = ''
         state.dict.forEach(dict => {
           if (dict.key === key) {
             dict.value.forEach(item => {
-              if (item.value === row[columnName] + '') {
-                label = item.label
+              if (item.key === row[columnName] + '') {
+                value = item.value
               }
             })
           }
         })
-        return label
+        return value
       }
     }
   }

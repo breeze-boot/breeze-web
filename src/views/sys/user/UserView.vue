@@ -227,7 +227,7 @@
           <el-cascader
             v-model="user.deptId"
             :options="deptOption"
-            :props="{ checkStrictly: true }"
+            :props="{ checkStrictly: true, emitPath: false , value: 'key', label: 'value' }"
             :show-all-levels="false"
             clearable
             filterable
@@ -237,9 +237,9 @@
           <el-select v-model="user.postId" collapse-tags filterable placeholder="请选择岗位">
             <el-option
               v-for="item in postOption"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              :key="item.key"
+              :label="item.value"
+              :value="item.key">
             </el-option>
           </el-select>
         </el-form-item>
@@ -247,9 +247,9 @@
           <el-select v-model="user.roleIds" collapse-tags filterable multiple placeholder="请选择用户角色">
             <el-option
               v-for="item in roleOption"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              :key="item.key"
+              :label="item.value"
+              :value="item.key">
             </el-option>
           </el-select>
         </el-form-item>
@@ -335,9 +335,9 @@
           <el-select v-model="user.postId" collapse-tags disabled filterable placeholder="请选择岗位" size="mini">
             <el-option
               v-for="item in postOption"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              :key="item.key"
+              :label="item.value"
+              :value="item.key">
             </el-option>
           </el-select>
         </el-descriptions-item>
@@ -376,7 +376,7 @@
 
 <script>
 import { del, exportInfo, list, modify, open, resetPass, save, selectPost, selectRole } from '@/api/sys/user'
-import { confirmAlert, DIALOG_TYPE, filterTreeParentId } from '@/utils/constant'
+import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
 import { selectDept } from '@/api/sys/dept'
@@ -603,14 +603,6 @@ export default {
       selectDept().then(res => {
         if (res.code === 1 && res.data) {
           this.deptOption = res.data
-          const treeTemp = filterTreeParentId(res.data, (tree) => {
-            return tree.id && tree.id === this.user.deptId
-          }, 'id')
-          const tempArray = []
-          treeTemp.forEach(id => tempArray.push(id))
-          if (!this.isAdd) {
-            this.user.deptId = tempArray
-          }
         }
       })
     },
@@ -705,7 +697,6 @@ export default {
     },
     exportInfo () {
       exportInfo().then(rep => {
-        debugger
         const blob = new Blob([rep.data],
           {
             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -763,7 +754,6 @@ export default {
     submitUserForm: function (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.user.deptId = this.user.deptId[this.user.deptId.length - 1]
           this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
         } else {
           console.log('error submit!!')

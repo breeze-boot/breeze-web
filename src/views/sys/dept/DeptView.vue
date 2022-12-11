@@ -68,7 +68,7 @@
           <el-cascader
             v-model="dept.parentId"
             :options="deptOption"
-            :props="{ checkStrictly: true, emitPath: false }"
+            :props="{ checkStrictly: true, emitPath: false , value: 'key', label: 'value' }"
             :show-all-levels="false"
             clearable
             filterable
@@ -108,7 +108,7 @@
 
 <script>
 import { del, list, modify, save, selectDept } from '@/api/sys/dept'
-import { confirmAlert, DIALOG_TYPE, filterTreeParentId, ROOT } from '@/utils/constant'
+import { confirmAlert, DIALOG_TYPE, ROOT } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { Message } from 'element-ui'
 
@@ -235,7 +235,7 @@ export default {
       this.$nextTick(() => {
         Object.assign(this.dept, row)
         this.dept.parentId = row.parentId
-        this.selectDept(this.dept.id)
+        this.selectDept()
       })
       this.infoDialogVisible = true
     },
@@ -243,23 +243,16 @@ export default {
       selectDept(id).then(res => {
         if (res.code === 1 && res.data) {
           this.deptOption = [{
-            value: ROOT,
-            label: '根节点',
+            key: ROOT,
+            value: '根节点',
             children: res.data
           }]
-          const treeTemp = filterTreeParentId(res.data, (tree) => {
-            return tree.id && tree.id === this.dept.parentId
-          }, 'id')
-          const tempArray = [ROOT]
-          treeTemp.map(id => tempArray.push(id))
-          this.dept.parentId = tempArray
         }
       })
     },
     submitDeptForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dept.parentId = this.dept.parentId[this.dept.parentId.length - 1]
           this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
         } else {
           console.log('error submit!!')

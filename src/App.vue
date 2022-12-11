@@ -17,7 +17,6 @@ export default {
     ...mapMutations('menu', ['setCurrentMenu', 'setMenuIsCollapse']),
     ...mapMutations('tabs', ['setTab', 'setCurrentTabValue']),
     reSize () {
-      debugger
       const width = document.documentElement.clientWidth || document.body.clientWidth
       if (width < 1024) {
         // 设置 VUEX 中的值

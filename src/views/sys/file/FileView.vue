@@ -131,9 +131,9 @@
           <el-select v-model="file.ossStyle" placeholder="请选择存储位置">
             <el-option
               v-for="item in this.getDict()('OSS_STYLE')"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
+              :key="item.key"
+              :label="item.value"
+              :value="item.key">
             </el-option>
           </el-select>
         </el-form-item>
