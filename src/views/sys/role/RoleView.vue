@@ -56,10 +56,13 @@
             <el-table-column
               fixed="right"
               label="操作"
-              width="150">
+              width="200">
               <template slot-scope="scope">
                 <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
                 <el-button v-has="['sys:role:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+                <el-button v-has="['sys:dataPermission:editRoleDataPermission']" size="mini" type="text"
+                           @click="editRoleDataPermission(scope.row)">数据权限
+                </el-button>
                 <el-button v-has="['sys:role:delete']" size="mini" type="text"
                            @click.native.prevent="removeItem(scope.$index, roleTableData,scope.row)">删除
                 </el-button>
@@ -112,6 +115,27 @@
       </div>
     </el-dialog>
 
+    <el-dialog :title="title" :visible.sync="dataPermissionDialogVisible" width="500px"
+               @close="closeDataPermissionDialog('dataPermissionRuleForm')">
+      <el-form ref="dataPermissionRuleForm" :model="dataPermission" :rules="dataPermissionRule" size="mini">
+        <el-form-item :label-width="formLabelWidth" label="数据权限" prop="dataPermissionId">
+          <el-select v-model="dataPermission.dataPermissionId" collapse-tags filterable multiple placeholder="请选择数据权限">
+            <el-option
+              v-for="item in dataPermissionOptions"
+              :key="item.key"
+              :label="item.value"
+              :value="item.key">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="mini" @click="resetDataPermissionRuleForm('dataPermissionRuleForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="submitDataPermissionRuleForm('dataPermissionRuleForm')">确 定
+        </el-button>
+      </div>
+    </el-dialog>
+
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="800px"
                @close="closeInfoDialog">
       <el-descriptions :column="1" border size="mini">
@@ -138,6 +162,7 @@ import { listTreePermission } from '@/api/sys/menu'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
+import { editRoleDataPermission, selectDataPermission } from '@/api/sys/dataPermission'
 
 export default {
   name: 'RoleView',
@@ -162,6 +187,7 @@ export default {
       roleId: undefined,
       roleDialogVisible: false,
       infoDialogVisible: false,
+      dataPermissionDialogVisible: false,
       role: {
         id: undefined,
         roleName: '',
@@ -183,11 +209,26 @@ export default {
             trigger: 'blur'
           }
         ],
-        roleCode: [
+        roleCode:
+          [
+            {
+              required: true,
+              message: '请输入角色编码',
+              trigger: 'blur'
+            }
+          ]
+      },
+      dataPermissionOptions: [],
+      dataPermission: {
+        roleId: undefined,
+        dataPermissionId: []
+      },
+      dataPermissionRule: {
+        dataPermissionId: [
           {
             required: true,
-            message: '请输入角色编码',
-            trigger: 'blur'
+            message: '请选择数据数据权限规则',
+            trigger: 'change'
           }
         ]
       }
@@ -196,8 +237,16 @@ export default {
   mounted () {
     this.reloadList()
     this.reloadListTreeMenu()
+    this.selectDataPermission()
   },
   methods: {
+    selectDataPermission () {
+      selectDataPermission().then(rep => {
+        if (rep.code === 1) {
+          this.dataPermissionOptions = rep.data
+        }
+      })
+    },
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
@@ -336,6 +385,9 @@ export default {
       this.role.id = undefined
       this.$refs[formName].resetFields()
     },
+    closeDataPermissionDialog (formName) {
+      this.$refs[formName].resetFields()
+    },
     closeInfoDialog () {
       this.role = this.roleInfo
     },
@@ -351,6 +403,41 @@ export default {
     },
     resetRoleForm (formName) {
       this.roleDialogVisible = false
+      this.$refs[formName].resetFields()
+    },
+    editRoleDataPermission (row) {
+      this.title = '编辑角色数据权限'
+      this.dataPermissionDialogVisible = true
+      this.dataPermission.roleId = row.id
+    },
+    submitDataPermissionRuleForm (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          const data = []
+          this.dataPermission.dataPermissionId.forEach(id => {
+            data.push({
+              dataPermissionId: id,
+              roleId: this.dataPermission.roleId
+            })
+          })
+          editRoleDataPermission(data).then(rep => {
+            if (rep.code === 1 && !rep.data) {
+              this.$message({
+                message: '数据权限编辑成功',
+                type: 'success'
+              })
+              this.dataPermissionDialogVisible = false
+              this.reloadList()
+            }
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    resetDataPermissionRuleForm (formName) {
+      this.dataPermissionDialogVisible = false
       this.$refs[formName].resetFields()
     },
     save () {

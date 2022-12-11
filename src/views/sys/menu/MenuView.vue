@@ -81,7 +81,7 @@
           label="权限编码"
           prop="permission"
           show-overflow-tooltip
-          width="120"/>
+          width="180"/>
         <el-table-column
           label="菜单路径"
           prop="path"
@@ -147,17 +147,17 @@
         <el-form-item :label-width="formLabelWidth" label="组件类型"
                       style="text-align: left;">
           <el-radio-group v-model="menu.type"
-                          @click="menu.type === '2' ? menu.href = 0 : menu.href = 1">
+                          @click="menu.type === 2 ? menu.href = 0 : menu.href = 1">
             <el-radio-button
               v-for="item in this.getDict()('MENU_TYPE')"
               :key="item.key"
-              :label="item.key">
+              :label="Number(item.key)">
               {{ item.value }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item v-if="menu.type === '1'" :label-width="formLabelWidth" label="外链" style="text-align: left;">
+        <el-form-item v-if="menu.type === 1" :label-width="formLabelWidth" label="外链" style="text-align: left;">
           <el-radio-group v-model="menu.href">
             <el-radio-button
               v-for="item in this.getDict()('HREF')"
@@ -168,7 +168,7 @@
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item v-if="menu.type === '1'" :label-width="formLabelWidth" label="缓存" style="text-align: left;">
+        <el-form-item v-if="menu.type === 1" :label-width="formLabelWidth" label="缓存" style="text-align: left;">
           <el-radio-group v-model="menu.keepAlive">
             <el-radio-button
               v-for="item in this.getDict()('KEEPALIVE')"
@@ -179,7 +179,7 @@
           </el-radio-group>
         </el-form-item>
 
-        <el-form-item v-if="menu.type === '1'" :label-width="formLabelWidth" label="隐藏" style="text-align: left;">
+        <el-form-item v-if="menu.type === 1" :label-width="formLabelWidth" label="隐藏" style="text-align: left;">
           <el-radio-group v-model="menu.hidden">
             <el-radio-button
               v-for="item in this.getDict()('HIDDEN')"
@@ -209,30 +209,30 @@
           <el-input v-model="menu.title" autocomplete="off" clearable placeholder="请输入组件显示的标题"></el-input>
         </el-form-item>
 
-        <el-form-item v-if="menu.type === '0' || menu.type === '1'" :label-width="formLabelWidth" label="组件图标"
+        <el-form-item v-if="menu.type === 0 || menu.type === 1" :label-width="formLabelWidth" label="组件图标"
                       prop="icon">
           <el-button plain style="margin:0 10px" type="success" @click="showIconDialog">打开</el-button>
           <svg-icon :icon-name="menu.icon" style="font-size: 20px;"/>
           <span> {{ menu.icon }} </span>
         </el-form-item>
 
-        <el-form-item v-if="menu.type === '0' || menu.type === '1'" :label-width="formLabelWidth"
+        <el-form-item v-if="menu.type === 0 || menu.type === 1" :label-width="formLabelWidth"
                       label="菜单路径"
                       prop="path">
           <el-input v-model="menu.path" autocomplete="off" clearable placeholder="请输入菜单路径"></el-input>
         </el-form-item>
 
-        <el-form-item v-if="menu.href === '0' && menu.type === '1'" :label-width="formLabelWidth" label="组件名称"
+        <el-form-item v-if="menu.href === 0 && menu.type === 1" :label-width="formLabelWidth" label="组件名称"
                       prop="name">
           <el-input v-model="menu.name" autocomplete="off" clearable placeholder="请输入组件名称"></el-input>
         </el-form-item>
 
-        <el-form-item v-if="menu.href === '0' && menu.type === '1'" :label-width="formLabelWidth" label="组件路径"
+        <el-form-item v-if="menu.href === 0 && menu.type === 1" :label-width="formLabelWidth" label="组件路径"
                       prop="component">
           <el-input v-model="menu.component" autocomplete="off" clearable placeholder="请输入组件路径"></el-input>
         </el-form-item>
 
-        <el-form-item v-if="menu.href === '0' && (menu.type === '1' || menu.type === '2')" :label-width="formLabelWidth"
+        <el-form-item v-if="menu.href === 0 && (menu.type === 1 || menu.type === 2)" :label-width="formLabelWidth"
                       label="权限编码"
                       prop="permission">
           <el-input v-model="menu.permission" autocomplete="off" clearable placeholder="请输入权限编码"></el-input>
@@ -266,7 +266,7 @@
             外部链接
           </template>
           <el-tag
-            :type="menu.href === '0' ? 'primary' :  'info'"
+            :type="menu.href === 0 ? 'primary' :  'info'"
             disable-transitions>
             {{ this.getDescriptionsDictLabel()(menu, 'href', 'HREF') }}
           </el-tag>
@@ -395,10 +395,10 @@ export default {
         parentId: ROOT,
         permission: '',
         component: '',
-        href: '0',
-        keepAlive: '0',
-        hidden: '0',
-        type: '0',
+        href: 0,
+        keepAlive: 0,
+        hidden: 0,
+        type: 0,
         path: ''
       },
       menuInfo: {
@@ -412,10 +412,10 @@ export default {
         parentId: ROOT,
         permission: '',
         component: '',
-        href: '0',
-        keepAlive: '0',
-        hidden: '0',
-        type: '0',
+        href: 0,
+        keepAlive: 0,
+        hidden: 0,
+        type: 0,
         path: ''
       },
       menuOption: [],
@@ -551,6 +551,7 @@ export default {
     },
     edit (row) {
       this.title = '修改菜单'
+      this.dialogType = DIALOG_TYPE.EDIT
       this.$nextTick(() => {
         Object.assign(this.menu, row)
         this.menu.parentId = row.parentId
@@ -558,10 +559,10 @@ export default {
         this.selectPlatform()
       })
       this.menuDialogVisible = true
-      this.dialogType = DIALOG_TYPE.EDIT
     },
     info (row) {
       this.title = '查看信息'
+      this.dialogType = DIALOG_TYPE.SHOW
       this.$nextTick(() => {
         Object.assign(this.menu, row)
         this.menu.parentId = row.parentId
@@ -569,7 +570,6 @@ export default {
         this.selectPlatform()
       })
       this.infoDialogVisible = true
-      this.dialogType = DIALOG_TYPE.SHOW
     },
     handleChangeSort (val) {
     },

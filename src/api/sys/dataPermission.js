@@ -116,3 +116,33 @@ export function selectColumn (tableName) {
     params: { tableName: tableName }
   })
 }
+
+/**
+ * 数据权限下拉框
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function selectDataPermission () {
+  return request({
+    url: servicePath.system + '/sys/common/selectDataPermission',
+    method: 'get',
+    transformResponse: [(data) => {
+      return JSONBigInt2Str.parse(data)
+    }]
+  })
+}
+
+/**
+ * 数据权限
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function editRoleDataPermission (data) {
+  return request({
+    url: servicePath.system + '/sys/dataPermission/editRoleDataPermission',
+    method: 'post',
+    data: data
+  })
+}
