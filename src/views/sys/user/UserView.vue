@@ -192,9 +192,10 @@
         <el-form-item style="text-align: center;">
           <el-upload
             :before-upload="beforeAvatarUpload"
+            :http-request="uploadImage"
             :on-success="handleAvatarSuccess"
             :show-file-list="false"
-            action="https://jsonplaceholder.typicode.com/posts/"
+            action=""
             class="avatar-uploader"
             prop="avatar">
             <img v-if="user.avatar" :src="user.avatar" class="avatar">
@@ -202,26 +203,26 @@
           </el-upload>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="用户名" prop="username">
-          <el-input v-model="user.username" autocomplete="off" clearable></el-input>
+          <el-input v-model="user.username" autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item v-if="isAdd" :label-width="formLabelWidth" label="密码" prop="password">
-          <el-input v-model="user.password" autocomplete="off" clearable show-password type="password"></el-input>
+          <el-input v-model="user.password" autocomplete="off" clearable show-password type="password"/>
         </el-form-item>
         <el-form-item v-if="isAdd" :label-width="formLabelWidth" label="确认密码" prop="confirmPassword">
           <el-input v-model="user.confirmPassword" autocomplete="off" clearable show-password
-                    type="password"></el-input>
+                    type="password"/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="用户工号" prop="userCode">
-          <el-input v-model="user.userCode" autocomplete="off" clearable></el-input>
+          <el-input v-model="user.userCode" autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="手机号" prop="phone">
-          <el-input v-model="user.phone" autocomplete="off" clearable></el-input>
+          <el-input v-model="user.phone" autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="E-mail" prop="email">
-          <el-input v-model="user.email" autocomplete="off" clearable type="input"></el-input>
+          <el-input v-model="user.email" autocomplete="off" clearable type="input"/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="展示名称" prop="amountName">
-          <el-input v-model="user.amountName" autocomplete="off" clearable type="input"></el-input>
+          <el-input v-model="user.amountName" autocomplete="off" clearable type="input"/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" class="dept" label="部门" prop="deptId">
           <el-cascader
@@ -260,7 +261,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="身份证" prop="idCard">
-          <el-input v-model="user.idCard" autocomplete="off" clearable type="input"></el-input>
+          <el-input v-model="user.idCard" autocomplete="off" clearable type="input"/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="是否锁定" prop="isLock" style="text-align: left;">
           <el-switch
@@ -382,6 +383,7 @@ import JSONBigInt from 'json-bigint'
 import { selectDept } from '@/api/sys/dept'
 import { mapGetters } from 'vuex'
 import { saveAs } from 'file-saver'
+import { upload } from '@/api/sys/file'
 
 export default {
   name: 'UserView',
@@ -597,6 +599,25 @@ export default {
             user.roleIds = roleIds
           })
         }
+      })
+    },
+    uploadImage (param) {
+      debugger
+      const formData = new FormData()
+      formData.append('file', param.file)
+      formData.append('title', '用户头像')
+      formData.append('ossStyle', 0)
+      upload(formData).then(rep => {
+        if (rep.code === 1 && rep.data) {
+          this.$message({
+            message: '图片上传成功',
+            type: 'success'
+          })
+          debugger
+          this.user.avatar = rep.data
+        }
+      }).catch(e => {
+        console.error('图片上传失败', e)
       })
     },
     selectDept () {
