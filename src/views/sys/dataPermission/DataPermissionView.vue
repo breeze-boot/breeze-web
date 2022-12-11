@@ -190,7 +190,7 @@
           :label-width="formLabelWidth" label="自定义SQL" prop="strSql">
           <el-button @click="diySql">设置</el-button>
           <el-table
-            :data="dataPermissionTableSqlDiyData"
+            :data="dataPermission.dataPermissionTableSqlDiyData"
             border
             size="mini"
             style="margin-top: 10px">
@@ -209,7 +209,7 @@
               prop="conditions">
             </el-table-column>
             <el-table-column
-              v-if="this.dataPermissionTableSqlDiyData.length > 1"
+              v-if="this.dataPermission.dataPermissionTableSqlDiyData.length > 1"
               label="SQL运算符"
               prop="operator">
               <template slot-scope="scope">
@@ -217,8 +217,6 @@
                                 :disabled="scope.$index === 0"
                                 size="mini"
                                 @change="operatorChange(scope.row.operator, scope.$index)">
-                  v-model="dataPermission.operator">
-                  {{ scope.$index }}
                   <el-radio-button label="AND">AND</el-radio-button>
                   <el-radio-button label="OR">OR</el-radio-button>
                 </el-radio-group>
@@ -228,7 +226,7 @@
               label="操作">
               <template slot-scope="scope">
                 <el-button size="mini" type="text"
-                           @click.native.prevent="removeSqlItem(scope.$index, dataPermissionTableSqlDiyData, scope.row)">
+                           @click.native.prevent="removeSqlItem(scope.$index,dataPermission.dataPermissionTableSqlDiyData, scope.row)">
                   删除
                 </el-button>
               </template>
@@ -314,8 +312,7 @@ export default {
     return {
       multipleSelectionPermissionIds: [],
       dataPermissionTableData: [],
-      dataPermissionTableSqlDiyData: [],
-      selectedTable: true,
+      selectedTable: false,
       searchPermissionForm: {
         dataPermissionName: '',
         dataPermissionCode: '',
@@ -385,7 +382,9 @@ export default {
           label: '等于空'
         }
       ],
+      // 自定义sql的表单
       dataPermissionDiy: {
+        id: null,
         name: '',
         tableColumn: '',
         conditions: '',
@@ -400,7 +399,7 @@ export default {
         strSql: '',
         dataPermissions: '',
         description: '',
-        dataPermissionDiy: []
+        dataPermissionTableSqlDiyData: []
       },
       dataPermissionInfo: {
         id: null,
@@ -411,7 +410,7 @@ export default {
         strSql: '',
         dataPermissions: '',
         description: '',
-        dataPermissionDiy: []
+        dataPermissionTableSqlDiyData: []
       },
       dataPermissionRules: {
         dataPermissionName: [
@@ -491,12 +490,13 @@ export default {
       selectDept().then(res => {
         if (res.code === 1 && res.data) {
           this.deptOption = res.data
-          if (row.dataPermissions) {
-            if (row.dataPermissionType === 'DIY_DEPT') {
-              this.dataPermission.dataPermissions = row.dataPermissions.split(',')
-            } else {
-              this.dataPermission.dataPermissions = row.dataPermissions
-            }
+          if (!row || !row.dataPermissions) {
+            return
+          }
+          if (row.dataPermissionType === 'DIY_DEPT') {
+            this.dataPermission.dataPermissions = row.dataPermissions.split(',')
+          } else {
+            this.dataPermission.dataPermissions = row.dataPermissions
           }
         }
       })
@@ -578,12 +578,13 @@ export default {
     removeSqlItem (index, rows, row) {
       confirmAlert(() => {
         rows.splice(index, 1)
+        rows[0].operator = null
         this.$message.success('删除成功')
       })
     },
     create () {
       this.title = '创建数据权限'
-      this.selectDept()
+      this.selectDept({})
       this.dialogType = DIALOG_TYPE.ADD
       this.dataPermissionDialogVisible = true
     },
@@ -615,8 +616,9 @@ export default {
       this.selectColumn(val)
     },
     closePermissionDialog (formName) {
+      debugger
       this.dataPermission.id = undefined
-      this.dataPermissionTableSqlDiyData = this.dataPermissionInfo.dataPermissionDiy
+      this.dataPermission.dataPermissionTableSqlDiyData = this.dataPermissionInfo.dataPermissionTableSqlDiyData
       this.$refs[formName].resetFields()
     },
     closeInfoDialog () {
@@ -634,8 +636,7 @@ export default {
         if (valid) {
           const temp = {}
           Object.assign(temp, this.dataPermissionDiy)
-          this.dataPermissionTableSqlDiyData.push(temp)
-          this.dataPermission.dataPermissionDiy = this.dataPermissionTableSqlDiyData
+          this.dataPermission.dataPermissionTableSqlDiyData.push(temp)
           this.dataPermissionDiyDialogVisible = false
         } else {
           console.log('error submit!!')
