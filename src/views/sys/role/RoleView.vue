@@ -37,23 +37,22 @@
             @selection-change="roleHandleSelectionChange">
             <el-table-column
               type="selection"
-              width="55">
-            </el-table-column>
+              width="55"/>
             <el-table-column
               v-if="false"
               label="ID"
               prop="id"
-              width="200">
-            </el-table-column>
+              width="200"/>
             <el-table-column
               label="角色名称"
-              prop="roleName">
-            </el-table-column>
+              prop="roleName"/>
             <el-table-column
               label="角色编码"
-              prop="roleCode">
-            </el-table-column>
+              prop="roleCode"/>
             <el-table-column
+              label="数据权限名称"
+              prop="dataPermissionName"/>
+            <el-table-column>
               fixed="right"
               label="操作"
               width="200">
