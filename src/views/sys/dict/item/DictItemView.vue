@@ -26,10 +26,10 @@
                  @close="closeDictItemDialog('dictItemRuleForm')">
         <el-form ref="dictItemRuleForm" :model="dictItem" :rules="dictItemRules" size="mini">
           <el-form-item :label-width="formLabelWidth" label="字典KEY" prop="key">
-            <el-input v-model="dictItem.key" autocomplete="off" clearable></el-input>
+            <el-input v-model="dictItem.key" autocomplete="off" clearable/>
           </el-form-item>
           <el-form-item :label-width="formLabelWidth" label="字典值" prop="value">
-            <el-input v-model="dictItem.value" autocomplete="off" clearable></el-input>
+            <el-input v-model="dictItem.value" autocomplete="off" clearable/>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">

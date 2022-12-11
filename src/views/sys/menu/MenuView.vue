@@ -206,7 +206,7 @@
         </el-form-item>
 
         <el-form-item :label-width="formLabelWidth" label="标题" prop="title">
-          <el-input v-model="menu.title" autocomplete="off" clearable placeholder="请输入组件显示的标题"></el-input>
+          <el-input v-model="menu.title" autocomplete="off" clearable placeholder="请输入组件显示的标题"/>
         </el-form-item>
 
         <el-form-item v-if="menu.type === 0 || menu.type === 1" :label-width="formLabelWidth" label="组件图标"
@@ -219,23 +219,23 @@
         <el-form-item v-if="menu.type === 0 || menu.type === 1" :label-width="formLabelWidth"
                       label="菜单路径"
                       prop="path">
-          <el-input v-model="menu.path" autocomplete="off" clearable placeholder="请输入菜单路径"></el-input>
+          <el-input v-model="menu.path" autocomplete="off" clearable placeholder="请输入菜单路径"/>
         </el-form-item>
 
         <el-form-item v-if="menu.href === 0 && menu.type === 1" :label-width="formLabelWidth" label="组件名称"
                       prop="name">
-          <el-input v-model="menu.name" autocomplete="off" clearable placeholder="请输入组件名称"></el-input>
+          <el-input v-model="menu.name" autocomplete="off" clearable placeholder="请输入组件名称"/>
         </el-form-item>
 
         <el-form-item v-if="menu.href === 0 && menu.type === 1" :label-width="formLabelWidth" label="组件路径"
                       prop="component">
-          <el-input v-model="menu.component" autocomplete="off" clearable placeholder="请输入组件路径"></el-input>
+          <el-input v-model="menu.component" autocomplete="off" clearable placeholder="请输入组件路径"/>
         </el-form-item>
 
         <el-form-item v-if="menu.href === 0 && (menu.type === 1 || menu.type === 2)" :label-width="formLabelWidth"
                       label="权限编码"
                       prop="permission">
-          <el-input v-model="menu.permission" autocomplete="off" clearable placeholder="请输入权限编码"></el-input>
+          <el-input v-model="menu.permission" autocomplete="off" clearable placeholder="请输入权限编码"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

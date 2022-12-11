@@ -88,10 +88,10 @@
                @close="closeTenantDialog('tenantRuleForm')">
       <el-form ref="tenantRuleForm" :model="tenant" :rules="tenantRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="租户名称" prop="tenantName">
-          <el-input v-model="tenant.tenantName" autocomplete="off" clearable></el-input>
+          <el-input v-model="tenant.tenantName" autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="租户编码" prop="tenantCode">
-          <el-input v-model="tenant.tenantCode" autocomplete="off" clearable></el-input>
+          <el-input v-model="tenant.tenantCode" autocomplete="off" clearable/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

@@ -93,13 +93,13 @@
                @close="closePlatformDialog('platformRuleForm')">
       <el-form ref="platformRuleForm" :model="platform" :rules="platformRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="平台名称" prop="platformName">
-          <el-input v-model="platform.platformName" autocomplete="off" clearable></el-input>
+          <el-input v-model="platform.platformName" autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="平台编码" prop="platformCode">
-          <el-input v-model="platform.platformCode" autocomplete="off" clearable></el-input>
+          <el-input v-model="platform.platformCode" autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="描述" prop="description">
-          <el-input v-model="platform.description" autocomplete="off" clearable type="textarea"></el-input>
+          <el-input v-model="platform.description" autocomplete="off" clearable type="textarea"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

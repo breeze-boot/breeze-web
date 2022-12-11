@@ -13,7 +13,7 @@
           auto-complete="false"
           placeholder="账号"
           type="text"
-        ></el-input>
+        />
       </el-form-item>
       <el-form-item prop="password">
         <el-input
@@ -22,7 +22,7 @@
           placeholder="密码"
           show-password
           type="password"
-        ></el-input>
+        />
       </el-form-item>
       <el-form-item id="tenant_select" prop="tenant" size="mini">
         <el-select v-model="userLogin.tenantId" placeholder="请选择租户" @change="handleTenant">

@@ -115,10 +115,10 @@
                @close="closeMsgDialog('msgRuleForm')">
       <el-form ref="msgRuleForm" :model="msg" :rules="msgRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="消息名称" prop="msgTitle">
-          <el-input v-model="msg.msgTitle" autocomplete="off" clearable></el-input>
+          <el-input v-model="msg.msgTitle" autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="消息编码" prop="msgCode">
-          <el-input v-model="msg.msgCode" autocomplete="off" clearable></el-input>
+          <el-input v-model="msg.msgCode" autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="消息类型" prop="msgType">
           <el-radio-group v-model="msg.msgType">
@@ -135,7 +135,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="内容" prop="content">
-          <el-input v-model="msg.content" autocomplete="off" clearable type="textarea"></el-input>
+          <el-input v-model="msg.content" autocomplete="off" clearable type="textarea"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

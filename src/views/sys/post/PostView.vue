@@ -93,13 +93,13 @@
                @close="closePostDialog('postRuleForm')">
       <el-form ref="postRuleForm" :model="post" :rules="postRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="岗位名称" prop="postName">
-          <el-input v-model="post.postName" autocomplete="off" clearable></el-input>
+          <el-input v-model="post.postName" autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="岗位编码" prop="postCode">
-          <el-input v-model="post.postCode" autocomplete="off" clearable></el-input>
+          <el-input v-model="post.postCode" autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="岗位描述" prop="description">
-          <el-input v-model="post.description" autocomplete="off" clearable type="textarea"></el-input>
+          <el-input v-model="post.description" autocomplete="off" clearable type="textarea"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

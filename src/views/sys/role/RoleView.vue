@@ -102,10 +102,10 @@
                @close="closeDialog('roleRuleForm')">
       <el-form ref="roleRuleForm" :model="role" :rules="roleRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="角色名称" prop="roleName">
-          <el-input v-model="role.roleName" autocomplete="off" clearable></el-input>
+          <el-input v-model="role.roleName" autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="角色编码" prop="roleCode">
-          <el-input v-model="role.roleCode" autocomplete="off" clearable></el-input>
+          <el-input v-model="role.roleCode" autocomplete="off" clearable/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

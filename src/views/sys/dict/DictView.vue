@@ -94,10 +94,10 @@
                @close="closeDictDialog('dictRuleForm')">
       <el-form ref="dictRuleForm" :model="dict" :rules="dictRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="字典名称" prop="dictName">
-          <el-input v-model="dict.dictName" autocomplete="off" clearable></el-input>
+          <el-input v-model="dict.dictName" autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="字典编码" prop="dictCode">
-          <el-input v-model="dict.dictCode" autocomplete="off" clearable></el-input>
+          <el-input v-model="dict.dictCode" autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="是否开启" prop="dictCode" style="text-align: left;">
           <el-switch

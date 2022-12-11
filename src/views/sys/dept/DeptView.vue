@@ -75,10 +75,10 @@
           ></el-cascader>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="部门名称" prop="deptName">
-          <el-input v-model="dept.deptName" autocomplete="off" clearable></el-input>
+          <el-input v-model="dept.deptName" autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="部门编码" prop="deptCode">
-          <el-input v-model="dept.deptCode" autocomplete="off" clearable></el-input>
+          <el-input v-model="dept.deptCode" autocomplete="off" clearable/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">

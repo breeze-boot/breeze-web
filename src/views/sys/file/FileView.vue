@@ -125,7 +125,7 @@
                @close="closeUploadDialog">
       <el-form ref="uploadFileFrom" :model="file" :rules="fileRules" label-width="0" size="mini">
         <el-form-item prop="title">
-          <el-input v-model="file.title" placeholder="请输入文件标题"></el-input>
+          <el-input v-model="file.title" placeholder="请输入文件标题"/>
         </el-form-item>
         <el-form-item prop="ossStyle" style="margin-bottom: 20px;">
           <el-select v-model="file.ossStyle" placeholder="请选择存储位置">
