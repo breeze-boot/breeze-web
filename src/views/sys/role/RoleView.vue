@@ -257,6 +257,9 @@ export default {
       })
     },
     listRolesPermission (roleId) {
+      if (!roleId) {
+        return
+      }
       listRolesPermission(roleId).then((rep) => {
         if (rep.code === 1) {
           this.$nextTick(() => {
