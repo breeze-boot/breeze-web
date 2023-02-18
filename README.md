@@ -1,4 +1,4 @@
-# test
+# Breeze-web
 
 ## Project setup
 
@@ -26,8 +26,7 @@ yarn lint
 
 ### Customize configuration
 
-See [Configuration Reference](https://cli.vuejs.org/config/).
-
+浏览器访问 http://localhost:8080
 
 ![login.png](images/login.png)
 ![img_1.png](images/img_1.png)
