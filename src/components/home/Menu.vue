@@ -49,8 +49,20 @@ export default {
     ...mapGetters('menu', ['getMenus'])
   },
   methods: {
+    /**
+     * 打开菜单事件
+     *
+     * @param key
+     * @param keyPath
+     */
     handleOpen (key, keyPath) {
     },
+    /**
+     * 关闭菜单事件
+     *
+     * @param key
+     * @param keyPath
+     */
     handleClose (key, keyPath) {
     }
   }

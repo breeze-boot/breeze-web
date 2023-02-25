@@ -53,14 +53,14 @@
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="reset()">重置</el-button>
+              <el-button type="info" @click="searchReset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
         <el-button v-has="['sys:log:export']" plain size="mini" type="info" @click="exportInfo">导出</el-button>
-        <el-button v-has="['sys:log:delete']" plain size="mini" type="danger" @click="del">删除</el-button>
+        <el-button v-has="['sys:log:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
         <el-button v-has="['sys:log:clear']" plain size="mini" type="danger" @click="clear">清空全表</el-button>
       </div>
       <el-table
@@ -221,9 +221,15 @@ export default {
   name: 'LogView',
   data () {
     return {
+      // 当前操作类型
+      dialogType: DIALOG_TYPE.ADD,
+      // 弹出框标题
       title: '',
+      // 单元格选中数据
       multipleSelectionLogId: [],
+      // 日志表格数据
       logTableData: [],
+      // 日志查询条件数据
       searchLogForm: {
         systemModule: '',
         doType: '',
@@ -235,8 +241,13 @@ export default {
         current: 1,
         size: 10
       },
+      // 分页总数
       total: 0,
+      // 日志详情弹出框
       infoDialogVisible: false,
+      // 表单标题宽度
+      formLabelWidth: '80px',
+      // 日志详情数据
       log: {
         id: undefined,
         systemModule: '',
@@ -249,10 +260,7 @@ export default {
         system: '',
         ip: '',
         createBy: ''
-      },
-      // 默认是创建
-      dialogType: DIALOG_TYPE.ADD,
-      formLabelWidth: '80px'
+      }
     }
   },
   mounted () {
@@ -262,6 +270,9 @@ export default {
   },
   methods: {
     ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
+    /**
+     * 初始化加载表格数据
+     */
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
@@ -272,29 +283,58 @@ export default {
         }
       })
     },
+    /**
+     * 构造查询条件
+     *
+     * @returns {{result: string, logType: string, createBy: string, current: number, size: number, searchDate: string, doType: string, startDate: string, systemModule: string}}
+     */
+    buildParam () {
+      return this.searchLogForm
+    },
+    /**
+     * 分页大小切换
+     *
+     * @param size
+     */
     handleSizeChange (size) {
       this.searchLogForm.size = size
       this.reloadList()
     },
+    /**
+     * 当前页切换
+     *
+     * @param current
+     */
     handleCurrentChange (current) {
       this.searchLogForm.current = current
       this.reloadList()
     },
+    /**
+     * 查询按钮
+     */
     search () {
       this.reloadList()
     },
-    buildParam () {
-      return this.searchLogForm
-    },
-    reset () {
+    /**
+     * 查询重置按钮
+     */
+    searchReset () {
       this.$refs.searchLogForm.resetFields()
+    },
+    /**
+     * 平台表格复选框事件
+     *
+     * @param val
+     */
+    logHandleSelectionChange (val) {
+      this.multipleSelectionLogId = val
     },
     exportInfo () {
     },
     /**
      * 批量删除
      */
-    del () {
+    remove () {
       confirmAlert(() => {
         const ids = []
         this.multipleSelectionLogId.map((x) => ids.push(JSONBigInt.parse(x.id)))
@@ -333,9 +373,11 @@ export default {
         })
       })
     },
-    logHandleSelectionChange (val) {
-      this.multipleSelectionLogId = val
-    },
+    /**
+     * 详情
+     *
+     * @param row
+     */
     info (row) {
       this.title = '查看详情信息'
       this.dialogType = DIALOG_TYPE.SHOW

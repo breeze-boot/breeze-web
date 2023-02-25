@@ -215,9 +215,17 @@ export default {
   name: 'FileView',
   data () {
     return {
+      // 当前操作类型
+      dialogType: DIALOG_TYPE.ADD,
+      // 弹出框标题
+      title: '',
+      // 单元格选中数据
       multipleSelectionFileIds: [],
+      // 文件表格数据
       fileTableData: [],
+      // 表格展示图片地址
       imgUrl: '',
+      // 文件查询条件数据
       searchFileForm: {
         originalFileName: '',
         newFileName: '',
@@ -225,24 +233,29 @@ export default {
         createName: '',
         size: 10
       },
+      // 分页总数
       total: 0,
-      title: '',
+      // 文件上传弹出框
       uploadDialogVisible: false,
+      // 图片预览弹出框
       previewDialogVisible: false,
+      // 文件详情弹出框
       infoDialogVisible: false,
-      // 默认是创建
-      dialogType: DIALOG_TYPE.ADD,
+      // 表单标题宽度
       formLabelWidth: '80px',
+      // 文件添加修改数据
       file: {
         id: null,
         title: '',
         ossStyle: ''
       },
+      // 文件详情数据
       fileInfo: {
         id: null,
         title: '',
         ossStyle: ''
       },
+      // 文件添加修改表单规则
       fileRules: {
         title: [
           {
@@ -268,33 +281,62 @@ export default {
   },
   methods: {
     ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
+    /**
+     * 初始化加载表格数据
+     */
     reloadList () {
-      list(this.buildParam()).then((rep) => {
-        if (rep.code === 1) {
-          this.fileTableData = rep.data.records
-          this.searchFileForm.size = rep.data.size
-          this.searchFileForm.current = rep.data.current
-          this.total = rep.data.total
+      list(this.buildParam()).then((response) => {
+        if (response.code === 1) {
+          this.fileTableData = response.data.records
+          this.searchFileForm.size = response.data.size
+          this.searchFileForm.current = response.data.current
+          this.total = response.data.total
         }
       })
     },
+    /**
+     * 构造查询条件
+     *
+     * @returns {{originalFileName: string, createBy: string, size: number, newFileName: string, createName: string}}
+     */
     buildParam () {
       return this.searchFileForm
     },
+    /**
+     * 分页大小切换
+     *
+     * @param size
+     */
     handleSizeChange (size) {
       this.searchFileForm.size = size
       this.reloadList()
     },
+    /**
+     * 当前页切换
+     *
+     * @param current
+     */
     handleCurrentChange (current) {
       this.searchFileForm.current = current
       this.reloadList()
     },
+    /**
+     * 查询按钮
+     */
     search () {
       this.reloadList()
     },
+    /**
+     * 查询重置按钮
+     */
     searchReset () {
       this.$refs.searchForm.resetFields()
     },
+    /**
+     * 平台表格复选框事件
+     *
+     * @param val
+     */
     fileHandleSelectionChange (val) {
       this.multipleSelectionFileIds = val
     },
@@ -305,8 +347,8 @@ export default {
       confirmAlert(() => {
         const ids = []
         this.multipleSelectionFileIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
-        del(ids).then(rep => {
-          if (rep.code === 1) {
+        del(ids).then(response => {
+          if (response.code === 1) {
             this.$message.success('删除成功')
             this.reloadList()
           }
@@ -322,8 +364,8 @@ export default {
      */
     removeItem (index, rows, row) {
       confirmAlert(() => {
-        del([JSONBigInt.parse(row.id)]).then(rep => {
-          if (rep.code === 1) {
+        del([JSONBigInt.parse(row.id)]).then(response => {
+          if (response.code === 1) {
             rows.splice(index, 1)
             this.$message.success('删除成功')
             this.reloadList()
@@ -331,6 +373,58 @@ export default {
         })
       })
     },
+    /**
+     * 创建
+     */
+    create () {
+      this.title = '上传文件'
+      this.dialogType = DIALOG_TYPE.ADD
+      this.uploadDialogVisible = true
+    },
+    /**
+     * 修改
+     *
+     * @param row
+     */
+    edit (row) {
+      this.title = '重新上传文件'
+      this.dialogType = DIALOG_TYPE.EDIT
+      this.uploadDialogVisible = true
+      this.$nextTick(() => {
+        Object.assign(this.file, row)
+      })
+    },
+    /**
+     * 详情
+     *
+     * @param row
+     */
+    info (row) {
+      this.title = '查看信息'
+      this.dialogType = DIALOG_TYPE.SHOW
+      this.infoDialogVisible = true
+      this.$nextTick(() => {
+        Object.assign(this.file, row)
+      })
+    },
+    /**
+     * 预览
+     *
+     * @param row
+     */
+    preview (row) {
+      preview(row.id).then(rep => {
+        if (rep.code === 1) {
+          this.previewDialogVisible = true
+          this.imgUrl = rep.data
+        }
+      })
+    },
+    /**
+     * 上传
+     *
+     * @param param
+     */
     uploadImage (param) {
       const formData = new FormData()
       if (!this.file.title) {
@@ -346,42 +440,18 @@ export default {
       formData.append('file', param.file)
       formData.append('title', this.file.title)
       formData.append('ossStyle', this.file.ossStyle)
-      upload(formData).then(rep => {
+      upload(formData).then(response => {
         this.uploadDialogVisible = false
         this.reloadList()
       }).catch(e => {
         console.error('图片上传失败', e)
       })
     },
-    info (row) {
-      this.title = '查看信息'
-      this.dialogType = DIALOG_TYPE.SHOW
-      this.infoDialogVisible = true
-      this.$nextTick(() => {
-        Object.assign(this.file, row)
-      })
-    },
-    edit (row) {
-      this.title = '重新上传文件'
-      this.dialogType = DIALOG_TYPE.EDIT
-      this.uploadDialogVisible = true
-      this.$nextTick(() => {
-        Object.assign(this.file, row)
-      })
-    },
-    create () {
-      this.title = '上传文件'
-      this.dialogType = DIALOG_TYPE.ADD
-      this.uploadDialogVisible = true
-    },
-    preview (row) {
-      preview(row.id).then(rep => {
-        if (rep.code === 1) {
-          this.previewDialogVisible = true
-          this.imgUrl = rep.data
-        }
-      })
-    },
+    /**
+     * 下载
+     *
+     * @param row
+     */
     download (row) {
       download(row.id).then(rep => {
         const blob = new Blob([rep.data],
@@ -393,9 +463,15 @@ export default {
         console.log(err)
       })
     },
+    /**
+     * 关闭上传弹出框事件
+     */
     closeUploadDialog () {
       this.file = this.fileInfo
     },
+    /**
+     * 关闭详情弹出框事件
+     */
     closeInfoDialog () {
       this.file = this.fileInfo
     }

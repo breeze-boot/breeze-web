@@ -14,7 +14,13 @@ export default {
     }]
   },
   mutations: {
-    setTab (state, menu) {
+    /**
+     * 添加Tab
+     *
+     * @param state
+     * @param menu
+     */
+    setTab: (state, menu) => {
       if (state.hidden === 0) {
         if (menu.name === 'welcome') {
           menu.title = '欢迎'
@@ -28,13 +34,24 @@ export default {
       }
       state.dynamicTabs.push(menu)
     },
-    setCurrentTabValue (state, name) {
+    /**
+     * 设置当前的Tab名称
+     *
+     * @param state
+     * @param name
+     */
+    setCurrentTabValue: (state, name) => {
       localStorage.setItem('current_tab_name', name)
       state.currentTabValue = name
     }
   },
   actions: {},
   getters: {
+    /**
+     * 获取当前的Tab名称
+     *
+     * @param state
+     */
     getCurrentTabValue (state) {
       return state.currentTabValue
     }

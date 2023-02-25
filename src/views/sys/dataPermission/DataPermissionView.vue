@@ -305,7 +305,6 @@
 import { del, list, modify, save, selectColumn, selectTable } from '@/api/sys/dataPermission'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
-import { Message } from 'element-ui'
 import { selectDept } from '@/api/sys/dept'
 import { mapGetters } from 'vuex'
 
@@ -313,7 +312,13 @@ export default {
   name: 'DataPermissionView',
   data () {
     return {
+      // 当前操作类型
+      dialogType: DIALOG_TYPE.ADD,
+      // 弹出框标题
+      title: '',
+      // 单元格选中数据
       multipleSelectionPermissionIds: [],
+      // 部门表格数据
       dataPermissionTableData: [],
       selectedTable: false,
       searchPermissionForm: {
@@ -323,12 +328,9 @@ export default {
         size: 10
       },
       total: 0,
-      title: '',
       dataPermissionDialogVisible: false,
       infoDialogVisible: false,
       dataPermissionDiyDialogVisible: false,
-      // 默认是创建
-      dialogType: DIALOG_TYPE.ADD,
       formLabelWidth: '110px',
       deptOption: [],
       tableOption: [],
@@ -433,9 +435,9 @@ export default {
       })
     },
     selectDept (row) {
-      selectDept().then(res => {
-        if (res.code === 1 && res.data) {
-          this.deptOption = res.data
+      selectDept().then(response => {
+        if (response.code === 1 && response.data) {
+          this.deptOption = response.data
           if (!row || !row.dataPermissions) {
             return
           }
@@ -579,7 +581,6 @@ export default {
     submitDiyPermissionForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          debugger
           const temp = {}
           Object.assign(temp, this.dataPermissionDiy)
           this.dataPermission.dataPermissionTableSqlDiyData.push(temp)
@@ -631,7 +632,7 @@ export default {
       this.dataPermission.id = undefined
       save(this.dataPermission).then((rep) => {
         if (rep.code === 1) {
-          Message.success({ message: '添加成功' })
+          this.$message.success('添加成功')
           this.dataPermissionDialogVisible = false
           this.reloadList()
         }
@@ -640,7 +641,7 @@ export default {
     modify () {
       modify(this.dataPermission).then((rep) => {
         if (rep.code === 1) {
-          Message.success({ message: '修改成功' })
+          this.$message.success('修改成功')
           this.dataPermissionDialogVisible = false
           this.reloadList()
         }

@@ -65,7 +65,7 @@
           label="图标"
           prop="icon"
           show-overflow-tooltip
-          width="200">
+          width="190">
           <template slot-scope="scope">
             <svg-icon :icon-name="scope.row.icon" :icon-style="'margin-right: 0px;'" style="font-size: 20px;"/>
             <el-tag
@@ -131,7 +131,7 @@
     </el-main>
 
     <el-dialog :title="title" :visible.sync="menuDialogVisible" width="800px"
-               @close="closeDialog">
+               @close="closeMenuDialog">
       <el-form ref="menuRuleForm" :model="menu" :rules="rules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="平台" prop="platformId" style="text-align: left;">
           <el-select v-model="menu.platformId" placeholder="请选择所属的平台">
@@ -202,7 +202,7 @@
         </el-form-item>
 
         <el-form-item :label-width="formLabelWidth" label="排序" prop="sort" style="text-align: left;">
-          <el-input-number v-model="menu.sort" :max="10" :min="1" :step="5" label="排序" @change="handleChangeSort"/>
+          <el-input-number v-model="menu.sort" :min="1" :step="2" label="排序" @change="handleChangeSort"/>
         </el-form-item>
 
         <el-form-item :label-width="formLabelWidth" label="标题" prop="title">
@@ -239,7 +239,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetForm">取 消</el-button>
+        <el-button size="mini" @click="resetMenuForm">取 消</el-button>
         <el-button size="mini" type="primary" @click="submitForm('menuRuleForm')">确 定</el-button>
       </div>
     </el-dialog>
@@ -363,7 +363,6 @@ import { del, list, modify, save, selectMenu, selectPlatform } from '@/api/sys/m
 import { confirmAlert, DIALOG_TYPE, ROOT } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import IconDialog from '@/components/svg/IconDialog'
-import { Message } from 'element-ui'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -373,17 +372,31 @@ export default {
   },
   data () {
     return {
+      // 当前操作类型
+      dialogType: DIALOG_TYPE.ADD,
+      // 弹出框标题
       title: '',
+      // 单元格选中数据
       multipleSelectionMenuId: [],
+      // 菜单表格数据
       menuTableData: [],
+      // 平台下拉框数据
       platformOptions: [],
+      // 菜单下拉框数据
+      menuOption: [],
+      // 菜单查询条件数据
       searchMenuForm: {
         platformId: ROOT,
         name: '',
         title: ''
       },
+      // 菜单添加修改弹出框
       menuDialogVisible: false,
+      // 菜单详情弹出框
       infoDialogVisible: false,
+      // 表单标题宽度
+      formLabelWidth: '80px',
+      // 菜单添加修改数据
       menu: {
         id: undefined,
         platformId: ROOT,
@@ -401,6 +414,7 @@ export default {
         type: 0,
         path: ''
       },
+      // 菜单详情数据
       menuInfo: {
         id: undefined,
         platformId: ROOT,
@@ -418,10 +432,7 @@ export default {
         type: 0,
         path: ''
       },
-      menuOption: [],
-      // 默认是创建
-      dialogType: DIALOG_TYPE.ADD,
-      formLabelWidth: '80px',
+      // 菜单添加修改表单规则
       rules: {
         platformId: [
           {
@@ -476,15 +487,9 @@ export default {
   },
   methods: {
     ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
-    selectPlatform () {
-      selectPlatform().then((rep) => {
-        if (rep.code === 1) {
-          this.platformOptions = rep.data
-        }
-      }).catch((e) => {
-        console.error(e)
-      })
-    },
+    /**
+     * 初始化加载表格数据
+     */
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
@@ -495,12 +500,23 @@ export default {
         }
       })
     },
+    /**
+     * 构造查询条件
+     *
+     * @returns {{name: string, platformId: string, title: string}}
+     */
     buildParam () {
       return this.searchMenuForm
     },
+    /**
+     * 查询按钮
+     */
     search () {
       this.reloadList()
     },
+    /**
+     * 查询重置按钮
+     */
     searchReset () {
       this.$refs.searchForm.resetFields()
     },
@@ -519,6 +535,12 @@ export default {
         })
       })
     },
+    /**
+     * 删除树形数据
+     *
+     * @param rows
+     * @param row
+     */
     deleteTreeTableData (rows, row) {
       for (let index = 0; index < rows.length; index++) {
         if (rows[index].id === row.id) {
@@ -531,12 +553,20 @@ export default {
         }
       }
     },
+    /**
+     * 树形展开重置布局
+     *
+     * @param val
+     */
     menuHandleExpandChange (val) {
       this.multipleSelectionMenuId = val
       this.$nextTick(() => {
         this.$refs.menuTable.doLayout()
       })
     },
+    /**
+     * 创建
+     */
     create (row) {
       this.title = '创建菜单'
       this.dialogType = DIALOG_TYPE.ADD
@@ -546,9 +576,17 @@ export default {
       })
       this.menuDialogVisible = true
     },
+    /**
+     * 克隆
+     */
     clone () {
       this.title = '创建菜单'
+      // TODO
     },
+    /**
+     * 修改
+     * @param row
+     */
     edit (row) {
       this.title = '修改菜单'
       this.dialogType = DIALOG_TYPE.EDIT
@@ -560,6 +598,10 @@ export default {
       })
       this.menuDialogVisible = true
     },
+    /**
+     * 详情
+     * @param row
+     */
     info (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
@@ -571,19 +613,27 @@ export default {
       })
       this.infoDialogVisible = true
     },
-    handleChangeSort (val) {
-    },
-    selectMenu (id) {
-      selectMenu(id).then(res => {
-        if (res.code === 1 && res.data) {
-          this.menuOption = [{
-            key: ROOT,
-            value: '根节点',
-            children: res.data
-          }]
-        }
+    /**
+     * 关闭菜单添加修改弹出框事件
+     * @param formName
+     */
+    closeMenuDialog () {
+      this.$nextTick(() => {
+        Object.assign(this.menu, this.menuInfo)
       })
     },
+    /**
+     * 关闭详情弹出框事件
+     */
+    closeInfoDialog () {
+      this.$nextTick(() => {
+        Object.assign(this.menu, this.menuInfo)
+      })
+    },
+    /**
+     * 添加修改弹出框提交
+     * @param formName
+     */
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -593,42 +643,81 @@ export default {
         }
       })
     },
+    /**
+     * 保存请求
+     */
     save () {
       save(this.menu).then((rep) => {
         if (rep.code === 1) {
-          Message.success({ message: rep.message })
+          this.$message.success(rep.message)
           this.menuDialogVisible = false
           this.reloadList()
         }
       })
     },
+    /**
+     * 修改请求
+     */
     modify () {
       modify(this.menu).then((rep) => {
         if (rep.code === 1) {
-          Message.success({ message: rep.message })
+          this.$message.success(rep.message)
           this.menuDialogVisible = false
           this.reloadList()
         }
       })
     },
-    resetForm () {
+    /**
+     * 添加修改弹出框重置
+     */
+    resetMenuForm () {
       this.menuDialogVisible = false
     },
+    /**
+     * 打卡icon选择弹出框
+     */
     showIconDialog () {
       this.$refs.iconDialog.showIconDialog({})
     },
-    closeInfoDialog () {
-      this.$nextTick(() => {
-        Object.assign(this.menu, this.menuInfo)
-      })
-    },
-    closeDialog () {
-      this.$nextTick(() => {
-        Object.assign(this.menu, this.menuInfo)
-      })
-    },
+    /**
+     * 选择icon事件
+     * @param val
+     */
     choiceIcon (val) {
       this.menu.icon = val
+    },
+    /**
+     * 平台下拉框
+     */
+    selectPlatform () {
+      selectPlatform().then((rep) => {
+        if (rep.code === 1) {
+          this.platformOptions = rep.data
+        }
+      }).catch((e) => {
+        console.error(e)
+      })
+    },
+    /**
+     * 菜单下拉框
+     *
+     * @param id
+     */
+    selectMenu (id) {
+      selectMenu(id).then(response => {
+        if (response.code === 1 && response.data) {
+          this.menuOption = [{
+            key: ROOT,
+            value: '根节点',
+            children: response.data
+          }]
+        }
+      })
+    },
+    /**
+     * @param val
+     */
+    handleChangeSort (val) {
     }
   }
 }

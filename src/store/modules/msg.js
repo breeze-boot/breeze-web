@@ -12,6 +12,12 @@ export default {
     reConnectTime: null
   },
   mutations: {
+    /**
+     * 存储消息
+     *
+     * @param state
+     * @param msgData
+     */
     setMsg (state, msgData) {
       msgData.forEach(msg => {
         // 去重
@@ -21,12 +27,29 @@ export default {
         }
       })
     },
+    /**
+     * 清空消息
+     *
+     * @param state
+     */
     clearMsg (state) {
       state.msg = []
     },
+    /**
+     * 关闭消息卡片
+     *
+     * @param state
+     * @param msg
+     */
     closeMsgCard (state, msg) {
       state.msg = state.msg.filter((tempMsg) => tempMsg.msgCode !== msg.msgCode)
     },
+    /**
+     * 标记消息已读
+     *
+     * @param state
+     * @param msg
+     */
     markReadMsgCard (state, msg) {
       state.msg = state.msg.filter((tempMsg) => tempMsg.msgCode !== msg.msgCode)
     }
@@ -35,11 +58,11 @@ export default {
     reloadMsg (context) {
       // 若去后台重新加载，清空本地的缓存
       context.state.msg = []
-      listMsgByUsername().then(rep => {
-        if (rep.code !== 1) {
+      listMsgByUsername().then(response => {
+        if (response.code !== 1) {
           return
         }
-        context.commit('setMsg', rep.data)
+        context.commit('setMsg', response.data)
       })
     },
     clearMsg (context) {
@@ -48,8 +71,8 @@ export default {
     },
     closeMsgCard (context, msg) {
       // 更改状态
-      close(msg.msgCode).then(rep => {
-        if (rep.code !== 1) {
+      close(msg.msgCode).then(response => {
+        if (response.code !== 1) {
           return
         }
         context.commit('closeMsgCard', msg)
@@ -57,8 +80,8 @@ export default {
     },
     markReadMsgCard (context, msg) {
       // 更改状态
-      read(msg.msgCode).then(rep => {
-        if (rep.code !== 1) {
+      read(msg.msgCode).then(response => {
+        if (response.code !== 1) {
           return
         }
         context.commit('markReadMsgCard', msg)

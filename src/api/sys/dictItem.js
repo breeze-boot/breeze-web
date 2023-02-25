@@ -6,6 +6,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
 /**
  * 列表
  *
+ * @param data
  * @returns {AxiosPromise}
  */
 export function list (data) {
@@ -21,7 +22,7 @@ export function list (data) {
 }
 
 /**
- * 添加
+ * 新增
  *
  * @param data
  * @returns {AxiosPromise}
@@ -37,7 +38,7 @@ export function save (data) {
 /**
  * 删除
  *
- * @param data
+ * @param ids
  * @returns {AxiosPromise}
  */
 export function del (ids) {

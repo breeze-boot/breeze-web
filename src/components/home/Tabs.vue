@@ -2,6 +2,7 @@
   <div>
     <el-tabs
       v-model="currentTabValue"
+      @tab-click="handleTabClick"
       @tab-remove="removeTab">
       <el-tab-pane
         v-for="(tab, index) in dynamicTabs"
@@ -29,8 +30,6 @@ export default {
         return this.$store.getters['tabs/getCurrentTabValue']
       },
       set (currentTabValue) {
-        router.push({ name: currentTabValue })
-        // this.$store.commit('tabs/setCurrentTabValue', currentTabValue)
       }
     },
     dynamicTabs: {
@@ -43,6 +42,19 @@ export default {
     }
   },
   methods: {
+    /**
+     * Tab点击切换事件
+     *
+     * @param tab
+     */
+    handleTabClick (tab) {
+      router.push({ name: tab.name })
+    },
+    /**
+     * 删除Tab
+     *
+     * @param targetName
+     */
     removeTab (targetName) {
       if (targetName === 'welcome') {
         return

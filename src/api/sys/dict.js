@@ -5,6 +5,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
 
 /**
  * 列表
+ *
  * @param data
  * @returns {AxiosPromise}
  */
@@ -20,7 +21,8 @@ export function list (data) {
 }
 
 /**
- * 保存
+ * 新增
+ *
  * @param data
  * @returns {AxiosPromise}
  */
@@ -34,6 +36,7 @@ export function save (data) {
 
 /**
  * 删除
+ *
  * @param ids
  * @returns {AxiosPromise}
  */
@@ -47,6 +50,7 @@ export function del (ids) {
 
 /**
  * 修改
+ *
  * @param data
  * @returns {AxiosPromise}
  */
@@ -59,7 +63,8 @@ export function modify (data) {
 }
 
 /**
- * 开关
+ * 锁定
+ *
  * @param data
  * @returns {AxiosPromise}
  */
@@ -73,6 +78,7 @@ export function open (data) {
 
 /**
  * 查询字典
+ *
  * @param dictCodes
  * @returns {AxiosPromise}
  */
@@ -81,5 +87,23 @@ export function listDict (dictCodes) {
     url: servicePath.system + '/sys/dict/listDict',
     method: 'post',
     data: dictCodes
+  })
+}
+
+/**
+ * 校验字典编码是否重复
+ *
+ * @param dictCode
+ * @param dictId
+ * @returns {AxiosPromise}
+ */
+export function checkDictCode (dictCode, dictId) {
+  return request({
+    url: servicePath.system + '/sys/dict/checkDictCode',
+    method: 'get',
+    params: {
+      dictId: dictId || '',
+      dictCode: dictCode
+    }
   })
 }

@@ -190,8 +190,15 @@ export default {
   name: 'UserMsgView',
   data () {
     return {
+      // 当前操作类型
+      dialogType: DIALOG_TYPE.ADD,
+      // 弹出框标题
+      title: '',
+      // 单元格选中数据
       multipleSelectionUserMsgIds: [],
+      // 消息表格数据
       userMsgTableData: [],
+      // 消息查询条件数据
       searchUserMsgForm: {
         msgTitle: '',
         msgCode: '',
@@ -199,12 +206,12 @@ export default {
         current: 1,
         size: 10
       },
+      // 分页总数
       total: 0,
-      title: '',
+      // 消息详情弹出框
       infoDialogVisible: false,
-      // 默认是创建
-      dialogType: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
+      // 消息添加修改数据
       userMsg: {
         id: null,
         msgTitle: '',
@@ -216,6 +223,7 @@ export default {
         createTime: '',
         markRead: ''
       },
+      // 消息详情数据
       userMsgInfo: {
         id: null,
         msgTitle: '',
@@ -236,6 +244,9 @@ export default {
   },
   methods: {
     ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
+    /**
+     * 初始化加载表格数据
+     */
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
@@ -246,23 +257,49 @@ export default {
         }
       })
     },
+    /**
+     * 构造查询条件
+     *
+     * @returns {{current: number, size: number, msgTitle: string, msgCode: string, username: string}}
+     */
     buildParam () {
       return this.searchUserMsgForm
     },
+    /**
+     * 分页大小切换
+     *
+     * @param size
+     */
     handleSizeChange (size) {
       this.searchUserMsgForm.size = size
       this.reloadList()
     },
+    /**
+     * 当前页切换
+     *
+     * @param current
+     */
     handleCurrentChange (current) {
       this.searchUserMsgForm.current = current
       this.reloadList()
     },
+    /**
+     * 查询按钮
+     */
     search () {
       this.reloadList()
     },
+    /**
+     * 查询重置按钮
+     */
     searchReset () {
       this.$refs.searchForm.resetFields()
     },
+    /**
+     * 平台表格复选框事件
+     *
+     * @param val
+     */
     userMsgHandleSelectionChange (val) {
       this.multipleSelectionUserMsgIds = val
     },
@@ -299,6 +336,11 @@ export default {
         })
       })
     },
+    /**
+     * 详情
+     *
+     * @param row
+     */
     info (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
@@ -307,6 +349,11 @@ export default {
         Object.assign(this.userMsg, row)
       })
     },
+    /**
+     * 关闭消息详情弹出框事件
+     *
+     * @param formName
+     */
     closeInfoDialog () {
       this.userMsg = this.userMsgInfo
     }

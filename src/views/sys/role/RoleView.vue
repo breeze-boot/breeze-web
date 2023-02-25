@@ -99,7 +99,7 @@
     </el-main>
 
     <el-dialog :title="title" :visible.sync="roleDialogVisible" width="800px"
-               @close="closeDialog('roleRuleForm')">
+               @close="closeRoleDialog('roleRuleForm')">
       <el-form ref="roleRuleForm" :model="role" :rules="roleRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="角色名称" prop="roleName">
           <el-input v-model="role.roleName" autocomplete="off" clearable/>
@@ -156,10 +156,9 @@
 </template>
 
 <script>
-import { del, list, listRolesPermission, modify, modifyPermission, save } from '@/api/sys/role'
+import { checkRoleCode, del, list, listRolesPermission, modify, modifyPermission, save } from '@/api/sys/role'
 import { listTreePermission } from '@/api/sys/menu'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
-import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
 import { editRoleDataPermission, selectDataPermission } from '@/api/sys/dataPermission'
 
@@ -167,39 +166,62 @@ export default {
   name: 'RoleView',
   data () {
     return {
+      // 当前操作类型
+      dialogType: DIALOG_TYPE.ADD,
+      // 弹出框标题
       title: '',
+      // 是否锁定重置按钮
       disabled: true,
+      // 单元格选中数据
       multipleSelectionRoleIds: [],
+      // 数据权限下拉框
+      dataPermissionOptions: [],
+      // 数据权限添加修改数据
+      dataPermission: {
+        roleId: undefined,
+        dataPermissionId: []
+      },
+      // 角色表格数据
       roleTableData: [],
+      // 角色查询条件数据
       searchRoleForm: {
         roleName: '',
         roleCode: '',
         current: 1,
         size: 10
       },
+      // 分页总数
       total: 0,
+      // 树形角色数据
       roleTreeData: [],
+      // 角色树形配置
       roleTreeProps: {
         children: 'children',
         label: 'title'
       },
-      roleId: undefined,
+      // 当前选择的角色
+      currentClickRoleId: undefined,
+      // 角色添加修改弹出框
       roleDialogVisible: false,
+      // 角色详情弹出框
       infoDialogVisible: false,
+      // 数据权限设置弹出框
       dataPermissionDialogVisible: false,
+      // 表单标题宽度
+      formLabelWidth: '80px',
+      // 角色添加修改弹出框
       role: {
         id: undefined,
         roleName: '',
         roleCode: ''
       },
+      // 角色详情弹出框
       roleInfo: {
         id: undefined,
         roleName: '',
         roleCode: ''
       },
-      // 默认是创建
-      dialogType: DIALOG_TYPE.ADD,
-      formLabelWidth: '80px',
+      // 角色添加修改表单规则
       roleRules: {
         roleName: [
           {
@@ -208,20 +230,26 @@ export default {
             trigger: 'blur'
           }
         ],
-        roleCode:
-          [
-            {
-              required: true,
-              message: '请输入角色编码',
-              trigger: 'blur'
-            }
-          ]
+        roleCode: [
+          {
+            required: true,
+            message: '请输入角色编码',
+            trigger: 'blur'
+          }, {
+            validator: (rule, value, callback) => {
+              checkRoleCode(value, this.role.id).then((response) => {
+                if (response.data) {
+                  callback()
+                  return
+                }
+                callback(new Error('编码重复'))
+              })
+            },
+            trigger: 'blur'
+          }
+        ]
       },
-      dataPermissionOptions: [],
-      dataPermission: {
-        roleId: undefined,
-        dataPermissionId: []
-      },
+      // 数据权限表单规则
       dataPermissionRule: {
         dataPermissionId: [
           {
@@ -234,18 +262,15 @@ export default {
     }
   },
   mounted () {
+    // 初始化加载表格数据
     this.reloadList()
     this.reloadListTreeMenu()
     this.selectDataPermission()
   },
   methods: {
-    selectDataPermission () {
-      selectDataPermission().then(rep => {
-        if (rep.code === 1) {
-          this.dataPermissionOptions = rep.data
-        }
-      })
-    },
+    /**
+     * 初始化加载表格数据
+     */
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
@@ -256,80 +281,88 @@ export default {
         }
       })
     },
+    /**
+     * 初始化加载树形数据
+     */
+    reloadListTreeMenu () {
+      listTreePermission().then((rep) => {
+        this.roleTreeData = rep.data
+      })
+    },
+    /**
+     * 初始化加载树形数据选的值
+     */
     listRolesPermission (roleId) {
       if (!roleId) {
         return
       }
       listRolesPermission(roleId).then((rep) => {
-        if (rep.code === 1) {
-          this.$nextTick(() => {
-            this.$refs.roleTree.setCheckedKeys([])
-            rep.data.forEach(data => {
-              this.$refs.roleTree.setChecked(data.menuId, true, false)
-            })
+        this.$nextTick(() => {
+          this.$refs.roleTree.setCheckedKeys([])
+          rep.data.forEach(data => {
+            this.$refs.roleTree.setChecked(data.menuId, true, false)
           })
-          this.disabled = false
-        }
+        })
+        this.disabled = false
       })
     },
-    submitPermission () {
-      const checkedKeys = this.$refs.roleTree.getCheckedKeys()
-      const halfCheckedKeys = this.$refs.roleTree.getHalfCheckedKeys()
-      if (halfCheckedKeys.length > 0) {
-        checkedKeys.push(...halfCheckedKeys)
-      }
-      if (checkedKeys.length <= 0) {
-        this.$message.warning('请选择角色权限')
-        return
-      }
-      if (this.roleId === undefined) {
-        this.$message.warning('请先点击角色')
-        return
-      }
-      modifyPermission({
-        roleId: this.roleId,
-        permissionIds: checkedKeys
-      }).then(rep => {
-        if (rep.code === 1) {
-          Message.success({ message: rep.message })
-          this.listRolesPermission(this.roleId)
-        }
-      })
+    /**
+     * 构造查询条件
+     *
+     * @returns {{current: number, size: number, roleCode: string, roleName: string}}
+     */
+    buildParam () {
+      return this.searchRoleForm
     },
-    resetPermission () {
-      this.listRolesPermission(this.roleId)
-    },
-    reloadListTreeMenu () {
-      listTreePermission().then((rep) => {
-        if (rep.code === 1) {
-          this.roleTreeData = rep.data
-        }
-      })
-    },
+    /**
+     * 分页大小切换
+     *
+     * @param size
+     */
     handleSizeChange (size) {
       this.searchRoleForm.size = size
       this.reloadList()
     },
+    /**
+     * 当前页切换
+     *
+     * @param current
+     */
     handleCurrentChange (current) {
       this.searchRoleForm.current = current
       this.reloadList()
     },
+    /**
+     * 查询按钮
+     */
     search () {
       this.reloadList()
       this.reloadListTreeMenu()
     },
-    rowClick (row, column, event) {
-      this.roleId = row.id
-      this.listRolesPermission(row.id)
-    },
-    buildParam () {
-      return this.searchRoleForm
-    },
+    /**
+     * 查询重置按钮
+     */
     searchReset () {
       this.$refs.searchForm.resetFields()
     },
+    /**
+     * 平台表格复选框事件
+     *
+     * @param val
+     */
     roleHandleSelectionChange (val) {
       this.multipleSelectionRoleIds = val
+    },
+    /**
+     * 单元格点击事件
+     *
+     * @param row
+     * @param column
+     * @param event
+     */
+    rowClick (row, column, event) {
+      this.currentClickRoleId = row.id
+      this.listRolesPermission(row.id)
     },
     /**
      * 批量删除
@@ -362,11 +395,18 @@ export default {
         })
       })
     },
+    /**
+     * 创建
+     */
     create () {
       this.title = '创建角色'
       this.dialogType = DIALOG_TYPE.ADD
       this.roleDialogVisible = true
     },
+    /**
+     * 修改
+     * @param row
+     */
     edit (row) {
       this.title = '修改角色信息'
       this.dialogType = DIALOG_TYPE.EDIT
@@ -375,6 +415,10 @@ export default {
         Object.assign(this.role, row)
       })
     },
+    /**
+     * 详情
+     * @param row
+     */
     info (row) {
       this.title = '查看角色信息'
       this.dialogType = DIALOG_TYPE.SHOW
@@ -383,16 +427,26 @@ export default {
         Object.assign(this.role, row)
       })
     },
-    closeDialog (formName) {
+    /**
+     * 关闭角色添加修改弹出框事件
+     *
+     * @param formName
+     */
+    closeRoleDialog (formName) {
       this.role.id = undefined
       this.$refs[formName].resetFields()
     },
-    closeDataPermissionDialog (formName) {
-      this.$refs[formName].resetFields()
-    },
+    /**
+     * 关闭详情弹出框事件
+     */
     closeInfoDialog () {
       this.role = this.roleInfo
     },
+    /**
+     * 添加修改弹出框提交
+     *
+     * @param formName
+     */
     submitRoleForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -403,15 +457,91 @@ export default {
         }
       })
     },
+    /**
+     * 保存请求
+     */
+    save () {
+      save(this.role).then((rep) => {
+        if (rep.code === 1) {
+          this.$message.success(rep.message)
+          this.roleDialogVisible = false
+          this.reloadList()
+          this.resetPermission()
+        }
+      })
+    },
+    /**
+     * 修改请求
+     */
+    modify () {
+      modify(this.role).then((rep) => {
+        if (rep.code === 1) {
+          this.$message.success(rep.message)
+          this.roleDialogVisible = false
+          this.reloadList()
+          this.resetPermission()
+        }
+      })
+    },
+    /**
+     * 添加修改弹出框重置
+     *
+     * @param formName
+     */
     resetRoleForm (formName) {
       this.roleDialogVisible = false
       this.$refs[formName].resetFields()
     },
+    /**
+     * 提交角色的权限
+     *
+     * @param formName
+     */
+    submitPermission () {
+      const checkedKeys = this.$refs.roleTree.getCheckedKeys()
+      const halfCheckedKeys = this.$refs.roleTree.getHalfCheckedKeys()
+      if (halfCheckedKeys.length > 0) {
+        checkedKeys.push(...halfCheckedKeys)
+      }
+      if (checkedKeys.length <= 0) {
+        this.$message.warning('请选择角色权限')
+        return
+      }
+      if (this.currentClickRoleId === undefined) {
+        this.$message.warning('请先点击角色')
+        return
+      }
+      modifyPermission({
+        roleId: this.currentClickRoleId,
+        permissionIds: checkedKeys
+      }).then(rep => {
+        if (rep.code === 1) {
+          this.$message.success(rep.message)
+          this.listRolesPermission(this.currentClickRoleId)
+        }
+      })
+    },
+    /**
+     * 重置角色权限
+     */
+    resetPermission () {
+      this.listRolesPermission(this.currentClickRoleId)
+    },
+    /**
+     * 编辑数据权限
+     *
+     * @param row
+     */
     editRoleDataPermission (row) {
       this.title = '编辑角色数据权限'
       this.dataPermissionDialogVisible = true
       this.dataPermission.roleId = row.id
     },
+    /**
+     * 提交数据权限
+     *
+     * @param formName
+     */
     submitDataPermissionRuleForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -438,27 +568,30 @@ export default {
         }
       })
     },
+    /**
+     * 重置数据权限表单
+     *
+     * @param formName
+     */
     resetDataPermissionRuleForm (formName) {
       this.dataPermissionDialogVisible = false
       this.$refs[formName].resetFields()
     },
-    save () {
-      save(this.role).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: rep.message })
-          this.roleDialogVisible = false
-          this.reloadList()
-          this.resetPermission()
-        }
-      })
+    /**
+     * 关闭数据权限配置弹出框事件
+     *
+     * @param formName
+     */
+    closeDataPermissionDialog (formName) {
+      this.$refs[formName].resetFields()
     },
-    modify () {
-      modify(this.role).then((rep) => {
+    /**
+     * 数据权限下拉框
+     */
+    selectDataPermission () {
+      selectDataPermission().then(rep => {
         if (rep.code === 1) {
-          Message.success({ message: rep.message })
-          this.roleDialogVisible = false
-          this.reloadList()
-          this.resetPermission()
+          this.dataPermissionOptions = rep.data
         }
       })
     }

@@ -194,8 +194,8 @@ export default {
               : JSON.stringify(this.checkPosArr),
             token: this.backToken
           }
-          reqCheck(data).then((res) => {
-            if (res.repCode === '0000') {
+          reqCheck(data).then((response) => {
+            if (response.repCode === '0000') {
               this.barAreaColor = '#4cae4c'
               this.barAreaBorderColor = '#5cb85c'
               this.text = '验证成功'
@@ -258,19 +258,19 @@ export default {
         clientUid: localStorage.getItem('point'),
         ts: Date.now() // 现在的时间戳
       }
-      reqGet(data).then((res) => {
-        if (res.repCode === '0000') {
-          this.pointBackImgBase = res.repData.originalImageBase64
-          this.backToken = res.repData.token
-          this.secretKey = res.repData.secretKey
-          this.poinTextList = res.repData.wordList
+      reqGet(data).then((response) => {
+        if (response.repCode === '0000') {
+          this.pointBackImgBase = response.repData.originalImageBase64
+          this.backToken = response.repData.token
+          this.secretKey = response.repData.secretKey
+          this.poinTextList = response.repData.wordList
           this.text = '请依次点击【' + this.poinTextList.join(',') + '】'
         } else {
-          this.text = res.repMsg
+          this.text = response.repMsg
         }
 
         // 判断接口请求次数是否失效
-        if (res.repCode === '6201') {
+        if (response.repCode === '6201') {
           this.pointBackImgBase = null
         }
       })

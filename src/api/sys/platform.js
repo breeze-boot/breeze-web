@@ -6,6 +6,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
 /**
  * 列表
  *
+ * @param data
  * @returns {AxiosPromise}
  */
 export function list (data) {
@@ -22,6 +23,7 @@ export function list (data) {
 /**
  * 删除
  *
+ * @param ids
  * @returns {AxiosPromise}
  */
 export function del (ids) {
@@ -35,6 +37,7 @@ export function del (ids) {
 /**
  * 新增
  *
+ * @param data
  * @returns {AxiosPromise}
  */
 export function save (data) {
@@ -48,6 +51,7 @@ export function save (data) {
 /**
  * 修改
  *
+ * @param data
  * @returns {AxiosPromise}
  */
 export function modify (data) {
@@ -55,5 +59,23 @@ export function modify (data) {
     url: servicePath.system + '/sys/platform/modify',
     method: 'put',
     data: data
+  })
+}
+
+/**
+ * 校验平台编码是否重复
+ *
+ * @param platformCode
+ * @param platformId
+ * @returns {AxiosPromise}
+ */
+export function checkPlatformCode (platformCode, platformId) {
+  return request({
+    url: servicePath.system + '/sys/platform/checkPlatformCode',
+    method: 'get',
+    params: {
+      platformId: platformId || '',
+      platformCode: platformCode
+    }
   })
 }

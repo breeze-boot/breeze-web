@@ -6,7 +6,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
 /**
  * 初始化菜单
  *
- * @param data
+ * @param params
  * @returns {AxiosPromise}
  */
 export function listTreeMenu (params) {
@@ -22,24 +22,9 @@ export function listTreeMenu (params) {
 }
 
 /**
- * 权限列表
- *
- * @param data
- * @returns {AxiosPromise}
- */
-export function listTreePermission () {
-  return request({
-    url: servicePath.system + '/sys/menu/listTreePermission',
-    method: 'get',
-    transformResponse: [(data) => {
-      return JSONBigInt2Str.parse(data)
-    }]
-  })
-}
-
-/**
  * 列表
  *
+ * @param data
  * @returns {AxiosPromise}
  */
 export function list (data) {
@@ -55,6 +40,8 @@ export function list (data) {
 
 /**
  * 添加
+ *
+ * @param data
  * @returns {AxiosPromise}
  */
 export function save (data) {
@@ -119,6 +106,22 @@ export function selectMenu (id) {
 export function selectPlatform () {
   return request({
     url: servicePath.system + '/sys/common/selectPlatform',
+    method: 'get',
+    transformResponse: [(data) => {
+      return JSONBigInt2Str.parse(data)
+    }]
+  })
+}
+
+/**
+ * 权限列表
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function listTreePermission () {
+  return request({
+    url: servicePath.system + '/sys/menu/listTreePermission',
     method: 'get',
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)

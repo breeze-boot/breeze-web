@@ -29,10 +29,20 @@ export default {
     ...mapState('menu', ['currentMenu'])
   },
   methods: {
+    /**
+     * Tag点击切换事件
+     *
+     * @param tab
+     */
     handleClick (tag) {
       this.currentMenu = tag.name
       router.push({ name: tag.name })
     },
+    /**
+     * Tag关闭事件
+     *
+     * @param tab
+     */
     handleClose (tag) {
       let index = this.dynamicTags.findIndex((value, index, arr) => {
         return value.name === tag.name

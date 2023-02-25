@@ -6,13 +6,14 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
 /**
  * 列表
  *
+ * @param data
  * @returns {AxiosPromise}
  */
-export function list (params) {
+export function list (data) {
   return request({
     url: servicePath.system + '/sys/log/list',
     method: 'post',
-    data: params,
+    data: data,
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)
     }]
@@ -20,9 +21,8 @@ export function list (params) {
 }
 
 /**
- * 删除
+ * 清空
  *
- * @param data
  * @returns {AxiosPromise}
  */
 export function clear () {
@@ -35,7 +35,7 @@ export function clear () {
 /**
  * 删除
  *
- * @param data
+ * @param ids
  * @returns {AxiosPromise}
  */
 export function del (ids) {

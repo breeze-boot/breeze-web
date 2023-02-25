@@ -16,11 +16,11 @@ const toListDict = (dictCodes = []) => {
       }
     })
     if (noFindDictCodes.length > 0) {
-      listDict(noFindDictCodes).then(rep => {
-        if (rep.code === 0 || !rep.data) {
+      listDict(noFindDictCodes).then(response => {
+        if (response.code === 0 || !response.data) {
           return
         }
-        for (const [key, value] of Object.entries(rep.data)) {
+        for (const [key, value] of Object.entries(response.data)) {
           const dict = {
             key: key,
             value: value

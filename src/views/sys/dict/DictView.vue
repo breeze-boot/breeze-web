@@ -136,9 +136,8 @@
 </template>
 
 <script>
-import { del, list, modify, open, save } from '@/api/sys/dict'
+import { checkDictCode, del, list, modify, open, save } from '@/api/sys/dict'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
-import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
 
 export default {
@@ -146,33 +145,44 @@ export default {
   components: {},
   data () {
     return {
+      // 当前操作类型
+      dialogType: DIALOG_TYPE.ADD,
+      // 弹出框标题
       title: '',
+      // 单元格选中数据
       multipleSelection: [],
+      // 字典表格数据
       dictTableData: [],
+      // 字典查询条件数据
       searchDictForm: {
         dictName: '',
         dictCode: '',
         current: 1,
         size: 10
       },
+      // 分页总数
       total: 0,
+      // 字典添加修改弹出框
       dictDialogVisible: false,
+      // 字典详情弹出框
       infoDialogVisible: false,
+      // 表单标题宽度
+      formLabelWidth: '80px',
+      // 字典添加修改数据
       dict: {
         id: undefined,
         dictName: '',
         dictCode: '',
         isOpen: 0
       },
+      // 字典详情数据
       dictInfo: {
         id: undefined,
         dictName: '',
         dictCode: '',
         isOpen: 0
       },
-      // 默认是创建
-      dialogType: DIALOG_TYPE.ADD,
-      formLabelWidth: '80px',
+      // 字典添加修改表单规则
       dictRules: {
         dictName: [
           {
@@ -186,6 +196,17 @@ export default {
             required: true,
             message: '请输入字典编码',
             trigger: 'blur'
+          }, {
+            validator: (rule, value, callback) => {
+              checkDictCode(value).then((response) => {
+                if (response.data) {
+                  callback()
+                  return
+                }
+                callback(new Error('编码重复'))
+              })
+            },
+            trigger: 'blur'
           }
         ]
       }
@@ -195,41 +216,62 @@ export default {
     this.reloadList()
   },
   methods: {
+    /**
+     * 初始化加载表格数据
+     */
     reloadList () {
-      list(this.buildParam()).then((rep) => {
-        if (rep.code === 1) {
-          this.dictTableData = rep.data.records
-          this.searchDictForm.size = rep.data.size
-          this.searchDictForm.current = rep.data.current
-          this.total = rep.data.total
+      list(this.buildParam()).then((response) => {
+        if (response.code === 1) {
+          this.dictTableData = response.data.records
+          this.searchDictForm.size = response.data.size
+          this.searchDictForm.current = response.data.current
+          this.total = response.data.total
         }
       })
     },
-    open (index, row) {
-      open({
-        id: row.id,
-        isOpen: row.isOpen
-      }).then((rep) => {
-        Message.success({ message: rep.message })
-      })
+    /**
+     * 构造查询条件
+     *
+     * @returns {{current: number, size: number, dictCode: string, dictName: string}}
+     */
+    buildParam () {
+      return this.searchDictForm
     },
+    /**
+     * 分页大小切换
+     *
+     * @param size
+     */
     handleSizeChange (size) {
       this.searchDictForm.size = size
       this.reloadList()
     },
+    /**
+     * 当前页切换
+     *
+     * @param current
+     */
     handleCurrentChange (current) {
       this.searchDictForm.current = current
       this.reloadList()
     },
+    /**
+     * 查询按钮
+     */
     search () {
       this.reloadList()
     },
-    buildParam () {
-      return this.searchDictForm
-    },
+    /**
+     * 查询重置按钮
+     */
     searchReset () {
       this.$refs.searchForm.resetFields()
     },
+    /**
+     * 字典表格复选框事件
+     *
+     * @param val
+     */
     dictHandleSelectionChange (val) {
       this.multipleSelection = val
     },
@@ -240,8 +282,8 @@ export default {
       confirmAlert(() => {
         const ids = []
         this.multipleSelection.map((x) => ids.push(JSONBigInt.parse(x.id)))
-        del(ids).then((rep) => {
-          if (rep.code === 1) {
+        del(ids).then((response) => {
+          if (response.code === 1) {
             this.$message.success('删除成功')
             this.reloadList()
           }
@@ -257,8 +299,8 @@ export default {
      */
     removeItem (index, rows, row) {
       confirmAlert(() => {
-        del([JSONBigInt.parse(row.id)]).then(rep => {
-          if (rep.code === 1) {
+        del([JSONBigInt.parse(row.id)]).then(response => {
+          if (response.code === 1) {
             rows.splice(index, 1)
             this.reloadList()
             this.$message.success('删除成功')
@@ -266,11 +308,18 @@ export default {
         })
       })
     },
+    /**
+     * 创建
+     */
     create () {
       this.title = '创建字典'
       this.dialogType = DIALOG_TYPE.ADD
       this.dictDialogVisible = true
     },
+    /**
+     * 修改
+     * @param row
+     */
     edit (row) {
       this.title = '修改字典'
       this.dialogType = DIALOG_TYPE.EDIT
@@ -279,6 +328,11 @@ export default {
         Object.assign(this.dict, row)
       })
     },
+    /**
+     * 详情
+     *
+     * @param row
+     */
     info (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
@@ -287,13 +341,26 @@ export default {
         Object.assign(this.dict, row)
       })
     },
-    showDictDetail (row) {
-      this.$router.push({
-        name: 'dictItem',
-        path: '/dictItem',
-        params: row
-      })
+    /**
+     * 关闭平台添加修改弹出框事件
+     *
+     * @param formName
+     */
+    closeDictDialog (formName) {
+      this.dict.id = undefined
+      this.$refs[formName].resetFields()
     },
+    /**
+     * 关闭详情弹出框事件
+     */
+    closeInfoDialog () {
+      this.dict = this.dictInfo
+    },
+    /**
+     * 添加修改弹出框提交
+     *
+     * @param formName
+     */
     submitDictForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -304,35 +371,67 @@ export default {
         }
       })
     },
+    /**
+     * 保存请求
+     */
     save () {
-      save(this.dict).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: rep.message })
+      save(this.dict).then((response) => {
+        if (response.code === 1) {
+          this.$message.success(response.message)
           this.dictDialogVisible = false
           this.reloadList()
         }
       })
     },
+    /**
+     * 修改请求
+     */
     modify () {
-      modify(this.dict).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: rep.message })
+      modify(this.dict).then((response) => {
+        if (response.code === 1) {
+          this.$message.success(response.message)
           this.dictDialogVisible = false
           this.reloadList()
         }
       })
     },
-    closeInfoDialog () {
-      this.dict = this.dictInfo
-    },
-    closeDictDialog (formName) {
-      this.dict.id = undefined
-      this.$refs[formName].resetFields()
-    },
+    /**
+     * 添加修改弹出框重置
+     *
+     * @param formName
+     */
     resetDictForm (formName) {
       this.dictDialogVisible = false
       this.closeDictDialog()
       this.$refs[formName].resetFields()
+    },
+    /**
+     * 跳转字典详情页
+     *
+     * @param row
+     */
+    showDictDetail (row) {
+      this.$router.push({
+        name: 'dictItem',
+        query: {
+          id: row.id,
+          dictId: row.dictId
+        }
+      })
+    },
+    /**
+     * 锁定
+     *
+     * @param index
+     * @param row
+     */
+    open (index, row) {
+      open({
+        id: row.id,
+        isOpen: row.isOpen
+      }).then((response) => {
+        this.$message.success(response.message)
+      })
     }
   }
 }

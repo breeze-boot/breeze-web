@@ -2,6 +2,8 @@ import Vue from 'vue'
 
 /**
  * 权限指令
+ *
+ * @type {DirectiveOptions}
  */
 const has = Vue.directive('has', {
   inserted: function (el, binding, vNode) {
@@ -14,6 +16,9 @@ const has = Vue.directive('has', {
 
 /**
  * 权限检查方法
+ *
+ * @param array
+ * @returns {boolean}
  */
 const isHasPer = (array) => {
   // 获取用户按钮权限

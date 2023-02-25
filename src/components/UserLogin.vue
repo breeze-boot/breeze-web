@@ -35,8 +35,8 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button style="width: 100%" type="primary" @click="onSubmit"
-        >{{ loginBtn }}
+        <el-button style="width: 100%" type="primary" @click="login">
+          {{ loginBtn }}
         </el-button>
       </el-form-item>
     </el-form>
@@ -55,7 +55,6 @@
 import Verify from '@/components/verifition/Verify'
 import { selectTenant } from '@/api/sys/tenant'
 import { mapActions, mapMutations } from 'vuex'
-import { login } from '@/api/sys/login'
 
 export default {
   name: 'userLogin',
@@ -104,20 +103,18 @@ export default {
     ...mapActions('menu', ['loadRoute']),
     ...mapMutations('userInfo', ['setUserInfo']),
     success () {
-      login(this.userLogin).then((rep) => {
-        if (rep.code === 1) {
-          localStorage.setItem('access_token', rep.data.access_token)
-          localStorage.setItem('authorities', rep.data.user_info.authorities)
-          this.setUserInfo(rep.data.user_info)
-          // 获取路由
-          this.loadRoute()
-        }
+      this.$store.dispatch('userInfo/login', this.userLogin).then(() => {
+        this.$router.push({ path: 'welcome' || '/' }).catch((e) => {
+          console.error(e)
+        })
+      }).catch((e) => {
+        console.error(e)
       })
     },
     handleTenant () {
       localStorage.setItem('B_TENANT_ID', this.userLogin.tenantId)
     },
-    onSubmit () {
+    login () {
       this.$refs.userLogin.validate((valid) => {
         if (valid) {
           this.$refs.verify.show()

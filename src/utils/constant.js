@@ -25,9 +25,7 @@ export const confirmAlert = (func) => {
   }).then(() => {
     func()
   }).catch((e) => {
-    Message.info({
-      message: '取消删除'
-    })
+    Message.warning({ message: '取消删除' })
   })
 }
 

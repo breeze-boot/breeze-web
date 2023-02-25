@@ -6,6 +6,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
 /**
  * 列表
  *
+ * @param data
  * @returns {AxiosPromise}
  */
 export function list (data) {
@@ -22,6 +23,7 @@ export function list (data) {
 /**
  * 删除
  *
+ * @param ids
  * @returns {AxiosPromise}
  */
 export function del (ids) {
@@ -35,6 +37,7 @@ export function del (ids) {
 /**
  * 新增
  *
+ * @param data
  * @returns {AxiosPromise}
  */
 export function save (data) {
@@ -48,6 +51,7 @@ export function save (data) {
 /**
  * 修改
  *
+ * @param data
  * @returns {AxiosPromise}
  */
 export function modify (data) {
@@ -59,44 +63,8 @@ export function modify (data) {
 }
 
 /**
- * 详情
- *
- * @returns {AxiosPromise}
- */
-export function info (id) {
-  return request({
-    url: servicePath.system + '/sys/user/info/' + id,
-    method: 'get'
-  })
-}
-
-/**
- * 修改
- *
- * @returns {AxiosPromise}
- */
-export function resetPass (data) {
-  return request({
-    url: servicePath.system + '/sys/user/resetPass',
-    method: 'put',
-    data: data
-  })
-}
-
-/**
- * 开关
- * @returns {AxiosPromise}
- */
-export function open (data) {
-  return request({
-    url: servicePath.system + '/sys/user/open',
-    method: 'put',
-    data: data
-  })
-}
-
-/**
  * 导出
+ *
  * @returns {AxiosPromise}
  */
 export function exportInfo () {
@@ -108,7 +76,41 @@ export function exportInfo () {
 }
 
 /**
+ * 重置密码
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function resetPass (data) {
+  return request({
+    url: servicePath.system + '/sys/user/resetPass',
+    method: 'put',
+    data: data
+  })
+}
+
+/**
+ * 锁定
+ *
+ * @param username
+ * @param isLock
+ * @returns {AxiosPromise}
+ */
+export function open (username, isLock) {
+  return request({
+    url: servicePath.system + '/sys/user/open',
+    method: 'put',
+    data: {
+      username: username,
+      isLock: isLock
+    }
+  })
+}
+
+/**
  * 用户分配角色
+ *
+ * @param data
  * @returns {AxiosPromise}
  */
 export function userAddRole (data) {
@@ -146,5 +148,23 @@ export function selectPost () {
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)
     }]
+  })
+}
+
+/**
+ * 校验用户名是否重复
+ *
+ *  @param username
+ *  @param userId
+ * @returns {AxiosPromise}
+ */
+export function checkUsername (username, userId) {
+  return request({
+    url: servicePath.system + '/sys/user/checkUsername',
+    method: 'get',
+    params: {
+      userId: userId || '',
+      username: username
+    }
   })
 }

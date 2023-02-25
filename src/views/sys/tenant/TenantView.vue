@@ -128,42 +128,50 @@
 </template>
 
 <script>
-import { del, list, modify, save } from '@/api/sys/tenant'
+import { checkTenantCode, del, list, modify, save } from '@/api/sys/tenant'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
-import { Message } from 'element-ui'
 
 export default {
   name: 'TenantView',
   data () {
     return {
+      // 当前操作类型
+      dialogType: DIALOG_TYPE.ADD,
+      // 弹出框标题
+      title: '',
+      // 单元格选中数据
       multipleSelectionTenantIds: [],
+      // 租户表格数据
       tenantTableData: [],
+      // 租户查询条件数据
       searchTenantForm: {
         tenantName: '',
         tenantCode: '',
         current: 1,
         size: 10
       },
+      // 分页总数
       total: 0,
-      title: '',
+      // 租户添加修改弹出框
       tenantDialogVisible: false,
       infoDialogVisible: false,
-      // 默认是创建
-      dialogType: DIALOG_TYPE.ADD,
       formLabelWidth: '80px',
+      // 租户添加修改数据
       tenant: {
-        id: null,
+        id: undefined,
         tenantName: '',
         tenantCode: '',
         description: ''
       },
+      // 租户详情数据
       tenantInfo: {
-        id: null,
+        id: undefined,
         tenantName: '',
         tenantCode: '',
         description: ''
       },
+      // 租户添加修改表单规则
       tenantRules: {
         tenantName: [
           {
@@ -177,42 +185,83 @@ export default {
             required: true,
             message: '请输入租户编码',
             trigger: 'blur'
+          }, {
+            validator: (rule, value, callback) => {
+              checkTenantCode(value, this.tenant.id).then((response) => {
+                if (response.data) {
+                  callback()
+                  return
+                }
+                callback(new Error('编码重复'))
+              })
+            },
+            trigger: 'blur'
           }
         ]
       }
     }
   },
   mounted () {
+    // 初始化加载表格数据
     this.reloadList()
   },
   methods: {
+    /**
+     * 初始化加载表格数据
+     */
     reloadList () {
-      list(this.buildParam()).then((rep) => {
-        if (rep.code === 1) {
-          this.tenantTableData = rep.data.records
-          this.searchTenantForm.size = rep.data.size
-          this.searchTenantForm.current = rep.data.current
-          this.total = rep.data.total
+      list(this.buildParam()).then((response) => {
+        if (response.code === 1) {
+          this.tenantTableData = response.data.records
+          this.searchTenantForm.size = response.data.size
+          this.searchTenantForm.current = response.data.current
+          this.total = response.data.total
         }
       })
     },
+    /**
+     * 构造查询条件
+     *
+     * @returns {{current: number, tenantName: string, size: number, tenantCode: string}}
+     */
     buildParam () {
       return this.searchTenantForm
     },
+    /**
+     * 分页大小切换
+     *
+     * @param size
+     */
     handleSizeChange (size) {
       this.searchTenantForm.size = size
       this.reloadList()
     },
+    /**
+     * 当前页切换
+     *
+     * @param current
+     */
     handleCurrentChange (current) {
       this.searchTenantForm.current = current
       this.reloadList()
     },
+    /**
+     * 查询按钮
+     */
     search () {
       this.reloadList()
     },
+    /**
+     * 查询重置按钮
+     */
     searchReset () {
       this.$refs.searchForm.resetFields()
     },
+    /**
+     * 租户表格复选框事件
+     *
+     * @param val
+     */
     tenantHandleSelectionChange (val) {
       this.multipleSelectionTenantIds = val
     },
@@ -223,8 +272,8 @@ export default {
       confirmAlert(() => {
         const ids = []
         this.multipleSelectionTenantIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
-        del(ids).then(rep => {
-          if (rep.code === 1) {
+        del(ids).then(response => {
+          if (response.code === 1) {
             this.$message.success('删除成功')
             this.reloadList()
           }
@@ -240,8 +289,8 @@ export default {
      */
     removeItem (index, rows, row) {
       confirmAlert(() => {
-        del([JSONBigInt.parse(row.id)]).then(rep => {
-          if (rep.code === 1) {
+        del([JSONBigInt.parse(row.id)]).then(response => {
+          if (response.code === 1) {
             rows.splice(index, 1)
             this.reloadList()
             this.$message.success('删除成功')
@@ -249,11 +298,18 @@ export default {
         })
       })
     },
+    /**
+     * 创建
+     */
     create () {
       this.title = '创建租户'
       this.dialogType = DIALOG_TYPE.ADD
       this.tenantDialogVisible = true
     },
+    /**
+     * 修改
+     * @param row
+     */
     edit (row) {
       this.title = '修改租户'
       this.dialogType = DIALOG_TYPE.EDIT
@@ -262,6 +318,11 @@ export default {
         Object.assign(this.tenant, row)
       })
     },
+    /**
+     * 详情
+     *
+     * @param row
+     */
     info (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
@@ -270,15 +331,24 @@ export default {
         Object.assign(this.tenant, row)
       })
     },
+    /**
+     * 关闭租户添加修改弹出框事件
+     *
+     * @param formName
+     */
     closeTenantDialog (formName) {
       this.tenant.id = undefined
       this.$refs[formName].resetFields()
     },
+    /**
+     * 关闭详情弹出框事件
+     */
     closeInfoDialog () {
       this.tenant = this.tenantInfo
     },
     /**
-     * 提交
+     * 添加修改弹出框提交
+     *
      * @param formName
      */
     submitTenantForm (formName) {
@@ -291,28 +361,39 @@ export default {
         }
       })
     },
+    /**
+     * 保存请求
+     */
+    save () {
+      this.tenant.id = undefined
+      save(this.tenant).then((response) => {
+        if (response.code === 1) {
+          this.$message.success('添加成功')
+          this.tenantDialogVisible = false
+          this.reloadList()
+        }
+      })
+    },
+    /**
+     * 修改请求
+     */
+    modify () {
+      modify(this.tenant).then((response) => {
+        if (response.code === 1) {
+          this.$message.success('修改成功')
+          this.tenantDialogVisible = false
+          this.reloadList()
+        }
+      })
+    },
+    /**
+     * 添加修改弹出框重置
+     *
+     * @param formName
+     */
     resetTenantForm (formName) {
       this.tenantDialogVisible = false
       this.$refs[formName].resetFields()
-    },
-    save () {
-      this.tenant.id = undefined
-      save(this.tenant).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: '添加成功' })
-          this.tenantDialogVisible = false
-          this.reloadList()
-        }
-      })
-    },
-    modify () {
-      modify(this.tenant).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: '修改成功' })
-          this.tenantDialogVisible = false
-          this.reloadList()
-        }
-      })
     }
   }
 }

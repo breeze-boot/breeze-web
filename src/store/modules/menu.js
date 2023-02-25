@@ -3,7 +3,6 @@ import Vuex from 'vuex'
 import { filterTree } from '@/utils/constant'
 import { listTreeMenu } from '@/api/sys/menu'
 import { convertMenus } from '@/router/remote-dy-route'
-import router from '@/router/index'
 
 Vue.use(Vuex)
 
@@ -21,58 +20,55 @@ export default {
     isLoadMenu: false
   },
   mutations: {
-    setMenus (state, menus) {
+    setMenus: (state, menus) => {
       state.menus = menus
     },
-    setKeepAliveMenus (state, menu) {
+    setKeepAliveMenus: (state, menu) => {
       // 过滤出哪些路由需要缓存
       if (menu.keepAlive === 1) {
         state.keepAliveMenus =
           menu.component.substr(menu.component.lastIndexOf('/') + 1)
       }
     },
-    setMenuIsCollapse (state, menuIsCollapse) {
+    setMenuIsCollapse: (state, menuIsCollapse) => {
       state.menuIsCollapse.collapseWhitespace = menuIsCollapse.collapseWhitespace
       state.menuIsCollapse.isCollapse = menuIsCollapse.isCollapse
       state.menuIsCollapse.fadeIn = menuIsCollapse.fadeIn
     },
-    isLoadMenu (state, isLoadMenu) {
+    isLoadMenu: (state, isLoadMenu) => {
       state.isLoadMenu = isLoadMenu
     },
-    setCurrentMenu (state, menu) {
+    setCurrentMenu: (state, menu) => {
       if (menu.hidden === 1) {
         return
       }
       state.currentMenu = menu.name
     },
-    clearMenus (state) {
+    clearMenus: (state) => {
       state.menus = []
     }
   },
   actions: {
     /**
-     * 获取菜单完成后跳转首页
+     * 动态获取路由
      *
      * @param context
+     * @returns {Promise<>}
      */
     loadRoute (context) {
-      listTreeMenu({
-        platformCode: 'managementCenter'
-      }).then(rep => {
-        if (rep.code === 0) {
-          return
-        }
-        // 动态绑定路由
+      return new Promise((resolve, reject) => {
         if (context.rootGetters['menu/getMenus'].length === 0 || !context.rootGetters['menu/isLoadMenu']) {
-          convertMenus(rep.data)
-          context.commit('setMenus', rep.data)
+          listTreeMenu({
+            platformCode: 'managementCenter'
+          }).then(response => {
+            // 动态绑定路由
+            convertMenus(response.data)
+            context.commit('setMenus', response.data)
+            resolve()
+          }).catch(error => {
+            reject(error)
+          })
         }
-        let path = router.app._route.query.redirect
-        const name = localStorage.getItem('current_tag_name')
-        if (!path && name) {
-          path = name
-        }
-        router.replace(path === '/' || path === undefined ? 'welcome' : path)
       })
     }
   },

@@ -21,7 +21,9 @@ export function list (data) {
 }
 
 /**
- * 添加
+ * 新增
+ *
+ * @param data
  * @returns {AxiosPromise}
  */
 export function save (data) {
@@ -35,7 +37,7 @@ export function save (data) {
 /**
  * 删除
  *
- * @param data
+ * @param ids
  * @returns {AxiosPromise}
  */
 export function del (id) {
@@ -63,7 +65,7 @@ export function modify (data) {
 /**
  * 部门下拉框
  *
- * @param data
+ * @param id
  * @returns {AxiosPromise}
  */
 export function selectDept (id) {
@@ -74,5 +76,23 @@ export function selectDept (id) {
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)
     }]
+  })
+}
+
+/**
+ * 校验部门编码是否重复
+ *
+ * @param deptCode
+ * @param deptId
+ * @returns {AxiosPromise}
+ */
+export function checkDeptCode (deptCode, deptId) {
+  return request({
+    url: servicePath.system + '/sys/dept/checkDeptCode',
+    method: 'get',
+    params: {
+      deptId: deptId || '',
+      deptCode: deptCode
+    }
   })
 }

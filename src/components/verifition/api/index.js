@@ -5,6 +5,9 @@ import { request } from '@/utils/axios'
 
 /**
  * 获取验证图片  以及token
+ *
+ * @param data
+ * @returns {AxiosPromise}
  */
 export function reqGet (data) {
   return request({
@@ -16,6 +19,9 @@ export function reqGet (data) {
 
 /**
  * 滑动或者点选验证
+ *
+ * @param data
+ * @returns {AxiosPromise}
  */
 export function reqCheck (data) {
   return request({

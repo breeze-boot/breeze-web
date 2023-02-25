@@ -9,7 +9,7 @@ VueRouter.prototype.push = function push (location) {
   return originalPush.call(this, location).catch(err => err)
 }
 
-VueRouter.prototype.replace = function replace (location) {
+VueRouter.prototype.reslace = function reslace (location) {
   return originalPush.call(this, location).catch(err => err)
 }
 
@@ -47,24 +47,31 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  // 去首页登录页放行
   if (to.path === '/' || to.path === '/login') {
     next()
-  } else {
-    const accessToken = localStorage.getItem('access_token')
-    if (accessToken) {
-      if (!store.state.menu.isLoadMenu) {
-        store.commit('menu/isLoadMenu', true)
-        store.dispatch('menu/loadRoute')
-        next({
-          ...to, // next({ ...to })的目的,是保证路由添加完了再进入页面 (可以理解为重进一次)
-          replace: true // 重进一次, 不保留重复历史
-        })
-      } else {
-        next()
-      }
-    } else {
-      next('/?redirect=' + to.path)
+    return
+  }
+  const accessToken = localStorage.getItem('access_token')
+  if (accessToken) {
+    if (store.state.menu.isLoadMenu) {
+      next()
+      return
     }
+    store.commit('menu/isLoadMenu', true)
+    store.dispatch('menu/loadRoute').then(() => {
+      next({
+        ...to,
+        replace: true
+      })
+    }).catch(err => {
+      store.dispatch('userInfo/LogOut').then(() => {
+        this.$message.error(err)
+        next({ path: '/' })
+      })
+    })
+  } else {
+    next('/?redirect=' + to.path)
   }
 })
 

@@ -55,6 +55,9 @@ export default {
   },
   methods: {
     ...mapActions('msg', ['closeMsgCard', 'markReadMsgCard']),
+    /**
+     * 初始化webSocket
+     */
     initWebSocket () {
       const socket = new SockJS(process.env.VUE_APP_SERVICE_URI + '/ws')
       store.state.msg.stompClient = Stomp.over(socket)
@@ -81,6 +84,9 @@ export default {
         }
       )
     },
+    /**
+     * 关闭
+     */
     closeWebsocket () {
       clearInterval(store.state.msg.reConnectTime)
       if (store.state.msg.stompClient !== null) {
@@ -89,18 +95,29 @@ export default {
         })
       }
     },
+    /**
+     * 订阅Topic
+     */
     subscribeTopic () {
       store.state.msg.stompClient.subscribe('/topic/msg', this.notice())
     },
+    /**
+     * 订阅用户
+     */
     subscribe () {
       store.state.msg.stompClient.subscribe('/user/queue/userMsg', this.notice())
     },
+    /**
+     * 消息卡片
+     *
+     * @returns {(function(*): void)|*}
+     */
     notice () {
       // const _this = this
       return (response) => {
         const h = this.$createElement
-        const rep = JSON.parse(response.body)
-        const data = rep.data
+        const responseJSON = JSON.parse(response.body)
+        const data = responseJSON.data
         // 放到vuex
         data.msgLevel = data.msgLevel || 'info'
         console.debug('msg => {}', data)
@@ -146,16 +163,31 @@ export default {
     toShowDetail () {
       // 去详情列表
     },
+    /**
+     * 关闭
+     *
+     * @param data
+     */
     toClose (data) {
       this.notifications[data.msgCode].close()
       this.closeMsgCard(data)
       delete this.notifications[data.msgCode]
     },
+    /**
+     * 已读
+     *
+     * @param data
+     */
     toRead (data) {
       this.notifications[data.msgCode].close()
       this.markReadMsgCard(data)
       delete this.notifications[data.msgCode]
     },
+    /**
+     * 滑轮
+     *
+     * @param e
+     */
     wheel (e) {
       const a = document.getElementById('tag')
       const scrollWidth = 100

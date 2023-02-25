@@ -205,10 +205,11 @@
         <el-form-item :label-width="formLabelWidth" label="用户名" prop="username">
           <el-input v-model="user.username" autocomplete="off" clearable/>
         </el-form-item>
-        <el-form-item v-if="isAdd" :label-width="formLabelWidth" label="密码" prop="password">
+        <el-form-item v-if="dialogType === dialogTypeAdd" :label-width="formLabelWidth" label="密码" prop="password">
           <el-input v-model="user.password" autocomplete="off" clearable show-password type="password"/>
         </el-form-item>
-        <el-form-item v-if="isAdd" :label-width="formLabelWidth" label="确认密码" prop="confirmPassword">
+        <el-form-item v-if="dialogType === dialogTypeAdd" :label-width="formLabelWidth" label="确认密码"
+                      prop="confirmPassword">
           <el-input v-model="user.confirmPassword" autocomplete="off" clearable show-password
                     type="password"/>
         </el-form-item>
@@ -352,7 +353,6 @@
           <template slot="label">
             用户角色
           </template>
-          {{ user.roleNames.length > 0 ? user.roleNames : '' }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
@@ -376,9 +376,19 @@
 </template>
 
 <script>
-import { del, exportInfo, list, modify, open, resetPass, save, selectPost, selectRole } from '@/api/sys/user'
+import {
+  checkUsername,
+  del,
+  exportInfo,
+  list,
+  modify,
+  open,
+  resetPass,
+  save,
+  selectPost,
+  selectRole
+} from '@/api/sys/user'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
-import { Message } from 'element-ui'
 import JSONBigInt from 'json-bigint'
 import { selectDept } from '@/api/sys/dept'
 import { mapGetters } from 'vuex'
@@ -390,9 +400,17 @@ export default {
   components: {},
   data () {
     return {
+      // 添加操作类型常量
+      dialogTypeAdd: DIALOG_TYPE.ADD,
+      // 当前操作类型
+      dialogType: DIALOG_TYPE.ADD,
+      // 弹出框标题
       title: '',
+      // 单元格选中数据
       multipleSelectionUserId: [],
+      // 用户表格数据
       userTableData: [],
+      // 用户查询条件数据
       searchUserForm: {
         username: '',
         userCode: '',
@@ -400,101 +418,87 @@ export default {
         current: 1,
         size: 10
       },
+      // 分页总数
       total: 0,
-      // 弹出框
+      // 重置密码弹出框
       restPasswordDialogVisible: false,
+      // 用户添加修改弹出框
       userDialogVisible: false,
+      // 详情弹出框
       infoDialogVisible: false,
+      // 表单标题宽度
+      formLabelWidth: '80px',
+      // 用户添加修改数据
+      user: {
+        id: undefined,
+        // 头像的图片路径
+        avatar: '',
+        amountName: '',
+        password: '',
+        phone: '',
+        confirmPassword: '',
+        userCode: '',
+        username: '',
+        deptId: '',
+        postId: '',
+        roleIds: [],
+        roleNames: [],
+        sysRoles: [],
+        idCard: '',
+        email: '',
+        sex: 1,
+        isLock: 0
+      },
+      // 用户详情数据
+      userInfo: {
+        id: undefined,
+        // 头像的图片路径
+        avatar: '',
+        amountName: '',
+        password: '',
+        phone: '',
+        confirmPassword: '',
+        userCode: '',
+        username: '',
+        deptId: '',
+        postId: '',
+        roleIds: [],
+        roleNames: [],
+        sysRoles: [],
+        idCard: '',
+        email: '',
+        sex: 1,
+        isLock: 0
+      },
+      // 密码重置数据
       userPassword: {
         id: null,
         password: '',
         confirmPassword: ''
       },
-      formLabelWidth: '80px',
-      resetPasswordRules: {
-        password: [
-          {
-            required: true,
-            validator: (rule, value, callback) => {
-              if (value === '') {
-                callback(new Error('请输入密码'))
-              } else {
-                if (this.userPassword.confirmPassword !== '') {
-                  this.$refs.restPasswordRuleForm.validateField('confirmPassword')
-                }
-                callback()
-              }
-            },
-            trigger: 'blur'
-          }
-        ],
-        confirmPassword: [
-          {
-            required: true,
-            validator: (rule, value, callback) => {
-              if (value === '') {
-                callback(new Error('请再次输入密码'))
-              } else if (value !== this.userPassword.password) {
-                callback(new Error('两次输入密码不一致!'))
-              } else {
-                callback()
-              }
-            },
-            trigger: 'blur'
-          }
-        ]
-      },
-      isAdd: true,
-      user: {
-        id: '',
-        // 头像的图片路径
-        avatar: '',
-        amountName: '',
-        password: '',
-        phone: '',
-        confirmPassword: '',
-        userCode: '',
-        username: '',
-        deptId: '',
-        postId: '',
-        roleIds: [],
-        roleNames: [],
-        sysRoles: [],
-        idCard: '',
-        email: '',
-        sex: 1,
-        isLock: 0
-      },
-      userInfo: {
-        id: '',
-        // 头像的图片路径
-        avatar: '',
-        amountName: '',
-        password: '',
-        phone: '',
-        confirmPassword: '',
-        userCode: '',
-        username: '',
-        deptId: '',
-        postId: '',
-        roleIds: [],
-        roleNames: [],
-        sysRoles: [],
-        idCard: '',
-        email: '',
-        sex: 1,
-        isLock: 0
-      },
+      // 部门下拉框
       deptOption: [],
+      // 岗位下拉框
       postOption: [],
+      // 角色下拉框
       roleOption: [],
-      // 默认是创建
-      dialogType: DIALOG_TYPE.ADD,
+      // 用户添加修改表单规则
       userRules: {
         username: [
           {
             required: true,
             message: '请输入用户名称',
+            trigger: 'blur'
+          }, {
+            validator: (rule, value, callback) => {
+              checkUsername(value, this.user.id).then((response) => {
+                if (response.data) {
+                  callback()
+                  return
+                }
+                callback(new Error('用户名重复'))
+              })
+            },
             trigger: 'blur'
           }
         ],
@@ -564,122 +568,147 @@ export default {
             trigger: 'blur'
           }
         ]
+      },
+      // 重置密码表单规则
+      resetPasswordRules: {
+        password: [
+          {
+            required: true,
+            validator: (rule, value, callback) => {
+              if (value === '') {
+                callback(new Error('请输入密码'))
+              } else {
+                if (this.userPassword.confirmPassword !== '') {
+                  this.$refs.restPasswordRuleForm.validateField('confirmPassword')
+                }
+                callback()
+              }
+            },
+            trigger: 'blur'
+          }
+        ],
+        confirmPassword: [
+          {
+            required: true,
+            validator: (rule, value, callback) => {
+              if (value === '') {
+                callback(new Error('请再次输入密码'))
+              } else if (value !== this.userPassword.password) {
+                callback(new Error('两次输入密码不一致!'))
+              } else {
+                callback()
+              }
+            },
+            trigger: 'blur'
+          }
+        ]
       }
     }
   },
   mounted () {
+    // 初始字典数据
     this.$toLoadDict(['SEX', 'IS_LOCK']).then((dict) => {
       this.reloadList()
     })
+    // 初始化部门下拉框
     this.selectDept()
+    // 初始化角色下拉框
     this.selectRole()
+    // 初始化岗位下拉框
     this.selectPost()
   },
   methods: {
     ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
-    goRoleView (row) {
-      this.$router.push({
-        name: 'userRole',
-        path: '/userRole',
-        params: row
-      })
-    },
+    /**
+     * 初始化加载表格数据
+     */
     reloadList () {
-      list(this.buildParam()).then((rep) => {
-        if (rep.code === 1) {
-          this.userTableData = rep.data.records
-          this.searchUserForm.size = rep.data.size
-          this.searchUserForm.current = rep.data.current
-          this.total = rep.data.total
-          rep.data.records.forEach(user => {
-            const roleIds = []
-            user.sysRoles.forEach(role => {
-              roleIds.push(role.id)
-            })
-            user.roleIds = roleIds
-          })
-        }
+      list(this.buildParam()).then((response) => {
+        this.userTableData = response.data.records
+        this.searchUserForm.size = response.data.size
+        this.searchUserForm.current = response.data.current
+        this.total = response.data.total
       })
     },
-    uploadImage (param) {
-      debugger
-      const formData = new FormData()
-      formData.append('file', param.file)
-      formData.append('title', '用户头像')
-      formData.append('ossStyle', 0)
-      upload(formData).then(rep => {
-        if (rep.code === 1 && rep.data) {
-          this.$message({
-            message: '图片上传成功',
-            type: 'success'
-          })
-          debugger
-          this.user.avatar = rep.data
-        }
-      }).catch(e => {
-        console.error('图片上传失败', e)
-      })
-    },
+    /**
+     * 初始化部门下拉框数据
+     */
     selectDept () {
-      selectDept().then(res => {
-        if (res.code === 1 && res.data) {
-          this.deptOption = res.data
+      selectDept().then(response => {
+        if (response.code === 1 && response.data) {
+          this.deptOption = response.data
         }
       })
     },
-    selectPost (row) {
-      selectPost().then(rep => {
-        if (rep.code === 1) {
-          this.postOption = rep.data
-          // 修改和查看
-          if (!this.isAdd) {
-            this.user.postId = row.postId
+    /**
+     * 初始化岗位下拉框数据
+     */
+    selectPost (postId) {
+      selectPost().then(response => {
+        if (response.code === 1) {
+          this.postOption = response.data
+          if (this.dialogType === DIALOG_TYPE.ADD) {
+            return
           }
-        }
-      })
-    },
-    selectRole (row) {
-      selectRole().then(rep => {
-        if (rep.code === 1) {
-          this.roleOption = rep.data
           // 修改和查看
-          if (!this.isAdd) {
-            // 角色分配回显
-            this.user.roleIds = row.sysRoles.map(role => role.id)
-            // 展示
-            this.user.roleNames = row.sysRoles.map(role => role.roleName).join(',')
-          }
+          this.user.postId = postId
         }
       })
     },
+    /**
+     * 初始化角色下拉框数据
+     */
+    selectRole () {
+      selectRole().then(response => {
+        if (response.code === 1) {
+          this.roleOption = response.data
+        }
+      })
+    },
+    /**
+     * 构造查询条件
+     *
+     * @returns {{current: number, size: number, phone: string, userCode: string, username: string}}
+     */
     buildParam () {
       this.userTableData = []
       return this.searchUserForm
     },
-    open (index, row) {
-      open({
-        username: row.username,
-        isLock: row.isLock
-      }).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: rep.message })
-        }
-      })
-    },
+    /**
+     * 分页大小切换
+     *
+     * @param size
+     */
     handleSizeChange (size) {
       this.searchUserForm.size = size
       this.reloadList()
     },
+    /**
+     * 当前页切换
+     *
+     * @param current
+     */
     handleCurrentChange (current) {
       this.searchUserForm.current = current
       this.reloadList()
     },
+    /**
+     * 查询按钮
+     */
     search () {
       this.reloadList()
     },
+    /**
+     * 查询重置按钮
+     */
     searchReset () {
       this.$refs.searchForm.resetFields()
     },
+    /**
+     * 平台表格复选框事件
+     *
+     * @param val
+     */
     userHandleSelectionChange (val) {
       this.multipleSelectionUserId = val
     },
@@ -690,8 +719,8 @@ export default {
       confirmAlert(() => {
         const ids = []
         this.multipleSelectionUserId.map((x) => ids.push(JSONBigInt.parse(x.id)))
-        del(ids).then(rep => {
-          if (rep.code === 1) {
+        del(ids).then(response => {
+          if (response.code === 1) {
             this.reloadList()
             this.$message.success('删除成功')
           }
@@ -707,8 +736,8 @@ export default {
      */
     removeItem (index, rows, row) {
       confirmAlert(() => {
-        del([JSONBigInt.parse(row.id)]).then(rep => {
-          if (rep.code === 1) {
+        del([JSONBigInt.parse(row.id)]).then(response => {
+          if (response.code === 1) {
             rows.splice(index, 1)
             this.reloadList()
             this.$message.success('删除成功')
@@ -716,49 +745,198 @@ export default {
         })
       })
     },
+    /**
+     *导出
+     */
     exportInfo () {
-      exportInfo().then(rep => {
-        const blob = new Blob([rep.data],
+      exportInfo().then(response => {
+        const blob = new Blob([response.data],
           {
             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            size: rep.data.size
+            size: response.data.size
           })
-        saveAs(blob, rep.data.originalFileName)
+        saveAs(blob, response.data.originalFileName)
       }).catch(err => {
         console.log(err)
       })
     },
+    /**
+     * 导入
+     */
     importInfo () {
     },
+    /**
+     * 创建
+     */
     create () {
       this.title = '创建用户'
       this.dialogType = DIALOG_TYPE.ADD
-      this.isAdd = true
       this.userDialogVisible = true
     },
+    /**
+     * 修改
+     * @param row
+     */
     edit (row) {
       this.title = '修改用户'
       this.dialogType = DIALOG_TYPE.EDIT
-      this.isAdd = false
       this.$nextTick(() => {
         this.selectDept()
-        this.selectRole(row)
-        this.selectPost(row)
+        this.selectRole()
+        this.selectPost(row.postId)
         Object.assign(this.user, row)
       })
       this.userDialogVisible = true
     },
+    /**
+     * 详情
+     * @param row
+     */
     info (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.$nextTick(() => {
-        this.selectRole(row)
+        this.selectRole()
         this.selectDept()
         Object.assign(this.user, row)
       })
       this.infoDialogVisible = true
     },
-    handleAvatarSuccess (res, file) {
+    /**
+     * 关闭用户添加修改弹出框事件
+     * @param formName
+     */
+    closeUserDialog (formName) {
+      this.user.id = undefined
+      this.$refs[formName].resetFields()
+    },
+    /**
+     * 关闭详情弹出框事件
+     */
+    closeUserInfoDialog () {
+      this.user = this.userInfo
+    },
+    /**
+     * 添加修改弹出框提交
+     * @param formName
+     */
+    submitUserForm: function (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    /**
+     * 保存请求
+     */
+    save () {
+      save(this.user).then((response) => {
+        if (response.code === 1) {
+          this.$message.success({ message: response.message })
+          this.userDialogVisible = false
+          this.reloadList()
+        }
+      })
+    },
+    /**
+     * 修改请求
+     */
+    modify () {
+      modify(this.user).then((response) => {
+        if (response.code === 1) {
+          this.$message.success({ message: response.message })
+          this.userDialogVisible = false
+          this.reloadList()
+        }
+      })
+    },
+    /**
+     * 添加修改弹出框重置
+     * @param formName
+     */
+    resetUserForm (formName) {
+      this.userDialogVisible = false
+      this.$refs[formName].resetFields()
+    },
+    /**
+     * 重置密码按钮事件
+     * @param row
+     */
+    resetPass (row) {
+      this.restPasswordDialogVisible = true
+      this.$nextTick(() => {
+        Object.assign(this.userPassword, row)
+      })
+    },
+    /**
+     * 提交重置密码请求
+     * @param formName
+     */
+    submitRestPasswordForm (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          resetPass(this.userPassword).then(response => {
+            if (response.code === 1) {
+              this.$message.success({ message: '重置成功' })
+              this.restPasswordDialogVisible = false
+            }
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    /**
+     * 重置密码表单重置
+     * @param row
+     */
+    restUserPasswordForm (formName) {
+      this.restPasswordDialogVisible = false
+      this.$refs[formName].resetFields()
+    },
+    /**
+     * 密码弹出框关闭事件
+     * @param row
+     */
+    closeRestPasswordDialog (formName) {
+      this.user.id = undefined
+      this.$refs[formName].resetFields()
+    },
+    open (index, row) {
+      open(row.username, row.isLock).then((response) => {
+        if (response.code === 1) {
+          this.$message.success(response.message)
+        }
+      })
+    },
+    /**
+     * 头像图片上传
+     *
+     * @param param
+     */
+    uploadImage (param) {
+      const formData = new FormData()
+      formData.append('file', param.file)
+      formData.append('title', '用户头像')
+      formData.append('ossStyle', 0)
+      upload(formData).then(response => {
+        if (response.code === 1 && response.data) {
+          this.$message({
+            message: '图片上传成功',
+            type: 'success'
+          })
+          this.user.avatar = response.data
+        }
+      }).catch(e => {
+        console.error('图片上传失败', e)
+      })
+    },
+    handleAvatarSuccess (response, file) {
       this.user.avatar = URL.createObjectURL(file.raw)
     },
     beforeAvatarUpload (file) {
@@ -772,76 +950,15 @@ export default {
       }
       return isJPG && isLt2M
     },
-    submitUserForm: function (formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
-        } else {
-          console.log('error submit!!')
-          return false
+    goRoleView (row) {
+      debugger
+      this.$router.push({
+        name: 'userRole',
+        query: {
+          userId: row.id,
+          username: row.username
         }
       })
-    },
-    save () {
-      save(this.user).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: rep.message })
-          this.userDialogVisible = false
-          this.reloadList()
-        }
-      })
-    },
-    modify () {
-      modify(this.user).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: rep.message })
-          this.userDialogVisible = false
-          this.reloadList()
-        }
-      })
-    },
-    resetUserForm (formName) {
-      this.userDialogVisible = false
-      this.$refs[formName].resetFields()
-    },
-    closeUserDialog (formName) {
-      this.user.id = undefined
-      this.$refs[formName].resetFields()
-      this.isAdd = false
-    },
-    resetPass (row) {
-      this.restPasswordDialogVisible = true
-      this.$nextTick(() => {
-        Object.assign(this.userPassword, row)
-      })
-    },
-    closeRestPasswordDialog (formName) {
-      this.user.id = undefined
-      this.$refs[formName].resetFields()
-    },
-    closeUserInfoDialog () {
-      this.$nextTick(() => {
-        this.user = this.userInfo
-      })
-    },
-    submitRestPasswordForm (formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          resetPass(this.userPassword).then(rep => {
-            if (rep.code === 1) {
-              this.$message.success({ message: '重置成功' })
-              this.restPasswordDialogVisible = false
-            }
-          })
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
-    },
-    restUserPasswordForm (formName) {
-      this.restPasswordDialogVisible = false
-      this.$refs[formName].resetFields()
     }
   }
 }

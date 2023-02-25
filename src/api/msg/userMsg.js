@@ -6,6 +6,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
 /**
  * 列表
  *
+ * @param data
  * @returns {AxiosPromise}
  */
 export function list (data) {
@@ -22,6 +23,7 @@ export function list (data) {
 /**
  * 删除
  *
+ * @param ids
  * @returns {AxiosPromise}
  */
 export function del (ids) {
@@ -35,6 +37,7 @@ export function del (ids) {
 /**
  * 关闭
  *
+ * @param msgCode
  * @returns {AxiosPromise}
  */
 export function close (msgCode) {
@@ -47,6 +50,7 @@ export function close (msgCode) {
 /**
  * 标记已读
  *
+ * @param msgCode
  * @returns {AxiosPromise}
  */
 export function read (msgCode) {
@@ -57,7 +61,7 @@ export function read (msgCode) {
 }
 
 /**
- * 标记已读
+ * 获取消息
  *
  * @returns {AxiosPromise}
  */

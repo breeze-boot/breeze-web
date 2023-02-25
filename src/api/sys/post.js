@@ -6,6 +6,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
 /**
  * 列表
  *
+ * @param data
  * @returns {AxiosPromise}
  */
 export function list (data) {
@@ -22,6 +23,7 @@ export function list (data) {
 /**
  * 删除
  *
+ * @Param ids
  * @returns {AxiosPromise}
  */
 export function del (ids) {
@@ -35,6 +37,7 @@ export function del (ids) {
 /**
  * 新增
  *
+ * @Param data
  * @returns {AxiosPromise}
  */
 export function save (data) {
@@ -48,6 +51,7 @@ export function save (data) {
 /**
  * 修改
  *
+ * @Param data
  * @returns {AxiosPromise}
  */
 export function modify (data) {
@@ -55,5 +59,23 @@ export function modify (data) {
     url: servicePath.system + '/sys/post/modify',
     method: 'put',
     data: data
+  })
+}
+
+/**
+ * 校验岗位编码是否重复
+ *
+ * @param postCode
+ * @param postId
+ * @returns {AxiosPromise}
+ */
+export function checkPostCode (postCode, postId) {
+  return request({
+    url: servicePath.system + '/sys/post/checkPostCode',
+    method: 'get',
+    params: {
+      postId: postId || '',
+      postCode: postCode
+    }
   })
 }

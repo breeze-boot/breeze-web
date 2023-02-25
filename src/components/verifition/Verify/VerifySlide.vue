@@ -341,8 +341,8 @@ export default {
             }),
           token: this.backToken
         }
-        reqCheck(data).then((res) => {
-          if (res.repCode === '0000') {
+        reqCheck(data).then((response) => {
+          if (response.repCode === '0000') {
             this.moveBlockBackgroundColor = '#5cb85c'
             this.leftBarBorderColor = '#5cb85c'
             this.iconColor = '#fff'
@@ -432,18 +432,18 @@ export default {
         clientUid: localStorage.getItem('slider'),
         ts: Date.now() // 现在的时间戳
       }
-      reqGet(data).then((res) => {
-        if (res.repCode === '0000') {
-          this.backImgBase = res.repData.originalImageBase64
-          this.blockBackImgBase = res.repData.jigsawImageBase64
-          this.backToken = res.repData.token
-          this.secretKey = res.repData.secretKey
+      reqGet(data).then((response) => {
+        if (response.repCode === '0000') {
+          this.backImgBase = response.repData.originalImageBase64
+          this.blockBackImgBase = response.repData.jigsawImageBase64
+          this.backToken = response.repData.token
+          this.secretKey = response.repData.secretKey
         } else {
-          this.tipWords = res.repMsg
+          this.tipWords = response.repMsg
         }
 
         // 判断接口请求次数是否失效
-        if (res.repCode === '6201') {
+        if (response.repCode === '6201') {
           this.backImgBase = null
           this.blockBackImgBase = null
         }

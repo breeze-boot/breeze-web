@@ -60,7 +60,6 @@
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import 'animate.css'
-import { logout } from '@/api/sys/login'
 
 export default {
   name: 'Header',
@@ -77,33 +76,46 @@ export default {
     ...mapGetters('msg', ['getMsg'])
   },
   methods: {
-    ...mapGetters('userInfo', ['getUserInfo']),
     ...mapActions('msg', ['closeMsgCard', 'markReadMsgCard', 'reloadMsg']),
     ...mapActions('userInfo', ['clearUserInfo']),
     ...mapMutations('menu', ['setMenuIsCollapse', 'clearMenus']),
+    /**
+     *
+     * @param command
+     */
     handleCommand (command) {
       if (command === 'logout') {
-        const username = this.getUserInfo().username
-        logout({ username: username }).then(rep => {
-          if (rep.code === 1) {
-            localStorage.clear()
-            this.$router.push('/')
-            this.clearMenus()
-            this.clearUserInfo()
-            this.$message({
-              showClose: true,
-              message: '退出成功',
-              type: 'success'
-            })
-          }
+        this.$confirm('确定注销并退出系统', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$store.dispatch('userInfo/logOut').then(() => {
+            if (process.env.NODE_ENV === 'production') {
+              location.href = 'TODO'
+              return
+            }
+            location.href = '/'
+          })
+        }).catch(() => {
         })
         return
       }
       this.settingDrawer = true
     },
+    /**
+     * 关闭消息
+     *
+     * @param msg
+     */
     closeMsg (msg) {
       this.closeMsgCard(msg)
     },
+    /**
+     * 标记已读
+     *
+     * @param msg
+     */
     markReadMsg (msg) {
       this.closeMsgCard(msg)
     },

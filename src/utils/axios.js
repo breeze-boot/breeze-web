@@ -64,6 +64,12 @@ request.interceptors.request.use((config) => {
 })
 
 /**
+ *   code: 0 , 1 , 2 , 500
+ *   0: 业务错误失败
+ *   1: **请求成功**
+ *   2: 业务逻辑验证警告 请求不合法
+ *   500: 系统错误，服务异常
+ *
  * 响应拦截器
  */
 request.interceptors.response.use((response) => {
@@ -74,12 +80,13 @@ request.interceptors.response.use((response) => {
       return response
     }
     if (response.data.code === 2 && response.data.message) {
-      // 警告
+      // 业务逻辑验证警告
       showWaringMsg(response, response.data.message)
     } else if (response.data.code === 0 && response.data.message) {
-      // 错误
+      // 业务错误失败
       showErrorMsg(response, '系统异常')
     } else if (response.data.code === 500) {
+      // 系统错误
       console.error(response)
       showErrorMsg(response, '服务异常')
       return response.data

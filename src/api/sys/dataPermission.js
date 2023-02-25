@@ -6,6 +6,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
 /**
  * 列表
  *
+ * @param data
  * @returns {AxiosPromise}
  */
 export function list (data) {
@@ -20,38 +21,9 @@ export function list (data) {
 }
 
 /**
- * 角色权限获取
- *
- * @param data
- * @returns {AxiosPromise}
- */
-export function listPermission (dataPermissionId) {
-  return request({
-    url: servicePath.system + '/sys/dataPermission/listPermission',
-    method: 'get',
-    params: { dataPermissionId: dataPermissionId },
-    transformResponse: [(data) => {
-      return JSONBigInt2Str.parse(data)
-    }]
-  })
-}
-
-/**
- * 角色权限获取
- *
- * @param data
- * @returns {AxiosPromise}
- */
-export function editPermission (data) {
-  return request({
-    url: servicePath.system + '/sys/dataPermission/editPermission',
-    method: 'put',
-    data: data
-  })
-}
-
-/**
  * 添加
+ *
+ * @param data
  * @returns {AxiosPromise}
  */
 export function save (data) {
@@ -65,7 +37,7 @@ export function save (data) {
 /**
  * 删除
  *
- * @param data
+ * @param ids
  * @returns {AxiosPromise}
  */
 export function del (ids) {
@@ -91,7 +63,7 @@ export function modify (data) {
 }
 
 /**
- *查询表名
+ * 查询表名
  *
  * @param data
  * @returns {AxiosPromise}
@@ -106,7 +78,7 @@ export function selectTable () {
 /**
  * 查询列名
  *
- * @param data
+ * @param tableName
  * @returns {AxiosPromise}
  */
 export function selectColumn (tableName) {
@@ -120,7 +92,6 @@ export function selectColumn (tableName) {
 /**
  * 数据权限下拉框
  *
- * @param data
  * @returns {AxiosPromise}
  */
 export function selectDataPermission () {
@@ -134,7 +105,7 @@ export function selectDataPermission () {
 }
 
 /**
- * 数据权限
+ * 修改数据权限
  *
  * @param data
  * @returns {AxiosPromise}
@@ -143,6 +114,37 @@ export function editRoleDataPermission (data) {
   return request({
     url: servicePath.system + '/sys/dataPermission/editRoleDataPermission',
     method: 'post',
+    data: data
+  })
+}
+
+/**
+ * 获取数据权限
+ *
+ * @param dataPermissionId
+ * @returns {AxiosPromise}
+ */
+export function listPermission (dataPermissionId) {
+  return request({
+    url: servicePath.system + '/sys/dataPermission/listPermission',
+    method: 'get',
+    params: { dataPermissionId: dataPermissionId },
+    transformResponse: [(data) => {
+      return JSONBigInt2Str.parse(data)
+    }]
+  })
+}
+
+/**
+ * 修改数据权限
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function editPermission (data) {
+  return request({
+    url: servicePath.system + '/sys/dataPermission/editPermission',
+    method: 'put',
     data: data
   })
 }

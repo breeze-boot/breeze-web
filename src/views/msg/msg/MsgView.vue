@@ -317,7 +317,6 @@
 import { del, list, listUserByDeptId, modify, save, selectUser } from '@/api/msg/msg'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
-import { Message } from 'element-ui'
 import { selectDept } from '@/api/sys/dept'
 import { mapGetters } from 'vuex'
 
@@ -325,22 +324,36 @@ export default {
   name: 'MsgView',
   data () {
     return {
+      // 当前操作类型
+      dialogType: DIALOG_TYPE.ADD,
+      // 弹出框标题
+      title: '',
+      // 单元格选中数据
       multipleSelectionMsgIds: [],
+      // 消息表格数据
       msgTableData: [],
+      // 部门下拉框
+      deptOption: [],
+      // 消息查询条件数据
       searchMsgForm: {
         msgTitle: '',
         msgCode: '',
         current: 1,
         size: 10
       },
+      // 分页总数
       total: 0,
-      title: '',
+      // 消息添加修改弹出框
       msgDialogVisible: false,
+      // 发送消息到用户弹出框
       sendUserMsgDialogVisible: false,
+      // 发送消息到部门弹出框
       sendDeptMsgDialogVisible: false,
+      // 消息详情弹出框
       infoDialogVisible: false,
-      // 默认是创建
-      dialogType: DIALOG_TYPE.ADD,
+      // 切换部门组件
+      dept: false,
+      // 表单标题宽度
       formLabelWidth: '80px',
       msg: {
         id: null,
@@ -350,6 +363,7 @@ export default {
         msgLevel: 'info',
         content: ''
       },
+      // 消息详情数据
       msgInfo: {
         id: null,
         msgTitle: '',
@@ -358,6 +372,7 @@ export default {
         msgLevel: 'info',
         content: ''
       },
+      // 消息添加修改表单规则
       msgRules: {
         msgTitle: [
           {
@@ -381,12 +396,12 @@ export default {
           }
         ]
       },
-      deptOption: [],
+      // 发送消息表单规则
       sendMsgDataRules: {
         multipleDeptId: [],
         deptId: []
       },
-      dept: false,
+      // 发送消息数据
       sendMsgData: {
         multipleDeptId: [],
         deptId: [],
@@ -409,6 +424,274 @@ export default {
   },
   methods: {
     ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
+    /**
+     * 初始化加载表格数据
+     */
+    reloadList () {
+      list(this.buildParam()).then((rep) => {
+        this.msgTableData = rep.data.records
+        this.searchMsgForm.size = rep.data.size
+        this.searchMsgForm.current = rep.data.current
+        this.total = rep.data.total
+      })
+    },
+    /**
+     * 初始化加载表格数据
+     */
+    reloadUserData () {
+      selectUser().then((rep) => {
+        rep.data.forEach((user, index) => {
+          this.sendMsgData.transferUserData.push({
+            label: user.username,
+            key: user.id,
+            index: index
+          })
+        })
+      })
+    },
+    /**
+     * 构造查询条件
+     *
+     * @returns {{current: number, size: number, msgTitle: string, msgCode: string}}
+     */
+    buildParam () {
+      return this.searchMsgForm
+    },
+    /**
+     * 分页大小切换
+     *
+     * @param size
+     */
+    handleSizeChange (size) {
+      this.searchMsgForm.size = size
+      this.reloadList()
+    },
+    /**
+     * 分页大小切换
+     *
+     * @param size
+     */
+    handleCurrentChange (current) {
+      this.searchMsgForm.current = current
+      this.reloadList()
+    },
+    /**
+     * 查询按钮
+     */
+    search () {
+      this.reloadList()
+    },
+    /**
+     * 查询重置按钮
+     */
+    searchReset () {
+      this.$refs.searchForm.resetFields()
+    },
+    /**
+     * 消息表格复选框事件
+     *
+     * @param row
+     */
+    msgHandleSelectionChange (row) {
+      this.multipleSelectionMsgIds = row
+    },
+    /**
+     * 批量删除
+     */
+    remove () {
+      confirmAlert(() => {
+        const ids = []
+        this.multipleSelectionMsgIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        del(ids).then(rep => {
+          if (rep.code === 1) {
+            this.$message.success('删除成功')
+            this.reloadList()
+          }
+        })
+      })
+    },
+    /**
+     * 删除行
+     *
+     * @param index
+     * @param rows
+     * @param row
+     */
+    removeItem (index, rows, row) {
+      confirmAlert(() => {
+        del([JSONBigInt.parse(row.id)]).then(rep => {
+          if (rep.code === 1) {
+            rows.splice(index, 1)
+            this.reloadList()
+            this.$message.success('删除成功')
+          }
+        })
+      })
+    },
+    /**
+     * 创建
+     */
+    create () {
+      this.title = '创建消息'
+      this.dialogType = DIALOG_TYPE.ADD
+      this.msgDialogVisible = true
+    },
+    /**
+     * 修改
+     * @param row
+     */
+    edit (row) {
+      this.title = '修改消息'
+      this.dialogType = DIALOG_TYPE.EDIT
+      this.msgDialogVisible = true
+      this.$nextTick(() => {
+        Object.assign(this.msg, row)
+      })
+    },
+    /**
+     * 详情
+     *
+     * @param row
+     */
+    info (row) {
+      this.title = '查看信息'
+      this.dialogType = DIALOG_TYPE.SHOW
+      this.infoDialogVisible = true
+      this.$nextTick(() => {
+        Object.assign(this.msg, row)
+      })
+    },
+    /**
+     * 关闭消息添加修改弹出框事件
+     *
+     * @param formName
+     */
+    closeMsgDialog (formName) {
+      this.msg.id = undefined
+      this.$refs[formName].resetFields()
+    },
+    /**
+     * 关闭详情弹出框事件
+     */
+    closeInfoDialog () {
+      this.msg = this.msgInfo
+    },
+    /**
+     * 提交
+     * @param formName
+     */
+    submitMsgForm (formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    /**
+     * 保存请求
+     */
+    save () {
+      this.msg.id = undefined
+      save(this.msg).then((rep) => {
+        if (rep.code === 1) {
+          this.$message.success('添加成功')
+          this.msgDialogVisible = false
+          this.reloadList()
+        }
+      })
+    },
+    /**
+     * 修改请求
+     */
+    modify () {
+      modify(this.msg).then((rep) => {
+        if (rep.code === 1) {
+          this.$message.success('修改成功')
+          this.msgDialogVisible = false
+          this.reloadList()
+        }
+      })
+    },
+    /**
+     * 添加修改弹出框重置
+     *
+     * @param formName
+     */
+    resetMsgForm (formName) {
+      this.msgDialogVisible = false
+      this.$refs[formName].resetFields()
+    },
+    /**
+     * 删除项
+     *
+     * @param index
+     * @param rows
+     * @param row
+     */
+    removeUserItem (index, rows, row) {
+      confirmAlert(() => {
+        rows.splice(index, 1)
+        this.sendMsgData.users.splice(index, 1)
+        this.$message.success('删除成功')
+      })
+    },
+    /**
+     * 发送给全部请求
+     * @param row
+     */
+    sendAll (row) {
+      this.$sendMsg('/msg/sendBroadcastMsg', { msgId: row.id })
+    },
+    /**
+     * 发送给用户请求
+     */
+    sendMsgToUser () {
+      if (this.sendMsgData.users.length === 0) {
+        this.$message.warning('还未选择发送信息的用户')
+        return
+      }
+      this.$sendMsg('/msg/sendMsgToUser',
+        {
+          msgId: this.sendMsgData.msgId,
+          userIds: this.sendMsgData.users
+        }
+      )
+    },
+    /**
+     * 发送给全部
+     *
+     * @param row
+     */
+    toAll (row) {
+      this.sendUserMsgDialogVisible = true
+      this.reloadUserData()
+      this.title = '接收人'
+      this.sendMsgData.msgId = row.id
+    },
+    /**
+     * 发送给部门用户
+     *
+     * @param row
+     */
+    toDeptUser (row) {
+      this.sendDeptMsgDialogVisible = true
+      this.selectDept()
+      this.title = '接收部门'
+      this.sendMsgData.msgId = row.id
+    },
+    /**
+     * 部门下拉框
+     */
+    selectDept () {
+      selectDept().then(response => {
+        if (response.code === 1 && response.data) {
+          this.deptOption = response.data
+        }
+      })
+    },
     handleChangeSendData (val) {
       this.sendMsgData.userTableData = []
       if (val === '2') {
@@ -451,6 +734,9 @@ export default {
         }
       })
     },
+    /**
+     * 部门下拉框事件
+     */
     handleChangeDept () {
       this.sendMsgData.userTableData = []
       this.sendMsgData.users = []
@@ -477,151 +763,11 @@ export default {
         }
       })
     },
-    reloadUserData () {
-      selectUser().then((rep) => {
-        if (rep.code === 1) {
-          rep.data.forEach((user, index) => {
-            this.sendMsgData.transferUserData.push({
-              label: user.username,
-              key: user.id,
-              index: index
-            })
-          })
-        }
-      })
-    },
-    selectDept () {
-      selectDept().then(res => {
-        if (res.code === 1 && res.data) {
-          this.deptOption = res.data
-        }
-      })
-    },
-    reloadList () {
-      list(this.buildParam()).then((rep) => {
-        if (rep.code === 1) {
-          this.msgTableData = rep.data.records
-          this.searchMsgForm.size = rep.data.size
-          this.searchMsgForm.current = rep.data.current
-          this.total = rep.data.total
-        }
-      })
-    },
-    buildParam () {
-      return this.searchMsgForm
-    },
-    handleSizeChange (size) {
-      this.searchMsgForm.size = size
-      this.reloadList()
-    },
-    handleCurrentChange (current) {
-      this.searchMsgForm.current = current
-      this.reloadList()
-    },
-    search () {
-      this.reloadList()
-    },
-    searchReset () {
-      this.$refs.searchForm.resetFields()
-    },
-    msgHandleSelectionChange (row) {
-      this.multipleSelectionMsgIds = row
-    },
     /**
-     * 批量删除
-     */
-    remove () {
-      confirmAlert(() => {
-        const ids = []
-        this.multipleSelectionMsgIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
-        del(ids).then(rep => {
-          if (rep.code === 1) {
-            this.$message.success('删除成功')
-            this.reloadList()
-          }
-        })
-      })
-    },
-    /**
-     * 删除行
+     * 关闭发送消息弹出框事件
      *
-     * @param index
-     * @param rows
-     * @param row
+     * @param formName
      */
-    removeItem (index, rows, row) {
-      confirmAlert(() => {
-        del([JSONBigInt.parse(row.id)]).then(rep => {
-          if (rep.code === 1) {
-            rows.splice(index, 1)
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
-        })
-      })
-    },
-    removeUserItem (index, rows, row) {
-      confirmAlert(() => {
-        rows.splice(index, 1)
-        this.sendMsgData.users.splice(index, 1)
-        this.$message.success('删除成功')
-      })
-    },
-    sendAll (row) {
-      this.$sendMsg('/msg/sendBroadcastMsg', { msgId: row.id })
-    },
-    sendMsgToUser () {
-      if (this.sendMsgData.users.length === 0) {
-        Message.warning({ message: '还未选择发送信息的用户' })
-        return
-      }
-      this.$sendMsg('/msg/sendMsgToUser',
-        {
-          msgId: this.sendMsgData.msgId,
-          userIds: this.sendMsgData.users
-        }
-      )
-    },
-    toAll (row) {
-      this.sendUserMsgDialogVisible = true
-      this.reloadUserData()
-      this.title = '接收人'
-      this.sendMsgData.msgId = row.id
-    },
-    toDeptUser (row) {
-      this.sendDeptMsgDialogVisible = true
-      this.selectDept()
-      this.title = '接收部门'
-      this.sendMsgData.msgId = row.id
-    },
-    create () {
-      this.title = '创建消息'
-      this.dialogType = DIALOG_TYPE.ADD
-      this.msgDialogVisible = true
-    },
-    edit (row) {
-      this.title = '修改消息'
-      this.dialogType = DIALOG_TYPE.EDIT
-      this.msgDialogVisible = true
-      this.$nextTick(() => {
-        Object.assign(this.msg, row)
-      })
-    },
-    info (row) {
-      this.title = '查看信息'
-      this.dialogType = DIALOG_TYPE.SHOW
-      this.infoDialogVisible = true
-      this.$nextTick(() => {
-        Object.assign(this.msg, row)
-      })
-    },
-    closeMsgDialog (formName) {
-      this.msg.id = undefined
-      this.$refs[formName].resetFields()
-    },
-    closeInfoDialog () {
-      this.msg = this.msgInfo
-    },
     closeSendMsgDialog () {
       this.sendMsgData = {
         multipleDeptId: [],
@@ -634,43 +780,6 @@ export default {
       }
       this.sendUserMsgDialogVisible = false
       this.sendDeptMsgDialogVisible = false
-    },
-    /**
-     * 提交
-     * @param formName
-     */
-    submitMsgForm (formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
-    },
-    resetMsgForm (formName) {
-      this.msgDialogVisible = false
-      this.$refs[formName].resetFields()
-    },
-    save () {
-      this.msg.id = undefined
-      save(this.msg).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: '添加成功' })
-          this.msgDialogVisible = false
-          this.reloadList()
-        }
-      })
-    },
-    modify () {
-      modify(this.msg).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: '修改成功' })
-          this.msgDialogVisible = false
-          this.reloadList()
-        }
-      })
     }
   }
 }

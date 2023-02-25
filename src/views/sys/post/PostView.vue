@@ -60,10 +60,6 @@
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
-          label="创建人"
-          prop="createName">
-        </el-table-column>
-        <el-table-column
           fixed="right"
           label="操作"
           width="150">
@@ -136,42 +132,52 @@
 </template>
 
 <script>
-import { del, list, modify, save } from '@/api/sys/post'
+import { checkPostCode, del, list, modify, save } from '@/api/sys/post'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
-import { Message } from 'element-ui'
 
 export default {
   name: 'PostView',
   data () {
     return {
+      // 当前操作类型
+      dialogType: DIALOG_TYPE.ADD,
+      // 弹出框标题
+      title: '',
+      // 单元格选中数据
       multipleSelectionPostIds: [],
+      // 岗位表格数据
       postTableData: [],
+      // 岗位查询条件数据
       searchPostForm: {
         postName: '',
         postCode: '',
         current: 1,
         size: 10
       },
+      // 分页总数
       total: 0,
-      title: '',
+      // 岗位添加修改弹出框
       postDialogVisible: false,
+      // 岗位详情弹出框
       infoDialogVisible: false,
-      // 默认是创建
-      dialogType: DIALOG_TYPE.ADD,
+      // 表单标题宽度
       formLabelWidth: '80px',
+      // 岗位添加修改数据
       post: {
-        id: null,
+        id: undefined,
         postName: '',
         postCode: '',
         description: ''
       },
+      // 岗位详情数据
       postInfo: {
-        id: null,
+        id: undefined,
         postName: '',
         postCode: '',
         description: ''
       },
+      // 岗位添加修改表单规则
       postRules: {
         postName: [
           {
@@ -185,8 +191,18 @@ export default {
             required: true,
             message: '请输入岗位编码',
             trigger: 'blur'
-          }
-        ]
+          }, {
+            validator: (rule, value, callback) => {
+              checkPostCode(value, this.post.id).then((response) => {
+                if (response.data) {
+                  callback()
+                  return
+                }
+                callback(new Error('编码重复'))
+              })
+            },
+            trigger: 'blur'
+          }]
       }
     }
   },
@@ -194,33 +210,60 @@ export default {
     this.reloadList()
   },
   methods: {
+    /**
+     * 初始化加载表格数据
+     */
     reloadList () {
-      list(this.buildParam()).then((rep) => {
-        if (rep.code === 1) {
-          this.postTableData = rep.data.records
-          this.searchPostForm.size = rep.data.size
-          this.searchPostForm.current = rep.data.current
-          this.total = rep.data.total
-        }
+      list(this.buildParam()).then((response) => {
+        this.postTableData = response.data.records
+        this.searchPostForm.size = response.data.size
+        this.searchPostForm.current = response.data.current
+        this.total = response.data.total
       })
     },
+    /**
+     * 构造查询条件
+     *
+     * @returns {{current: number, size: number, postName: string, postCode: string}}
+     */
     buildParam () {
       return this.searchPostForm
     },
+    /**
+     * 分页大小切换
+     *
+     * @param size
+     */
     handleSizeChange (size) {
       this.searchPostForm.size = size
       this.reloadList()
     },
+    /**
+     * 当前页切换
+     *
+     * @param current
+     */
     handleCurrentChange (current) {
       this.searchPostForm.current = current
       this.reloadList()
     },
+    /**
+     * 查询按钮
+     */
     search () {
       this.reloadList()
     },
+    /**
+     * 查询重置按钮
+     */
     searchReset () {
       this.$refs.searchForm.resetFields()
     },
+    /**
+     * 平台表格复选框事件
+     *
+     * @param val
+     */
     postHandleSelectionChange (val) {
       this.multipleSelectionPostIds = val
     },
@@ -231,8 +274,8 @@ export default {
       confirmAlert(() => {
         const ids = []
         this.multipleSelectionPostIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
-        del(ids).then(rep => {
-          if (rep.code === 1) {
+        del(ids).then(response => {
+          if (response.code === 1) {
             this.$message.success('删除成功')
             this.reloadList()
           }
@@ -248,20 +291,26 @@ export default {
      */
     removeItem (index, rows, row) {
       confirmAlert(() => {
-        del([JSONBigInt.parse(row.id)]).then(rep => {
-          if (rep.code === 1) {
-            rows.splice(index, 1)
+        del([JSONBigInt.parse(row.id)]).then(response => {
+          if (response.code === 1) {
             rows.splice(index, 1)
             this.$message.success('删除成功')
           }
         })
       })
     },
+    /**
+     * 创建
+     */
     create () {
       this.title = '创建岗位'
       this.dialogType = DIALOG_TYPE.ADD
       this.postDialogVisible = true
     },
+    /**
+     * 修改
+     * @param row
+     */
     edit (row) {
       this.title = '修改岗位'
       this.dialogType = DIALOG_TYPE.EDIT
@@ -270,6 +319,10 @@ export default {
         Object.assign(this.post, row)
       })
     },
+    /**
+     * 详情
+     * @param row
+     */
     info (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
@@ -278,10 +331,17 @@ export default {
         Object.assign(this.post, row)
       })
     },
+    /**
+     * 关闭岗位添加修改弹出框事件
+     * @param formName
+     */
     closePostDialog (formName) {
       this.post.id = undefined
       this.$refs[formName].resetFields()
     },
+    /**
+     * 关闭详情弹出框事件
+     */
     closeInfoDialog () {
       this.post = this.postInfo
     },
@@ -299,28 +359,38 @@ export default {
         }
       })
     },
+    /**
+     * 保存请求
+     */
+    save () {
+      this.post.id = undefined
+      save(this.post).then((response) => {
+        if (response.code === 1) {
+          this.$message.success('添加成功')
+          this.postDialogVisible = false
+          this.reloadList()
+        }
+      })
+    },
+    /**
+     * 修改请求
+     */
+    modify () {
+      modify(this.post).then((response) => {
+        if (response.code === 1) {
+          this.$message.success('修改成功')
+          this.postDialogVisible = false
+          this.reloadList()
+        }
+      })
+    },
+    /**
+     * 添加修改弹出框重置
+     * @param formName
+     */
     resetPostForm (formName) {
       this.postDialogVisible = false
       this.$refs[formName].resetFields()
-    },
-    save () {
-      this.post.id = undefined
-      save(this.post).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: '添加成功' })
-          this.postDialogVisible = false
-          this.reloadList()
-        }
-      })
-    },
-    modify () {
-      modify(this.post).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: '修改成功' })
-          this.postDialogVisible = false
-          this.reloadList()
-        }
-      })
     }
   }
 }

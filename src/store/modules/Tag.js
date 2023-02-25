@@ -14,7 +14,13 @@ export default {
     }]
   },
   mutations: {
-    setTag (state, menu) {
+    /**
+     * 添加Tag
+     *
+     * @param state
+     * @param menu
+     */
+    setTag: (state, menu) => {
       if (state.hidden === 0) {
         if (menu.name === 'welcome') {
           menu.title = '欢迎'
@@ -28,13 +34,24 @@ export default {
       }
       state.dynamicTags.push(menu)
     },
-    setCurrentTagValue (state, name) {
+    /**
+     * 设置当前的Tag名称
+     *
+     * @param state
+     * @param name
+     */
+    setCurrentTagValue: (state, name) => {
       localStorage.setItem('current_tag_name', name)
       state.currentTagValue = name
     }
   },
   actions: {},
   getters: {
+    /**
+     * 获取当前的Tag名称
+     *
+     * @param state
+     */
     getCurrentTagValue (state) {
       return state.currentTabValue
     }

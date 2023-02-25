@@ -62,7 +62,7 @@
     </el-main>
 
     <el-dialog :title="title" :visible.sync="deptDialogVisible" width="600px"
-               @close="closeDialog('deptRuleForm')">
+               @close="closeDeptDialog('deptRuleForm')">
       <el-form ref="deptRuleForm" :model="dept" :rules="deptRules" size="mini">
         <el-form-item :label-width="formLabelWidth" class="parentId" label="上级部门" prop="parentId">
           <el-cascader
@@ -107,42 +107,50 @@
 </template>
 
 <script>
-import { del, list, modify, save, selectDept } from '@/api/sys/dept'
+import { checkDeptCode, del, list, modify, save, selectDept } from '@/api/sys/dept'
 import { confirmAlert, DIALOG_TYPE, ROOT } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
-import { Message } from 'element-ui'
 
 export default {
   name: 'DeptView',
   data () {
     return {
+      // 当前操作类型
+      dialogType: DIALOG_TYPE.ADD,
+      // 弹出框标题
       title: '',
-      rowIndex: 0,
-      multipleSelection: [],
+      // 单元格选中数据
+      multipleSelectionDeptIds: [],
+      // 部门表格数据
       deptTableData: [],
+      // 部门下拉框数据
+      deptOption: [],
+      // 部门查询条件数据
       searchDeptForm: {
         deptName: '',
         deptCode: ''
       },
+      // 部门添加修改弹出框
       deptDialogVisible: false,
+      // 部门详情弹出框
       infoDialogVisible: false,
-      deptOption: [],
+      // 表单标题宽度
+      formLabelWidth: '80px',
+      // 部门添加修改数据
       dept: {
         id: undefined,
-        parentId: null,
+        parentId: ROOT,
         deptName: '',
         deptCode: ''
       },
+      // 部门详情数据
       deptInfo: {
         id: undefined,
-        parentId: null,
+        parentId: ROOT,
         deptName: '',
         deptCode: ''
       },
-      // 默认是创建
-      dialogType: DIALOG_TYPE.ADD,
-      formLabelWidth: '80px',
-      show: false,
+      // 部门添加修改数据
       deptRules: {
         deptName: [
           {
@@ -156,8 +164,18 @@ export default {
             required: true,
             message: '请输入部门编码',
             trigger: 'blur'
-          }
-        ]
+          }, {
+            validator: (rule, value, callback) => {
+              checkDeptCode(value, this.dept.id).then((response) => {
+                if (response.data) {
+                  callback()
+                  return
+                }
+                callback(new Error('编码重复'))
+              })
+            },
+            trigger: 'blur'
+          }]
       }
     }
   },
@@ -165,6 +183,9 @@ export default {
     this.reloadList()
   },
   methods: {
+    /**
+     * 初始化加载表格数据
+     */
     reloadList () {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
@@ -172,17 +193,33 @@ export default {
         }
       })
     },
+    /**
+     * 构造查询条件
+     *
+     * @returns {{deptName: string, deptCode: string}}
+     */
     buildParam () {
       return this.searchDeptForm
     },
+    /**
+     * 查询按钮
+     */
     search () {
       this.reloadList()
     },
+    /**
+     * 查询重置按钮
+     */
     searchReset () {
       this.$refs.searchForm.resetFields()
     },
+    /**
+     * 部门表格复选框事件
+     *
+     * @param val
+     */
     deptHandleSelectionChange (val) {
-      this.multipleSelection = val
+      this.multipleSelectionDeptIds = val
     },
     /**
      * 删除行
@@ -199,6 +236,12 @@ export default {
         })
       })
     },
+    /**
+     * 删除树形逻辑
+     *
+     * @param rows
+     * @param row
+     */
     deleteTreeTableData (rows, row) {
       for (let index = 0; index < rows.length; index++) {
         if (rows[index].id === row.id) {
@@ -211,14 +254,23 @@ export default {
         }
       }
     },
+    /**
+     * 创建
+     */
     create (row) {
       this.title = '创建部门'
       // 赋值
       this.dialogType = DIALOG_TYPE.ADD
-      this.dept.parentId = row.id ? row.id : ''
-      this.selectDept()
+      this.$nextTick(() => {
+        this.dept.parentId = row.id ? row.id : ''
+        this.selectDept()
+      })
       this.deptDialogVisible = true
     },
+    /**
+     * 修改
+     * @param row
+     */
     edit (row) {
       this.title = '修改部门信息'
       this.dialogType = DIALOG_TYPE.EDIT
@@ -229,6 +281,11 @@ export default {
       })
       this.deptDialogVisible = true
     },
+    /**
+     * 详情
+     *
+     * @param row
+     */
     info (row) {
       this.title = '查看部门信息'
       this.dialogType = DIALOG_TYPE.SHOW
@@ -239,17 +296,26 @@ export default {
       })
       this.infoDialogVisible = true
     },
-    selectDept (id) {
-      selectDept(id).then(res => {
-        if (res.code === 1 && res.data) {
-          this.deptOption = [{
-            key: ROOT,
-            value: '根节点',
-            children: res.data
-          }]
-        }
-      })
+    /**
+     * 关闭部门添加修改弹出框事件
+     *
+     * @param formName
+     */
+    closeDeptDialog (formName) {
+      this.dept.id = undefined
+      this.$refs[formName].resetFields()
     },
+    /**
+     * 关闭详情弹出框事件
+     */
+    closeInfoDialog () {
+      this.dept = this.deptInfo
+    },
+    /**
+     * 添加修改弹出框提交
+     *
+     * @param formName
+     */
     submitDeptForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -260,34 +326,54 @@ export default {
         }
       })
     },
+    /**
+     * 保存请求
+     */
+    save () {
+      save(this.dept).then((rep) => {
+        if (rep.code === 1) {
+          this.$message.success(rep.message)
+          this.deptDialogVisible = false
+          this.reloadList()
+        }
+      })
+    },
+    /**
+     * 修改请求
+     */
+    modify () {
+      modify(this.dept).then((rep) => {
+        if (rep.code === 1) {
+          this.$message.success(rep.message)
+          this.deptDialogVisible = false
+          this.reloadList()
+        }
+      })
+    },
+    /**
+     * 添加修改弹出框重置
+     *
+     * @param formName
+     */
     resetDeptForm (formName) {
       this.deptDialogVisible = false
       this.$refs[formName].resetFields()
     },
-    save () {
-      save(this.dept).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: rep.message })
-          this.deptDialogVisible = false
-          this.reloadList()
+    /**
+     * 部门下拉框
+     *
+     * @param id
+     */
+    selectDept (id) {
+      selectDept(id).then(response => {
+        if (response.code === 1 && response.data) {
+          this.deptOption = [{
+            key: ROOT,
+            value: '根节点',
+            children: response.data
+          }]
         }
       })
-    },
-    modify () {
-      modify(this.dept).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: rep.message })
-          this.deptDialogVisible = false
-          this.reloadList()
-        }
-      })
-    },
-    closeInfoDialog () {
-      this.dept = this.deptInfo
-    },
-    closeDialog (formName) {
-      this.dept.id = undefined
-      this.$refs[formName].resetFields()
     }
   }
 }

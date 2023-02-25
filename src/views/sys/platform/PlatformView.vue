@@ -60,10 +60,6 @@
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
-          label="创建人"
-          prop="createName">
-        </el-table-column>
-        <el-table-column
           fixed="right"
           label="操作"
           width="150">
@@ -136,42 +132,52 @@
 </template>
 
 <script>
-import { del, list, modify, save } from '@/api/sys/platform'
+import { checkPlatformCode, del, list, modify, save } from '@/api/sys/platform'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
-import { Message } from 'element-ui'
 
 export default {
   name: 'PlatformView',
   data () {
     return {
+      // 当前操作类型
+      dialogType: DIALOG_TYPE.ADD,
+      // 弹出框标题
+      title: '',
+      // 单元格选中数据
       multipleSelectionPlatformIds: [],
+      // 平台表格数据
       platformTableData: [],
+      // 平台查询条件数据
       searchPlatformForm: {
         platformName: '',
         platformCode: '',
         current: 1,
         size: 10
       },
+      // 分页总数
       total: 0,
-      title: '',
+      // 平台添加修改弹出框
       platformDialogVisible: false,
+      // 平台详情弹出框
       infoDialogVisible: false,
-      // 默认是创建
-      dialogType: DIALOG_TYPE.ADD,
+      // 表单标题宽度
       formLabelWidth: '80px',
+      // 平台添加修改数据
       platform: {
-        id: null,
+        id: undefined,
         platformName: '',
         platformCode: '',
         description: ''
       },
+      // 平台详情数据
       platformInfo: {
-        id: null,
+        id: undefined,
         platformName: '',
         platformCode: '',
         description: ''
       },
+      // 平台添加修改表单规则
       platformRules: {
         platformName: [
           {
@@ -185,42 +191,81 @@ export default {
             required: true,
             message: '请输入平台编码',
             trigger: 'blur'
+          }, {
+            validator: (rule, value, callback) => {
+              checkPlatformCode(value, this.platform.id).then((response) => {
+                if (response.data) {
+                  callback()
+                  return
+                }
+                callback(new Error('编码重复'))
+              })
+            },
+            trigger: 'blur'
           }
         ]
       }
     }
   },
   mounted () {
+    // 初始化加载表格数据
     this.reloadList()
   },
   methods: {
+    /**
+     * 初始化加载表格数据
+     */
     reloadList () {
-      list(this.buildParam()).then((rep) => {
-        if (rep.code === 1) {
-          this.platformTableData = rep.data.records
-          this.searchPlatformForm.size = rep.data.size
-          this.searchPlatformForm.current = rep.data.current
-          this.total = rep.data.total
-        }
+      list(this.buildParam()).then((response) => {
+        this.platformTableData = response.data.records
+        this.searchPlatformForm.size = response.data.size
+        this.searchPlatformForm.current = response.data.current
+        this.total = response.data.total
       })
     },
+    /**
+     * 构造查询条件
+     *
+     * @returns {{current: number, size: number, platformName: string, platformCode: string}}
+     */
     buildParam () {
       return this.searchPlatformForm
     },
+    /**
+     * 分页大小切换
+     *
+     * @param size
+     */
     handleSizeChange (size) {
       this.searchPlatformForm.size = size
       this.reloadList()
     },
+    /**
+     * 当前页切换
+     *
+     * @param current
+     */
     handleCurrentChange (current) {
       this.searchPlatformForm.current = current
       this.reloadList()
     },
+    /**
+     * 查询按钮
+     */
     search () {
       this.reloadList()
     },
+    /**
+     * 查询重置按钮
+     */
     searchReset () {
       this.$refs.searchForm.resetFields()
     },
+    /**
+     * 平台表格复选框事件
+     *
+     * @param val
+     */
     platformHandleSelectionChange (val) {
       this.multipleSelectionPlatformIds = val
     },
@@ -231,8 +276,8 @@ export default {
       confirmAlert(() => {
         const ids = []
         this.multipleSelectionPlatformIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
-        del(ids).then(rep => {
-          if (rep.code === 1) {
+        del(ids).then(response => {
+          if (response.code === 1) {
             this.$message.success('删除成功')
             this.reloadList()
           }
@@ -248,8 +293,8 @@ export default {
      */
     removeItem (index, rows, row) {
       confirmAlert(() => {
-        del([JSONBigInt.parse(row.id)]).then(rep => {
-          if (rep.code === 1) {
+        del([JSONBigInt.parse(row.id)]).then(response => {
+          if (response.code === 1) {
             rows.splice(index, 1)
             this.reloadList()
             this.$message.success('删除成功')
@@ -257,11 +302,18 @@ export default {
         })
       })
     },
+    /**
+     * 创建
+     */
     create () {
       this.title = '创建平台'
       this.dialogType = DIALOG_TYPE.ADD
       this.platformDialogVisible = true
     },
+    /**
+     * 修改
+     * @param row
+     */
     edit (row) {
       this.title = '修改平台'
       this.dialogType = DIALOG_TYPE.EDIT
@@ -270,6 +322,11 @@ export default {
         Object.assign(this.platform, row)
       })
     },
+    /**
+     * 详情
+     *
+     * @param row
+     */
     info (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
@@ -278,15 +335,24 @@ export default {
         Object.assign(this.platform, row)
       })
     },
+    /**
+     * 关闭平台添加修改弹出框事件
+     *
+     * @param formName
+     */
     closePlatformDialog (formName) {
       this.platform.id = undefined
       this.$refs[formName].resetFields()
     },
+    /**
+     * 关闭详情弹出框事件
+     */
     closeInfoDialog () {
       this.platform = this.platformInfo
     },
     /**
-     * 提交
+     * 添加修改弹出框提交
+     *
      * @param formName
      */
     submitPlatformForm (formName) {
@@ -299,28 +365,39 @@ export default {
         }
       })
     },
+    /**
+     * 保存请求
+     */
+    save () {
+      this.platform.id = undefined
+      save(this.platform).then((response) => {
+        if (response.code === 1) {
+          this.$message.success('添加成功')
+          this.platformDialogVisible = false
+          this.reloadList()
+        }
+      })
+    },
+    /**
+     * 修改请求
+     */
+    modify () {
+      modify(this.platform).then((response) => {
+        if (response.code === 1) {
+          this.$message.success('修改成功')
+          this.platformDialogVisible = false
+          this.reloadList()
+        }
+      })
+    },
+    /**
+     * 添加修改弹出框重置
+     *
+     * @param formName
+     */
     resetPlatformForm (formName) {
       this.platformDialogVisible = false
       this.$refs[formName].resetFields()
-    },
-    save () {
-      this.platform.id = undefined
-      save(this.platform).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: '添加成功' })
-          this.platformDialogVisible = false
-          this.reloadList()
-        }
-      })
-    },
-    modify () {
-      modify(this.platform).then((rep) => {
-        if (rep.code === 1) {
-          Message.success({ message: '修改成功' })
-          this.platformDialogVisible = false
-          this.reloadList()
-        }
-      })
     }
   }
 }
