@@ -20,7 +20,9 @@
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
         <el-button v-has="['sys:post:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:post:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
+        <el-button v-has="['sys:post:delete']"
+                   :disabled="checkDeleteItem" plain size="mini" type="danger" @click="remove">删除
+        </el-button>
       </div>
       <el-table
         ref="multipleTable"
@@ -157,6 +159,8 @@ export default {
       },
       // 分页总数
       total: 0,
+      // 标记删除按钮是否可以点击
+      checkDeleteItem: true,
       // 岗位添加修改弹出框
       postDialogVisible: false,
       // 岗位详情弹出框
@@ -265,6 +269,7 @@ export default {
      * @param val
      */
     postHandleSelectionChange (val) {
+      this.checkDeleteItem = !val.length
       this.multipleSelectionPostIds = val
     },
     /**
@@ -276,8 +281,8 @@ export default {
         this.multipleSelectionPostIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(response => {
           if (response.code === 1) {
-            this.$message.success('删除成功')
             this.reloadList()
+            this.$message.success('删除成功')
           }
         })
       })

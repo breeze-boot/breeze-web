@@ -20,7 +20,9 @@
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
         <el-button v-has="['sys:msg:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:msg:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
+        <el-button v-has="['sys:msg:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
+                   @click="remove">删除
+        </el-button>
       </div>
       <el-table
         ref="deptTable"
@@ -343,6 +345,8 @@ export default {
       },
       // 分页总数
       total: 0,
+      // 标记删除按钮是否可以点击
+      checkDeleteItem: true,
       // 消息添加修改弹出框
       msgDialogVisible: false,
       // 发送消息到用户弹出框
@@ -492,8 +496,9 @@ export default {
      *
      * @param row
      */
-    msgHandleSelectionChange (row) {
-      this.multipleSelectionMsgIds = row
+    msgHandleSelectionChange (val) {
+      this.checkDeleteItem = !val.length
+      this.multipleSelectionMsgIds = val
     },
     /**
      * 批量删除
@@ -504,8 +509,8 @@ export default {
         this.multipleSelectionMsgIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(rep => {
           if (rep.code === 1) {
-            this.$message.success('删除成功')
             this.reloadList()
+            this.$message.success('删除成功')
           }
         })
       })

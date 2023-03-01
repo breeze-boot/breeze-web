@@ -22,7 +22,9 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:userMsg:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
+        <el-button v-has="['sys:userMsg:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
+                   @click="remove">删除
+        </el-button>
       </div>
       <el-table
         ref="multipleTable"
@@ -131,7 +133,7 @@
             消息类型
           </template>
           <el-tag size="small">
-            {{ this.getDescriptionsDictLabel()(msg, 'userMsgType', 'MSG_TYPE') }}
+            {{ this.getDescriptionsDictLabel()(userMsg, 'userMsgType', 'MSG_TYPE') }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
@@ -208,6 +210,8 @@ export default {
       },
       // 分页总数
       total: 0,
+      // 标记删除按钮是否可以点击
+      checkDeleteItem: true,
       // 消息详情弹出框
       infoDialogVisible: false,
       formLabelWidth: '80px',
@@ -301,6 +305,7 @@ export default {
      * @param val
      */
     userMsgHandleSelectionChange (val) {
+      this.checkDeleteItem = !val.length
       this.multipleSelectionUserMsgIds = val
     },
     /**
@@ -312,8 +317,8 @@ export default {
         this.multipleSelectionUserMsgIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(rep => {
           if (rep.code === 1) {
-            this.$message.success('删除成功')
             this.reloadList()
+            this.$message.success('删除成功')
           }
         })
       })

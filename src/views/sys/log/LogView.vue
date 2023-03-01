@@ -60,7 +60,9 @@
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
         <el-button v-has="['sys:log:export']" plain size="mini" type="info" @click="exportInfo">导出</el-button>
-        <el-button v-has="['sys:log:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
+        <el-button v-has="['sys:log:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
+                   @click="remove">删除
+        </el-button>
         <el-button v-has="['sys:log:clear']" plain size="mini" type="danger" @click="clear">清空全表</el-button>
       </div>
       <el-table
@@ -243,6 +245,8 @@ export default {
       },
       // 分页总数
       total: 0,
+      // 标记删除按钮是否可以点击
+      checkDeleteItem: true,
       // 日志详情弹出框
       infoDialogVisible: false,
       // 表单标题宽度
@@ -327,6 +331,7 @@ export default {
      * @param val
      */
     logHandleSelectionChange (val) {
+      this.checkDeleteItem = !val.length
       this.multipleSelectionLogId = val
     },
     exportInfo () {
@@ -340,8 +345,8 @@ export default {
         this.multipleSelectionLogId.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then((rep) => {
           if (rep.code === 1) {
-            this.$message.success('删除成功')
             this.reloadList()
+            this.$message.success('删除成功')
           }
         })
       })

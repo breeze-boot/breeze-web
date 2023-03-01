@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { Loading, Message } from 'element-ui'
+import { reLoginConfirm, showErrorMsg, showWaringMsg } from '@/utils/constant'
 
 let loadingInstance = {}
 
@@ -15,22 +16,6 @@ export const request = axios.create({
     B_TENANT_ID: localStorage.getItem('B_TENANT_ID') || '1'
   }
 })
-
-export const showErrorMsg = (success, msg) => {
-  if (success.data.message) {
-    Message.error({ message: success.data.message })
-  } else {
-    Message.error({ message: msg })
-  }
-}
-
-export const showWaringMsg = (success, msg) => {
-  if (success.data.message) {
-    Message.warning({ message: success.data.message })
-  } else {
-    Message.warning({ message: msg })
-  }
-}
 
 /**
  * 服务的路径
@@ -85,11 +70,17 @@ request.interceptors.response.use((response) => {
     } else if (response.data.code === 0 && response.data.message) {
       // 业务错误失败
       showErrorMsg(response, '系统异常')
+      setTimeout(() => {
+        loadingInstance.close()
+      }, 2000)
+      return Promise.reject(response)
     } else if (response.data.code === 500) {
       // 系统错误
-      console.error(response)
       showErrorMsg(response, '服务异常')
-      return response.data
+      setTimeout(() => {
+        loadingInstance.close()
+      }, 2000)
+      return Promise.reject(response)
     }
     loadingInstance.close()
     return response.data
@@ -105,9 +96,11 @@ request.interceptors.response.use((response) => {
     Message.error({ message: '请求地址不存在' })
   } else if (error.response.status === 401) {
     showErrorMsg(error.response, error.response.data.message)
-    // TODO 重新登录
+    reLoginConfirm()
   } else if (error.response.status === 403) {
     showErrorMsg(error.response, error.response.data.message)
   }
   console.error(error.response.status)
+  loadingInstance.close()
+  return Promise.reject(error)
 })

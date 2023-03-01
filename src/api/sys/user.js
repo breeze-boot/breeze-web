@@ -168,3 +168,19 @@ export function checkUsername (username, userId) {
     }
   })
 }
+
+/**
+ * 详情
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function info (userId) {
+  return request({
+    url: servicePath.system + '/sys/user/info/' + JSONBigInt.parse(userId),
+    method: 'get',
+    transformResponse: [(data) => {
+      return JSONBigInt2Str.parse(data)
+    }]
+  })
+}

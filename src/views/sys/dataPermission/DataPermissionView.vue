@@ -21,7 +21,9 @@
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
         <el-button v-has="['sys:dataPermission:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:dataPermission:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
+        <el-button v-has="['sys:dataPermission:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
+                   @click="remove">删除
+        </el-button>
       </div>
       <el-table
         ref="multipleTable"
@@ -328,6 +330,8 @@ export default {
         size: 10
       },
       total: 0,
+      // 标记删除按钮是否可以点击
+      checkDeleteItem: true,
       dataPermissionDialogVisible: false,
       infoDialogVisible: false,
       dataPermissionDiyDialogVisible: false,
@@ -481,6 +485,7 @@ export default {
       this.$refs.searchForm.resetFields()
     },
     dataPermissionHandleSelectionChange (val) {
+      this.checkDeleteItem = !val.length
       this.multipleSelectionPermissionIds = val
     },
     /**
@@ -492,8 +497,8 @@ export default {
         this.multipleSelectionPermissionIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(rep => {
           if (rep.code === 1) {
-            this.$message.success('删除成功')
             this.reloadList()
+            this.$message.success('删除成功')
           }
         })
       })

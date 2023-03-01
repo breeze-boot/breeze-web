@@ -104,11 +104,10 @@ export default {
     ...mapMutations('userInfo', ['setUserInfo']),
     success () {
       this.$store.dispatch('userInfo/login', this.userLogin).then(() => {
-        this.$router.push({ path: 'welcome' || '/' }).catch((e) => {
+        this.$router.push({ path: this.$route.query.redirect || 'welcome' }).catch((e) => {
           console.error(e)
         })
       }).catch((e) => {
-        console.error(e)
       })
     },
     handleTenant () {

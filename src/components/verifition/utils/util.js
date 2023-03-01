@@ -1,5 +1,5 @@
 /**
- * https://gitee.com/anji-plus/captcha.git
+ * 鸣谢项目地址：https://gitee.com/anji-plus/captcha.git
  */
 export function resetSize (vm) {
   // 图片的宽度、高度，移动条的宽度、高度

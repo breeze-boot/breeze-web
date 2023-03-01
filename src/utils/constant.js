@@ -1,7 +1,14 @@
 import Vue from 'vue'
 import { Message } from 'element-ui'
+import store from '@/store'
 
 export const ROOT = '1111111111111111111'
+
+export const OSS = {
+  LOCAL: 0,
+  MINIO: 1
+}
+
 export const DIALOG_TYPE = {
   ADD: {
     desc: '添加',
@@ -17,8 +24,24 @@ export const DIALOG_TYPE = {
   }
 }
 
-export const confirmAlert = (func) => {
-  Vue.prototype.$confirm('是否删除', '提示', {
+export const showErrorMsg = (success, msg) => {
+  if (success.data.message) {
+    Message.error({ message: success.data.message })
+  } else {
+    Message.error({ message: msg })
+  }
+}
+
+export const showWaringMsg = (success, msg) => {
+  if (success.data.message) {
+    Message.warning({ message: success.data.message })
+  } else {
+    Message.warning({ message: msg })
+  }
+}
+
+export const confirmAlert = (func, msg) => {
+  Vue.prototype.$confirm(msg || '是否删除', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning'
@@ -26,6 +49,14 @@ export const confirmAlert = (func) => {
     func()
   }).catch((e) => {
     Message.warning({ message: '取消删除' })
+  })
+}
+
+export const reLoginConfirm = (msg) => {
+  confirmAlert(msg || '登录状态已过期，请重新登录', () => {
+    store.dispatch('userInfo/logOut').then(() => {
+      location.href = '#/welcome'
+    })
   })
 }
 

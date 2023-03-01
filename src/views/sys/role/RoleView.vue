@@ -22,7 +22,9 @@
         <el-col :md="19">
           <div style="margin-bottom: 10px; text-align: left;">
             <el-button v-has="['sys:role:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-            <el-button v-has="['sys:role:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
+            <el-button v-has="['sys:role:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
+                       @click="remove">删除
+            </el-button>
           </div>
           <el-table
             ref="multipleTable"
@@ -104,9 +106,18 @@
         <el-form-item :label-width="formLabelWidth" label="角色名称" prop="roleName">
           <el-input v-model="role.roleName" autocomplete="off" clearable/>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="角色编码" prop="roleCode">
-          <el-input v-model="role.roleCode" autocomplete="off" clearable/>
-        </el-form-item>
+        <el-row>
+          <el-col :span="16">
+            <el-form-item :label-width="formLabelWidth" label="角色编码" prop="roleCode">
+              <el-input v-model="role.roleCode" autocomplete="off" clearable>
+                <template slot="prepend">{{ prefix }}</template>
+              </el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :offset="1" :span="6" style="color: red; padding: 10px;">
+            {{ prefix }}{{ role.roleCode }}
+          </el-col>
+        </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="mini" @click="resetRoleForm('roleRuleForm')">取 消</el-button>
@@ -158,7 +169,7 @@
 <script>
 import { checkRoleCode, del, list, listRolesPermission, modify, modifyPermission, save } from '@/api/sys/role'
 import { listTreePermission } from '@/api/sys/menu'
-import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { confirmAlert, DIALOG_TYPE, reLoginConfirm } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { editRoleDataPermission, selectDataPermission } from '@/api/sys/dataPermission'
 
@@ -170,6 +181,8 @@ export default {
       dialogType: DIALOG_TYPE.ADD,
       // 弹出框标题
       title: '',
+      // 编码前缀
+      prefix: 'ROLE_',
       // 是否锁定重置按钮
       disabled: true,
       // 单元格选中数据
@@ -199,6 +212,8 @@ export default {
         children: 'children',
         label: 'title'
       },
+      // 标记删除按钮是否可以点击
+      checkDeleteItem: true,
       // 当前选择的角色
       currentClickRoleId: undefined,
       // 角色添加修改弹出框
@@ -351,6 +366,7 @@ export default {
      * @param val
      */
     roleHandleSelectionChange (val) {
+      this.checkDeleteItem = !val.length
       this.multipleSelectionRoleIds = val
     },
     /**
@@ -373,8 +389,8 @@ export default {
         this.multipleSelectionRoleIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then((rep) => {
           if (rep.code === 1) {
-            this.$message.success('删除成功')
             this.reloadList()
+            this.$message.success('删除成功')
           }
         })
       })
@@ -413,6 +429,7 @@ export default {
       this.roleDialogVisible = true
       this.$nextTick(() => {
         Object.assign(this.role, row)
+        this.role.roleCode = this.role.roleCode.replace(this.prefix, '')
       })
     },
     /**
@@ -461,6 +478,7 @@ export default {
      * 保存请求
      */
     save () {
+      this.role.roleCode = this.prefix + this.role.roleCode
       save(this.role).then((rep) => {
         if (rep.code === 1) {
           this.$message.success(rep.message)
@@ -474,6 +492,7 @@ export default {
      * 修改请求
      */
     modify () {
+      this.role.roleCode = this.prefix + this.role.roleCode
       modify(this.role).then((rep) => {
         if (rep.code === 1) {
           this.$message.success(rep.message)
@@ -518,6 +537,7 @@ export default {
         if (rep.code === 1) {
           this.$message.success(rep.message)
           this.listRolesPermission(this.currentClickRoleId)
+          reLoginConfirm('请重新登录')
         }
       })
     },

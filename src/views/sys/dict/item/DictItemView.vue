@@ -3,7 +3,9 @@
     <el-main>
       <div style="margin-bottom: 10px; text-align: left;">
         <el-button v-has="['sys:dict:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:dict:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
+        <el-button v-has="['sys:dict:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
+                   @click="remove">删除
+        </el-button>
       </div>
       <el-table ref="multipleDictItemTable" :data="dictItemTableData" border height="400" size="mini" stripe
                 style="width: 100%"
@@ -67,6 +69,8 @@ export default {
       },
       // 分页总数
       total: 0,
+      // 标记删除按钮是否可以点击
+      checkDeleteItem: true,
       // 字典项添加修改弹出框
       dictItemDialogVisible: false,
       // 表单标题宽度
@@ -158,6 +162,7 @@ export default {
      * @param val
      */
     dictItemHandleSelectionChange (val) {
+      this.checkDeleteItem = !val.length
       this.multipleSelection = val
     },
     /**

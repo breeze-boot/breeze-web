@@ -59,7 +59,10 @@ export function upload (data) {
   return request({
     url: servicePath.system + '/sys/file/upload',
     method: 'POST',
-    data: data
+    data: data,
+    transformResponse: [(data) => {
+      return JSONBigInt2Str.parse(data)
+    }]
   })
 }
 

@@ -1,5 +1,5 @@
 /**
- * https://gitee.com/anji-plus/captcha.git
+ * 鸣谢项目地址：https://gitee.com/anji-plus/captcha.git
  */
 import CryptoJS from 'crypto-js'
 

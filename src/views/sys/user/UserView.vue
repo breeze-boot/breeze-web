@@ -23,7 +23,9 @@
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
         <el-button v-has="['sys:user:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:user:delete']" plain size="mini" type="danger" @click="remove">删除</el-button>
+        <el-button v-has="['sys:user:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
+                   @click="remove">删除
+        </el-button>
         <el-button v-has="['sys:user:export']" plain size="mini" type="info" @click="exportInfo">导出</el-button>
         <el-button v-has="['sys:user:import']" plain size="mini" @click="importInfo">导入</el-button>
       </div>
@@ -198,7 +200,7 @@
             action=""
             class="avatar-uploader"
             prop="avatar">
-            <img v-if="user.avatar" :src="user.avatar" class="avatar">
+            <img v-if="avatarUrl" :src="avatarUrl" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
@@ -319,29 +321,13 @@
           <template slot="label">
             部门
           </template>
-          <el-cascader
-            v-model="user.deptId"
-            :options="deptOption"
-            :props="{ checkStrictly: true }"
-            :show-all-levels="false"
-            clearable
-            disabled
-            filterable
-            size="mini"
-          ></el-cascader>
+          {{ user.deptName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             岗位
           </template>
-          <el-select v-model="user.postId" collapse-tags disabled filterable placeholder="请选择岗位" size="mini">
-            <el-option
-              v-for="item in postOption"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key">
-            </el-option>
-          </el-select>
+          {{ user.postName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
@@ -353,6 +339,7 @@
           <template slot="label">
             用户角色
           </template>
+          {{ user.roleNames.length > 0 ? user.roleNames : '' }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
@@ -380,6 +367,7 @@ import {
   checkUsername,
   del,
   exportInfo,
+  info,
   list,
   modify,
   open,
@@ -388,7 +376,7 @@ import {
   selectPost,
   selectRole
 } from '@/api/sys/user'
-import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { confirmAlert, DIALOG_TYPE, OSS } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { selectDept } from '@/api/sys/dept'
 import { mapGetters } from 'vuex'
@@ -420,6 +408,8 @@ export default {
       },
       // 分页总数
       total: 0,
+      // 标记删除按钮是否可以点击
+      checkDeleteItem: true,
       // 重置密码弹出框
       restPasswordDialogVisible: false,
       // 用户添加修改弹出框
@@ -449,6 +439,7 @@ export default {
         sex: 1,
         isLock: 0
       },
+      avatarUrl: '',
       // 用户详情数据
       userInfo: {
         id: undefined,
@@ -624,6 +615,7 @@ export default {
      */
     reloadList () {
       list(this.buildParam()).then((response) => {
+        this.avatarUrl = ''
         this.userTableData = response.data.records
         this.searchUserForm.size = response.data.size
         this.searchUserForm.current = response.data.current
@@ -710,6 +702,7 @@ export default {
      * @param val
      */
     userHandleSelectionChange (val) {
+      this.checkDeleteItem = !val.length
       this.multipleSelectionUserId = val
     },
     /**
@@ -780,13 +773,17 @@ export default {
     edit (row) {
       this.title = '修改用户'
       this.dialogType = DIALOG_TYPE.EDIT
-      this.$nextTick(() => {
-        this.selectDept()
-        this.selectRole()
-        this.selectPost(row.postId)
-        Object.assign(this.user, row)
+      info(row.id).then(response => {
+        this.$nextTick(() => {
+          this.selectRole()
+          this.selectDept()
+          this.selectPost(row.postId)
+          debugger
+          Object.assign(this.user, response.data)
+          this.avatarUrl = response.data.avatar
+          this.userDialogVisible = true
+        })
       })
-      this.userDialogVisible = true
     },
     /**
      * 详情
@@ -795,12 +792,15 @@ export default {
     info (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
-      this.$nextTick(() => {
-        this.selectRole()
-        this.selectDept()
-        Object.assign(this.user, row)
+      info(row.id).then(response => {
+        this.$nextTick(() => {
+          this.selectRole()
+          this.selectDept()
+          Object.assign(this.user, response.data)
+          this.avatarUrl = response.data.avatar
+          this.infoDialogVisible = true
+        })
       })
-      this.infoDialogVisible = true
     },
     /**
      * 关闭用户添加修改弹出框事件
@@ -846,6 +846,7 @@ export default {
      * 修改请求
      */
     modify () {
+      debugger
       modify(this.user).then((response) => {
         if (response.code === 1) {
           this.$message.success({ message: response.message })
@@ -923,14 +924,16 @@ export default {
       const formData = new FormData()
       formData.append('file', param.file)
       formData.append('title', '用户头像')
-      formData.append('ossStyle', 0)
+      formData.append('ossStyle', OSS.LOCAL)
       upload(formData).then(response => {
         if (response.code === 1 && response.data) {
           this.$message({
             message: '图片上传成功',
             type: 'success'
           })
-          this.user.avatar = response.data
+          this.user.avatar = response.data.path
+          this.user.avatarFileId = response.data.fileId
+          this.avatarUrl = response.data.url
         }
       }).catch(e => {
         console.error('图片上传失败', e)
@@ -951,7 +954,6 @@ export default {
       return isJPG && isLt2M
     },
     goRoleView (row) {
-      debugger
       this.$router.push({
         name: 'userRole',
         query: {
