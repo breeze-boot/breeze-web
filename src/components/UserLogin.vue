@@ -24,19 +24,19 @@
           type="password"
         />
       </el-form-item>
-      <el-form-item id="tenant_select" prop="tenant" size="mini">
-        <el-select v-model="userLogin.tenantId" placeholder="请选择租户" @change="handleTenant">
+      <el-form-item id="tenant_select" prop="tenantId" size="mini">
+        <el-select v-model="userLogin.tenantId" placeholder="请选择租户">
           <el-option
             v-for="item in tenantOption"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
+            :key="item.key"
+            :label="item.value"
+            :value="item.key">
           </el-option>
         </el-select>
       </el-form-item>
       <el-form-item>
         <el-button style="width: 100%" type="primary" @click="login">
-          {{ loginBtn }}
+          登录
         </el-button>
       </el-form-item>
     </el-form>
@@ -63,7 +63,6 @@ export default {
   },
   data () {
     return {
-      loginBtn: '登录',
       userLogin: {
         username: 'admin',
         password: '123456',
@@ -83,6 +82,13 @@ export default {
             required: true,
             message: '请输入登录密码',
             trigger: 'blur'
+          }
+        ],
+        tenantId: [
+          {
+            required: true,
+            message: '请选择活动租户',
+            trigger: 'change'
           }
         ]
       }
@@ -110,19 +116,11 @@ export default {
       }).catch((e) => {
       })
     },
-    handleTenant () {
-      localStorage.setItem('B_TENANT_ID', this.userLogin.tenantId)
-    },
     login () {
       this.$refs.userLogin.validate((valid) => {
         if (valid) {
           this.$refs.verify.show()
         } else {
-          this.$message({
-            showClose: true,
-            message: '登录失败',
-            type: 'error'
-          })
           localStorage.removeItem('access_token')
           return false
         }

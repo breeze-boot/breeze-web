@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { filterTree } from '@/utils/constant'
 import { listTreeMenu } from '@/api/sys/menu'
-import { convertMenus } from '@/router/remote-dy-route'
+import { bindMenu, bindRoute } from '@/router/remote-dy-route'
 
 Vue.use(Vuex)
 
@@ -62,8 +62,9 @@ export default {
             platformCode: 'managementCenter'
           }).then(response => {
             // 动态绑定路由
-            convertMenus(response.data)
-            context.commit('setMenus', response.data)
+            bindRoute(response.data)
+            // 动态绑定菜单
+            bindMenu(response.data)
             resolve()
           }).catch(error => {
             reject(error)

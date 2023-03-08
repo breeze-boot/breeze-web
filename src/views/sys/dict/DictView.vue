@@ -92,7 +92,7 @@
       </div>
     </el-main>
 
-    <el-dialog :title="title" :visible.sync="dictDialogVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="dictDialogVisible" width="40vw"
                @close="closeDictDialog('dictRuleForm')">
       <el-form ref="dictRuleForm" :model="dict" :rules="dictRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="字典名称" prop="dictName">
@@ -118,7 +118,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="800px" @close="closeInfoDialog">
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw" @close="closeInfoDialog">
       <el-descriptions :column="1" border size="mini">
         <el-descriptions-item>
           <template slot="label">

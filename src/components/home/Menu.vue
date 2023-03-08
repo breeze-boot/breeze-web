@@ -8,11 +8,11 @@
       active-text-color="#ffd04b"
       background-color="#093f6b"
       class="el-menu-vertical"
-      router
       style="border-right: 1px solid #093f6b"
       text-color="#fff"
       @close="handleClose"
-      @open="handleOpen">
+      @open="handleOpen"
+      @select="handleRouter">
       <div :style="{minWidth: this.menuIsCollapse.collapseWhitespace  + 'px'}" class="logo">
         <img :style="{animationName: this.menuIsCollapse.fadeIn, animationDuration: 0 + 's'}" alt=""
              src="../../assets/logo.png"/>
@@ -49,6 +49,18 @@ export default {
     ...mapGetters('menu', ['getMenus'])
   },
   methods: {
+    /**
+     * 切换菜单
+     *
+     * @param key
+     * @param keyPath
+     */
+    handleRouter (name) {
+      if (!name) {
+        return
+      }
+      this.$router.push({ name: name })
+    },
     /**
      * 打开菜单事件
      *

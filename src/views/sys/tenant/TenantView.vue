@@ -86,7 +86,7 @@
       </div>
     </el-main>
 
-    <el-dialog :title="title" :visible.sync="tenantDialogVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="tenantDialogVisible" width="40vw"
                @close="closeTenantDialog('tenantRuleForm')">
       <el-form ref="tenantRuleForm" :model="tenant" :rules="tenantRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="租户名称" prop="tenantName">
@@ -102,7 +102,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
                @close="closeInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item>

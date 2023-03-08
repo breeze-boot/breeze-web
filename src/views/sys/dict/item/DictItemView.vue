@@ -24,7 +24,7 @@
         </el-table-column>
       </el-table>
 
-      <el-dialog :title="title" :visible.sync="dictItemDialogVisible" width="800px"
+      <el-dialog :title="title" :visible.sync="dictItemDialogVisible" width="40vw"
                  @close="closeDictItemDialog('dictItemRuleForm')">
         <el-form ref="dictItemRuleForm" :model="dictItem" :rules="dictItemRules" size="mini">
           <el-form-item :label-width="formLabelWidth" label="字典KEY" prop="key">

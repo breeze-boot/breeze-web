@@ -113,7 +113,7 @@
       </div>
     </el-main>
 
-    <el-dialog :title="title" :visible.sync="msgDialogVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="msgDialogVisible" width="40vw"
                @close="closeMsgDialog('msgRuleForm')">
       <el-form ref="msgRuleForm" :model="msg" :rules="msgRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="消息名称" prop="msgTitle">
@@ -146,7 +146,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
                @close="closeInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item>

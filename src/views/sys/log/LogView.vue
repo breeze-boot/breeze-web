@@ -152,7 +152,7 @@
         </el-pagination>
       </div>
     </el-main>
-    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="800px">
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw">
       <el-descriptions :column="1" border size="mini">
         <el-descriptions-item>
           <template slot="label">

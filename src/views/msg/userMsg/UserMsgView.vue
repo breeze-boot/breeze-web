@@ -113,7 +113,7 @@
       </div>
     </el-main>
 
-    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
                @close="closeInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item>

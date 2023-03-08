@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { login, logout } from '@/api/sys/login'
+import { login, logout } from '@/api/login'
 
 Vue.use(Vuex)
 
@@ -39,6 +39,7 @@ export default {
       userLogin.password.trim()
       return new Promise((resolve, reject) => {
         login(userLogin).then(response => {
+          localStorage.setItem('B_TENANT_ID', response.data.userInfo.tenantId)
           commit('setAccessToken', response.data.accessToken)
           commit('setAuthorities', response.data.userInfo.authorities)
           commit('setUserInfo', response.data.userInfo)

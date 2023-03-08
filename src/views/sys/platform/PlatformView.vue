@@ -87,7 +87,7 @@
       </div>
     </el-main>
 
-    <el-dialog :title="title" :visible.sync="platformDialogVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="platformDialogVisible" width="40vw"
                @close="closePlatformDialog('platformRuleForm')">
       <el-form ref="platformRuleForm" :model="platform" :rules="platformRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="平台名称" prop="platformName">
@@ -106,7 +106,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
                @close="closeInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item>

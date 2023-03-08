@@ -5,19 +5,6 @@ import { reLoginConfirm, showErrorMsg, showWaringMsg } from '@/utils/constant'
 let loadingInstance = {}
 
 /**
- * 创建的实例返回一个对象,实例对象
- */
-export const request = axios.create({
-  // 请求路径，基础接口路径 请求 9000 时经过/dev-api相当于请求 http://localhost:9000
-  baseURL: process.env.VUE_APP_BASE_API,
-  // 请求超时时间
-  timeout: 30000,
-  headers: {
-    B_TENANT_ID: localStorage.getItem('B_TENANT_ID') || '1'
-  }
-})
-
-/**
  * 服务的路径
  *
  * @type {string}
@@ -25,6 +12,16 @@ export const request = axios.create({
 export const servicePath = {
   system: ''
 }
+
+/**
+ * 创建的实例返回一个对象,实例对象
+ */
+export const request = axios.create({
+  // 请求路径，基础接口路径 请求 9000 时经过/dev-api相当于请求 http://localhost:9000
+  baseURL: process.env.VUE_APP_BASE_API,
+  // 请求超时时间
+  timeout: 30000
+})
 
 /**
  * 请求拦截器
@@ -37,6 +34,8 @@ request.interceptors.request.use((config) => {
   if (authorization) {
     config.headers.Authorization = 'Bearer ' + authorization
   }
+  config.headers.B_TENANT_ID = localStorage.getItem('B_TENANT_ID')
+
   loadingInstance = Loading.service({
     lock: true,
     text: 'Loading',
@@ -96,8 +95,8 @@ request.interceptors.response.use((response) => {
     Message.error({ message: '请求地址不存在' })
   } else if (error.response.status === 401) {
     showErrorMsg(error.response, error.response.data.message)
-    reLoginConfirm()
   } else if (error.response.status === 403) {
+    reLoginConfirm()
     showErrorMsg(error.response, error.response.data.message)
   }
   console.error(error.response.status)

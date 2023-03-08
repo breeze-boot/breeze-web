@@ -170,7 +170,7 @@
       </div>
     </el-main>
 
-    <el-dialog :title="title" :visible.sync="restPasswordDialogVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="restPasswordDialogVisible" width="40vw"
                @close="closeRestPasswordDialog('restPasswordRuleForm')">
       <el-form ref="restPasswordRuleForm" :model="userPassword" :rules="resetPasswordRules" size="mini"
                style="padding-right: 15px;">
@@ -188,7 +188,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="title" :visible.sync="userDialogVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="userDialogVisible" width="40vw"
                @close="closeUserDialog('userRuleForm')">
       <el-form ref="userRuleForm" :model="user" :rules="userRules" size="mini" style="padding-right: 15px;">
         <el-form-item style="text-align: center;">
@@ -282,7 +282,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
                @close="closeUserInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item>
@@ -778,7 +778,6 @@ export default {
           this.selectRole()
           this.selectDept()
           this.selectPost(row.postId)
-          debugger
           Object.assign(this.user, response.data)
           this.avatarUrl = response.data.avatar
           this.userDialogVisible = true
@@ -846,7 +845,6 @@ export default {
      * 修改请求
      */
     modify () {
-      debugger
       modify(this.user).then((response) => {
         if (response.code === 1) {
           this.$message.success({ message: response.message })

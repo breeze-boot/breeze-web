@@ -100,7 +100,7 @@
       </el-row>
     </el-main>
 
-    <el-dialog :title="title" :visible.sync="roleDialogVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="roleDialogVisible" width="40vw"
                @close="closeRoleDialog('roleRuleForm')">
       <el-form ref="roleRuleForm" :model="role" :rules="roleRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="角色名称" prop="roleName">
@@ -146,7 +146,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
                @close="closeInfoDialog">
       <el-descriptions :column="1" border size="mini">
         <el-descriptions-item>

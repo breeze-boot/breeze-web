@@ -53,11 +53,11 @@ export const confirmAlert = (func, msg) => {
 }
 
 export const reLoginConfirm = (msg) => {
-  confirmAlert(msg || '登录状态已过期，请重新登录', () => {
+  confirmAlert(() => {
     store.dispatch('userInfo/logOut').then(() => {
       location.href = '#/welcome'
     })
-  })
+  }, msg || '登录状态已过期，请重新登录')
 }
 
 /**

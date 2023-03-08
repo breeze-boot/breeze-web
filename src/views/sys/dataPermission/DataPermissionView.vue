@@ -115,7 +115,7 @@
       </div>
     </el-main>
 
-    <el-dialog :title="title" :visible.sync="dataPermissionDialogVisible" width="800px"
+    <el-dialog :title="title" :visible.sync="dataPermissionDialogVisible" width="40vw"
                @close="closePermissionDialog('dataPermissionRuleForm')">
       <el-form ref="dataPermissionRuleForm" :model="dataPermission" :rules="dataPermissionRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="数据权限名称" prop="dataPermissionName">
