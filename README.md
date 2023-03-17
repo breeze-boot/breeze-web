@@ -13,7 +13,7 @@
 
 ### 特别鸣谢：
 - [验证码 https://gitee.com/anji-plus/captcha](https://gitee.com/anji-plus/captcha)
-- [流程设计器 https://github.com/GoldSubmarine/workflow-bpmn-modeler](https://github.com/GoldSubmarine/workflow-bpmn-modeler)
+- [流程设计器 https://gitee.com/MiyueSC/bpmn-process-designer](https://gitee.com/MiyueSC/bpmn-process-designer)
 
 # 请遵循 Apache 2.0 协议
 
@@ -50,7 +50,8 @@
   │ │ ├─ assets \
   │ │ ├─ components \
   │ │ ├─ mixins \
-  │ │ ├─ plugins \ │ │ ├─ router \
+  │ │ ├─ plugins \
+  │ │ ├─ router \
   │ │ ├─ store \
   │ │ ├─ utils \
   │ │ └──views

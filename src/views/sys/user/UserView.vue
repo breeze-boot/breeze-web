@@ -964,7 +964,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="scss">
 .el-dropdown {
   font-size: 0.5rem;
 

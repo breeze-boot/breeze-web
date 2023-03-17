@@ -129,7 +129,7 @@ export default {
   }
 }
 </script>
-<style lang="less">
+<style lang="scss">
 .userLogin {
   position: absolute;
   left: 50%;

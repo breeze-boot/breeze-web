@@ -56,7 +56,7 @@ export default {
   }
 }
 </script>
-<style lang="less">
+<style lang="scss">
 #tag {
   padding: 2px 2px;
   margin-bottom: 2px;

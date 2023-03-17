@@ -22,7 +22,14 @@
     "vue": "^2.6.14",
     "vue-router": "^3.5.1",
     "vuex": "^3.6.2",
-    "workflow-bpmn-modeler": "^0.2.8"
+    "bpmn-js-sketchy": "^0.5.3",
+    "bpmn-js-task-resize": "^1.2.0",
+    "bpmn-js-token-simulation": "^0.10.0",
+    "highlight.js": "^10.5.0",
+    "diagram-js-minimap": "^2.0.4",
+    "xml-js": "^1.6.11",
+    "x2js": "^3.4.2",
+    "min-dash": "^3.5.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -38,9 +45,14 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-vue": "^8.0.3",
-    "less": "^3.0.4",
-    "less-loader": "^5.0.0",
+    "sass": "1.55.0",
+    "sass-loader": "13.2.0",
     "svg-sprite-loader": "^6.0.11",
-    "vue-template-compiler": "^2.6.14"
+    "vue-template-compiler": "^2.6.14",
+    "bpmn-js": "^8.8.3",
+    "bpmn-js-properties-panel": "^0.37.2",
+    "camunda-bpmn-moddle": "^4.4.1",
+    "compression-webpack-plugin": "^6.1.1",
+    "script-ext-html-webpack-plugin": "^2.1.5"
   }
 }

@@ -1,142 +1,359 @@
 <template>
-  <el-container class="designer">
-    <bpmn-modeler
-      ref="bpmDesigner"
-      :categorys="categorys"
-      :groups="groups"
-      :is-view="false"
-      :users="users"
-      :xml="xml"
-      @save="save"
-    />
+  <el-container id="designer">
+    <my-process-palette/>
+    <my-process-designer
+      :key="`designer-${reloadIndex}`"
+      ref="processDesigner"
+      v-model="xmlString"
+      :options="{
+        taskResizingEnabled: true,
+        eventResizingEnabled: true,
+        minimap: {
+          open: true
+        }
+      }"
+      keyboard
+      v-bind="controlForm"
+      @element-click="elementClick"
+      @element-contextmenu="elementContextmenu"
+      @init-finished="initModeler"
+    >
+    </my-process-designer>
+    <my-properties-panel :key="`penal-${reloadIndex}`" :bpmn-modeler="modeler" :prefix="controlForm.prefix"
+                         class="process-panel"/>
+
+    <!-- demo config -->
+    <div class="demo-control-bar">
+      <div class="open-model-button" @click="controlDrawerVisible = true"><i class="el-icon-setting"></i></div>
+    </div>
+    <el-drawer :visible.sync="controlDrawerVisible" append-to-body destroy-on-close size="400px" title="偏好设置">
+      <el-form :model="controlForm" class="control-form" label-width="100px" size="small" @submit.native.prevent>
+        <el-form-item label="流程ID">
+          <el-input v-model="controlForm.processId" @change="reloadProcessDesigner(true)"/>
+        </el-form-item>
+        <el-form-item label="流程名称">
+          <el-input v-model="controlForm.processName" @change="reloadProcessDesigner(true)"/>
+        </el-form-item>
+        <el-form-item label="流转模拟">
+          <el-switch v-model="controlForm.simulation" active-text="启用" inactive-text="停用"
+                     @change="reloadProcessDesigner()"/>
+        </el-form-item>
+        <el-form-item label="禁用双击">
+          <el-switch v-model="controlForm.labelEditing" active-text="启用" inactive-text="停用"
+                     @change="changeLabelEditingStatus"/>
+        </el-form-item>
+        <el-form-item label="自定义渲染">
+          <el-switch v-model="controlForm.labelVisible" active-text="启用" inactive-text="停用"
+                     @change="changeLabelVisibleStatus"/>
+        </el-form-item>
+        <el-form-item label="流程引擎">
+          <el-radio-group v-model="controlForm.prefix" @change="reloadProcessDesigner()">
+            <el-radio label="camunda">camunda</el-radio>
+            <el-radio label="flowable">flowable</el-radio>
+            <el-radio label="activiti">activiti</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="工具栏">
+          <el-radio-group v-model="controlForm.headerButtonSize">
+            <el-radio label="mini">mini</el-radio>
+            <el-radio label="small">small</el-radio>
+            <el-radio label="medium">medium</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-switch v-model="pageMode" active-text="dark" inactive-text="light" @change="changePageMode"></el-switch>
+      </el-form>
+    </el-drawer>
+
+    <div class="demo-info-bar">
+      <div class="open-model-button" @click="infoTipVisible = !infoTipVisible"><i class="el-icon-info"></i></div>
+      <transition name="zoom-in-right">
+        <div v-show="infoTipVisible" class="info-tip">
+          <p><strong>该项目仅作为Bpmn.js的简单演示项目，不涉及过多的自定义Render内容。</strong></p>
+          <p>注：activiti 好像不支持表单配置，控制台可能会报错</p>
+          <p>付费咨询请加微信（毕竟生活太累了😩😩😩）</p>
+          <p>
+            <span>更多配置请查看源码：</span>
+            <a href="https://github.com/miyuesc/bpmn-process-designer">MiyueSC/bpmn-process-designer</a>
+          </p>
+          <p>
+            <span>bpmn 官方图标：</span>
+            <a href="https://cdn.staticaly.com/gh/bpmn-io/bpmn-font/master/dist/demo.html">bpmn-io/bpmn-font</a>
+          </p>
+          <p>
+            <span>疑问请在此留言：</span>
+            <a
+              href="https://github.com/miyuesc/bpmn-process-designer/issues/16">MiyueSC/bpmn-process-designer/issues</a>
+          </p>
+        </div>
+      </transition>
+    </div>
   </el-container>
 </template>
 
 <script>
-import bpmnModeler from 'workflow-bpmn-modeler'
-import { deploy, getProcessDefinitionXml, getVersionProcessDefinitionXml } from '@/api/process/definition'
+import translations from '@/translations'
+// 自定义渲染（隐藏了 label 标签）
+import CustomRenderer from '@/modules/custom-renderer'
+// 自定义元素选中时的弹出菜单（修改 默认任务 为 用户任务）
+import CustomContentPadProvider from '../../../../package/designer/plugins/content-pad'
+// 自定义左侧菜单（修改 默认任务 为 用户任务）
+import CustomPaletteProvider from '../../../../package/designer/plugins/palette'
+import Log from '../../../../package/Log'
+// 小地图
+import minimapModule from 'diagram-js-minimap'
+
+import UserSql from '../../../modules/extension/user.json'
+
+// clickoutside
+import clickoutside from 'element-ui/lib/utils/clickoutside'
+import RewriteAutoPlace from '../../../modules/auto-place/rewriteAutoPlace'
 
 export default {
   name: 'DesignerView',
-  components: {
-    bpmnModeler
+  directives: {
+    clickoutside: clickoutside
   },
   data () {
     return {
-      processKey: '',
-      tenantId: '',
-      processDefinitionId: '',
-      xml: '',
-      users: [
-        {
-          name: 'The Beatles',
-          id: '1'
-        },
-        {
-          name: 'The Rolling Stones',
-          id: '2'
-        },
-        {
-          name: 'Pink Floyed',
-          id: '3'
-        }
-      ],
-      groups: [
-        {
-          name: 'Folk Music',
-          id: '4'
-        },
-        {
-          name: 'Rock Music',
-          id: '5'
-        },
-        {
-          name: 'Classical Music',
-          id: '6'
-        }
-      ],
-      categorys: [
-        {
-          name: 'Music',
-          id: '7'
-        },
-        {
-          name: 'Articles',
-          id: '8'
-        }
-      ]
+      xmlString: '',
+      modeler: null,
+      reloadIndex: 0,
+      controlDrawerVisible: false,
+      infoTipVisible: false,
+      pageMode: false,
+      translationsSelf: translations,
+      controlForm: {
+        processId: '',
+        processName: '',
+        simulation: true,
+        labelEditing: false,
+        labelVisible: false,
+        prefix: 'flowable',
+        headerButtonSize: 'mini',
+        events: ['element.click', 'element.contextmenu'],
+        // additionalModel: []
+        moddleExtension: { user: UserSql },
+        additionalModel: [
+          CustomContentPadProvider,
+          CustomPaletteProvider,
+          minimapModule,
+          {
+            __init__: ['autoPlaceSelectionBehavior'],
+            autoPlace: ['type', RewriteAutoPlace]
+          }
+        ]
+      },
+      addis: {
+        CustomContentPadProvider,
+        CustomPaletteProvider
+      }
     }
   },
   created () {
-    // eslint-disable-next-line no-template-curly-in-string
-    this.xml = '<?xml version="1.0" encoding="UTF-8"?>\\n<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" xmlns:flowable="http://flowable.org/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.flowable.org/processdef">\\n  <process id="holiday001" name="holiday" flowable:processCategory="8">\\n    <startEvent id="startNode1" name="开始">\\n      <outgoing>Flow_0k5g6iy</outgoing>\\n    </startEvent>\\n    <userTask id="Activity_0m9kfnp" flowable:assignee="3">\\n      <incoming>Flow_0k5g6iy</incoming>\\n      <outgoing>Flow_1yee174</outgoing>\\n    </userTask>\\n    <sequenceFlow id="Flow_0k5g6iy" sourceRef="startNode1" targetRef="Activity_0m9kfnp" />\\n    <serviceTask id="Activity_1xcycgo" flowable:class="com.breeze.boot.flowable.callable.CallExternalSystemDelegate">\\n      <incoming>Flow_0bnb40e</incoming>\\n      <outgoing>Flow_0hm6psg</outgoing>\\n    </serviceTask>\\n    <exclusiveGateway id="Gateway_0y14fyl">\\n      <incoming>Flow_1yee174</incoming>\\n      <outgoing>Flow_0bnb40e</outgoing>\\n      <outgoing>Flow_0svom0r</outgoing>\\n    </exclusiveGateway>\\n    <sequenceFlow id="Flow_1yee174" sourceRef="Activity_0m9kfnp" targetRef="Gateway_0y14fyl" />\\n    <sequenceFlow id="Flow_0bnb40e" name="同意" sourceRef="Gateway_0y14fyl" targetRef="Activity_1xcycgo">\\n      <conditionExpression xsi:type="tFormalExpression">${approved}</conditionExpression>\\n    </sequenceFlow>\\n    <sequenceFlow id="Flow_0svom0r" name="拒绝" sourceRef="Gateway_0y14fyl" targetRef="Activity_1k8uks7">\\n      <conditionExpression xsi:type="tFormalExpression">${!approved}</conditionExpression>\\n    </sequenceFlow>\\n    <serviceTask id="Activity_1k8uks7" flowable:class="com.breeze.boot.flowable.callable.SendRejectionMail">\\n      <incoming>Flow_0svom0r</incoming>\\n      <outgoing>Flow_0nt3skk</outgoing>\\n    </serviceTask>\\n    <sequenceFlow id="Flow_0hm6psg" sourceRef="Activity_1xcycgo" targetRef="Activity_1d8tyg9" />\\n    <endEvent id="Event_0uzbald" name="结束">\\n      <incoming>Flow_1q3gzyv</incoming>\\n    </endEvent>\\n    <sequenceFlow id="Flow_1q3gzyv" sourceRef="Activity_1d8tyg9" targetRef="Event_0uzbald" />\\n    <userTask id="Activity_1d8tyg9" name="假期审批" flowable:assignee="2">\\n      <incoming>Flow_0hm6psg</incoming>\\n      <outgoing>Flow_1q3gzyv</outgoing>\\n    </userTask>\\n    <endEvent id="Event_0lgoel3" name="结束">\\n      <incoming>Flow_0nt3skk</incoming>\\n    </endEvent>\\n    <sequenceFlow id="Flow_0nt3skk" sourceRef="Activity_1k8uks7" targetRef="Event_0lgoel3" />\\n  </process>\\n  <bpmndi:BPMNDiagram id="BPMNDiagram_flow">\\n    <bpmndi:BPMNPlane id="BPMNPlane_flow" bpmnElement="holiday001">\\n      <bpmndi:BPMNEdge id="Flow_0nt3skk_di" bpmnElement="Flow_0nt3skk">\\n        <di:waypoint x="500" y="250" />\\n        <di:waypoint x="642" y="250" />\\n      </bpmndi:BPMNEdge>\\n      <bpmndi:BPMNEdge id="Flow_1q3gzyv_di" bpmnElement="Flow_1q3gzyv">\\n        <di:waypoint x="700" y="140" />\\n        <di:waypoint x="802" y="140" />\\n      </bpmndi:BPMNEdge>\\n      <bpmndi:BPMNEdge id="Flow_0hm6psg_di" bpmnElement="Flow_0hm6psg">\\n        <di:waypoint x="500" y="140" />\\n        <di:waypoint x="600" y="140" />\\n      </bpmndi:BPMNEdge>\\n      <bpmndi:BPMNEdge id="Flow_0svom0r_di" bpmnElement="Flow_0svom0r">\\n        <di:waypoint x="240" y="165" />\\n        <di:waypoint x="240" y="250" />\\n        <di:waypoint x="400" y="250" />\\n        <bpmndi:BPMNLabel>\\n          <omgdc:Bounds x="244" y="205" width="22" height="14" />\\n        </bpmndi:BPMNLabel>\\n      </bpmndi:BPMNEdge>\\n      <bpmndi:BPMNEdge id="Flow_0bnb40e_di" bpmnElement="Flow_0bnb40e">\\n        <di:waypoint x="265" y="140" />\\n        <di:waypoint x="400" y="140" />\\n        <bpmndi:BPMNLabel>\\n          <omgdc:Bounds x="321" y="122" width="23" height="14" />\\n        </bpmndi:BPMNLabel>\\n      </bpmndi:BPMNEdge>\\n      <bpmndi:BPMNEdge id="Flow_1yee174_di" bpmnElement="Flow_1yee174">\\n        <di:waypoint x="120" y="140" />\\n        <di:waypoint x="215" y="140" />\\n      </bpmndi:BPMNEdge>\\n      <bpmndi:BPMNEdge id="Flow_0k5g6iy_di" bpmnElement="Flow_0k5g6iy">\\n        <di:waypoint x="-65" y="140" />\\n        <di:waypoint x="20" y="140" />\\n      </bpmndi:BPMNEdge>\\n      <bpmndi:BPMNShape id="BPMNShape_startNode1" bpmnElement="startNode1" bioc:stroke="">\\n        <omgdc:Bounds x="-95" y="125" width="30" height="30" />\\n        <bpmndi:BPMNLabel>\\n          <omgdc:Bounds x="-92" y="162" width="22" height="14" />\\n        </bpmndi:BPMNLabel>\\n      </bpmndi:BPMNShape>\\n      <bpmndi:BPMNShape id="Activity_00p5085_di" bpmnElement="Activity_0m9kfnp">\\n        <omgdc:Bounds x="20" y="100" width="100" height="80" />\\n      </bpmndi:BPMNShape>\\n      <bpmndi:BPMNShape id="Activity_113nume_di" bpmnElement="Activity_1xcycgo">\\n        <omgdc:Bounds x="400" y="100" width="100" height="80" />\\n      </bpmndi:BPMNShape>\\n      <bpmndi:BPMNShape id="Gateway_0y14fyl_di" bpmnElement="Gateway_0y14fyl" isMarkerVisible="true">\\n        <omgdc:Bounds x="215" y="115" width="50" height="50" />\\n      </bpmndi:BPMNShape>\\n      <bpmndi:BPMNShape id="Activity_0ltz7ne_di" bpmnElement="Activity_1k8uks7">\\n        <omgdc:Bounds x="400" y="210" width="100" height="80" />\\n      </bpmndi:BPMNShape>\\n      <bpmndi:BPMNShape id="Event_0uzbald_di" bpmnElement="Event_0uzbald">\\n        <omgdc:Bounds x="802" y="122" width="36" height="36" />\\n        <bpmndi:BPMNLabel>\\n          <omgdc:Bounds x="809" y="165" width="22" height="14" />\\n        </bpmndi:BPMNLabel>\\n      </bpmndi:BPMNShape>\\n      <bpmndi:BPMNShape id="Activity_1gj4r8x_di" bpmnElement="Activity_1d8tyg9">\\n        <omgdc:Bounds x="600" y="100" width="100" height="80" />\\n      </bpmndi:BPMNShape>\\n      <bpmndi:BPMNShape id="Event_0lgoel3_di" bpmnElement="Event_0lgoel3">\\n        <omgdc:Bounds x="642" y="232" width="36" height="36" />\\n        <bpmndi:BPMNLabel>\\n          <omgdc:Bounds x="649" y="275" width="22" height="14" />\\n        </bpmndi:BPMNLabel>\\n      </bpmndi:BPMNShape>\\n    </bpmndi:BPMNPlane>\\n  </bpmndi:BPMNDiagram>\\n</definitions>\\n'
-    this.processKey = this.$route.query.processKey
-    this.processDefinitionId = this.$route.query.processDefinitionId
-    this.tenantId = this.$route.query.tenantId
-    if (this.processKey) {
-      this.getProcessDefinitionXml(this.processKey, this.tenantId)
-    } else if (this.processDefinitionId) {
-      this.getVersionProcessDefinitionXml(this.processDefinitionId, this.tenantId)
-    }
   },
   methods: {
-    getProcessDefinitionXml (processKey, tenantId) {
-      getProcessDefinitionXml(processKey, tenantId).then(response => {
-        this.xml = response.data
-      })
+    initModeler (modeler) {
+      setTimeout(() => {
+        this.modeler = modeler
+        const canvas = modeler.get('canvas')
+
+        const rootElement = canvas.getRootElement()
+        Log.prettyPrimary('Process Id:', rootElement.id)
+        Log.prettyPrimary('Process Name:', rootElement.businessObject.name)
+      }, 10)
     },
-    getVersionProcessDefinitionXml (processKey, tenantId) {
-      getVersionProcessDefinitionXml(processKey, tenantId).then(response => {
-        this.xml = response.data
-      })
-    },
-    getModelDetail () {
-      // Send request to get xml
-      // this.xml = response.xml
-    },
-    save (data) {
-      // data: { process: {...}, xml: '...', svg: '...' }
-      const paramData = {
-        xml: data.xml,
-        tenantId: '1',
-        id: data.process.id,
-        category: data.process.category,
-        name: data.process.name
+    reloadProcessDesigner (notDeep) {
+      this.controlForm.additionalModel = []
+      for (const key in this.addis) {
+        if (this.addis[key]) {
+          this.controlForm.additionalModel.push(this.addis[key])
+        }
       }
-      deploy(paramData).then(response => {
-      })
+      !notDeep && (this.xmlString = undefined)
+      this.reloadIndex += 1
+      this.modeler = null // 避免 panel 异常
+    },
+    changeLabelEditingStatus (status) {
+      this.addis.labelEditing = status ? { labelEditingProvider: ['value', ''] } : false
+      this.reloadProcessDesigner()
+    },
+    changeLabelVisibleStatus (status) {
+      this.addis.customRenderer = status ? CustomRenderer : false
+      this.reloadProcessDesigner()
+    },
+    elementClick (element) {
+      console.log(element)
+      this.element = element
+    },
+    elementContextmenu (element) {
+      console.log('elementContextmenu:', element)
+    },
+    changePageMode (mode) {
+      const theme = mode
+        ? {
+          // dark
+            stroke: '#ffffff',
+            fill: '#333333'
+          }
+        : {
+          // light
+            stroke: '#000000',
+            fill: '#ffffff'
+          }
+      const elements = this.modeler.get('elementRegistry').getAll()
+      this.modeler.get('modeling').setColor(elements, theme)
+    },
+    toggle () {
+      console.log(this.modeler)
+      console.log(this.modeler.get('toggleMode'))
+      this.modeler.get('toggleMode').toggleMode()
     }
   }
 }
 </script>
-<style lang="less">
-.designer {
-  .flow-containers .djs-palette {
-    left: 0px !important;
-    top: 0px;
-    border: 1px solid rgba(199, 197, 197, 0.32);
-    width: 130px !important;
-    margin: 10px 20px;
-    border-radius: 10px !important;
+
+<style lang="scss">
+body {
+  overflow: hidden;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+#designer {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  display: inline-grid;
+  grid-template-columns: 100px auto max-content;
+}
+
+.demo-info-bar {
+  position: fixed;
+  right: 8px;
+  bottom: 108px;
+  z-index: 1;
+}
+
+.demo-control-bar {
+  position: fixed;
+  right: 8px;
+  bottom: 48px;
+  z-index: 1;
+}
+
+.open-model-button {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 32px;
+  background: rgba(64, 158, 255, 1);
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.zoom-in-right-enter-active,
+.zoom-in-right-leave-active {
+  opacity: 1;
+  transform: scaleY(1) translateY(-48px);
+  transition: all 300ms cubic-bezier(0.23, 1, 0.32, 1);
+  transform-origin: right center;
+}
+
+.zoom-in-right-enter,
+.zoom-in-right-leave-active {
+  opacity: 0;
+  transform: scaleX(0) translateY(-48px);
+}
+
+.info-tip {
+  position: absolute;
+  width: 480px;
+  top: 0;
+  right: 64px;
+  z-index: 10;
+  box-sizing: border-box;
+  padding: 0 16px;
+  color: #333333;
+  background: #f2f6fc;
+  transform: translateY(-48px);
+  border: 1px solid #ebeef5;
+  border-radius: 4px;
+
+  &::before,
+  &::after {
+    content: "";
+    width: 0;
+    height: 0;
+    border-width: 8px;
+    border-style: solid;
+    position: absolute;
+    right: -15px;
+    top: 50%;
   }
 
-  .is-vertical .el-aside {
-    background: rgba(250, 250, 250, 0.7) !important;
-    margin-top: 5px;
-    width: 18vw !important;
-    border-radius: 10px !important;
-    border: 0.5px solid #e8e8e8 !important;
+  &::before {
+    border-color: transparent transparent transparent #f2f6fc;
+    z-index: 10;
   }
 
-  .flow-containers {
-    background-image: linear-gradient(90deg, rgba(60, 10, 30, .04) 3%, transparent 0), linear-gradient(1turn, rgba(60, 10, 30, .04) 3%, transparent 0);
-    background-size: 20px 20px;
-    background-position: 50%;
-    background-repeat: repeat;
+  &::after {
+    right: -16px;
+    border-color: transparent transparent transparent #ebeef5;
+    z-index: 1;
+  }
+}
+
+.control-form {
+  .el-radio {
+    width: 100%;
+    line-height: 32px;
+  }
+}
+
+.element-overlays {
+  box-sizing: border-box;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+  color: #fafafa;
+}
+
+body,
+body * {
+  /* 滚动条 */
+  &::-webkit-scrollbar-track-piece {
+    background-color: #fff; /*滚动条的背景颜色*/
+    -webkit-border-radius: 0; /*滚动条的圆角宽度*/
   }
 
-  .is-vertical .el-header {
-    background: rgb(253, 253, 253) !important;
+  &::-webkit-scrollbar {
+    width: 10px; /*滚动条的宽度*/
+    height: 8px; /*滚动条的高度*/
+  }
+
+  &::-webkit-scrollbar-thumb:vertical {
+    /*垂直滚动条的样式*/
+    height: 50px;
+    background-color: rgba(153, 153, 153, 0.5);
+    -webkit-border-radius: 4px;
+    outline: 2px solid #fff;
+    outline-offset: -2px;
+    border: 2px solid #fff;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    /*滚动条的hover样式*/
+    background-color: rgba(159, 159, 159, 0.3);
+    -webkit-border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    /*滚动条的hover样式*/
+    background-color: rgba(159, 159, 159, 0.5);
+    -webkit-border-radius: 4px;
   }
 }
 </style>

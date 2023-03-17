@@ -15,7 +15,7 @@ export default {
 }
 </script>
 
-<style lang="less" scoped>
+<style lang="scss" scoped>
 .welcome {
   height: 90vh;
 }
