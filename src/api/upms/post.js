@@ -11,7 +11,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function list (data) {
   return request({
-    url: servicePath.process + '/category/list',
+    url: servicePath.upms + '/post/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -23,12 +23,12 @@ export function list (data) {
 /**
  * 删除
  *
- * @param ids
+ * @Param ids
  * @returns {AxiosPromise}
  */
 export function del (ids) {
   return request({
-    url: servicePath.process + '/category/delete',
+    url: servicePath.upms + '/post/delete',
     method: 'delete',
     data: ids
   })
@@ -37,12 +37,12 @@ export function del (ids) {
 /**
  * 新增
  *
- * @param data
+ * @Param data
  * @returns {AxiosPromise}
  */
 export function save (data) {
   return request({
-    url: servicePath.process + '/category/create',
+    url: servicePath.upms + '/post/create',
     method: 'post',
     data: data
   })
@@ -51,31 +51,31 @@ export function save (data) {
 /**
  * 修改
  *
- * @param data
+ * @Param data
  * @returns {AxiosPromise}
  */
 export function modify (data) {
   return request({
-    url: servicePath.process + '/category/modify',
+    url: servicePath.upms + '/post/modify',
     method: 'put',
     data: data
   })
 }
 
 /**
- * 校验流程分类编码是否重复
+ * 校验岗位编码是否重复
  *
- * @param categoryCode
- * @param categoryId
+ * @param postCode
+ * @param postId
  * @returns {AxiosPromise}
  */
-export function checkCategoryCode (categoryCode, categoryId) {
+export function checkPostCode (postCode, postId) {
   return request({
-    url: servicePath.process + '/category/checkCategoryCode',
+    url: servicePath.upms + '/post/checkPostCode',
     method: 'get',
     params: {
-      categoryId: categoryId || '',
-      categoryCode: categoryCode
+      postId: postId || '',
+      postCode: postCode
     }
   })
 }

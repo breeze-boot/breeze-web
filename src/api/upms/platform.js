@@ -11,7 +11,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function list (data) {
   return request({
-    url: servicePath.process + '/category/list',
+    url: servicePath.upms + '/platform/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -28,7 +28,7 @@ export function list (data) {
  */
 export function del (ids) {
   return request({
-    url: servicePath.process + '/category/delete',
+    url: servicePath.upms + '/platform/delete',
     method: 'delete',
     data: ids
   })
@@ -42,7 +42,7 @@ export function del (ids) {
  */
 export function save (data) {
   return request({
-    url: servicePath.process + '/category/create',
+    url: servicePath.upms + '/platform/create',
     method: 'post',
     data: data
   })
@@ -56,26 +56,26 @@ export function save (data) {
  */
 export function modify (data) {
   return request({
-    url: servicePath.process + '/category/modify',
+    url: servicePath.upms + '/platform/modify',
     method: 'put',
     data: data
   })
 }
 
 /**
- * 校验流程分类编码是否重复
+ * 校验平台编码是否重复
  *
- * @param categoryCode
- * @param categoryId
+ * @param platformCode
+ * @param platformId
  * @returns {AxiosPromise}
  */
-export function checkCategoryCode (categoryCode, categoryId) {
+export function checkPlatformCode (platformCode, platformId) {
   return request({
-    url: servicePath.process + '/category/checkCategoryCode',
+    url: servicePath.upms + '/platform/checkPlatformCode',
     method: 'get',
     params: {
-      categoryId: categoryId || '',
-      categoryCode: categoryCode
+      platformId: platformId || '',
+      platformCode: platformCode
     }
   })
 }

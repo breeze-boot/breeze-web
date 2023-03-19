@@ -10,7 +10,9 @@ let loadingInstance = {}
  * @type {string}
  */
 export const servicePath = {
-  system: ''
+  upms: '',
+  sys: '',
+  process: ''
 }
 
 /**
@@ -95,9 +97,12 @@ request.interceptors.response.use((response) => {
     Message.error({ message: '请求地址不存在' })
   } else if (error.response.status === 401) {
     showErrorMsg(error.response, error.response.data.message)
+    loadingInstance.close()
+    return
   } else if (error.response.status === 403) {
-    reLoginConfirm()
     showErrorMsg(error.response, error.response.data.message)
+    reLoginConfirm()
+    return
   }
   console.error(error.response.status)
   loadingInstance.close()

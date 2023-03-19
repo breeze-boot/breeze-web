@@ -11,7 +11,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function list (data) {
   return request({
-    url: servicePath.process + '/category/list',
+    url: servicePath.upms + '/tenant/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -28,7 +28,7 @@ export function list (data) {
  */
 export function del (ids) {
   return request({
-    url: servicePath.process + '/category/delete',
+    url: servicePath.upms + '/tenant/delete',
     method: 'delete',
     data: ids
   })
@@ -42,7 +42,7 @@ export function del (ids) {
  */
 export function save (data) {
   return request({
-    url: servicePath.process + '/category/create',
+    url: servicePath.upms + '/tenant/create',
     method: 'post',
     data: data
   })
@@ -56,26 +56,38 @@ export function save (data) {
  */
 export function modify (data) {
   return request({
-    url: servicePath.process + '/category/modify',
+    url: servicePath.upms + '/tenant/modify',
     method: 'put',
     data: data
   })
 }
 
 /**
- * 校验流程分类编码是否重复
+ * 系统租户下拉框
  *
- * @param categoryCode
- * @param categoryId
  * @returns {AxiosPromise}
  */
-export function checkCategoryCode (categoryCode, categoryId) {
+export function selectTenant () {
   return request({
-    url: servicePath.process + '/category/checkCategoryCode',
+    url: servicePath.upms + '/common/selectTenant',
+    method: 'get'
+  })
+}
+
+/**
+ * 校验租户编码是否重复
+ *
+ * @param tenantCode
+ * @param tenantId
+ * @returns {AxiosPromise}
+ */
+export function checkTenantCode (tenantCode, tenantId) {
+  return request({
+    url: servicePath.upms + '/tenant/checkTenantCode',
     method: 'get',
     params: {
-      categoryId: categoryId || '',
-      categoryCode: categoryCode
+      tenantId: tenantId || '',
+      tenantCode: tenantCode
     }
   })
 }

@@ -1,4 +1,4 @@
-import { request, servicePath } from '@/utils/axios'
+import { request } from '@/utils/axios'
 
 /**
  * 用户密码登录
@@ -11,9 +11,8 @@ export function login (data) {
     username: data.username,
     password: data.password
   }
-
   return request({
-    url: servicePath.system + '/breeze/login',
+    url: '/breeze/login',
     method: 'post',
     data: dataObj
   })
@@ -27,7 +26,7 @@ export function login (data) {
  */
 export function logout (username) {
   return request({
-    url: servicePath.system + '/breeze/logout',
+    url: '/breeze/logout',
     method: 'get',
     params: username
   })

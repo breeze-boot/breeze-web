@@ -4,23 +4,6 @@ import JSONBigInt from 'json-bigint'
 const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
 
 /**
- * 发起流程
- *
- * @param data
- * @returns {AxiosPromise}
- */
-export function startProcess (data) {
-  return request({
-    url: servicePath.process + '/instance/startProcess',
-    method: 'post',
-    data: data,
-    transformResponse: [(data) => {
-      return JSONBigInt2Str.parse(data)
-    }]
-  })
-}
-
-/**
  * 列表
  *
  * @param data
@@ -28,7 +11,7 @@ export function startProcess (data) {
  */
 export function list (data) {
   return request({
-    url: servicePath.process + '/instance/list',
+    url: servicePath.upms + '/log/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -38,15 +21,27 @@ export function list (data) {
 }
 
 /**
- * 列表
+ * 清空
  *
- * @param data
  * @returns {AxiosPromise}
  */
-export function del (id) {
+export function clear () {
   return request({
-    url: servicePath.process + '/instance/delete',
+    url: servicePath.upms + '/log/clear',
+    method: 'delete'
+  })
+}
+
+/**
+ * 删除
+ *
+ * @param ids
+ * @returns {AxiosPromise}
+ */
+export function del (ids) {
+  return request({
+    url: servicePath.upms + '/log/delete',
     method: 'delete',
-    params: id
+    data: ids
   })
 }

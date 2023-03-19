@@ -11,7 +11,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function list (data) {
   return request({
-    url: servicePath.process + '/category/list',
+    url: servicePath.sys + '/msg/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -28,7 +28,7 @@ export function list (data) {
  */
 export function del (ids) {
   return request({
-    url: servicePath.process + '/category/delete',
+    url: servicePath.sys + '/msg/delete',
     method: 'delete',
     data: ids
   })
@@ -42,7 +42,7 @@ export function del (ids) {
  */
 export function save (data) {
   return request({
-    url: servicePath.process + '/category/create',
+    url: servicePath.sys + '/msg/create',
     method: 'post',
     data: data
   })
@@ -51,31 +51,44 @@ export function save (data) {
 /**
  * 修改
  *
- * @param data
  * @returns {AxiosPromise}
  */
 export function modify (data) {
   return request({
-    url: servicePath.process + '/category/modify',
+    url: servicePath.sys + '/msg/modify',
     method: 'put',
     data: data
   })
 }
 
 /**
- * 校验流程分类编码是否重复
+ * 用户列表
  *
- * @param categoryCode
- * @param categoryId
  * @returns {AxiosPromise}
  */
-export function checkCategoryCode (categoryCode, categoryId) {
+export function selectUser () {
   return request({
-    url: servicePath.process + '/category/checkCategoryCode',
+    url: servicePath.sys + '/common/selectUser',
     method: 'get',
-    params: {
-      categoryId: categoryId || '',
-      categoryCode: categoryCode
-    }
+    transformResponse: [(data) => {
+      return JSONBigInt2Str.parse(data)
+    }]
+  })
+}
+
+/**
+ * 部门下的用户列表
+ *
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function listUserByDeptId (data) {
+  return request({
+    url: servicePath.sys + '/user/listUserByDeptId',
+    method: 'post',
+    data: data,
+    transformResponse: [(data) => {
+      return JSONBigInt2Str.parse(data)
+    }]
   })
 }

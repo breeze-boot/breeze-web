@@ -11,7 +11,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function list (data) {
   return request({
-    url: servicePath.process + '/category/list',
+    url: servicePath.sys + '/userMsg/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -28,54 +28,49 @@ export function list (data) {
  */
 export function del (ids) {
   return request({
-    url: servicePath.process + '/category/delete',
+    url: servicePath.sys + '/userMsg/delete',
     method: 'delete',
     data: ids
   })
 }
 
 /**
- * 新增
+ * 关闭
  *
- * @param data
+ * @param msgCode
  * @returns {AxiosPromise}
  */
-export function save (data) {
+export function close (msgCode) {
   return request({
-    url: servicePath.process + '/category/create',
-    method: 'post',
-    data: data
+    url: servicePath.sys + '/userMsg/close/' + msgCode,
+    method: 'put'
   })
 }
 
 /**
- * 修改
+ * 标记已读
  *
- * @param data
+ * @param msgCode
  * @returns {AxiosPromise}
  */
-export function modify (data) {
+export function read (msgCode) {
   return request({
-    url: servicePath.process + '/category/modify',
-    method: 'put',
-    data: data
+    url: servicePath.sys + '/userMsg/read/' + msgCode,
+    method: 'put'
   })
 }
 
 /**
- * 校验流程分类编码是否重复
+ * 获取消息
  *
- * @param categoryCode
- * @param categoryId
  * @returns {AxiosPromise}
  */
-export function checkCategoryCode (categoryCode, categoryId) {
+export function listMsgByUsername () {
   return request({
-    url: servicePath.process + '/category/checkCategoryCode',
+    url: servicePath.sys + '/userMsg/listMsgByUsername',
     method: 'get',
     params: {
-      categoryId: categoryId || '',
-      categoryCode: categoryCode
+      username: JSON.parse(localStorage.getItem('user_info')).username
     }
   })
 }

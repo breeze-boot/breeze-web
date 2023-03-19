@@ -11,7 +11,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function deploy (data) {
   return request({
-    url: servicePath.system + '/process/definition/deploy',
+    url: servicePath.process + '/definition/deploy',
     method: 'post',
     data: data
   })
@@ -25,7 +25,7 @@ export function deploy (data) {
  */
 export function list (data) {
   return request({
-    url: servicePath.system + '/process/definition/list',
+    url: servicePath.process + '/definition/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -42,7 +42,7 @@ export function list (data) {
  */
 export function listVersion (data) {
   return request({
-    url: servicePath.system + '/process/definition/listVersion',
+    url: servicePath.process + '/definition/listVersion',
     method: 'post',
     data: data
   })
@@ -57,7 +57,7 @@ export function listVersion (data) {
  */
 export function getProcessDefinitionXml (processKey, tenantId) {
   return request({
-    url: servicePath.system + '/process/definition/getProcessDefinitionXml',
+    url: servicePath.process + '/definition/getProcessDefinitionXml',
     method: 'get',
     params: {
       processKey: processKey,
@@ -75,7 +75,7 @@ export function getProcessDefinitionXml (processKey, tenantId) {
  */
 export function getVersionProcessDefinitionXml (processDefinitionId, tenantId) {
   return request({
-    url: servicePath.system + '/process/definition/getVersionProcessDefinitionXml',
+    url: servicePath.process + '/definition/getVersionProcessDefinitionXml',
     method: 'get',
     params: {
       processDefinitionId: processDefinitionId,
@@ -93,7 +93,7 @@ export function getVersionProcessDefinitionXml (processDefinitionId, tenantId) {
  */
 export function getProcessDefinitionPng (processKey, tenantId) {
   return request({
-    url: servicePath.system + '/process/definition/getProcessDefinitionPng',
+    url: servicePath.process + '/definition/getProcessDefinitionPng',
     method: 'get',
     params: {
       processKey: processKey,
@@ -111,7 +111,7 @@ export function getProcessDefinitionPng (processKey, tenantId) {
  */
 export function getVersionProcessDefinitionPng (processDefinitionId, tenantId) {
   return request({
-    url: servicePath.system + '/process/definition/getVersionProcessDefinitionPng',
+    url: servicePath.process + '/definition/getVersionProcessDefinitionPng',
     method: 'get',
     params: {
       processDefinitionId: processDefinitionId,
@@ -128,7 +128,7 @@ export function getVersionProcessDefinitionPng (processDefinitionId, tenantId) {
  */
 export function del (deploymentId) {
   return request({
-    url: servicePath.system + '/process/definition/delete',
+    url: servicePath.process + '/definition/delete',
     method: 'delete',
     params: {
       deploymentId: deploymentId,
@@ -144,7 +144,7 @@ export function del (deploymentId) {
  */
 export function modify (data) {
   return request({
-    url: servicePath.system + '/process/definition/modify',
+    url: servicePath.process + '/definition/modify',
     method: 'put',
     data: data
   })
@@ -158,7 +158,7 @@ export function modify (data) {
  */
 export function isSuspended (processDefinitionId) {
   return request({
-    url: servicePath.system + '/process/definition/isSuspended',
+    url: servicePath.process + '/definition/isSuspended',
     method: 'put',
     params: {
       processDefinitionId: processDefinitionId
@@ -173,7 +173,7 @@ export function isSuspended (processDefinitionId) {
  */
 export function selectUser () {
   return request({
-    url: servicePath.system + '/sys/common/selectUser',
+    url: servicePath.process + '/common/selectUser',
     method: 'get',
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)

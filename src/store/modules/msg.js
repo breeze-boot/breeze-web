@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { close, listMsgByUsername, read } from '@/api/msg/userMsg'
+import { close, listMsgByUsername, read } from '@/api/sys/userMsg'
 
 Vue.use(Vuex)
 

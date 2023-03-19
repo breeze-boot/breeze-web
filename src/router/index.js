@@ -65,8 +65,8 @@ router.beforeEach((to, from, next) => {
         replace: true
       })
     }).catch(err => {
-      store.dispatch('userInfo/LogOut').then(() => {
-        this.$message.error(err)
+      store.dispatch('userInfo/logOut').then(() => {
+        console.error(err)
         next({ path: '/' })
       })
     })

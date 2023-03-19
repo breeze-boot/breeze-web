@@ -11,7 +11,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function list (data) {
   return request({
-    url: servicePath.process + '/category/list',
+    url: servicePath.upms + '/file/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -28,54 +28,54 @@ export function list (data) {
  */
 export function del (ids) {
   return request({
-    url: servicePath.process + '/category/delete',
+    url: servicePath.upms + '/file/delete',
     method: 'delete',
     data: ids
   })
 }
 
 /**
- * 新增
+ * 下载
  *
- * @param data
+ * @param ids
  * @returns {AxiosPromise}
  */
-export function save (data) {
+export function download (id) {
   return request({
-    url: servicePath.process + '/category/create',
-    method: 'post',
-    data: data
-  })
-}
-
-/**
- * 修改
- *
- * @param data
- * @returns {AxiosPromise}
- */
-export function modify (data) {
-  return request({
-    url: servicePath.process + '/category/modify',
-    method: 'put',
-    data: data
-  })
-}
-
-/**
- * 校验流程分类编码是否重复
- *
- * @param categoryCode
- * @param categoryId
- * @returns {AxiosPromise}
- */
-export function checkCategoryCode (categoryCode, categoryId) {
-  return request({
-    url: servicePath.process + '/category/checkCategoryCode',
+    url: servicePath.upms + '/file/download',
     method: 'get',
-    params: {
-      categoryId: categoryId || '',
-      categoryCode: categoryCode
-    }
+    params: { fileId: id },
+    responseType: 'blob'
+  })
+}
+
+/**
+ * 文件上传
+
+ * @param data
+ * @returns {AxiosPromise}
+ */
+export function upload (data) {
+  return request({
+    url: servicePath.upms + '/file/upload',
+    method: 'POST',
+    data: data,
+    transformResponse: [(data) => {
+      return JSONBigInt2Str.parse(data)
+    }]
+  })
+}
+
+/**
+ * 图片预览
+ *
+ * @param id
+ * @returns {AxiosPromise}
+ */
+export function preview (id) {
+  return request({
+    url: servicePath.upms + '/file/preview',
+    method: 'get',
+    params: { fileId: id }
   })
 }

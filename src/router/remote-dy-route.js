@@ -12,10 +12,14 @@ export const bindMenu = (menus) => {
 }
 
 export const convertMenu = (path, menus) => {
+  if (!menus || menus.length === 0) {
+    return
+  }
   menus.forEach(menu => {
     if (menu.href === 1) {
       return
     }
+
     const tPath = !path ? '' : (path + menu.path)
     menu.path = tPath
     if (!menu.children) {
@@ -29,6 +33,10 @@ export const convertMenu = (path, menus) => {
  * @param menus
  */
 export const bindRoute = (menus) => {
+  if (!menus || menus.length === 0) {
+    return
+  }
+
   menus.forEach(menu => {
     addRoute(menu.path, menu)
     if (!menu.children) {
@@ -43,6 +51,10 @@ export const bindRoute = (menus) => {
  * @param menus
  */
 export const filterRoute = (path = '', menus) => {
+  if (!menus || menus.length === 0) {
+    return
+  }
+
   menus.forEach(menu => {
     const tPath = !path ? '' : (path + menu.path)
     // 添加路由
