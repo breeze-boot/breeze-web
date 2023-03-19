@@ -10,7 +10,6 @@ let loadingInstance = {}
  * @type {string}
  */
 export const servicePath = {
-  upms: '',
   sys: '',
   process: ''
 }

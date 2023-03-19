@@ -319,7 +319,7 @@
 import { del, list, listUserByDeptId, modify, save, selectUser } from '@/api/sys/msg'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
-import { selectDept } from '@/api/upms/dept'
+import { selectDept } from '@/api/sys/dept'
 import { mapGetters } from 'vuex'
 
 export default {

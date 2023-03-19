@@ -1,15 +1,15 @@
 <template>
   <el-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchJobForm" class="demo-form-inline" label-width="80px"
+      <el-form ref="searchForm" :inline="true" :model="searchTenantForm" class="demo-form-inline" label-width="80px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
-            <el-form-item label="任务名称" prop="jobName">
-              <el-input v-model="searchJobForm.jobName" clearable placeholder="任务名称"/>
+            <el-form-item label="租户名称" prop="tenantName">
+              <el-input v-model="searchTenantForm.tenantName" clearable placeholder="租户名称"/>
             </el-form-item>
-            <el-form-item label="任务组名称" prop="jobGroupName">
-              <el-input v-model="searchJobForm.jobGroupName" clearable placeholder="任务组名称"/>
+            <el-form-item label="租户编码" prop="tenantCode">
+              <el-input v-model="searchTenantForm.tenantCode" clearable placeholder="租户编码"/>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search()">查询</el-button>
@@ -19,14 +19,14 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:job:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:job:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
+        <el-button v-has="['sys:tenant:create']" plain size="mini" type="primary" @click="create">新建</el-button>
+        <el-button v-has="['sys:tenant:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
                    @click="remove">删除
         </el-button>
       </div>
       <el-table
         ref="multipleTable"
-        :data="jobTableData"
+        :data="tenantTableData"
         border
         empty-text="无数据"
         height="500"
@@ -34,7 +34,7 @@
         size="mini"
         stripe
         style="width: 100%"
-        @selection-change="jobHandleSelectionChange">
+        @selection-change="tenantHandleSelectionChange">
         <el-table-column
           type="selection"
           width="55">
@@ -43,57 +43,40 @@
           v-if="false"
           label="ID"
           prop="id"
-          width="200"/>
+          width="200">
+        </el-table-column>
         <el-table-column
-          label="任务名称"
-          prop="jobName"
+          label="租户名称"
+          prop="tenantName"
           show-overflow-tooltip
-          width="200"/>
+          width="200">
+        </el-table-column>
         <el-table-column
-          label="任务组名称"
-          prop="jobGroupName"
-          show-overflow-tooltip/>
+          label="租户编码"
+          prop="tenantCode"
+          show-overflow-tooltip>
+        </el-table-column>
         <el-table-column
-          label="cron"
-          prop="cronExpression"
-          show-overflow-tooltip/>
-        <el-table-column
-          label="调用方法"
-          prop="clazzName"
-          show-overflow-tooltip/>
-        <el-table-column
-          label="执行策略"
-          prop="misfire_policy"
-          show-overflow-tooltip/>
-        <el-table-column
-          label="并发"
-          prop="concurrent"
-          show-overflow-tooltip/>
-        <el-table-column
-          label="状态"
-          prop="status"
-          show-overflow-tooltip/>
-        <el-table-column
-          label="状态"
-          prop="status"
-          show-overflow-tooltip/>
+          label="创建人"
+          prop="createName">
+        </el-table-column>
         <el-table-column
           fixed="right"
           label="操作"
           width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['sys:job:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
-            <el-button v-has="['sys:job:delete']" size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, jobTableData,scope.row)">删除
+            <el-button v-has="['sys:tenant:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button v-has="['sys:tenant:delete']" size="mini" type="text"
+                       @click.native.prevent="removeItem(scope.$index, tenantTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchJobForm.current"
-          :page-size="searchJobForm.size"
+          :current-page="searchTenantForm.current"
+          :page-size="searchTenantForm.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -103,19 +86,19 @@
       </div>
     </el-main>
 
-    <el-dialog :title="title" :visible.sync="jobDialogVisible" width="40vw"
-               @close="closeJobDialog('jobRuleForm')">
-      <el-form ref="jobRuleForm" :model="job" :rules="jobRules" size="mini">
-        <el-form-item :label-width="formLabelWidth" label="任务名称" prop="jobName">
-          <el-input v-model="job.jobName" autocomplete="off" clearable/>
+    <el-dialog :title="title" :visible.sync="tenantDialogVisible" width="40vw"
+               @close="closeTenantDialog('tenantRuleForm')">
+      <el-form ref="tenantRuleForm" :model="tenant" :rules="tenantRules" size="mini">
+        <el-form-item :label-width="formLabelWidth" label="租户名称" prop="tenantName">
+          <el-input v-model="tenant.tenantName" autocomplete="off" clearable/>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="任务组名称" prop="jobGroupName">
-          <el-input v-model="job.jobGroupName" autocomplete="off" clearable/>
+        <el-form-item :label-width="formLabelWidth" label="租户编码" prop="tenantCode">
+          <el-input v-model="tenant.tenantCode" autocomplete="off" clearable/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetJobForm('jobRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitJobForm('jobRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="resetTenantForm('tenantRuleForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="submitTenantForm('tenantRuleForm')">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -124,15 +107,21 @@
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item>
           <template slot="label">
-            任务名称
+            租户名称
           </template>
-          {{ job.jobName }}
+          {{ tenant.tenantName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            任务组名称
+            租户编码
           </template>
-          <el-tag size="small">{{ job.jobGroupName }}</el-tag>
+          <el-tag size="small">{{ tenant.tenantCode }}</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            描述
+          </template>
+          {{ tenant.description }}
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -141,12 +130,12 @@
 </template>
 
 <script>
-import { del, list, modify, save } from '@/api/sys/job'
+import { checkTenantCode, del, list, modify, save } from '@/api/sys/tenant'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 
 export default {
-  name: 'JobView',
+  name: 'TenantView',
   data () {
     return {
       // 当前操作类型
@@ -154,13 +143,13 @@ export default {
       // 弹出框标题
       title: '',
       // 单元格选中数据
-      multipleSelectionJobIds: [],
-      // 任务表格数据
-      jobTableData: [],
-      // 任务查询条件数据
-      searchJobForm: {
-        jobName: '',
-        jobGroupName: '',
+      multipleSelectionTenantIds: [],
+      // 租户表格数据
+      tenantTableData: [],
+      // 租户查询条件数据
+      searchTenantForm: {
+        tenantName: '',
+        tenantCode: '',
         current: 1,
         size: 10
       },
@@ -168,42 +157,49 @@ export default {
       total: 0,
       // 标记删除按钮是否可以点击
       checkDeleteItem: true,
-      // 任务添加修改弹出框
-      jobDialogVisible: false,
-      // 任务详情弹出框
+      // 租户添加修改弹出框
+      tenantDialogVisible: false,
+      // 用户添加修改弹出框
       infoDialogVisible: false,
       // 表单标题宽度
       formLabelWidth: '80px',
-      // 任务添加修改数据
-      job: {
+      // 租户添加修改数据
+      tenant: {
         id: undefined,
-        jobName: '',
-        jobGroupName: '',
+        tenantName: '',
+        tenantCode: '',
         description: ''
       },
-      // 任务详情数据
-      jobInfo: {
+      // 租户详情数据
+      tenantInfo: {
         id: undefined,
-        jobName: '',
-        jobGroupName: '',
+        tenantName: '',
+        tenantCode: '',
         description: ''
       },
-      // 任务添加修改表单规则
-      jobRules: {
-        jobName: [
+      // 租户添加修改表单规则
+      tenantRules: {
+        tenantName: [
           {
             required: true,
-            message: '请输入任务名称',
+            message: '请输入租户名称',
             trigger: 'blur'
           }
         ],
-        jobGroupName: [
+        tenantCode: [
           {
             required: true,
-            message: '请输入任务编码',
+            message: '请输入租户编码',
             trigger: 'blur'
           }, {
             validator: (rule, value, callback) => {
+              checkTenantCode(value, this.tenant.id).then((response) => {
+                if (response.data) {
+                  callback()
+                  return
+                }
+                callback(new Error('编码重复'))
+              })
             },
             trigger: 'blur'
           }
@@ -221,19 +217,21 @@ export default {
      */
     reloadList () {
       list(this.buildParam()).then((response) => {
-        this.jobTableData = response.data.records
-        this.searchJobForm.size = response.data.size
-        this.searchJobForm.current = response.data.current
-        this.total = response.data.total
+        if (response.code === 1) {
+          this.tenantTableData = response.data.records
+          this.searchTenantForm.size = response.data.size
+          this.searchTenantForm.current = response.data.current
+          this.total = response.data.total
+        }
       })
     },
     /**
      * 构造查询条件
      *
-     * @returns {{current: number, size: number, jobName: string, jobGroupName: string}}
+     * @returns {{current: number, tenantName: string, size: number, tenantCode: string}}
      */
     buildParam () {
-      return this.searchJobForm
+      return this.searchTenantForm
     },
     /**
      * 分页大小切换
@@ -241,7 +239,7 @@ export default {
      * @param size
      */
     handleSizeChange (size) {
-      this.searchJobForm.size = size
+      this.searchTenantForm.size = size
       this.reloadList()
     },
     /**
@@ -250,7 +248,7 @@ export default {
      * @param current
      */
     handleCurrentChange (current) {
-      this.searchJobForm.current = current
+      this.searchTenantForm.current = current
       this.reloadList()
     },
     /**
@@ -266,13 +264,13 @@ export default {
       this.$refs.searchForm.resetFields()
     },
     /**
-     * 任务表格复选框事件
+     * 租户表格复选框事件
      *
      * @param val
      */
-    jobHandleSelectionChange (val) {
+    tenantHandleSelectionChange (val) {
       this.checkDeleteItem = !val.length
-      this.multipleSelectionJobIds = val
+      this.multipleSelectionTenantIds = val
     },
     /**
      * 批量删除
@@ -280,7 +278,7 @@ export default {
     remove () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelectionJobIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        this.multipleSelectionTenantIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(response => {
           if (response.code === 1) {
             this.reloadList()
@@ -311,20 +309,20 @@ export default {
      * 创建
      */
     create () {
-      this.title = '创建任务'
+      this.title = '创建租户'
       this.dialogType = DIALOG_TYPE.ADD
-      this.jobDialogVisible = true
+      this.tenantDialogVisible = true
     },
     /**
      * 修改
      * @param row
      */
     edit (row) {
-      this.title = '修改任务'
+      this.title = '修改租户'
       this.dialogType = DIALOG_TYPE.EDIT
-      this.jobDialogVisible = true
+      this.tenantDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.job, row)
+        Object.assign(this.tenant, row)
       })
     },
     /**
@@ -337,30 +335,30 @@ export default {
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.job, row)
+        Object.assign(this.tenant, row)
       })
     },
     /**
-     * 关闭任务添加修改弹出框事件
+     * 关闭租户添加修改弹出框事件
      *
      * @param formName
      */
-    closeJobDialog (formName) {
-      this.job.id = undefined
+    closeTenantDialog (formName) {
+      this.tenant.id = undefined
       this.$refs[formName].resetFields()
     },
     /**
      * 关闭详情弹出框事件
      */
     closeInfoDialog () {
-      this.job = this.jobInfo
+      this.tenant = this.tenantInfo
     },
     /**
      * 添加修改弹出框提交
      *
      * @param formName
      */
-    submitJobForm (formName) {
+    submitTenantForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
@@ -374,11 +372,11 @@ export default {
      * 保存请求
      */
     save () {
-      this.job.id = undefined
-      save(this.job).then((response) => {
+      this.tenant.id = undefined
+      save(this.tenant).then((response) => {
         if (response.code === 1) {
           this.$message.success('添加成功')
-          this.jobDialogVisible = false
+          this.tenantDialogVisible = false
           this.reloadList()
         }
       })
@@ -387,10 +385,10 @@ export default {
      * 修改请求
      */
     modify () {
-      modify(this.job).then((response) => {
+      modify(this.tenant).then((response) => {
         if (response.code === 1) {
           this.$message.success('修改成功')
-          this.jobDialogVisible = false
+          this.tenantDialogVisible = false
           this.reloadList()
         }
       })
@@ -400,8 +398,8 @@ export default {
      *
      * @param formName
      */
-    resetJobForm (formName) {
-      this.jobDialogVisible = false
+    resetTenantForm (formName) {
+      this.tenantDialogVisible = false
       this.$refs[formName].resetFields()
     }
   }
