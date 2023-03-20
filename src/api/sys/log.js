@@ -25,9 +25,9 @@ export function list (data) {
  *
  * @returns {AxiosPromise}
  */
-export function clear () {
+export function truncate () {
   return request({
-    url: servicePath.sys + '/log/clear',
+    url: servicePath.sys + '/log/truncate',
     method: 'delete'
   })
 }

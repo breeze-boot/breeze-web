@@ -48,7 +48,7 @@ export const confirmAlert = (func, msg) => {
   }).then(() => {
     func()
   }).catch((e) => {
-    Message.warning({ message: '取消删除' })
+    console.error(e)
   })
 }
 

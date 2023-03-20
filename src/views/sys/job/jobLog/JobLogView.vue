@@ -24,18 +24,17 @@
       </el-form>
 
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:jobLog:export']" plain size="mini" type="info" @click="exportInfo">导出</el-button>
         <el-button v-has="['sys:jobLog:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
                    @click="remove">删除
         </el-button>
-        <el-button v-has="['sys:jobLog:clear']" plain size="mini" type="danger" @click="clear">清空全表</el-button>
+        <el-button v-has="['sys:jobLog:truncate']" plain size="mini" type="danger" @click="truncate">清空全表</el-button>
       </div>
 
       <el-table
         ref="multipleTable"
         :data="jobLogTableData"
         border
-        height="70vh"
+        height="60vh"
         size="mini"
         stripe
         style="width: 100%"
@@ -50,48 +49,40 @@
           prop="id"
           width="200"/>
         <el-table-column
-          label="系统模块"
-          prop="systemModule"
+          label="任务名"
+          prop="jobName"
           width="180"/>
         <el-table-column
-          label="日志标题"
-          prop="jobLogTitle"
+          label="任务组名"
+          prop="jobGroupName"
           show-overflow-tooltip
           width="180"/>
         <el-table-column
-          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'LOG_TYPE')"
-          label="日志类型"
-          prop="jobLogType"
+          label="cron"
+          prop="cronExpression"/>
+        <el-table-column
+          label="调用的方法"
+          prop="clazzName"
           show-overflow-tooltip/>
         <el-table-column
-          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'DO_TYPE')"
-          label="操作类型"
-          prop="doType"/>
-        <el-table-column
-          label="请求类型"
-          prop="requestType"
-          show-overflow-tooltip>
-        </el-table-column>
-        <el-table-column
-          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'RESULT')"
-          label="执行结果"
-          prop="result"
+          label="日志信息"
+          prop="jobMessage"
           show-overflow-tooltip/>
         <el-table-column
-          label="浏览器"
-          prop="browser"
+          label="执行开始时间"
+          prop="createTime"
           show-overflow-tooltip/>
         <el-table-column
-          label="IP"
-          prop="ip"
+          label="执行结束时间"
+          prop="endTime"
           show-overflow-tooltip/>
         <el-table-column
-          label="系统"
-          prop="system"
+          label="异常信息"
+          prop="exceptionInfo"
           show-overflow-tooltip/>
         <el-table-column
-          label="操作人"
-          prop="createBy"
+          label="状态"
+          prop="status"
           show-overflow-tooltip/>
         <el-table-column
           fixed="right"
@@ -122,57 +113,51 @@
       <el-descriptions :column="1" border size="mini">
         <el-descriptions-item>
           <template slot="label">
-            系统模块
+            任务名
           </template>
-          {{ jobLog.systemModule }}
+          {{ jobLog.jobName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            日志标题
+            任务组名
           </template>
-          {{ jobLog.jobLogTitle }}
+          {{ jobLog.jobGroupName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            日志类型
+            调用的方法
           </template>
-          {{ this.getDescriptionsDictLabel()(jobLog, 'jobLogType', 'LOG_TYPE') }}
+          {{ jobLog.clazzName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            操作类型
+            日志信息
           </template>
-          {{ this.getDescriptionsDictLabel()(jobLog, 'doType', 'DO_TYPE') }}
+          {{ jobLog.jobMessage }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            请求类型
+            执行开始时间
           </template>
-          {{ jobLog.requestType }}
+          {{ jobLog.createTime }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            浏览器
+            执行结束时间
           </template>
-          {{ jobLog.browser }}
+          {{ jobLog.endTime }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            IP
+            异常信息
           </template>
-          {{ jobLog.ip }}
+          {{ jobLog.exceptionInfo }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            系统
+            状态
           </template>
-          {{ jobLog.system }}
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            结果
-          </template>
-          {{ this.getDescriptionsDictLabel()(jobLog, 'result', 'RESULT') }}
+          {{ this.getDescriptionsDictLabel()(jobLog, 'status', 'JOB_STATUS') }}
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -180,7 +165,7 @@
 </template>
 
 <script>
-import { clear, del, list } from '@/api/sys/jobLog'
+import { truncate, del, list } from '@/api/sys/jobLog'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { mapGetters } from 'vuex'
@@ -199,6 +184,7 @@ export default {
       jobLogTableData: [],
       // 日志查询条件数据
       searchJobLogForm: {
+        jobName: this.$route.query.jobName,
         current: 1,
         size: 10
       },
@@ -210,24 +196,22 @@ export default {
       infoDialogVisible: false,
       // 表单标题宽度
       formLabelWidth: '80px',
-      // 日志详情数据
+      // 日志数据
       jobLog: {
         id: undefined,
-        systemModule: '',
-        logTitle: '',
-        logType: '',
-        doType: '',
-        requestType: '',
-        result: '',
-        browser: '',
-        system: '',
-        ip: '',
-        createBy: ''
+        jobName: '',
+        jobGroupName: '',
+        createTime: '',
+        endTime: '',
+        status: '',
+        exceptionInfo: '',
+        jobMessage: '',
+        clazzName: ''
       }
     }
   },
   mounted () {
-    this.$toLoadDict(['LOG_TYPE', 'DO_TYPE', 'RESULT']).then((dict) => {
+    this.$toLoadDict(['JOB_STATUS']).then((dict) => {
       this.reloadList()
     })
   },
@@ -249,7 +233,7 @@ export default {
     /**
      * 构造查询条件
      *
-     * @returns {{result: string, logType: string, createBy: string, current: number, size: number, searchDate: string, doType: string, startDate: string, systemModule: string}}
+     * @returns {{current: number, size: number}}
      */
     buildParam () {
       return this.searchJobLogForm
@@ -293,8 +277,6 @@ export default {
       this.checkDeleteItem = !val.length
       this.multipleSelectionJobLogId = val
     },
-    exportInfo () {
-    },
     /**
      * 批量删除
      */
@@ -313,9 +295,9 @@ export default {
     /**
      * 清空
      */
-    clear () {
+    truncate () {
       confirmAlert(() => {
-        clear().then((rep) => {
+        truncate().then((rep) => {
           this.$message.success('全部清空')
           this.reloadList()
         })

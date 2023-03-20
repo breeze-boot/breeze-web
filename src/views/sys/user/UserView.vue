@@ -127,7 +127,7 @@
               active-color="#13ce66"
               inactive-color="#AAAAAA"
               size="mini"
-              @change="open(scope.$index, scope.row)">
+              @change="handleOpen(scope.$index, scope.row)">
             </el-switch>
           </template>
         </el-table-column>
@@ -906,7 +906,7 @@ export default {
       this.user.id = undefined
       this.$refs[formName].resetFields()
     },
-    open (index, row) {
+    handleOpen (index, row) {
       open(row.username, row.isLock).then((response) => {
         if (response.code === 1) {
           this.$message.success(response.message)

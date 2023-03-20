@@ -6,10 +6,10 @@
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="系统模块" prop="systemModule">
-              <el-input v-model="searchLogForm.systemModule" clearable placeholder="系统模块"/>
+              <el-input v-model="searchLogForm.systemModule" clearable placeholder="请输入系统模块"/>
             </el-form-item>
             <el-form-item label="操作类型" prop="doType">
-              <el-select v-model="searchLogForm.doType" placeholder="请选择">
+              <el-select v-model="searchLogForm.doType" placeholder="请选择操作类型">
                 <el-option
                   v-for="item in this.getDict()('DO_TYPE')"
                   :key="item.key"
@@ -19,7 +19,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="日志类型" prop="logType">
-              <el-select v-model="searchLogForm.doType" placeholder="请选择">
+              <el-select v-model="searchLogForm.doType" placeholder="请选择日志类型">
                 <el-option
                   v-for="item in this.getDict()('LOG_TYPE')"
                   :key="item.key"
@@ -28,8 +28,8 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="结果" prop="result">
-              <el-select v-model="searchLogForm.result" placeholder="请选择">
+            <el-form-item label="执行结果" prop="result">
+              <el-select v-model="searchLogForm.result" placeholder="请选择执行结果">
                 <el-option
                   v-for="item in this.getDict()('RESULT')"
                   :key="item.key"
@@ -64,7 +64,7 @@
         <el-button v-has="['sys:log:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
                    @click="remove">删除
         </el-button>
-        <el-button v-has="['sys:log:clear']" plain size="mini" type="danger" @click="clear">清空全表</el-button>
+        <el-button v-has="['sys:log:truncate']" plain size="mini" type="danger" @click="truncate">清空全表</el-button>
       </div>
 
       <el-table
@@ -216,7 +216,7 @@
 </template>
 
 <script>
-import { clear, del, list } from '@/api/sys/log'
+import { truncate, del, list } from '@/api/sys/log'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
 import { mapGetters } from 'vuex'
@@ -356,9 +356,9 @@ export default {
     /**
      * 清空
      */
-    clear () {
+    truncate () {
       confirmAlert(() => {
-        clear().then((rep) => {
+        truncate().then((rep) => {
           this.$message.success('全部清空')
           this.reloadList()
         })

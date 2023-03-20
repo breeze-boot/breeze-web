@@ -5,11 +5,18 @@
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
-            <el-form-item label="任务名称" prop="jobName">
+            <el-form-item label="任务名" prop="jobName">
               <el-input v-model="searchJobForm.jobName" clearable placeholder="任务名称"/>
             </el-form-item>
-            <el-form-item label="任务组名称" prop="jobGroupName">
-              <el-input v-model="searchJobForm.jobGroupName" clearable placeholder="任务组名称"/>
+            <el-form-item label="任务组名" prop="jobGroupName">
+              <el-select v-model="searchJobForm.jobGroupName" collapse-tags filterable placeholder="请选择任务组">
+                <el-option
+                  v-for="item in jobGroupOption"
+                  :key="item.key"
+                  :label="item.value"
+                  :value="item.key">
+                </el-option>
+              </el-select>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search()">查询</el-button>
@@ -45,43 +52,65 @@
           prop="id"
           width="200"/>
         <el-table-column
-          label="任务名称"
+          label="任务名"
           prop="jobName"
           show-overflow-tooltip
           width="200"/>
         <el-table-column
-          label="任务组名称"
+          label="任务组名"
           prop="jobGroupName"
-          show-overflow-tooltip/>
+          show-overflow-tooltip
+          width="150"/>
         <el-table-column
           label="cron"
           prop="cronExpression"
-          show-overflow-tooltip/>
+          show-overflow-tooltip
+          width="150">
+          <template slot-scope="scope">
+            <el-tag size="mini"> {{ scope.row.cronExpression }}</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column
           label="调用方法"
           prop="clazzName"
-          show-overflow-tooltip/>
+          show-overflow-tooltip
+          width="300"/>
         <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'MISFIRE_POLICY')"
           label="执行策略"
-          prop="misfire_policy"
-          show-overflow-tooltip/>
+          prop="misfirePolicy"
+          show-overflow-tooltip>
+        </el-table-column>
         <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'CONCURRENT')"
           label="并发"
           prop="concurrent"
-          show-overflow-tooltip/>
+          show-overflow-tooltip
+          width="60"/>
         <el-table-column
           label="状态"
           prop="status"
-          show-overflow-tooltip/>
-        <el-table-column
-          label="状态"
-          prop="status"
-          show-overflow-tooltip/>
+          show-overflow-tooltip
+          width="100">
+          <template slot-scope="scope">
+            <el-switch
+              v-model="scope.row.status"
+              :active-value="1"
+              :inactive-value="0"
+              active-color="#13ce66"
+              inactive-color="#AAAAAA"
+              size="mini"
+              @change="handleOpen(scope.$index, scope.row)">
+            </el-switch>
+          </template>
+        </el-table-column>
         <el-table-column
           fixed="right"
           label="操作"
-          width="150">
+          width="270">
           <template slot-scope="scope">
+            <el-button v-has="['sys:job:run']" size="mini" type="text" @click="runJobNow(scope.row)">运行一次</el-button>
+            <el-button size="mini" type="text" @click="jobLog(scope.row)">查看运行情况</el-button>
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
             <el-button v-has="['sys:job:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
             <el-button v-has="['sys:job:delete']" size="mini" type="text"
@@ -106,11 +135,52 @@
     <el-dialog :title="title" :visible.sync="jobDialogVisible" width="40vw"
                @close="closeJobDialog('jobRuleForm')">
       <el-form ref="jobRuleForm" :model="job" :rules="jobRules" size="mini">
-        <el-form-item :label-width="formLabelWidth" label="任务名称" prop="jobName">
-          <el-input v-model="job.jobName" autocomplete="off" clearable/>
+        <el-form-item :label-width="formLabelWidth" label="任务名" prop="jobName">
+          <el-input v-model="job.jobName" autocomplete="off" clearable placeholder="请输入任务名"/>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="任务组名称" prop="jobGroupName">
-          <el-input v-model="job.jobGroupName" autocomplete="off" clearable/>
+        <el-form-item :label-width="formLabelWidth" label="任务组名" prop="jobGroupName">
+          <el-select v-model="job.jobGroupName" collapse-tags filterable placeholder="请选择任务组">
+            <el-option
+              v-for="item in jobGroupOption"
+              :key="item.key"
+              :label="item.value"
+              :value="item.key">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="cron" prop="cronExpression">
+          <el-input v-model="job.cronExpression" autocomplete="off" clearable placeholder="请设置cron表达式"
+                    style="width: 500px;"/>
+          <el-button type="primary" @click="showDialog">生成 cron</el-button>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="调用方法" prop="clazzName">
+          <el-input v-model="job.clazzName" autocomplete="off" clearable
+                    placeholder="请设置执行方法【全类名.方法名('string',1, true, 1D, 1L)】或【Bean名.方法名('string',1, true, 1D, 1L)】"/>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="执行策略" prop="misfirePolicy">
+          <el-radio-group v-model="job.misfirePolicy">
+            <el-radio :label="-1">立刻执行</el-radio>
+            <el-radio :label="1">执行一次（默认）</el-radio>
+            <el-radio :label="2">放弃执行</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="并发" prop="concurrent">
+          <el-switch
+            v-model="job.concurrent"
+            :active-value="1"
+            :inactive-value="0"
+            active-color="#13ce66"
+            inactive-color="#AAAAAA">
+          </el-switch>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="状态" prop="status">
+          <el-switch
+            v-model="job.status"
+            :active-value="1"
+            :inactive-value="0"
+            active-color="#13ce66"
+            inactive-color="#AAAAAA">
+          </el-switch>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -124,28 +194,64 @@
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item>
           <template slot="label">
-            任务名称
+            任务名
           </template>
           {{ job.jobName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
-            任务组名称
+            任务组名
           </template>
-          <el-tag size="small">{{ job.jobGroupName }}</el-tag>
+          {{ job.jobGroupName }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            cron
+          </template>
+          <el-tag size="small">{{ job.cronExpression }}</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            调用方法
+          </template>
+          {{ job.clazzName }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            执行策略
+          </template>
+          {{ this.getDescriptionsDictLabel()(job, 'misfirePolicy', 'MISFIRE_POLICY') }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            并发
+          </template>
+          {{ this.getDescriptionsDictLabel()(job, 'concurrent', 'CONCURRENT') }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            状态
+          </template>
+          {{ this.getDescriptionsDictLabel()(job, 'status', 'JOB_STATUS') }}
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
 
+    <el-dialog :visible.sync="cronDialogVisible" title="生成 cron">
+      <vcrontab :expression="dialogCron" @fill="crontabFill" @hide="cronDialogVisible=false"></vcrontab>
+    </el-dialog>
   </el-container>
 </template>
 
 <script>
-import { del, list, modify, save } from '@/api/sys/job'
+import { del, list, modify, open, runJobNow, save } from '@/api/sys/job'
 import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
 import JSONBigInt from 'json-bigint'
+import { mapGetters } from 'vuex'
+import vcrontab from 'vcrontab'
 
 export default {
+  components: { vcrontab },
   name: 'JobView',
   data () {
     return {
@@ -172,6 +278,8 @@ export default {
       jobDialogVisible: false,
       // 任务详情弹出框
       infoDialogVisible: false,
+      // cron生成弹出框
+      cronDialogVisible: false,
       // 表单标题宽度
       formLabelWidth: '80px',
       // 任务添加修改数据
@@ -179,14 +287,22 @@ export default {
         id: undefined,
         jobName: '',
         jobGroupName: '',
-        description: ''
+        cronExpression: '',
+        clazzName: '',
+        misfirePolicy: 2,
+        concurrent: 0,
+        status: 0
       },
       // 任务详情数据
       jobInfo: {
         id: undefined,
         jobName: '',
         jobGroupName: '',
-        description: ''
+        cronExpression: '',
+        clazzName: '',
+        misfirePolicy: 2,
+        concurrent: 0,
+        status: 0
       },
       // 任务添加修改表单规则
       jobRules: {
@@ -200,22 +316,42 @@ export default {
         jobGroupName: [
           {
             required: true,
-            message: '请输入任务编码',
+            message: '请选择任务组名',
+            trigger: 'change'
+          }
+        ],
+        clazzName: [
+          {
+            required: true,
+            message: '请输入执行类名.方法(参数)',
             trigger: 'blur'
-          }, {
-            validator: (rule, value, callback) => {
-            },
+          }
+        ],
+        cronExpression: [
+          {
+            required: true,
+            message: '请设置cron表达式',
             trigger: 'blur'
           }
         ]
-      }
+      },
+      // 任务组数据
+      jobGroupOption: [{
+        key: 'DEFAULT',
+        value: '默认'
+      }],
+      // cron dialog 表单
+      dialogCron: ''
     }
   },
   mounted () {
-    // 初始化加载表格数据
-    this.reloadList()
+    this.$toLoadDict(['MISFIRE_POLICY', 'CONCURRENT', 'JOB_STATUS']).then((dict) => {
+      // 初始化加载表格数据
+      this.reloadList()
+    })
   },
   methods: {
+    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
     /**
      * 初始化加载表格数据
      */
@@ -395,6 +531,23 @@ export default {
         }
       })
     },
+    runJobNow (row) {
+      confirmAlert(() => {
+        runJobNow(row.id).then((response) => {
+          if (response.code === 1) {
+            this.$message.success('运行成功')
+          }
+        })
+      }, '是否运行一次')
+    },
+    jobLog (row) {
+      this.$router.push({
+        name: 'jobLog',
+        query: {
+          jobName: row.jobName
+        }
+      })
+    },
     /**
      * 添加修改弹出框重置
      *
@@ -403,6 +556,37 @@ export default {
     resetJobForm (formName) {
       this.jobDialogVisible = false
       this.$refs[formName].resetFields()
+    },
+    /**
+     * 开启
+     *
+     * @param index
+     * @param row
+     */
+    handleOpen (index, row) {
+      open(row.id, row.status).then((response) => {
+        if (response.code === 1) {
+          this.$message.success(response.message)
+        }
+      })
+    },
+    /**
+     * 回显 CRON
+     *
+     * @param value
+     */
+    crontabFill (value) {
+      // 确定后回传的值
+      this.job.cronExpression = value
+    },
+    /**
+     * 显示 cron dialog
+     *
+     * @param value
+     */
+    showDialog () {
+      this.dialogCron = this.job.cronExpression
+      this.cronDialogVisible = true
     }
   }
 }

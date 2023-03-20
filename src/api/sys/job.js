@@ -60,3 +60,37 @@ export function modify (data) {
     data: data
   })
 }
+
+/**
+ * 运行一次
+ *
+ * @param id
+ * @returns {AxiosPromise}
+ */
+export function runJobNow (id) {
+  return request({
+    url: servicePath.sys + '/job/runJobNow',
+    method: 'get',
+    params: {
+      jobId: id
+    }
+  })
+}
+
+/**
+ * 开启暂停
+ *
+ * @param jobId
+ * @param status
+ * @returns {AxiosPromise}
+ */
+export function open (jobId, status) {
+  return request({
+    url: servicePath.sys + '/job/open',
+    method: 'put',
+    params: {
+      jobId: jobId,
+      status: status
+    }
+  })
+}
