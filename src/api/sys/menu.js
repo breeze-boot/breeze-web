@@ -90,7 +90,7 @@ export function selectMenu (id) {
   return request({
     url: servicePath.sys + '/common/selectMenu',
     method: 'get',
-    params: { id: id },
+    params: { id: JSONBigInt2Str.parse(id) },
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)
     }]
