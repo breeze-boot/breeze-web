@@ -14,14 +14,12 @@ module.exports = defineConfig({
     config.module
       .rule('svg')
       .exclude.add(resolve('src/assets/icon'))
-      .add(resolve('packages/bpmn-icons'))
       .end()
 
     config.module
       .rule('icon')
       .test(/\.svg$/)
       .include.add(resolve('src/assets/icon'))
-      .add(resolve('packages/bpmn-icons'))
       .end()
       .use('svg-sprite-loader')
       .loader('svg-sprite-loader')
