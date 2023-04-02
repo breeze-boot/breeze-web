@@ -1,4 +1,4 @@
-import { request } from '@/utils/axios'
+import { request } from '@/axios'
 
 /**
  * 用户密码登录

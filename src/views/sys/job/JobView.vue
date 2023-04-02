@@ -11,7 +11,7 @@
             <el-form-item label="任务组名" prop="jobGroupName">
               <el-select v-model="searchJobForm.jobGroupName" collapse-tags filterable placeholder="请选择任务组">
                 <el-option
-                  v-for="item in jobGroupOption"
+                  v-for="item in this.getDict()('JOB_GROUP')"
                   :key="item.key"
                   :label="item.value"
                   :value="item.key">
@@ -57,6 +57,7 @@
           show-overflow-tooltip
           width="200"/>
         <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'JOB_GROUP')"
           label="任务组名"
           prop="jobGroupName"
           show-overflow-tooltip
@@ -141,7 +142,7 @@
         <el-form-item :label-width="formLabelWidth" label="任务组名" prop="jobGroupName">
           <el-select v-model="job.jobGroupName" collapse-tags filterable placeholder="请选择任务组">
             <el-option
-              v-for="item in jobGroupOption"
+              v-for="item in this.getDict()('JOB_GROUP')"
               :key="item.key"
               :label="item.value"
               :value="item.key">
@@ -245,16 +246,20 @@
 
 <script>
 import { del, list, modify, open, runJobNow, save } from '@/api/sys/job'
-import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
-import { mapGetters } from 'vuex'
 import vcrontab from 'vcrontab'
+import dict from '@/mixins/dict'
+import { confirmAlert } from '@utils/common'
 
 export default {
   components: { vcrontab },
+  mixins: [dict],
   name: 'JobView',
   data () {
     return {
+      // 此页面需要自字典编码
+      dictCode: ['MISFIRE_POLICY', 'JOB_GROUP', 'CONCURRENT', 'JOB_STATUS'],
       // 当前操作类型
       dialogType: DIALOG_TYPE.ADD,
       // 弹出框标题
@@ -335,23 +340,15 @@ export default {
           }
         ]
       },
-      // 任务组数据
-      jobGroupOption: [{
-        key: 'DEFAULT',
-        value: '默认'
-      }],
       // cron dialog 表单
       dialogCron: ''
     }
   },
   mounted () {
-    this.$toLoadDict(['MISFIRE_POLICY', 'CONCURRENT', 'JOB_STATUS']).then((dict) => {
-      // 初始化加载表格数据
-      this.reloadList()
-    })
+    // 初始化加载表格数据
+    this.reloadList()
   },
   methods: {
-    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
     /**
      * 初始化加载表格数据
      */

@@ -305,15 +305,19 @@
 
 <script>
 import { del, list, modify, save, selectColumn, selectTable } from '@/api/sys/dataPermission'
-import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { confirmAlert } from '@utils/common'
+import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
 import { selectDept } from '@/api/sys/dept'
-import { mapGetters } from 'vuex'
+import dict from '@/mixins/dict'
 
 export default {
   name: 'DataPermissionView',
+  mixins: [dict],
   data () {
     return {
+      // 此页面需要自字典编码
+      dictCode: ['DATA_PERMISSION_TYPE', 'COMPARE'],
       // 当前操作类型
       dialogType: DIALOG_TYPE.ADD,
       // 弹出框标题
@@ -417,12 +421,9 @@ export default {
     }
   },
   mounted () {
-    this.$toLoadDict(['DATA_PERMISSION_TYPE', 'COMPARE']).then((dict) => {
-      this.reloadList()
-    })
+    this.reloadList()
   },
   methods: {
-    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
     handlerPermissionTypeChange (val) {
       this.dataPermission.dataPermissions = []
     },

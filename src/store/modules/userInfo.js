@@ -35,10 +35,12 @@ export default {
      * @constructor
      */
     login ({ commit }, userLogin) {
-      userLogin.username.trim()
-      userLogin.password.trim()
+      const loginParam = {
+        username: userLogin.username.trim(),
+        password: userLogin.password.trim()
+      }
       return new Promise((resolve, reject) => {
-        login(userLogin).then(response => {
+        login(loginParam).then(response => {
           localStorage.setItem('B_TENANT_ID', response.data.userInfo.tenantId)
           commit('setAccessToken', response.data.accessToken)
           commit('setAuthorities', response.data.userInfo.authorities)

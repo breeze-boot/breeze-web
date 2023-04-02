@@ -7,12 +7,14 @@
           <el-col :md="24">
             <el-form-item label="日志时间" prop="searchDate">
               <el-date-picker
-                v-model="searchJobLogForm.createTime"
+                v-model="searchJobLogForm.searchDate"
+                clearable
                 end-placeholder="结束日期"
+                format="yyyy-MM-dd HH:mm:ss"
                 range-separator="至"
                 size="mini"
                 start-placeholder="开始日期"
-                type="daterange">
+                type="datetimerange">
               </el-date-picker>
             </el-form-item>
             <el-form-item>
@@ -81,8 +83,9 @@
           prop="exceptionInfo"
           show-overflow-tooltip/>
         <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'JOB_STATUS')"
           label="状态"
-          prop="status"
+          prop="jobStatus"
           show-overflow-tooltip/>
         <el-table-column
           fixed="right"
@@ -157,7 +160,7 @@
           <template slot="label">
             状态
           </template>
-          {{ this.getDescriptionsDictLabel()(jobLog, 'status', 'JOB_STATUS') }}
+          {{ this.getDescriptionsDictLabel()(jobLog, 'jobStatus', 'JOB_STATUS') }}
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -165,15 +168,19 @@
 </template>
 
 <script>
-import { truncate, del, list } from '@/api/sys/jobLog'
-import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { del, list, truncate } from '@/api/sys/jobLog'
+import { confirmAlert } from '@utils/common'
+import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
-import { mapGetters } from 'vuex'
+import dict from '@/mixins/dict'
 
 export default {
   name: 'JobLogView',
+  mixins: [dict],
   data () {
     return {
+      // 此页面需要自字典编码
+      dictCode: ['MSG_LEVEL', 'JOB_STATUS'],
       // 当前操作类型
       dialogType: DIALOG_TYPE.ADD,
       // 弹出框标题
@@ -185,6 +192,9 @@ export default {
       // 日志查询条件数据
       searchJobLogForm: {
         jobName: this.$route.query.jobName,
+        searchDate: '',
+        stateDate: '',
+        endDate: '',
         current: 1,
         size: 10
       },
@@ -211,12 +221,9 @@ export default {
     }
   },
   mounted () {
-    this.$toLoadDict(['JOB_STATUS']).then((dict) => {
-      this.reloadList()
-    })
+    this.reloadList()
   },
   methods: {
-    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
     /**
      * 初始化加载表格数据
      */
@@ -236,6 +243,8 @@ export default {
      * @returns {{current: number, size: number}}
      */
     buildParam () {
+      this.searchJobLogForm.startDate = this.searchJobLogForm.searchDate[0]
+      this.searchJobLogForm.endDate = this.searchJobLogForm.searchDate[1]
       return this.searchJobLogForm
     },
     /**

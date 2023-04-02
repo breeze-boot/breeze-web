@@ -9,10 +9,10 @@ const toListDict = (dictCodes = []) => {
   return new Promise(resolve => {
     const noFindDictCodes = []
     const findDict = []
-    dictCodes.forEach(key => {
-      const dict = store.getters['dict/getDict'](key)
-      if (dict && dict.length <= 0) {
-        noFindDictCodes.push(key)
+    dictCodes.forEach(dictCode => {
+      const dictMap = store.getters['dict/getDict'](dictCode)
+      if (dictMap && dictMap.size <= 0) {
+        noFindDictCodes.push(dictCode)
       }
     })
     if (noFindDictCodes.length > 0) {

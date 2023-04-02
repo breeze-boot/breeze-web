@@ -208,15 +208,19 @@
 
 <script>
 import { del, download, list, preview, upload } from '@/api/sys/file'
-import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { confirmAlert } from '@utils/common'
+import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
 import { saveAs } from 'file-saver'
-import { mapGetters } from 'vuex'
+import dict from '@/mixins/dict'
 
 export default {
   name: 'FileView',
+  mixins: [dict],
   data () {
     return {
+      // 此页面需要自字典编码
+      dictCode: ['OSS_STYLE'],
       // 当前操作类型
       dialogType: DIALOG_TYPE.ADD,
       // 弹出框标题
@@ -279,12 +283,9 @@ export default {
     }
   },
   mounted () {
-    this.$toLoadDict(['OSS_STYLE']).then((dict) => {
-      this.reloadList()
-    })
+    this.reloadList()
   },
   methods: {
-    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
     /**
      * 初始化加载表格数据
      */

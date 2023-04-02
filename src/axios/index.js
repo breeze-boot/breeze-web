@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { Loading, Message } from 'element-ui'
-import { reLoginConfirm, showErrorMsg, showWaringMsg } from '@/utils/constant'
+import { reLoginConfirm, showErrorMsg, showWaringMsg } from '@utils/common'
 
 let loadingInstance = {}
 

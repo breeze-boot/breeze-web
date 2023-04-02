@@ -6,24 +6,24 @@ Vue.use(Vuex)
 export default {
   namespaced: true,
   state: {
-    dict: []
+    dict: new Map()
   },
   mutations: {
     setDict (state, dict) {
-      if (state.dict.some(item => item.key === dict.key)) {
+      if (state.dict.has(dict.key)) {
         return
       }
-      state.dict.push(dict)
+      state.dict.set(dict.key, dict.value)
     }
   },
   actions: {},
   getters: {
     getDict (state) {
       return function (key) {
-        let result = []
-        state.dict.forEach(dict => {
-          if (dict.key === key) {
-            result = dict.value
+        let result = new Map()
+        state.dict.forEach((v, k) => {
+          if (k === key) {
+            result = v
           }
         })
         return result
@@ -31,13 +31,13 @@ export default {
     },
     getTableDictLabel (state) {
       return function (row, column, key) {
-        if (!row || !column) {
+        if (!row || !column.property) {
           return
         }
         let value = ''
-        state.dict.forEach(dict => {
-          if (dict.key === key) {
-            dict.value.forEach(item => {
+        state.dict.forEach((v, k) => {
+          if (k === key) {
+            v.forEach(item => {
               if (item.key === row[column.property] + '') {
                 value = item.value
               }
@@ -53,9 +53,9 @@ export default {
           return
         }
         let value = ''
-        state.dict.forEach(dict => {
-          if (dict.key === key) {
-            dict.value.forEach(item => {
+        state.dict.forEach((v, k) => {
+          if (k === key) {
+            v.forEach(item => {
               if (item.key === row[columnName] + '') {
                 value = item.value
               }

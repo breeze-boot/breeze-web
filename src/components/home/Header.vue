@@ -6,6 +6,9 @@
     </div>
 
     <div class="group">
+      <div class="group">
+        <i class="el-icon-s-unfold" @click="handleScreenFull"/>
+      </div>
       <div class="message">
         <el-badge class="item" is-dot>
           <i class="el-icon-message-solid" style="cursor: pointer;" @click="showMsgBox"></i>
@@ -59,6 +62,7 @@
 
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+import screenfull from 'screenfull'
 import 'animate.css'
 
 export default {
@@ -67,6 +71,7 @@ export default {
     return {
       settingDrawer: false,
       msgDrawer: false,
+      iconClass: '',
       direction: 'rtl'
     }
   },
@@ -75,10 +80,33 @@ export default {
     ...mapGetters('userInfo', ['getUsername']),
     ...mapGetters('msg', ['getMsg'])
   },
+  created () {
+    this.iconClass = ''
+  },
+  beforeUnmount () {
+  },
   methods: {
     ...mapActions('msg', ['closeMsgCard', 'markReadMsgCard', 'reloadMsg']),
     ...mapActions('userInfo', ['clearUserInfo']),
     ...mapMutations('menu', ['setMenuIsCollapse', 'clearMenus']),
+    screenFull () {
+      if (!screenfull.isEnabled) {
+        this.$message({
+          message: '你的浏览器不支持全屏',
+          type: 'warning'
+        })
+        return
+      }
+      if (screenfull.isFullscreen) {
+        this.iconClass = ''
+      } else {
+        this.iconClass = ''
+      }
+      screenfull.toggle()
+    },
+    handleScreenFull () {
+      this.screenFull()
+    },
     /**
      *
      * @param command

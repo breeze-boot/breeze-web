@@ -6,10 +6,13 @@
               @input.native="filterIcon">
       <i slot="suffix" class="el-icon-search el-input__icon"/>
     </el-input>
+
     <div class="icon" style="border: 1px solid #eee;">
       <div v-for="(item, index) in iconList" :key="index" class="svg-icon" @click="clickIcon(item)">
-        <svg-icon :icon-name="item" style="font-size: 20px;"/>
-        <div style="padding: 4px 6px 4px 2px; height: 2em; line-height: 2.5em;">{{ item }}
+        <svg-icon :icon-name="item"/>
+        <svg-icon :icon-name="item" style="font-size: 50px;"/>
+        <div style="padding: 4px 6px 4px 2px; height: 2em; line-height: 2.5em;">
+          {{ item }}
         </div>
       </div>
     </div>

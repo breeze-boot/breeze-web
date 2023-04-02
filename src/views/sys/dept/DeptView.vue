@@ -108,7 +108,8 @@
 
 <script>
 import { checkDeptCode, del, list, modify, save, selectDept } from '@/api/sys/dept'
-import { confirmAlert, DIALOG_TYPE, ROOT } from '@/utils/constant'
+import { confirmAlert } from '@utils/common'
+import { DIALOG_TYPE, ROOT } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
 
 export default {

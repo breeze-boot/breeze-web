@@ -113,9 +113,18 @@
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
-          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'SEX')"
           label="性别"
-          prop="sex"/>
+          prop="sex">
+          <template slot-scope="scope">
+            <el-tag
+              disable-transitions
+              size="mini"
+              style="margin: 0  5px"
+              type="success">
+              {{ getTableDictLabel()(scope.row, scope.column, 'SEX') }}
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column
           label="是否锁定"
           prop="isLock">
@@ -376,18 +385,22 @@ import {
   selectPost,
   selectRole
 } from '@/api/sys/user'
-import { confirmAlert, DIALOG_TYPE, OSS } from '@/utils/constant'
+import { confirmAlert } from '@utils/common'
+import { DIALOG_TYPE, OSS } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
 import { selectDept } from '@/api/sys/dept'
-import { mapGetters } from 'vuex'
 import { saveAs } from 'file-saver'
 import { upload } from '@/api/sys/file'
+import dict from '@/mixins/dict'
 
 export default {
   name: 'UserView',
   components: {},
+  mixins: [dict],
   data () {
     return {
+      // 此页面需要的字典编码
+      dictCode: ['SEX', 'IS_LOCK'],
       // 添加操作类型常量
       dialogTypeAdd: DIALOG_TYPE.ADD,
       // 当前操作类型
@@ -597,10 +610,7 @@ export default {
     }
   },
   mounted () {
-    // 初始字典数据
-    this.$toLoadDict(['SEX', 'IS_LOCK']).then((dict) => {
-      this.reloadList()
-    })
+    this.reloadList()
     // 初始化部门下拉框
     this.selectDept()
     // 初始化角色下拉框
@@ -609,7 +619,6 @@ export default {
     this.selectPost()
   },
   methods: {
-    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
     /**
      * 初始化加载表格数据
      */

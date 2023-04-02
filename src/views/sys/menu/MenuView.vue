@@ -117,7 +117,7 @@
         <el-table-column
           fixed="right"
           label="操作"
-          width="200">
+          width="180">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
             <el-button v-has="['sys:menu:create']" size="mini" type="text" @click="create(scope.row)">新建</el-button>
@@ -360,18 +360,22 @@
 
 <script>
 import { del, list, modify, save, selectMenu, selectPlatform } from '@/api/sys/menu'
-import { confirmAlert, DIALOG_TYPE, ROOT } from '@/utils/constant'
+import { confirmAlert } from '@utils/common'
+import { DIALOG_TYPE, ROOT } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
 import IconDialog from '@/components/svg/IconDialog'
-import { mapGetters } from 'vuex'
+import dict from '@/mixins/dict'
 
 export default {
   name: 'MenuView',
   components: {
     IconDialog
   },
+  mixins: [dict],
   data () {
     return {
+      // 此页面需要自字典编码
+      dictCode: ['HIDDEN', 'HREF', 'KEEPALIVE', 'MENU_TYPE'],
       // 当前操作类型
       dialogType: DIALOG_TYPE.ADD,
       // 弹出框标题
@@ -481,12 +485,9 @@ export default {
   },
   mounted () {
     this.selectPlatform()
-    this.$toLoadDict(['HIDDEN', 'HREF', 'KEEPALIVE', 'MENU_TYPE']).then((dict) => {
-      this.reloadList()
-    })
+    this.reloadList()
   },
   methods: {
-    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
     /**
      * 初始化加载表格数据
      */
@@ -704,7 +705,7 @@ export default {
      * @param id
      */
     selectMenu (id) {
-      selectMenu(id).then(response => {
+      selectMenu(id || 0).then(response => {
         if (response.code === 1 && response.data) {
           this.menuOption = [{
             key: ROOT,

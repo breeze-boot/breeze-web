@@ -317,15 +317,19 @@
 
 <script>
 import { del, list, listUserByDeptId, modify, save, selectUser } from '@/api/sys/msg'
-import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { confirmAlert } from '@utils/common'
+import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
 import { selectDept } from '@/api/sys/dept'
-import { mapGetters } from 'vuex'
+import dict from '@/mixins/dict'
 
 export default {
   name: 'MsgView',
+  mixins: [dict],
   data () {
     return {
+      // 此页面需要自字典编码
+      dictCode: ['MSG_LEVEL', 'MSG_TYPE', 'SEND_MSG_TYPE'],
       // 当前操作类型
       dialogType: DIALOG_TYPE.ADD,
       // 弹出框标题
@@ -421,13 +425,10 @@ export default {
     }
   },
   mounted () {
-    this.$toLoadDict(['MSG_LEVEL', 'MSG_TYPE', 'SEND_MSG_TYPE']).then((dict) => {
-      this.reloadList()
-    })
+    this.reloadList()
     this.selectDept()
   },
   methods: {
-    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
     /**
      * 初始化加载表格数据
      */

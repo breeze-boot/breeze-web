@@ -9,7 +9,7 @@ VueRouter.prototype.push = function push (location) {
   return originalPush.call(this, location).catch(err => err)
 }
 
-VueRouter.prototype.reslace = function reslace (location) {
+VueRouter.prototype.replace = function replace (location) {
   return originalPush.call(this, location).catch(err => err)
 }
 

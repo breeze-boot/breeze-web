@@ -254,8 +254,9 @@ import {
   listVersion,
   modify
 } from '@/api/process/definition'
-import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { DIALOG_TYPE } from '@/const/constant'
 import { startProcess } from '@/api/process/instance'
+import { confirmAlert } from '@utils/common'
 
 export default {
   name: 'DefinitionView',

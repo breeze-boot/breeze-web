@@ -117,8 +117,9 @@
 
 <script>
 import { checkCategoryCode, del, list, modify, save } from '@/api/process/category'
-import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { confirmAlert } from '@utils/common'
 import JSONBigInt from 'json-bigint'
+import { DIALOG_TYPE } from '@/const/constant'
 
 export default {
   name: 'CategoryView',

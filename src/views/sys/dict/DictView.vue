@@ -101,7 +101,7 @@
         <el-form-item :label-width="formLabelWidth" label="字典编码" prop="dictCode">
           <el-input v-model="dict.dictCode" autocomplete="off" clearable/>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="是否开启" prop="dictCode" style="text-align: left;">
+        <el-form-item :label-width="formLabelWidth" label="是否开启" prop="isOpen" style="text-align: left;">
           <el-switch
             v-model="dict.isOpen"
             :active-value="1"
@@ -139,7 +139,8 @@
 
 <script>
 import { checkDictCode, del, list, modify, open, save } from '@/api/sys/dict'
-import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { confirmAlert } from '@utils/common'
+import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
 
 export default {
@@ -202,7 +203,7 @@ export default {
             trigger: 'blur'
           }, {
             validator: (rule, value, callback) => {
-              checkDictCode(value).then((response) => {
+              checkDictCode(value, this.dict.id).then((response) => {
                 if (response.data) {
                   callback()
                   return

@@ -111,7 +111,8 @@
 
 <script>
 import { del, list } from '@/api/process/instance'
-import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { DIALOG_TYPE } from '@/const/constant'
+import { confirmAlert } from '@utils/common'
 import JSONBigInt from 'json-bigint'
 
 export default {

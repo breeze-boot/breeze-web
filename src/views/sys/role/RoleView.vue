@@ -169,7 +169,8 @@
 <script>
 import { checkRoleCode, del, list, listRolesPermission, modify, modifyPermission, save } from '@/api/sys/role'
 import { listTreePermission } from '@/api/sys/menu'
-import { confirmAlert, DIALOG_TYPE, reLoginConfirm } from '@/utils/constant'
+import { confirmAlert, reLoginConfirm } from '@utils/common'
+import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
 import { editRoleDataPermission, selectDataPermission } from '@/api/sys/dataPermission'
 

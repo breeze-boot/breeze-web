@@ -19,7 +19,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="日志类型" prop="logType">
-              <el-select v-model="searchLogForm.doType" placeholder="请选择日志类型">
+              <el-select v-model="searchLogForm.logType" placeholder="请选择日志类型">
                 <el-option
                   v-for="item in this.getDict()('LOG_TYPE')"
                   :key="item.key"
@@ -43,12 +43,14 @@
             </el-form-item>
             <el-form-item label="日志时间" prop="searchDate">
               <el-date-picker
-                v-model="searchLogForm.logType"
+                v-model="searchLogForm.searchDate"
+                clearable
                 end-placeholder="结束日期"
+                format="yyyy-MM-dd HH:mm:ss"
                 range-separator="至"
                 size="mini"
                 start-placeholder="开始日期"
-                type="daterange">
+                type="datetimerange">
               </el-date-picker>
             </el-form-item>
             <el-form-item>
@@ -216,15 +218,19 @@
 </template>
 
 <script>
-import { truncate, del, list } from '@/api/sys/log'
-import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { del, list, truncate } from '@/api/sys/log'
+import { confirmAlert } from '@utils/common'
+import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
-import { mapGetters } from 'vuex'
+import dict from '@/mixins/dict'
 
 export default {
   name: 'LogView',
+  mixins: [dict],
   data () {
     return {
+      // 此页面需要自字典编码
+      dictCode: ['LOG_TYPE', 'DO_TYPE', 'RESULT'],
       // 当前操作类型
       dialogType: DIALOG_TYPE.ADD,
       // 弹出框标题
@@ -238,6 +244,7 @@ export default {
         systemModule: '',
         doType: '',
         startDate: '',
+        endDate: '',
         searchDate: '',
         result: '',
         createBy: '',
@@ -270,12 +277,9 @@ export default {
     }
   },
   mounted () {
-    this.$toLoadDict(['LOG_TYPE', 'DO_TYPE', 'RESULT']).then((dict) => {
-      this.reloadList()
-    })
+    this.reloadList()
   },
   methods: {
-    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
     /**
      * 初始化加载表格数据
      */
@@ -295,6 +299,8 @@ export default {
      * @returns {{result: string, logType: string, createBy: string, current: number, size: number, searchDate: string, doType: string, startDate: string, systemModule: string}}
      */
     buildParam () {
+      this.searchLogForm.startDate = this.searchLogForm.searchDate[0]
+      this.searchLogForm.endDate = this.searchLogForm.searchDate[1]
       return this.searchLogForm
     },
     /**

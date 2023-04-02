@@ -133,7 +133,7 @@
             消息类型
           </template>
           <el-tag size="small">
-            {{ this.getDescriptionsDictLabel()(userMsg, 'userMsgType', 'MSG_TYPE') }}
+            {{ this.getDescriptionsDictLabel()(userMsg, 'msgType', 'MSG_TYPE') }}
           </el-tag>
         </el-descriptions-item>
         <el-descriptions-item>
@@ -184,14 +184,18 @@
 
 <script>
 import { del, list } from '@/api/sys/userMsg'
-import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { confirmAlert } from '@utils/common'
+import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
-import { mapGetters } from 'vuex'
+import dict from '@/mixins/dict'
 
 export default {
   name: 'UserMsgView',
+  mixins: [dict],
   data () {
     return {
+      // 此页面需要自字典编码
+      dictCode: ['MSG_LEVEL', 'MSG_TYPE', 'MARK_READ'],
       // 当前操作类型
       dialogType: DIALOG_TYPE.ADD,
       // 弹出框标题
@@ -242,12 +246,9 @@ export default {
     }
   },
   mounted () {
-    this.$toLoadDict(['MSG_LEVEL', 'MSG_TYPE', 'MARK_READ']).then((dict) => {
-      this.reloadList()
-    })
+    this.reloadList()
   },
   methods: {
-    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel']),
     /**
      * 初始化加载表格数据
      */

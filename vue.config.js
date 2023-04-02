@@ -14,11 +14,14 @@ module.exports = defineConfig({
     config.module
       .rule('svg')
       .exclude.add(resolve('src/assets/icon'))
+      .add(resolve('packages/bpmn-icons'))
       .end()
+
     config.module
       .rule('icon')
       .test(/\.svg$/)
       .include.add(resolve('src/assets/icon'))
+      .add(resolve('packages/bpmn-icons'))
       .end()
       .use('svg-sprite-loader')
       .loader('svg-sprite-loader')
@@ -44,13 +47,17 @@ module.exports = defineConfig({
       }
     }
   },
+  runtimeCompiler: true,
+  parallel: true,
+  productionSourceMap: false,
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
     // it can be accessed in index.html to inject the correct title.
     name: name,
     resolve: {
       alias: {
-        '@': resolve('src')
+        '@': resolve('src'),
+        '@utils': resolve('utils')
       }
     }
   }

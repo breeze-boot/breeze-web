@@ -135,7 +135,8 @@
 
 <script>
 import { checkPostCode, del, list, modify, save } from '@/api/sys/post'
-import { confirmAlert, DIALOG_TYPE } from '@/utils/constant'
+import { confirmAlert } from '@utils/common'
+import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
 
 export default {

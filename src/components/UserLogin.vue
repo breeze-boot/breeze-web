@@ -66,7 +66,7 @@ export default {
       userLogin: {
         username: 'admin',
         password: '123456',
-        tenantId: ''
+        tenantId: 1
       },
       tenantOption: [],
       rules: {
