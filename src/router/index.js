@@ -24,6 +24,11 @@ const routes = [
     redirect: '/'
   },
   {
+    path: '/auth-redirect',
+    component: () => import('@/views/AuthRedirectView.vue'),
+    hidden: true
+  },
+  {
     path: '/home',
     name: 'home',
     component: () => import('@/views/HomeView.vue'),
@@ -32,23 +37,36 @@ const routes = [
         path: '/welcome',
         name: 'welcome',
         component: () => import('@/views/WelcomeView.vue')
+      },
+      {
+        path: '/404',
+        name: '404',
+        component: () => import('@/views/404/NotFoundView.vue'),
+        meta: {
+          title: '404',
+          hidden: 1
+        }
       }
     ]
-  },
-  {
-    path: '/404',
-    name: '404',
-    component: () => import('@/views/404.vue')
   }
 ]
 
 const router = new VueRouter({
+  mode: 'hash',
   routes
 })
 
+const whiteList = ['/404', '/auth-redirect']
+
 router.beforeEach((to, from, next) => {
+  if (whiteList.includes(to.path)) {
+    console.debug(`白名单${whiteList}`)
+    next()
+    return
+  }
   // 去首页登录页放行
   if (to.path === '/' || to.path === '/login') {
+    console.debug(`登录页${to.path}`)
     next()
     return
   }
@@ -60,6 +78,7 @@ router.beforeEach((to, from, next) => {
     }
     store.commit('menu/isLoadMenu', true)
     store.dispatch('menu/loadRoute').then(() => {
+      console.debug('加载完成路由')
       next({
         ...to,
         replace: true
@@ -71,6 +90,7 @@ router.beforeEach((to, from, next) => {
       })
     })
   } else {
+    console.debug('重定向路由')
     next('/?redirect=' + to.path)
   }
 })

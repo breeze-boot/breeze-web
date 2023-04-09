@@ -88,3 +88,27 @@ export function filterTree (treeData, result = [], func = {}) {
   }
   return result
 }
+
+export const getParamsAndQueryByIndex = (dynamicTabs, currentIndex) => {
+  const toTabQuery = dynamicTabs[currentIndex].query
+  const query = {}
+  for (const key in toTabQuery) {
+    query[key] = toTabQuery[key]
+  }
+  const toTabParams = dynamicTabs[currentIndex].params
+  const params = {}
+  for (const key in toTabParams) {
+    params[key] = toTabParams[key]
+  }
+  return {
+    query,
+    params
+  }
+}
+
+export const getParamsAndQueryByName = (dynamicTabs, name) => {
+  const currentIndex = dynamicTabs.findIndex((value) => {
+    return value.name === name
+  })
+  return getParamsAndQueryByIndex(dynamicTabs, currentIndex)
+}

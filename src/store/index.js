@@ -4,8 +4,9 @@ import menu from '@/store/modules/menu'
 import msg from '@/store/modules/msg'
 import dict from '@/store/modules/dict'
 import userInfo from '@/store/modules/userInfo'
-import tag from '@/store/modules/Tag'
-import tabs from '@/store/modules/Tabs'
+import tab from '@/store/modules/Tab'
+import rightMenu from '@/store/modules/rightMenu'
+import settings from '@/store/modules/settings'
 
 Vue.use(Vuex)
 
@@ -14,8 +15,9 @@ export default new Vuex.Store({
     menu,
     userInfo,
     msg,
-    tag,
     dict,
-    tabs
+    tab,
+    rightMenu,
+    settings
   }
 })

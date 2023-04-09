@@ -309,7 +309,7 @@ import { confirmAlert } from '@utils/common'
 import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
 import { selectDept } from '@/api/sys/dept'
-import dict from '@/mixins/dict'
+import { dict } from '@/mixins'
 
 export default {
   name: 'DataPermissionView',
@@ -420,7 +420,7 @@ export default {
       }
     }
   },
-  mounted () {
+  created () {
     this.reloadList()
   },
   methods: {

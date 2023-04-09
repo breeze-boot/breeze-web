@@ -1,17 +1,13 @@
 <template>
   <div class="welcome">
-    404
-    <svg-icon icon-class="abc"></svg-icon>
+    <custom-icon icon-name="svg-404" icon-style="width: 90vw;height: 90vh;"/>
   </div>
 </template>
 
 <script>
 
-import SvgIcon from '@/components/svg/SvgIcon'
-
 export default {
-  name: 'WelcomeView',
-  components: { SvgIcon }
+  name: 'NotFoundView'
 }
 </script>
 

@@ -222,7 +222,7 @@ import { del, list, truncate } from '@/api/sys/log'
 import { confirmAlert } from '@utils/common'
 import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
-import dict from '@/mixins/dict'
+import { dict } from '@/mixins'
 
 export default {
   name: 'LogView',
@@ -276,7 +276,7 @@ export default {
       }
     }
   },
-  mounted () {
+  created () {
     this.reloadList()
   },
   methods: {
@@ -284,12 +284,12 @@ export default {
      * 初始化加载表格数据
      */
     reloadList () {
-      list(this.buildParam()).then((rep) => {
-        if (rep.code === 1) {
-          this.logTableData = rep.data.records
-          this.searchLogForm.size = rep.data.size
-          this.searchLogForm.current = rep.data.current
-          this.total = rep.data.total
+      list(this.buildParam()).then((response) => {
+        if (response.code === 1) {
+          this.logTableData = response.data.records
+          this.searchLogForm.size = response.data.size
+          this.searchLogForm.current = response.data.current
+          this.total = response.data.total
         }
       })
     },
@@ -351,8 +351,8 @@ export default {
       confirmAlert(() => {
         const ids = []
         this.multipleSelectionLogId.map((x) => ids.push(JSONBigInt.parse(x.id)))
-        del(ids).then((rep) => {
-          if (rep.code === 1) {
+        del(ids).then((response) => {
+          if (response.code === 1) {
             this.reloadList()
             this.$message.success('删除成功')
           }
@@ -364,7 +364,7 @@ export default {
      */
     truncate () {
       confirmAlert(() => {
-        truncate().then((rep) => {
+        truncate().then((response) => {
           this.$message.success('全部清空')
           this.reloadList()
         })
@@ -373,12 +373,14 @@ export default {
     /**
      * 删除行
      *
+     * @param index
      * @param rows
+     * @param row
      */
     removeItem (index, rows, row) {
       confirmAlert(() => {
-        del([JSONBigInt.parse(row.id)]).then(rep => {
-          if (rep.code === 1) {
+        del([JSONBigInt.parse(row.id)]).then(response => {
+          if (response.code === 1) {
             rows.splice(index, 1)
             this.reloadList()
             this.$message.success('删除成功')

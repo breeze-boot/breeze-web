@@ -1,16 +1,14 @@
 import Vue from 'vue'
-import Icon from '@/components/svg/SvgIcon'
+import CustomIcon from '@/components/icon/CustomIcon'
 
-Vue.component('svg-icon', Icon)
+Vue.component('custom-icon', CustomIcon)
 
 const requireAll = requireContext => requireContext.keys().map(requireContext)
 const req = require.context('./svg', false, /\.svg$/)
 requireAll(req)
 
-// icons
 const requireAllIcon = requireContext => requireContext.keys()
-const icons = requireAllIcon(req).map(i => {
-  const icon = i.match(/\.\/(.*)\.svg/)[1]
-  return icon.replace('icon-', '')
+const svgIcons = requireAllIcon(req).map(i => {
+  return i.match(/\.\/(.*)\.svg/)[1]
 })
-export default icons
+export default svgIcons

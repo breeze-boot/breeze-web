@@ -102,7 +102,7 @@ export default {
       }
     }
   },
-  mounted () {
+  created () {
     this.reloadList(this.buildParam())
   },
   methods: {

@@ -217,7 +217,7 @@ export default {
       }
     }
   },
-  mounted () {
+  created () {
     this.reloadList()
   },
   methods: {
@@ -420,8 +420,7 @@ export default {
       this.$router.push({
         name: 'dictItem',
         query: {
-          id: row.id,
-          dictId: row.dictId
+          id: row.id
         }
       })
     },

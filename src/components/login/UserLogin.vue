@@ -4,9 +4,9 @@
       ref="userLogin"
       :model="userLogin"
       :rules="rules"
-      class="userLogin"
+      class="user-login"
       size="small">
-      <h3>登录中心</h3>
+      <h3>用户登录</h3>
       <el-form-item prop="username">
         <el-input
           v-model="userLogin.username"
@@ -24,8 +24,8 @@
           type="password"
         />
       </el-form-item>
-      <el-form-item id="tenant_select" prop="tenantId" size="mini">
-        <el-select v-model="userLogin.tenantId" placeholder="请选择租户">
+      <el-form-item prop="tenantId">
+        <el-select v-model="userLogin.tenantId" :popper-append-to-body="false" placeholder="请选择租户">
           <el-option
             v-for="item in tenantOption"
             :key="item.key"
@@ -35,7 +35,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button style="width: 100%" type="primary" @click="login">
+        <el-button style="width: 100%" type="primary" @click="handleLogin">
           登录
         </el-button>
       </el-form-item>
@@ -94,9 +94,6 @@ export default {
       }
     }
   },
-  created () {
-    localStorage.clear()
-  },
   mounted () {
     selectTenant().then(rep => {
       if (rep.code === 1) {
@@ -110,13 +107,16 @@ export default {
     ...mapMutations('userInfo', ['setUserInfo']),
     success () {
       this.$store.dispatch('userInfo/login', this.userLogin).then(() => {
-        this.$router.push({ path: this.$route.query.redirect || 'welcome' }).catch((e) => {
+        this.$router.push({
+          path: this.$route.query.redirect || 'welcome'
+        }).catch((e) => {
           console.error(e)
         })
       }).catch((e) => {
+        console.error(e)
       })
     },
-    login () {
+    handleLogin () {
       this.$refs.userLogin.validate((valid) => {
         if (valid) {
           this.$refs.verify.show()
@@ -130,18 +130,13 @@ export default {
 }
 </script>
 <style lang="scss">
-.userLogin {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -70%);
-  background: rgba(236, 236, 236, 0.5);
-  background-clip: padding-box;
-  padding: 2vh 2vw;
+.user-login {
+  padding: 2vh 50px;
   width: 20vw;
+  height: 35vh;
   min-width: 300px;
-  border: 1px #bdbdbd solid;
-  box-shadow: 0 0 5px #9b9b9b;
+  margin-bottom: 5vh;
+  border: 1px solid #b4b4b4;
 
   h3 {
     font-size: 1.5rem;
@@ -149,12 +144,78 @@ export default {
     margin-bottom: 20px;
     padding: 10px 0;
   }
-}
 
-#tenant_select {
-  .el-select {
-    margin: 0 auto;
-    width: 100%;
+  .el-input__inner {
+    background: rgb(228, 231, 235);
+    height: 45px;
+    max-height: 45px;
+    color: rgba(50, 50, 50, 0.8);
+    border-radius: 1px;
+    font-size: 13px !important;
+  }
+
+  .el-select .el-input .el-select__caret {
+    color: rgba(50, 50, 50, 0.8);
+  }
+
+  // option选项 上面的箭头
+  .el-popper[x-placement^="bottom"] .popper__arrow::after {
+    display: none;
+  }
+
+  .popper__arrow {
+    border: none;
+  }
+
+  // option选项 最外层
+  .el-select-dropdown {
+    border: none !important;
+    left: 0 !important;
+    top: 45px !important;
+    background: rgb(228, 231, 235) !important;
+    z-index: 9999;
+    border-radius: 1px !important;
+  }
+
+  // option选项 文字样式
+  .el-select-dropdown__item {
+    color: rgba(50, 50, 50, 0.8) !important;
+    max-height: 35px !important;
+    height: 35px !important;
+    line-height: 35px !important;
+    z-index: 9999;
+  }
+
+  .el-select-dropdown__item.selected span {
+    color: rgba(50, 50, 50, 0.6) !important;
+    z-index: 9999;
+  }
+
+  // 移入option选项 样式调整
+  .el-select-dropdown__item.hover {
+    background: rgb(228, 231, 235) !important;
+    color: rgba(50, 50, 50, 0.6) !important;
+    z-index: 9999;
+  }
+
+  // 下拉框垂直滚动条宽度
+  .el-scrollbar__bar.is-vertical {
+    width: 10px;
+    top: 2px;
+  }
+
+  // 下拉框最大高度
+  .el-select-dropdown__wrap {
+    max-height: 200px;
+  }
+
+  .el-button:not(.other_login) {
+    max-height: 45px !important;
+    height: 45px !important;
+    background: linear-gradient(to right, rgb(9, 63, 107), rgba(9, 63, 107, 0.5), rgb(9, 63, 107));
+    border-radius: 1px;
+    border: none;
+    font-size: 18px;
   }
 }
 </style>

@@ -67,7 +67,7 @@
           show-overflow-tooltip
           width="190">
           <template slot-scope="scope">
-            <svg-icon :icon-name="scope.row.icon" :icon-style="'margin-right: 0px;'" style="font-size: 20px;"/>
+            <custom-icon :icon-name="scope.row.icon"/>
             <el-tag
               v-if="scope.row.icon"
               disable-transitions
@@ -212,7 +212,7 @@
         <el-form-item v-if="menu.type === 0 || menu.type === 1" :label-width="formLabelWidth" label="组件图标"
                       prop="icon">
           <el-button plain style="margin:0 10px" type="success" @click="showIconDialog">打开</el-button>
-          <svg-icon :icon-name="menu.icon" style="font-size: 20px;"/>
+          <custom-icon :icon-name="menu.icon"/>
           <span> {{ menu.icon }} </span>
         </el-form-item>
 
@@ -316,7 +316,7 @@
           {{ menu.title }}
         </el-descriptions-item>
 
-        <el-descriptions-item>
+        <el-descriptions-item  v-if="menu.type === 1">
           <template slot="label">
             图标
           </template>
@@ -354,6 +354,7 @@
     </el-dialog>
     <icon-dialog
       ref="iconDialog"
+      type="iconfont"
       @choiceIcon="choiceIcon"/>
   </el-container>
 </template>
@@ -363,8 +364,8 @@ import { del, list, modify, save, selectMenu, selectPlatform } from '@/api/sys/m
 import { confirmAlert } from '@utils/common'
 import { DIALOG_TYPE, ROOT } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
-import IconDialog from '@/components/svg/IconDialog'
-import dict from '@/mixins/dict'
+import IconDialog from '@/components/icon/IconDialog'
+import { dict } from '@/mixins'
 
 export default {
   name: 'MenuView',
@@ -483,9 +484,12 @@ export default {
       }
     }
   },
-  mounted () {
+  created () {
     this.selectPlatform()
     this.reloadList()
+  },
+  mounted () {
+    this.$refs.menuTable.doLayout()
   },
   methods: {
     /**
@@ -495,9 +499,6 @@ export default {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
           this.menuTableData = rep.data
-          this.$nextTick(() => {
-            this.$refs.menuTable.doLayout()
-          })
         }
       })
     },
@@ -616,7 +617,6 @@ export default {
     },
     /**
      * 关闭菜单添加修改弹出框事件
-     * @param formName
      */
     closeMenuDialog () {
       this.$nextTick(() => {

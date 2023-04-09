@@ -113,7 +113,7 @@ export default {
       total: 0
     }
   },
-  mounted () {
+  created () {
     this.reloadList()
   },
   methods: {
@@ -191,8 +191,6 @@ export default {
     },
     /**
      * 添加修改弹出框提交
-     *
-     * @param formName
      */
     submitUserRoleForm () {
       if (this.multipleSelectionUserRoleId.length === 0) {
@@ -215,8 +213,6 @@ export default {
     },
     /**
      * 添加修改弹出框重置
-     *
-     * @param formName
      */
     resetUserRoleForm () {
       this.reloadList()

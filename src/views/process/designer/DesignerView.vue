@@ -112,8 +112,8 @@ export default {
 <style lang="less">
 .designer {
   .flow-containers .djs-palette {
-    left: 0px !important;
-    top: 0px;
+    left: 0 !important;
+    top: 0;
     border: 1px solid rgba(199, 197, 197, 0.32);
     width: 130px !important;
     margin: 10px 20px;

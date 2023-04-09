@@ -1,19 +1,19 @@
 <template>
   <el-submenu v-if="menu.children && menu.children.length > 0" :index="menu.id" :popper-append-to-body=true>
     <template slot="title">
-      <svg-icon :icon-name="menu.icon" style="font-size: 20px;"/>
+      <i :class="`al-icon iconfont ${menu.icon}`"></i>
       <span slot="title">{{ menu.title }}</span>
     </template>
     <menu-item v-for="item in menu.children" :key="item.id" :menu="item"></menu-item>
   </el-submenu>
 
   <el-menu-item v-else-if="menu && menu.href===0" :index="menu.name">
-    <svg-icon :icon-name="menu.icon" style="font-size: 20px;"/>
+    <i :class="`al-icon iconfont ${menu.icon}`"></i>
     <span slot="title">{{ menu.title }}</span>
   </el-menu-item>
   <el-menu-item v-else-if="menu && menu.href===1">
     <el-link :href="menu.path" style="color: #ffffff;" target="_blank" type="info">
-      <svg-icon :icon-name="menu.icon" style="font-size: 20px;"/>
+      <i :class="`al-icon iconfont ${menu.icon}`"></i>
       <span>{{ menu.title }}</span>
     </el-link>
   </el-menu-item>

@@ -321,7 +321,7 @@ import { confirmAlert } from '@utils/common'
 import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
 import { selectDept } from '@/api/sys/dept'
-import dict from '@/mixins/dict'
+import { dict } from '@/mixins'
 
 export default {
   name: 'MsgView',
@@ -424,7 +424,7 @@ export default {
       }
     }
   },
-  mounted () {
+  created () {
     this.reloadList()
     this.selectDept()
   },
@@ -474,7 +474,7 @@ export default {
     /**
      * 分页大小切换
      *
-     * @param size
+     * @param current
      */
     handleCurrentChange (current) {
       this.searchMsgForm.current = current
@@ -495,7 +495,7 @@ export default {
     /**
      * 消息表格复选框事件
      *
-     * @param row
+     * @param val
      */
     msgHandleSelectionChange (val) {
       this.checkDeleteItem = !val.length
@@ -771,8 +771,6 @@ export default {
     },
     /**
      * 关闭发送消息弹出框事件
-     *
-     * @param formName
      */
     closeSendMsgDialog () {
       this.sendMsgData = {

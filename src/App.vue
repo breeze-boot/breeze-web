@@ -13,9 +13,8 @@ export default {
     return {}
   },
   methods: {
-    ...mapMutations('tag', ['setTag', 'setCurrentTagValue']),
     ...mapMutations('menu', ['setCurrentMenu', 'setMenuIsCollapse']),
-    ...mapMutations('tabs', ['setTab', 'setCurrentTabValue']),
+    ...mapMutations('tab', ['setTab']),
     reSize () {
       const width = document.documentElement.clientWidth || document.body.clientWidth
       if (width < 1024) {
@@ -33,7 +32,6 @@ export default {
           isCollapse: true
         })
       }
-      // document.getElementsByTagName('html')[0].style['font-size'] = 18 + 'px'
     }
   },
   mounted () {
@@ -55,16 +53,15 @@ export default {
     $route (to, from) {
       const accessToken = localStorage.getItem('access_token')
       if (to.name !== 'login' && to.name !== 'home' && accessToken) {
-        const menu = {
+        const params = {
           name: to.name,
           title: to.meta.title,
-          hidden: to.meta.hidden
+          hidden: to.meta.hidden,
+          query: this.$route.query,
+          params: this.$route.params
         }
-        this.setTab(menu)
-        this.setTag(menu)
-        this.setCurrentMenu(menu)
-        this.setCurrentTabValue(to.name)
-        this.setCurrentTagValue(to.name)
+        this.setTab(params)
+        this.setCurrentMenu(params)
       }
     }
   }
@@ -77,20 +74,20 @@ export default {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, .1);
+  background: rgba(0, 0, 0, 0.1);
   border-radius: 0;
 }
 
 ::-webkit-scrollbar {
   -webkit-appearance: none;
-  width: 10px;
-  height: 10px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
   cursor: pointer;
   border-radius: 5px;
-  background: rgba(0, 0, 0, .15);
-  transition: color .2s ease;
+  background: rgba(0, 0, 0, 0.1);
+  transition: color 0.2s ease;
 }
 </style>

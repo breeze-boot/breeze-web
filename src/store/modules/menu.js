@@ -26,8 +26,7 @@ export default {
     setKeepAliveMenus: (state, menu) => {
       // 过滤出哪些路由需要缓存
       if (menu.keepAlive === 1) {
-        state.keepAliveMenus =
-          menu.component.substr(menu.component.lastIndexOf('/') + 1)
+        state.keepAliveMenus.push(menu.component.substr(menu.component.lastIndexOf('/') + 1))
       }
     },
     setMenuIsCollapse: (state, menuIsCollapse) => {

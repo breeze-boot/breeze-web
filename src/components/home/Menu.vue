@@ -21,7 +21,7 @@
       <el-menu-item
         key="0"
         index="welcome">
-        <i class="el-icon-s-home"></i>
+        <i class="al-icon iconfont icon-home"/>
         <span slot="title">欢迎</span>
       </el-menu-item>
       <menu-item v-for="menu in this.getMenus"
@@ -52,8 +52,7 @@ export default {
     /**
      * 切换菜单
      *
-     * @param key
-     * @param keyPath
+     * @param name
      */
     handleRouter (name) {
       if (!name) {

@@ -7,8 +7,12 @@ const dict = {
     }
   },
   created () {
+    // 获取字典
+    if (this.dictCode.length === 0) {
+      return
+    }
     this.$toLoadDict(this.dictCode).then((dict) => {
-      console.info(dict)
+      console.debug('加载完成字典', dict)
     })
   },
   methods: {

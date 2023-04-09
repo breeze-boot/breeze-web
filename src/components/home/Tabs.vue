@@ -1,9 +1,11 @@
 <template>
   <div>
     <el-tabs
-      v-model="currentTabValue"
+      v-model="currentTab"
+      v-right-menu
       @tab-click="handleTabClick"
-      @tab-remove="removeTab">
+      @tab-remove="handleTabRemove">
+      <right-menu/>
       <el-tab-pane
         v-for="(tab, index) in dynamicTabs"
         :key="tab.name + index"
@@ -16,28 +18,30 @@
 </template>
 
 <script>
-
-import router from '@/router'
+import rightMenu from '@/components/rightMenu/RightMenu'
+import { getParamsAndQueryByName } from '@utils/common'
 
 export default {
   name: 'Tabs',
+  components: {
+    rightMenu
+  },
   data () {
     return {}
   },
   computed: {
-    currentTabValue: {
+    currentTab: {
       get () {
-        return this.$store.getters['tabs/getCurrentTabValue']
+        return this.$store.getters['tab/getCurrentTab']
       },
       set (currentTabValue) {
       }
     },
     dynamicTabs: {
       get () {
-        return this.$store.state.tabs.dynamicTabs
+        return this.$store.getters['tab/getDynamicTabs']
       },
       set (dynamicTabs) {
-        this.$store.state.tabs.dynamicTabs = dynamicTabs
       }
     }
   },
@@ -48,32 +52,23 @@ export default {
      * @param tab
      */
     handleTabClick (tab) {
-      router.push({ name: tab.name })
+      const {
+        query,
+        params
+      } = getParamsAndQueryByName(this.$store.getters['tab/getDynamicTabs'], tab.name)
+      this.$router.push({
+        name: tab.name,
+        query: query,
+        params: params
+      }).then(r => console.debug(r))
     },
     /**
      * 删除Tab
      *
      * @param targetName
      */
-    removeTab (targetName) {
-      if (targetName === 'welcome') {
-        return
-      }
-      const tabs = this.dynamicTabs
-      let activeName = this.currentTabValue
-      if (activeName === targetName) {
-        tabs.forEach((tab, index) => {
-          if (tab.name === targetName) {
-            const nextTab = tabs[index + 1] || tabs[index - 1]
-            if (nextTab) {
-              activeName = nextTab.name
-            }
-          }
-        })
-      }
-      this.$router.push({ name: activeName })
-      this.currentTabValue = activeName
-      this.dynamicTabs = tabs.filter((tab) => tab.name !== targetName)
+    handleTabRemove (targetName) {
+      this.$store.dispatch('tab/closeCurrentTab', targetName)
     }
   }
 }

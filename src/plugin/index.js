@@ -31,7 +31,7 @@ const toListDict = (dictCodes = []) => {
         resolve(findDict)
       })
     } else {
-      resolve(findDict)
+      resolve('从缓存加载')
     }
   })
 }

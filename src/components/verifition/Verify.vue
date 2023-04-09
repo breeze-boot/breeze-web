@@ -157,7 +157,7 @@ export default {
       const slider = 'slider' + '-' + s.join('')
       const point = 'point' + '-' + s.join('')
       // 判断下是否存在 slider
-      console.log(localStorage.getItem('slider'))
+      console.debug(localStorage.getItem('slider'))
       if (!localStorage.getItem('slider')) {
         localStorage.setItem('slider', slider)
       }
@@ -249,7 +249,7 @@ export default {
   z-index: 1001;
   width: 100%;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.3);
+  /*background: rgba(0, 0, 0, 0.3);*/
   /* display: none; */
   transition: all 0.5s;
 }

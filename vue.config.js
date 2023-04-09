@@ -55,7 +55,8 @@ module.exports = defineConfig({
     resolve: {
       alias: {
         '@': resolve('src'),
-        '@utils': resolve('utils')
+        '@utils': resolve('utils'),
+        '@theme': resolve('theme')
       }
     }
   }

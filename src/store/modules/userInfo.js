@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { login, logout } from '@/api/login'
+import { login, logout, sms, userInfo } from '@/api/login/login'
 
 Vue.use(Vuex)
 
@@ -52,6 +52,31 @@ export default {
       })
     },
     /**
+     * 手机登录
+     *
+     * @param commit
+     * @param phoneLogin
+     * @returns {Promise<>}
+     * @constructor
+     */
+    phoneLogin ({ commit }, phoneLogin) {
+      const loginParam = {
+        phone: phoneLogin.phone.trim(),
+        code: phoneLogin.code.trim()
+      }
+      return new Promise((resolve, reject) => {
+        sms(loginParam).then(response => {
+          localStorage.setItem('B_TENANT_ID', response.data.userInfo.tenantId)
+          commit('setAccessToken', response.data.accessToken)
+          commit('setAuthorities', response.data.userInfo.authorities)
+          commit('setUserInfo', response.data.userInfo)
+          resolve()
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
+    /**
      * 退出
      *
      * @param commit
@@ -81,6 +106,27 @@ export default {
      */
     clearUserInfo (state) {
       state.userInfo = undefined
+    },
+    /**
+     * 获取用户信息
+     *
+     * @param commit
+     * @param state
+     */
+    userInfo ({
+      commit,
+      state
+    }) {
+      return new Promise((resolve, reject) => {
+        userInfo().then((response) => {
+          debugger
+          commit('setAuthorities', response.data.authorities)
+          commit('setUserInfo', response.data)
+          resolve(response.data)
+        }).catch(error => {
+          reject(error)
+        })
+      })
     }
   },
   getters: {
@@ -90,7 +136,7 @@ export default {
      * @param state
      * @returns {*|string}
      */
-    getUsername (state) {
+    getLoginUser (state) {
       return state.userInfo ? state.userInfo.username : ''
     }
   }

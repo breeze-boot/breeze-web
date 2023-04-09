@@ -7,11 +7,9 @@
       <el-header>
         <Header/>
       </el-header>
-      <el-main style="padding: 1px 20px;">
-        <div class="tag" @mousewheel="wheel">
-          <Tag v-show="false"/>
-          <Tabs v-show="true"/>
-        </div>
+      <el-main style="padding: 0 20px;">
+        <Tags v-if="this.$store.getters['settings/getType'] === 'tag'"/>
+        <Tabs v-else/>
         <keep-alive :include="this.$store.state.menu.keepAliveMenus">
           <router-view
             :key="this.$route.fullPath"
@@ -27,7 +25,7 @@
 import Header from '@/components/home/Header'
 import Menu from '@/components/home/Menu'
 import Tabs from '@/components/home/Tabs'
-import Tag from '@/components/home/Tag'
+import Tags from '@/components/home/Tags'
 import SockJS from 'sockjs-client'
 import store from '@/store'
 import Stomp from 'stompjs'
@@ -38,7 +36,7 @@ export default {
   name: 'HomeView',
   components: {
     Tabs,
-    Tag,
+    Tags,
     Header,
     Menu
   },
@@ -78,7 +76,7 @@ export default {
           }
           // 重新连接一次
           store.state.msg.reConnectTime = setTimeout(() => {
-            console.log('重新连接>>>>>>>>>>')
+            console.debug('重新连接>>>>>>>>>>')
             this.initWebSocket()
           }, 60000)
         }
@@ -91,7 +89,7 @@ export default {
       clearInterval(store.state.msg.reConnectTime)
       if (store.state.msg.stompClient !== null) {
         store.state.msg.stompClient.disconnect(() => {
-          console.log('关闭连接')
+          console.debug('关闭连接')
         })
       }
     },
@@ -182,20 +180,6 @@ export default {
       this.notifications[data.msgCode].close()
       this.markReadMsgCard(data)
       delete this.notifications[data.msgCode]
-    },
-    /**
-     * 滑轮
-     *
-     * @param e
-     */
-    wheel (e) {
-      const a = document.getElementById('tag')
-      const scrollWidth = 100
-      let flag
-      e.wheelDelta ? flag = e.wheelDelta : flag = e.detail
-      if (flag > 3 || -flag > 3) flag = -flag
-      flag > 0 ? a.scrollLeft += scrollWidth : a.scrollLeft -= scrollWidth
-      e.preventDefault()
     }
   }
 }
@@ -245,5 +229,4 @@ export default {
   font-size: 0.4rem;
   border-radius: 3px;
 }
-
 </style>

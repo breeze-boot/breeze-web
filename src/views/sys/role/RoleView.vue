@@ -92,7 +92,7 @@
                    show-checkbox
                    style="height: 560px; overflow-y:scroll; border: #e1e1e1 1px solid; margin-top:37px;">
           </el-tree>
-          <div style="margin-top: 10px; text-align: center; padding: 0px 30px;">
+          <div style="margin-top: 10px; text-align: center; padding: 0 30px;">
             <el-button plain size="mini" type="primary" @click="submitPermission">提交</el-button>
             <el-button :disabled="disabled" plain size="mini" type="info" @click="resetPermission">重置</el-button>
           </div>
@@ -277,7 +277,7 @@ export default {
       }
     }
   },
-  mounted () {
+  created () {
     // 初始化加载表格数据
     this.reloadList()
     this.reloadListTreeMenu()
@@ -399,7 +399,9 @@ export default {
     /**
      * 删除行
      *
+     * @param index
      * @param rows
+     * @param row
      */
     removeItem (index, rows, row) {
       confirmAlert(() => {
@@ -514,8 +516,6 @@ export default {
     },
     /**
      * 提交角色的权限
-     *
-     * @param formName
      */
     submitPermission () {
       const checkedKeys = this.$refs.roleTree.getCheckedKeys()

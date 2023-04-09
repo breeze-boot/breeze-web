@@ -6,17 +6,17 @@
     </div>
 
     <div class="group">
-      <div class="group">
-        <i class="el-icon-s-unfold" @click="handleScreenFull"/>
+      <div class="group-item">
+        <custom-icon :icon-name="iconClass" style="cursor: pointer;" @click.native="handleScreenFull"/>
       </div>
-      <div class="message">
-        <el-badge class="item" is-dot>
+      <div class="group-item">
+        <el-badge :is-dot="this.$store.getters['msg/getMsg'].length > 0" class="item">
           <i class="el-icon-message-solid" style="cursor: pointer;" @click="showMsgBox"></i>
         </el-badge>
       </div>
       <el-dropdown @command="handleCommand">
-        <span class="el-dropdown-link">
-          <span> {{ this.getUsername }}</span>
+        <span class="el-dropdown-link login-name-box">
+          <span class="login-name" style="font-size: 0.99rem"> {{ this.currentLoginUserName }} </span>
         </span>
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="setting">
@@ -28,11 +28,44 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+
     <el-drawer
       :direction="direction"
       :visible.sync="settingDrawer"
       title="平台设置">
+      <el-main class="setting">
+        <el-row>
+          <el-col :md="4"> 选项卡：</el-col>
+          <el-col :md="20">
+            <el-radio-group v-model="settingData.cardType">
+              <el-radio v-for="(item, index) in settings.cardTypeList" :key="index" :label="item.label"
+                        @change="handleChangeType">
+                {{ item.name }}
+              </el-radio>
+            </el-radio-group>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :md="4"> 主题：</el-col>
+          <el-col :md="20">
+            <el-radio-group v-model="settingData.theme">
+              <el-radio v-for="(item, index) in settings.themeList" :key="index" :label="item.label"
+                        @change="handleChangeTheme">
+                {{ item.name }}
+              </el-radio>
+            </el-radio-group>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :md="4">
+          </el-col>
+          <el-col :md="20">
+          </el-col>
+        </el-row>
+      </el-main>
     </el-drawer>
+
+    <!-- 消息-->
     <el-drawer
       :direction="direction"
       :size="'20%'"
@@ -69,26 +102,68 @@ export default {
   name: 'Header',
   data () {
     return {
+      currentLoginUserName: '',
       settingDrawer: false,
       msgDrawer: false,
       iconClass: '',
-      direction: 'rtl'
+      direction: 'rtl',
+      settingData: {
+        cardType: '',
+        theme: ''
+      },
+      settings: {
+        cardTypeList: [
+          {
+            label: 'tab',
+            name: '选项卡式'
+          },
+          {
+            label: 'tag',
+            name: '标签式'
+          }
+        ],
+        themeList: [
+          {
+            label: 'simple',
+            name: '简约'
+          },
+          {
+            label: 'default',
+            name: '默认'
+          }
+        ]
+      }
     }
   },
   computed: {
     ...mapState('menu', ['menuIsCollapse']),
-    ...mapGetters('userInfo', ['getUsername']),
     ...mapGetters('msg', ['getMsg'])
   },
-  created () {
-    this.iconClass = ''
+  mounted () {
+    console.log('去获取登录用户')
+    // 获取当前你登录用户
+    this.currentLoginUserName = this.getLoginUser()
   },
-  beforeUnmount () {
+  created () {
+    this.iconClass = 'icon-quanpingxianshi'
+    this.settingData.cardType = this.$store.getters['settings/getType']
+    this.settingData.theme = this.$store.getters['settings/getTheme']
+    // 初始化消息
+    this.reloadMsg().then(r => console.debug(r))
   },
   methods: {
     ...mapActions('msg', ['closeMsgCard', 'markReadMsgCard', 'reloadMsg']),
     ...mapActions('userInfo', ['clearUserInfo']),
     ...mapMutations('menu', ['setMenuIsCollapse', 'clearMenus']),
+    ...mapMutations('settings', ['setType', 'setTheme']),
+    ...mapActions('msg', ['reloadMsg']),
+    ...mapGetters('userInfo', ['getLoginUser']),
+    handleChangeTheme () {
+      this.setTheme(this.settingData.theme)
+    },
+    handleChangeType () {
+      this.setType(this.settingData.cardType)
+    },
     screenFull () {
       if (!screenfull.isEnabled) {
         this.$message({
@@ -98,9 +173,9 @@ export default {
         return
       }
       if (screenfull.isFullscreen) {
-        this.iconClass = ''
+        this.iconClass = 'icon-quanpingxianshi'
       } else {
-        this.iconClass = ''
+        this.iconClass = 'icon-quanpingsuoxiao'
       }
       screenfull.toggle()
     },
@@ -158,8 +233,8 @@ export default {
     },
     showMsgBox () {
       this.msgDrawer = true
-      // 查询用户消息
-      this.reloadMsg()
+      // TODO 可采用长连接
+      this.reloadMsg().then(r => console.debug(r))
     }
   }
 }
@@ -172,6 +247,7 @@ export default {
   width: 100%;
   display: flex;
   align-items: center;
+  border-bottom: 1px solid #eee;
   justify-content: space-between;
 
   .collapse {
@@ -189,14 +265,32 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-right: 1%;
-    width: 8%;
+    padding-right: 10px;
     height: 100%;
 
-    .message {
+    .login-name-box {
+      display: block;
+      width: 80px;
+
+      .login-name {
+        display: block;
+        width: 70px;
+        text-overflow: ellipsis; /* 溢出用省略号*/
+        overflow: hidden; /**超出的文本隐藏 */
+        white-space: nowrap; /** 溢出不换行 */
+      }
+    }
+
+    .group-item {
       height: auto;
       width: auto;
-      margin: 0 1vw;
+      margin: 0 0.8vw;
+    }
+  }
+
+  .setting {
+    .el-row {
+      margin: 4vh 0;
     }
   }
 

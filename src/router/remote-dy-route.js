@@ -2,6 +2,8 @@ import store from '@/store'
 import router from '@/router/index'
 
 /**
+ * 菜单绑定函数
+ *
  * @param menus
  */
 export const bindMenu = (menus) => {
@@ -10,7 +12,12 @@ export const bindMenu = (menus) => {
   })
   store.commit('menu/setMenus', menus)
 }
-
+/**
+ * 转换菜单
+ *
+ * @param path
+ * @param menus
+ */
 export const convertMenu = (path, menus) => {
   if (!menus || menus.length === 0) {
     return
@@ -33,6 +40,12 @@ export const convertMenu = (path, menus) => {
  * @param menus
  */
 export const bindRoute = (menus) => {
+  const route404 = {
+    path: '*',
+    redirect: '/404',
+    hidden: true
+  }
+  router.addRoute(route404)
   if (!menus || menus.length === 0) {
     return
   }

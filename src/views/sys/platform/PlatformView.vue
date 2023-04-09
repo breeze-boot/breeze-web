@@ -212,7 +212,7 @@ export default {
       }
     }
   },
-  mounted () {
+  created () {
     // 初始化加载表格数据
     this.reloadList()
   },

@@ -56,13 +56,18 @@ export default {
   },
   actions: {
     reloadMsg (context) {
-      // 若去后台重新加载，清空本地的缓存
-      context.state.msg = []
-      listMsgByUsername().then(response => {
-        if (response.code !== 1) {
-          return
-        }
-        context.commit('setMsg', response.data)
+      return new Promise((resolve, reject) => {
+        // 若去后台重新加载，清空本地的缓存
+        context.state.msg = []
+        listMsgByUsername().then(response => {
+          if (response.code !== 1) {
+            return
+          }
+          context.commit('setMsg', response.data)
+          resolve(response.data)
+        }).catch(error => {
+          reject(error)
+        })
       })
     },
     clearMsg (context) {
@@ -93,7 +98,7 @@ export default {
       if (state.msg) {
         return state.msg
       }
-      return ''
+      return []
     }
   }
 }

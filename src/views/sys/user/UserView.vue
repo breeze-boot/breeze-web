@@ -209,7 +209,7 @@
             action=""
             class="avatar-uploader"
             prop="avatar">
-            <img v-if="avatarUrl" :src="avatarUrl" class="avatar">
+            <img v-if="avatarUrl" :src="avatarUrl" class="avatar" alt=""/>
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
         </el-form-item>
@@ -391,7 +391,7 @@ import JSONBigInt from 'json-bigint'
 import { selectDept } from '@/api/sys/dept'
 import { saveAs } from 'file-saver'
 import { upload } from '@/api/sys/file'
-import dict from '@/mixins/dict'
+import { dict } from '@/mixins'
 
 export default {
   name: 'UserView',
@@ -609,7 +609,7 @@ export default {
       }
     }
   },
-  mounted () {
+  created () {
     this.reloadList()
     // 初始化部门下拉框
     this.selectDept()
@@ -901,7 +901,8 @@ export default {
     },
     /**
      * 重置密码表单重置
-     * @param row
+     *
+     * @param formName
      */
     restUserPasswordForm (formName) {
       this.restPasswordDialogVisible = false
@@ -909,7 +910,8 @@ export default {
     },
     /**
      * 密码弹出框关闭事件
-     * @param row
+     *
+     * @param formName
      */
     closeRestPasswordDialog (formName) {
       this.user.id = undefined

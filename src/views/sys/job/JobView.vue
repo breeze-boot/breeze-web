@@ -249,7 +249,7 @@ import { del, list, modify, open, runJobNow, save } from '@/api/sys/job'
 import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
 import vcrontab from 'vcrontab'
-import dict from '@/mixins/dict'
+import { dict } from '@/mixins'
 import { confirmAlert } from '@utils/common'
 
 export default {
@@ -344,7 +344,7 @@ export default {
       dialogCron: ''
     }
   },
-  mounted () {
+  created () {
     // 初始化加载表格数据
     this.reloadList()
   },
@@ -578,8 +578,6 @@ export default {
     },
     /**
      * 显示 cron dialog
-     *
-     * @param value
      */
     showDialog () {
       this.dialogCron = this.job.cronExpression

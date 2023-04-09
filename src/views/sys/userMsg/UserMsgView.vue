@@ -187,7 +187,7 @@ import { del, list } from '@/api/sys/userMsg'
 import { confirmAlert } from '@utils/common'
 import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
-import dict from '@/mixins/dict'
+import { dict } from '@/mixins'
 
 export default {
   name: 'UserMsgView',
@@ -245,7 +245,7 @@ export default {
       }
     }
   },
-  mounted () {
+  created () {
     this.reloadList()
   },
   methods: {
@@ -357,8 +357,6 @@ export default {
     },
     /**
      * 关闭消息详情弹出框事件
-     *
-     * @param formName
      */
     closeInfoDialog () {
       this.userMsg = this.userMsgInfo
