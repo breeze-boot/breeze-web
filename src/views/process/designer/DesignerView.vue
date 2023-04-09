@@ -109,7 +109,7 @@ export default {
   }
 }
 </script>
-<style lang="less">
+<style lang="scss">
 .designer {
   .flow-containers .djs-palette {
     left: 0 !important;
