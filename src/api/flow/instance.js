@@ -11,7 +11,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function startProcess (data) {
   return request({
-    url: servicePath.flowable + '/instance/startProcess',
+    url: servicePath.flow + '/instance/startProcess',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -28,7 +28,7 @@ export function startProcess (data) {
  */
 export function list (data) {
   return request({
-    url: servicePath.flowable + '/instance/list',
+    url: servicePath.flow + '/instance/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -45,7 +45,7 @@ export function list (data) {
  */
 export function del (id) {
   return request({
-    url: servicePath.flowable + '/instance/delete',
+    url: servicePath.flow + '/instance/delete',
     method: 'delete',
     params: id
   })

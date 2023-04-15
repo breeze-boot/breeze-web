@@ -19,8 +19,8 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['flowable:category:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['flowable:category:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
+        <el-button v-has="['flow:category:create']" plain size="mini" type="primary" @click="create">新建</el-button>
+        <el-button v-has="['flow:category:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
                    @click="remove">删除
         </el-button>
       </div>
@@ -57,9 +57,9 @@
           width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['flowable:category:modify']" size="mini" type="text" @click="edit(scope.row)">编辑
+            <el-button v-has="['flow:category:modify']" size="mini" type="text" @click="edit(scope.row)">编辑
             </el-button>
-            <el-button v-has="['flowable:category:delete']" size="mini" type="text"
+            <el-button v-has="['flow:category:delete']" size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, categoryTableData,scope.row)">删除
             </el-button>
           </template>
@@ -116,7 +116,7 @@
 </template>
 
 <script>
-import { checkCategoryCode, del, list, modify, save } from '@/api/flowable/category'
+import { checkCategoryCode, del, list, modify, save } from '@/api/flow/category'
 import { confirmAlert } from '@utils/common'
 import JSONBigInt from 'json-bigint'
 import { DIALOG_TYPE } from '@/const/constant'

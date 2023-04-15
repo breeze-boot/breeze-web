@@ -9,7 +9,7 @@ import { reLoginConfirm, showErrorMsg, showWaringMsg } from '@utils/common'
  */
 export const servicePath = {
   system: '/system',
-  flowable: '/flowable'
+  flow: '/flow'
 }
 
 /**

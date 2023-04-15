@@ -17,7 +17,7 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['flowable:definition:create']" plain size="mini" type="primary" @click="create">新建</el-button>
+        <el-button v-has="['flow:definition:create']" plain size="mini" type="primary" @click="create">新建</el-button>
       </div>
       <el-table
         ref="multipleTable"
@@ -86,15 +86,15 @@
           label="操作"
           width="240">
           <template slot-scope="scope">
-            <el-button v-has="['flowable:instance:start']" size="mini" type="text" @click="startProcess(scope.row)">
+            <el-button v-has="['flow:instance:start']" size="mini" type="text" @click="startProcess(scope.row)">
               开启
             </el-button>
-            <el-button v-has="['flowable:designer']" size="mini" type="text" @click="latestProcessDesigner(scope.row)">
+            <el-button v-has="['flow:designer']" size="mini" type="text" @click="latestProcessDesigner(scope.row)">
               设计
             </el-button>
-            <el-button v-has="['flowable:definition:info']" size="mini" type="text" @click="viewImage(scope.row)">流程图片
+            <el-button v-has="['flow:definition:info']" size="mini" type="text" @click="viewImage(scope.row)">流程图片
             </el-button>
-            <el-button v-has="['flowable:definition:info']" size="mini" type="text" @click="viewVersion(scope.row)">查看版本
+            <el-button v-has="['flow:definition:info']" size="mini" type="text" @click="viewVersion(scope.row)">查看版本
             </el-button>
           </template>
         </el-table-column>
@@ -194,16 +194,16 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
-            <el-button v-has="['flowable:definition:info']" size="mini" type="text" @click="viewVersionImage(scope.row)">
+            <el-button v-has="['flow:definition:info']" size="mini" type="text" @click="viewVersionImage(scope.row)">
               流程图片
             </el-button>
-            <el-button v-has="['flowable:designer']" size="mini" type="text" @click="versionProcessDesigner(scope.row)">
+            <el-button v-has="['flow:designer']" size="mini" type="text" @click="versionProcessDesigner(scope.row)">
               设计
             </el-button>
-            <el-button v-has="['flowable:definition:suspended']" size="mini" type="text" @click="isSuspended(scope.row)">
+            <el-button v-has="['flow:definition:suspended']" size="mini" type="text" @click="isSuspended(scope.row)">
               {{ scope.row.suspended ? '激活' : '挂起' }}
             </el-button>
-            <el-button v-has="['flowable:definition:delete']" size="mini" type="text"
+            <el-button v-has="['flow:definition:delete']" size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, definitionTableData,scope.row)">删除
             </el-button>
           </template>
@@ -253,9 +253,9 @@ import {
   list,
   listVersion,
   modify
-} from '@/api/flowable/definition'
+} from '@/api/flow/definition'
 import { DIALOG_TYPE } from '@/const/constant'
-import { startProcess } from '@/api/flowable/instance'
+import { startProcess } from '@/api/flow/instance'
 import { confirmAlert } from '@utils/common'
 
 export default {

@@ -75,7 +75,7 @@
           width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['flowable:instance:delete']" size="mini" type="text"
+            <el-button v-has="['flow:instance:delete']" size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, instanceTableData,scope.row)">删除
             </el-button>
           </template>
@@ -110,7 +110,7 @@
 </template>
 
 <script>
-import { del, list } from '@/api/flowable/instance'
+import { del, list } from '@/api/flow/instance'
 import { DIALOG_TYPE } from '@/const/constant'
 import { confirmAlert } from '@utils/common'
 import JSONBigInt from 'json-bigint'

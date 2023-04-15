@@ -11,7 +11,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function list (data) {
   return request({
-    url: servicePath.flowable + '/category/list',
+    url: servicePath.flow + '/category/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -28,7 +28,7 @@ export function list (data) {
  */
 export function del (ids) {
   return request({
-    url: servicePath.flowable + '/category/delete',
+    url: servicePath.flow + '/category/delete',
     method: 'delete',
     data: ids
   })
@@ -42,7 +42,7 @@ export function del (ids) {
  */
 export function save (data) {
   return request({
-    url: servicePath.flowable + '/category/create',
+    url: servicePath.flow + '/category/create',
     method: 'post',
     data: data
   })
@@ -56,7 +56,7 @@ export function save (data) {
  */
 export function modify (data) {
   return request({
-    url: servicePath.flowable + '/category/modify',
+    url: servicePath.flow + '/category/modify',
     method: 'put',
     data: data
   })
@@ -71,7 +71,7 @@ export function modify (data) {
  */
 export function checkCategoryCode (categoryCode, categoryId) {
   return request({
-    url: servicePath.flowable + '/category/checkCategoryCode',
+    url: servicePath.flow + '/category/checkCategoryCode',
     method: 'get',
     params: {
       categoryId: categoryId || '',

@@ -14,7 +14,7 @@
 
 <script>
 import bpmnModeler from 'workflow-bpmn-modeler'
-import { deploy, getProcessDefinitionXml, getVersionProcessDefinitionXml } from '@/api/flowable/definition'
+import { deploy, getProcessDefinitionXml, getVersionProcessDefinitionXml } from '@/api/flow/definition'
 
 export default {
   name: 'DesignerView',
