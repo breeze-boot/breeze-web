@@ -13,7 +13,7 @@ export function reqGet (data) {
   return request({
     url: '/captcha/getCode',
     method: 'post',
-    data
+    data: data
   })
 }
 
@@ -26,11 +26,7 @@ export function reqGet (data) {
 export function reqCheck (data) {
   return request({
     url: '/captcha/checkCode',
-    headers: {
-      token: data.token,
-      pointJson: data.pointJson
-    },
     method: 'post',
-    data
+    data: data
   })
 }

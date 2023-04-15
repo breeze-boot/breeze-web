@@ -96,7 +96,6 @@
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import screenfull from 'screenfull'
-import 'animate.css'
 
 export default {
   name: 'Header',

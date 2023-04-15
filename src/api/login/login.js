@@ -1,4 +1,4 @@
-import { request } from '@/axios'
+import { request, servicePath } from '@/axios'
 
 /**
  * 用户密码登录
@@ -12,7 +12,7 @@ export function login (data) {
     password: data.password
   }
   return request({
-    url: '/breeze/login',
+    url: servicePath.system + '/breeze/login',
     method: 'post',
     data: dataObj
   })
@@ -30,7 +30,7 @@ export function sms (data) {
     code: data.code
   }
   return request({
-    url: '/breeze/sms',
+    url: servicePath.system + '/breeze/sms',
     method: 'post',
     data: dataObj
   })
@@ -44,7 +44,7 @@ export function sms (data) {
  */
 export function logout (username) {
   return request({
-    url: '/breeze/logout',
+    url: servicePath.system + '/breeze/logout',
     method: 'get',
     params: username
   })
@@ -58,7 +58,7 @@ export function logout (username) {
  */
 export function authUrl (appName) {
   return request({
-    url: '/breeze/auth/url/' + appName,
+    url: servicePath.system + '/breeze/auth/url/' + appName,
     method: 'get'
   })
 }
@@ -70,7 +70,7 @@ export function authUrl (appName) {
  */
 export function userInfo () {
   return request({
-    url: '/user/userInfo',
+    url: servicePath.system + '/user/userInfo',
     method: 'get'
   })
 }

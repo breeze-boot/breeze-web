@@ -13,8 +13,7 @@
         <keep-alive :include="this.$store.state.menu.keepAliveMenus">
           <router-view
             :key="this.$route.fullPath"
-            :style="{animationName: 'fadeIn', animationDuration: 0 + 's'}"
-            class="router-main"/>
+            :style="{animationName: 'pulse', animationDuration: 0.1 + 's'}"/>
         </keep-alive>
       </el-main>
     </el-container>
@@ -57,7 +56,7 @@ export default {
      * 初始化webSocket
      */
     initWebSocket () {
-      const socket = new SockJS(process.env.VUE_APP_SERVICE_URI + '/ws?b_tenant_id=' + localStorage.getItem('B_TENANT_ID'))
+      const socket = new SockJS(process.env.VUE_APP_WS_URI + '/ws?b_tenant_id=' + localStorage.getItem('B_TENANT_ID'))
       store.state.msg.stompClient = Stomp.over(socket)
       const header = {
         Authorization: localStorage.getItem('access_token'),
@@ -87,7 +86,7 @@ export default {
      */
     closeWebsocket () {
       clearInterval(store.state.msg.reConnectTime)
-      if (store.state.msg.stompClient !== null) {
+      if (store.state.msg && store.state.msg.stompClient !== null) {
         store.state.msg.stompClient.disconnect(() => {
           console.debug('关闭连接')
         })
@@ -196,11 +195,6 @@ export default {
   background: #093f6b;
   height: 100vh;
   width: fit-content !important;
-}
-
-.router-main {
-  height: 83vh;
-  box-shadow: 1px 1px 5px #eee;
 }
 
 .notice {

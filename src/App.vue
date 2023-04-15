@@ -73,6 +73,10 @@ export default {
   margin: 0;
 }
 
+body, html {
+  height: 100%;
+}
+
 ::-webkit-scrollbar-track {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 0;

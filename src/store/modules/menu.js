@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { filterTree } from '@utils/common'
-import { listTreeMenu } from '@/api/sys/menu'
+import { listTreeMenu } from '@/api/system/menu'
 import { bindMenu, bindRoute } from '@/router/remote-dy-route'
 
 Vue.use(Vuex)

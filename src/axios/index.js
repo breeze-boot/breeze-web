@@ -1,8 +1,6 @@
 import axios from 'axios'
-import { Loading, Message } from 'element-ui'
+import { Message } from 'element-ui'
 import { reLoginConfirm, showErrorMsg, showWaringMsg } from '@utils/common'
-
-let loadingInstance = {}
 
 /**
  * 服务的路径
@@ -10,8 +8,8 @@ let loadingInstance = {}
  * @type {string}
  */
 export const servicePath = {
-  sys: '',
-  process: ''
+  system: '/system',
+  flowable: '/flowable'
 }
 
 /**
@@ -36,13 +34,6 @@ request.interceptors.request.use((config) => {
     config.headers.Authorization = 'Bearer ' + authorization
   }
   config.headers.B_TENANT_ID = localStorage.getItem('B_TENANT_ID')
-
-  loadingInstance = Loading.service({
-    lock: true,
-    text: 'Loading',
-    spinner: 'el-icon-loading',
-    background: 'rgba(0, 0, 0, 0.7)'
-  })
   return config
 }, (error) => {
   Message.error({ message: error })
@@ -61,7 +52,6 @@ request.interceptors.response.use((response) => {
   if (response.status && response.status === 200) {
     if (response.headers['content-disposition']) {
       response.data.originalFileName = decodeURIComponent(response.headers['original-file-name'])
-      loadingInstance.close()
       return response
     }
     if (response.data.code === 2 && response.data.message) {
@@ -71,18 +61,15 @@ request.interceptors.response.use((response) => {
       // 业务错误失败
       showErrorMsg(response, '系统异常')
       setTimeout(() => {
-        loadingInstance.close()
       }, 2000)
       return Promise.reject(response)
     } else if (response.data.code === 500) {
       // 系统错误
       showErrorMsg(response, '服务异常')
       setTimeout(() => {
-        loadingInstance.close()
       }, 2000)
       return Promise.reject(response)
     }
-    loadingInstance.close()
     return response.data
   }
 }, (error) => {
@@ -96,7 +83,6 @@ request.interceptors.response.use((response) => {
     Message.error({ message: '请求地址不存在' })
   } else if (error.response.status === 401) {
     showErrorMsg(error.response, error.response.data.message)
-    loadingInstance.close()
     return
   } else if (error.response.status === 403) {
     showErrorMsg(error.response, error.response.data.message)
@@ -104,6 +90,5 @@ request.interceptors.response.use((response) => {
     return
   }
   console.error(error.response.status)
-  loadingInstance.close()
   return Promise.reject(error)
 })

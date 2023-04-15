@@ -35,7 +35,6 @@
 import UserLogin from '@/components/login/UserLogin.vue'
 import PhoneLogin from '@/components/login/PhoneLogin.vue'
 import { authUrl } from '@/api/login/login'
-import 'animate.css'
 
 export default {
   name: 'LoginView',

@@ -1,7 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import store from '@/store/index'
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 
+NProgress.configure({ showSpinner: false })
 Vue.use(VueRouter)
 const originalPush = VueRouter.prototype.push
 
@@ -59,6 +62,7 @@ const router = new VueRouter({
 const whiteList = ['/404', '/auth-redirect']
 
 router.beforeEach((to, from, next) => {
+  NProgress.start()
   if (whiteList.includes(to.path)) {
     console.debug(`白名单${whiteList}`)
     next()
@@ -74,6 +78,7 @@ router.beforeEach((to, from, next) => {
   if (accessToken) {
     if (store.state.menu.isLoadMenu) {
       next()
+      NProgress.done()
       return
     }
     store.commit('menu/isLoadMenu', true)
@@ -83,6 +88,7 @@ router.beforeEach((to, from, next) => {
         ...to,
         replace: true
       })
+      NProgress.done()
     }).catch(err => {
       store.dispatch('userInfo/logOut').then(() => {
         console.error(err)
@@ -90,6 +96,7 @@ router.beforeEach((to, from, next) => {
       })
     })
   } else {
+    NProgress.done()
     console.debug('重定向路由')
     next('/?redirect=' + to.path)
   }

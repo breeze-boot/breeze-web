@@ -1,5 +1,5 @@
 import store from '@/store/index'
-import { listDict } from '@/api/sys/dict'
+import { listDict } from '@/api/system/dict'
 
 const sendMsg = (url, msg) => {
   store.state.msg.stompClient.send(url, {}, JSON.stringify(msg))

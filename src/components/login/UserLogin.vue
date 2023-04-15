@@ -53,7 +53,7 @@
 
 <script>
 import Verify from '@/components/verifition/Verify'
-import { selectTenant } from '@/api/sys/tenant'
+import { selectTenant } from '@/api/system/tenant'
 import { mapActions, mapMutations } from 'vuex'
 
 export default {
