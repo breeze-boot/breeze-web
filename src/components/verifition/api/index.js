@@ -13,7 +13,7 @@ export function reqGet (data) {
   return request({
     url: '/captcha/getCode',
     method: 'post',
-    data: data
+    params: data
   })
 }
 
@@ -27,6 +27,6 @@ export function reqCheck (data) {
   return request({
     url: '/captcha/checkCode',
     method: 'post',
-    data: data
+    params: data
   })
 }

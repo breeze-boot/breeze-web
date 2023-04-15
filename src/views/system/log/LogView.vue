@@ -116,10 +116,6 @@
           prop="result"
           show-overflow-tooltip/>
         <el-table-column
-          label="浏览器"
-          prop="browser"
-          show-overflow-tooltip/>
-        <el-table-column
           label="IP"
           prop="ip"
           show-overflow-tooltip/>
