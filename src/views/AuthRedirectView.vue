@@ -19,7 +19,7 @@ export default {
     }
     if (localStorage) {
       console.debug(params)
-      localStorage.setItem('B_TENANT_ID', params['tenantId'])
+      localStorage.setItem('TENANT_ID', params['tenantId'])
       // 存储 accessToken 用于之后的请求
       this.$store.commit('userInfo/setAccessToken', params['accessToken'])
       // 获取用户信息

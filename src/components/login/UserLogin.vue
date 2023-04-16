@@ -106,6 +106,8 @@ export default {
     ...mapActions('menu', ['loadRoute']),
     ...mapMutations('userInfo', ['setUserInfo']),
     success () {
+      // 验证码校验通过就去存储当前的租户ID，登录成功后回去再次更新
+      localStorage.setItem('TENANT_ID', this.userLogin.tenantId)
       this.$store.dispatch('userInfo/login', this.userLogin).then(() => {
         this.$router.push({
           path: this.$route.query.redirect || 'welcome'

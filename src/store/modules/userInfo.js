@@ -9,7 +9,8 @@ export default {
   state: {
     accessToken: localStorage.getItem('access_token'),
     authorities: localStorage.getItem('authorities'),
-    userInfo: JSON.parse(localStorage.getItem('user_info'))
+    userInfo: JSON.parse(localStorage.getItem('user_info')),
+    tenantId: JSON.parse(localStorage.getItem('TENANT_ID'))
   },
   mutations: {
     setUserInfo: (state, userInfo) => {
@@ -41,7 +42,7 @@ export default {
       }
       return new Promise((resolve, reject) => {
         login(loginParam).then(response => {
-          localStorage.setItem('B_TENANT_ID', response.data.userInfo.tenantId)
+          localStorage.setItem('TENANT_ID', response.data.userInfo.tenantId)
           commit('setAccessToken', response.data.accessToken)
           commit('setAuthorities', response.data.userInfo.authorities)
           commit('setUserInfo', response.data.userInfo)
@@ -66,7 +67,7 @@ export default {
       }
       return new Promise((resolve, reject) => {
         sms(loginParam).then(response => {
-          localStorage.setItem('B_TENANT_ID', response.data.userInfo.tenantId)
+          localStorage.setItem('TENANT_ID', response.data.userInfo.tenantId)
           commit('setAccessToken', response.data.accessToken)
           commit('setAuthorities', response.data.userInfo.authorities)
           commit('setUserInfo', response.data.userInfo)

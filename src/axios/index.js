@@ -33,7 +33,7 @@ request.interceptors.request.use((config) => {
   if (authorization) {
     config.headers.Authorization = 'Bearer ' + authorization
   }
-  config.headers.B_TENANT_ID = localStorage.getItem('B_TENANT_ID')
+  config.headers.TENANT_ID = localStorage.getItem('TENANT_ID') || ''
   return config
 }, (error) => {
   Message.error({ message: error })

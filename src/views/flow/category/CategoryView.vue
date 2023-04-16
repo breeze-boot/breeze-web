@@ -155,14 +155,14 @@ export default {
         id: undefined,
         categoryName: '',
         categoryCode: '',
-        tenantId: localStorage.getItem('B_TENANT_ID')
+        tenantId: localStorage.getItem('TENANT_ID')
       },
       // 流程分类详情数据
       categoryInfo: {
         id: undefined,
         categoryName: '',
         categoryCode: '',
-        tenantId: localStorage.getItem('B_TENANT_ID')
+        tenantId: localStorage.getItem('TENANT_ID')
       },
       // 流程分类添加修改表单规则
       categoryRules: {

@@ -56,7 +56,7 @@ export default {
      * 初始化webSocket
      */
     initWebSocket () {
-      const socket = new SockJS(process.env.VUE_APP_WS_URI + '/ws?b_tenant_id=' + localStorage.getItem('B_TENANT_ID'))
+      const socket = new SockJS(process.env.VUE_APP_WS_URI + '/ws?tenant_id=' + localStorage.getItem('TENANT_ID'))
       store.state.msg.stompClient = Stomp.over(socket)
       const header = {
         Authorization: localStorage.getItem('access_token'),
