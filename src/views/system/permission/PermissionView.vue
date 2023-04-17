@@ -7,10 +7,10 @@
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="数据权限名称" prop="dataPermissionName">
-              <el-input v-model="searchPermissionForm.dataPermissionName" clearable placeholder="数据权限名称"/>
+              <el-input v-model="searchPermissionForm.permissionName" clearable placeholder="数据权限名称"/>
             </el-form-item>
-            <el-form-item label="数据权限编码" prop="dataPermissionCode">
-              <el-input v-model="searchPermissionForm.dataPermissionCode" clearable placeholder="数据权限编码"/>
+            <el-form-item label="数据权限编码" prop="permissionCode">
+              <el-input v-model="searchPermissionForm.permissionCode" clearable placeholder="数据权限编码"/>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="search()">查询</el-button>
@@ -20,8 +20,8 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:dataPermission:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:dataPermission:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
+        <el-button v-has="['sys:permission:create']" plain size="mini" type="primary" @click="create">新建</el-button>
+        <el-button v-has="['sys:permission:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
                    @click="remove">删除
         </el-button>
       </div>
@@ -35,7 +35,7 @@
         size="mini"
         stripe
         style="width: 100%"
-        @selection-change="dataPermissionHandleSelectionChange">
+        @selection-change="permissionHandleSelectionChange">
         <el-table-column
           type="selection"
           width="55">
@@ -48,13 +48,13 @@
         </el-table-column>
         <el-table-column
           label="数据权限名称"
-          prop="dataPermissionName"
+          prop="permissionName"
           show-overflow-tooltip
           width="200">
         </el-table-column>
         <el-table-column
           label="数据权限编码"
-          prop="dataPermissionCode"
+          prop="permissionCode"
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
@@ -94,9 +94,9 @@
           width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['sys:dataPermission:modify']" size="mini" type="text" @click="edit(scope.row)">编辑
+            <el-button v-has="['sys:permission:modify']" size="mini" type="text" @click="edit(scope.row)">编辑
             </el-button>
-            <el-button v-has="['sys:dataPermission:delete']" size="mini" type="text"
+            <el-button v-has="['sys:permission:delete']" size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, dataPermissionTableData,scope.row)">删除
             </el-button>
           </template>
@@ -117,16 +117,16 @@
 
     <el-dialog :title="title" :visible.sync="dataPermissionDialogVisible" width="40vw"
                @close="closePermissionDialog('dataPermissionRuleForm')">
-      <el-form ref="dataPermissionRuleForm" :model="dataPermission" :rules="dataPermissionRules" size="mini">
-        <el-form-item :label-width="formLabelWidth" label="数据权限名称" prop="dataPermissionName">
-          <el-input v-model="dataPermission.dataPermissionName" autocomplete="off" clearable/>
+      <el-form ref="dataPermissionRuleForm" :model="permission" :rules="dataPermissionRules" size="mini">
+        <el-form-item :label-width="formLabelWidth" label="数据权限名称" prop="permissionName">
+          <el-input v-model="permission.permissionName" autocomplete="off" clearable/>
         </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="数据权限编码" prop="dataPermissionCode">
-          <el-input v-model="dataPermission.dataPermissionCode"
+        <el-form-item :label-width="formLabelWidth" label="数据权限编码" prop="permissionCode">
+          <el-input v-model="permission.permissionCode"
                     autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="权限类别" prop="dataPermissionType">
-          <el-radio-group v-model="dataPermission.dataPermissionType" @change="handlerPermissionTypeChange">
+          <el-radio-group v-model="permission.dataPermissionType" @change="handlerPermissionTypeChange">
             <el-radio-button
               v-for="item in this.getDict()('DATA_PERMISSION_TYPE')"
               :key="item.key"
@@ -136,13 +136,13 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item
-          v-if="dataPermission.dataPermissionType === 'DEPT_AND_LOWER_LEVEL'"
+          v-if="permission.dataPermissionType === 'DEPT_AND_LOWER_LEVEL'"
           :label-width="formLabelWidth"
           class="dept"
           label="部门"
           prop="dept">
           <el-cascader
-            v-model="dataPermission.dataPermissions"
+            v-model="permission.dataPermissions"
             :options="deptOption"
             :props="{ checkStrictly: true,  emitPath: false , value: 'key', label: 'value' }"
             :show-all-levels="false"
@@ -151,91 +151,8 @@
             size="mini"
           ></el-cascader>
         </el-form-item>
-        <el-form-item
-          v-if="dataPermission.dataPermissionType === 'DEPT_LEVEL'"
-          :label-width="formLabelWidth"
-          class="dept"
-          label="部门"
-          prop="dept">
-          <el-cascader
-            v-model="dataPermission.dataPermissions"
-            :options="deptOption"
-            :props="{ checkStrictly: true, emitPath: false , value: 'key', label: 'value' }"
-            :show-all-levels="false"
-            clearable
-            collapse-tags
-            size="mini"
-          ></el-cascader>
-        </el-form-item>
-        <el-form-item
-          v-if="dataPermission.dataPermissionType === 'DIY_DEPT'"
-          :label-width="formLabelWidth"
-          class="dept"
-          label="部门"
-          prop="dept">
-          <el-cascader
-            v-model="dataPermission.dataPermissions"
-            :options="deptOption"
-            :props="{ multiple: true, checkStrictly: true, emitPath: false, value: 'key', label: 'value' }"
-            :show-all-levels="false"
-            clearable
-            collapse-tags
-            size="mini"
-          ></el-cascader>
-        </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="描述" prop="description">
-          <el-input v-model="dataPermission.description" autocomplete="off" clearable type="textarea"/>
-        </el-form-item>
-        <el-form-item
-          v-if="dataPermission.dataPermissionType === 'DEPT_LEVEL' || dataPermission.dataPermissionType === 'DEPT_AND_LOWER_LEVEL' || dataPermission.dataPermissionType === 'DIY_DEPT'"
-          :label-width="formLabelWidth"
-          label="自定义SQL"
-          prop="strSql">
-          <el-button @click="diySql">设置</el-button>
-          <el-table
-            :data="dataPermission.dataPermissionTableSqlDiyData"
-            border
-            size="mini"
-            style="margin-top: 10px">
-            <el-table-column
-              label="字段"
-              prop="tableColumn"
-              width="180">
-            </el-table-column>
-            <el-table-column
-              :formatter="(row, column) => this.getTableDictLabel()(row, column, 'COMPARE')"
-              label="比较"
-              prop="compare"
-              width="100">
-            </el-table-column>
-            <el-table-column
-              label="参数"
-              prop="conditions">
-            </el-table-column>
-            <el-table-column
-              v-if="this.dataPermission.dataPermissionTableSqlDiyData.length > 1"
-              label="SQL运算符"
-              prop="operator">
-              <template slot-scope="scope">
-                <el-radio-group v-model="scope.row.operator"
-                                :disabled="scope.$index === 0"
-                                size="mini"
-                                @change="operatorChange(scope.row.operator, scope.$index)">
-                  <el-radio-button label="AND">AND</el-radio-button>
-                  <el-radio-button label="OR">OR</el-radio-button>
-                </el-radio-group>
-              </template>
-            </el-table-column>
-            <el-table-column
-              label="操作">
-              <template slot-scope="scope">
-                <el-button size="mini" type="text"
-                           @click.native.prevent="removeSqlItem(scope.$index,dataPermission.dataPermissionTableSqlDiyData, scope.row)">
-                  删除
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
+          <el-input v-model="permission.description" autocomplete="off" clearable type="textarea"/>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -243,68 +160,11 @@
         <el-button size="mini" type="primary" @click="submitPermissionForm('dataPermissionRuleForm')">确 定</el-button>
       </div>
     </el-dialog>
-
-    <el-dialog :title="title" :visible.sync="dataPermissionDiyDialogVisible" width="600px"
-               @close="closePermissionDiyDialog('dataPermissionDiyRuleForm')">
-      <el-form ref="dataPermissionDiyRuleForm" :model="dataPermissionDiy" :rules="dataPermissionDiyRules" size="mini">
-        <el-form-item :label-width="formLabelWidth" label="表名" prop="name">
-          <el-select v-model="dataPermissionDiy.name" :disabled="selectedTable" collapse-tags filterable
-                     placeholder="请选择表名" @change=handleTable>
-            <el-option
-              v-for="item in tableOption"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="字段" prop="tableColumn">
-          <el-select v-model="dataPermissionDiy.tableColumn" collapse-tags filterable placeholder="请选择字段">
-            <el-option
-              v-for="item in columnOption"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="比较" prop="compare">
-          <el-select v-model="dataPermissionDiy.compare" collapse-tags filterable placeholder="请选择比较">
-            <el-option
-              v-for="item in this.getDict()('COMPARE')"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key">
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="参数" prop="conditions">
-          <el-input v-model="dataPermissionDiy.conditions" clearable placeholder="请输入条件参数"/>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetDiyPermissionForm('dataPermissionDiyRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitDiyPermissionForm('dataPermissionDiyRuleForm')">确 定
-        </el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="600px"
-               @close="closeInfoDialog">
-      <el-descriptions :column="2" border size="mini">
-        <el-descriptions-item>
-          <template slot="label">
-            SQL
-          </template>
-          {{ dataPermission.divSql }}
-        </el-descriptions-item>
-      </el-descriptions>
-    </el-dialog>
   </el-container>
 </template>
 
 <script>
-import { del, list, modify, save, selectColumn, selectTable } from '@/api/system/dataPermission'
+import { del, list, modify, save, selectColumn, selectTable } from '@/api/system/permission'
 import { confirmAlert } from '@utils/common'
 import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
@@ -328,8 +188,8 @@ export default {
       dataPermissionTableData: [],
       selectedTable: false,
       searchPermissionForm: {
-        dataPermissionName: '',
-        dataPermissionCode: '',
+        permissionName: '',
+        permissionCode: '',
         current: 1,
         size: 10
       },
@@ -351,10 +211,10 @@ export default {
         conditions: '',
         compare: ''
       },
-      dataPermission: {
+      permission: {
         id: null,
-        dataPermissionName: '',
-        dataPermissionCode: '',
+        permissionName: '',
+        permissionCode: '',
         operator: 'OR',
         dataPermissionType: '',
         strSql: '',
@@ -364,8 +224,8 @@ export default {
       },
       dataPermissionInfo: {
         id: null,
-        dataPermissionName: '',
-        dataPermissionCode: '',
+        permissionName: '',
+        permissionCode: '',
         operator: 'OR',
         dataPermissionType: '',
         strSql: '',
@@ -374,14 +234,14 @@ export default {
         dataPermissionTableSqlDiyData: []
       },
       dataPermissionRules: {
-        dataPermissionName: [
+        permissionName: [
           {
             required: true,
             message: '请输入数据权限名称',
             trigger: 'blur'
           }
         ],
-        dataPermissionCode: [
+        permissionCode: [
           {
             required: true,
             message: '请输入数据权限编码',
@@ -425,7 +285,7 @@ export default {
   },
   methods: {
     handlerPermissionTypeChange (val) {
-      this.dataPermission.dataPermissions = []
+      this.permission.dataPermissions = []
     },
     operatorChange (row, index) {
     },
@@ -447,9 +307,9 @@ export default {
             return
           }
           if (row.dataPermissionType === 'DIY_DEPT') {
-            this.dataPermission.dataPermissions = row.dataPermissions.split(',')
+            this.permission.dataPermissions = row.dataPermissions.split(',')
           } else {
-            this.dataPermission.dataPermissions = row.dataPermissions
+            this.permission.dataPermissions = row.dataPermissions
           }
         }
       })
@@ -485,7 +345,7 @@ export default {
     searchReset () {
       this.$refs.searchForm.resetFields()
     },
-    dataPermissionHandleSelectionChange (val) {
+    permissionHandleSelectionChange (val) {
       this.checkDeleteItem = !val.length
       this.multipleSelectionPermissionIds = val
     },
@@ -547,7 +407,7 @@ export default {
       this.dialogType = DIALOG_TYPE.EDIT
       this.dataPermissionDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.dataPermission, row)
+        Object.assign(this.permission, row)
         this.handlerPermissionTypeChange(row.dataPermissionType)
         this.selectDept(row)
       })
@@ -558,7 +418,7 @@ export default {
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.dataPermission, row)
+        Object.assign(this.permission, row)
       })
     },
     diySql () {
@@ -570,12 +430,12 @@ export default {
       this.selectColumn(val)
     },
     closePermissionDialog (formName) {
-      this.dataPermission.id = undefined
-      this.dataPermission.dataPermissionTableSqlDiyData = this.dataPermissionInfo.dataPermissionTableSqlDiyData
+      this.permission.id = undefined
+      this.permission.dataPermissionTableSqlDiyData = this.dataPermissionInfo.dataPermissionTableSqlDiyData
       this.$refs[formName].resetFields()
     },
     closeInfoDialog () {
-      this.dataPermission = this.dataPermissionInfo
+      this.permission = this.dataPermissionInfo
     },
     closePermissionDiyDialog (formName) {
       this.$refs[formName].resetFields()
@@ -589,7 +449,7 @@ export default {
         if (valid) {
           const temp = {}
           Object.assign(temp, this.dataPermissionDiy)
-          this.dataPermission.dataPermissionTableSqlDiyData.push(temp)
+          this.permission.dataPermissionTableSqlDiyData.push(temp)
           this.dataPermissionDiyDialogVisible = false
         } else {
           console.log('error submit!!')
@@ -608,9 +468,9 @@ export default {
     submitPermissionForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          if ((typeof this.dataPermission.dataPermissions) === 'object') {
+          if ((typeof this.permission.dataPermissions) === 'object') {
             const temp = []
-            this.dataPermission.dataPermissions.forEach(p => {
+            this.permission.dataPermissions.forEach(p => {
               if ((typeof p) === 'object') {
                 p.forEach(a => {
                   temp.push(a)
@@ -619,9 +479,9 @@ export default {
                 temp.push(p)
               }
             })
-            this.dataPermission.dataPermissions = temp
+            this.permission.dataPermissions = temp
           } else {
-            this.dataPermission.dataPermissions = [this.dataPermission.dataPermissions]
+            this.permission.dataPermissions = [this.permission.dataPermissions]
           }
           this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
         } else {
@@ -635,8 +495,8 @@ export default {
       this.$refs[formName].resetFields()
     },
     save () {
-      this.dataPermission.id = undefined
-      save(this.dataPermission).then((rep) => {
+      this.permission.id = undefined
+      save(this.permission).then((rep) => {
         if (rep.code === 1) {
           this.$message.success('添加成功')
           this.dataPermissionDialogVisible = false
@@ -645,7 +505,7 @@ export default {
       })
     },
     modify () {
-      modify(this.dataPermission).then((rep) => {
+      modify(this.permission).then((rep) => {
         if (rep.code === 1) {
           this.$message.success('修改成功')
           this.dataPermissionDialogVisible = false

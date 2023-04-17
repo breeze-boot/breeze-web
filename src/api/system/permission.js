@@ -11,7 +11,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function list (data) {
   return request({
-    url: servicePath.system + '/dataPermission/list',
+    url: servicePath.system + '/permission/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -28,7 +28,7 @@ export function list (data) {
  */
 export function save (data) {
   return request({
-    url: servicePath.system + '/dataPermission/create',
+    url: servicePath.system + '/permission/create',
     method: 'post',
     data: data
   })
@@ -42,7 +42,7 @@ export function save (data) {
  */
 export function del (ids) {
   return request({
-    url: servicePath.system + '/dataPermission/delete',
+    url: servicePath.system + '/permission/delete',
     method: 'delete',
     data: ids
   })
@@ -56,7 +56,7 @@ export function del (ids) {
  */
 export function modify (data) {
   return request({
-    url: servicePath.system + '/dataPermission/modify',
+    url: servicePath.system + '/permission/modify',
     method: 'put',
     data: data
   })
@@ -94,9 +94,9 @@ export function selectColumn (tableName) {
  *
  * @returns {AxiosPromise}
  */
-export function selectDataPermission () {
+export function selectPermission () {
   return request({
-    url: servicePath.system + '/common/selectDataPermission',
+    url: servicePath.system + '/common/selectPermission',
     method: 'get',
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)
@@ -110,9 +110,9 @@ export function selectDataPermission () {
  * @param data
  * @returns {AxiosPromise}
  */
-export function editRoleDataPermission (data) {
+export function editRolePermission (data) {
   return request({
-    url: servicePath.system + '/dataPermission/editRoleDataPermission',
+    url: servicePath.system + '/permission/editRolePermission',
     method: 'post',
     data: data
   })
@@ -126,7 +126,7 @@ export function editRoleDataPermission (data) {
  */
 export function listPermission (dataPermissionId) {
   return request({
-    url: servicePath.system + '/dataPermission/listPermission',
+    url: servicePath.system + '/permission/listPermission',
     method: 'get',
     params: { dataPermissionId: dataPermissionId },
     transformResponse: [(data) => {
@@ -143,7 +143,7 @@ export function listPermission (dataPermissionId) {
  */
 export function editPermission (data) {
   return request({
-    url: servicePath.system + '/dataPermission/editPermission',
+    url: servicePath.system + '/permission/editPermission',
     method: 'put',
     data: data
   })
