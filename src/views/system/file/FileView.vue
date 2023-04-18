@@ -129,8 +129,8 @@
           <el-form-item prop="title">
             <el-input v-model="file.title" placeholder="请输入文件标题"/>
           </el-form-item>
-          <el-form-item prop="ossStyle" style="margin-bottom: 20px;">
-            <el-select v-model="file.ossStyle" placeholder="请选择存储位置">
+          <el-form-item :prop="ossStyle" style="margin-bottom: 20px;">
+            <el-select v-model="file.ossStyle" :disabled="true" placeholder="请选择存储位置">
               <el-option
                 v-for="item in this.getDict()('OSS_STYLE')"
                 :key="item.key"
@@ -208,7 +208,7 @@
 </template>
 
 <script>
-import { del, download, list, preview, upload } from '@/api/system/file'
+import { del, download, list, preview, uploadMinioS3 } from '@/api/system/file'
 import { confirmAlert } from '@utils/common'
 import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
@@ -256,7 +256,7 @@ export default {
       file: {
         id: null,
         title: '',
-        ossStyle: ''
+        ossStyle: '1'
       },
       // 文件详情数据
       fileInfo: {
@@ -447,7 +447,18 @@ export default {
       formData.append('file', param.file)
       formData.append('title', this.file.title)
       formData.append('ossStyle', this.file.ossStyle)
-      upload(formData).then(response => {
+      this.file.ossStyle === 1 ? this.uploadMinioS3(formData) : this.uploadLocalStorage(formData)
+    },
+    uploadMinioS3 (formData) {
+      uploadMinioS3(formData).then(response => {
+        this.uploadDialogVisible = false
+        this.reloadList()
+      }).catch(e => {
+        console.error('图片上传失败', e)
+      })
+    },
+    uploadLocalStorage (formData) {
+      uploadMinioS3(formData).then(response => {
         this.uploadDialogVisible = false
         this.reloadList()
       }).catch(e => {
@@ -460,14 +471,11 @@ export default {
      * @param row
      */
     download (row) {
-      download(row.id).then(rep => {
-        const blob = new Blob([rep.data],
-          {
-            type: 'image/jpeg'
-          })
-        saveAs(blob, rep.data.originalFileName)
+      download(row.id).then(response => {
+        const blob = new Blob([response.data], { type: response.data.contentType })
+        saveAs(blob, response.data.fileName)
       }).catch(err => {
-        console.log(err)
+        console.error('下载失败', err)
       })
     },
     /**

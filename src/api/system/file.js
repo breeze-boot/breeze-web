@@ -55,9 +55,9 @@ export function download (id) {
  * @param data
  * @returns {AxiosPromise}
  */
-export function upload (data) {
+export function uploadMinioS3 (data) {
   return request({
-    url: servicePath.system + '/file/upload',
+    url: servicePath.system + '/file/uploadMinioS3',
     method: 'POST',
     data: data,
     transformResponse: [(data) => {

@@ -390,7 +390,7 @@ import { DIALOG_TYPE, OSS } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
 import { selectDept } from '@/api/system/dept'
 import { saveAs } from 'file-saver'
-import { upload } from '@/api/system/file'
+import { uploadMinioS3 } from '@/api/system/file'
 import { dict } from '@/mixins'
 
 export default {
@@ -934,7 +934,7 @@ export default {
       formData.append('file', param.file)
       formData.append('title', '用户头像')
       formData.append('ossStyle', OSS.LOCAL)
-      upload(formData).then(response => {
+      uploadMinioS3(formData).then(response => {
         if (response.code === 1 && response.data) {
           this.$message({
             message: '图片上传成功',

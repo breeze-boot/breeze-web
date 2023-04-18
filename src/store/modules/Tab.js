@@ -14,7 +14,7 @@ const defaultTab = {
 export default {
   namespaced: true,
   state: {
-    currentTab: localStorage.getItem('current_tab'),
+    currentTab: JSON.parse(localStorage.getItem('current_tab')),
     dynamicTabs: [{
       title: '欢迎',
       name: 'welcome',
@@ -32,8 +32,8 @@ export default {
       if (tab.name === 'welcome') {
         tab.title = '欢迎'
       }
-      localStorage.setItem('current_tab', tab.name)
-      state.currentTab = tab.name
+      localStorage.setItem('current_tab', JSON.stringify(tab))
+      state.currentTab = tab
       const tabs = state.dynamicTabs.some((item) => item.name === tab.name)
       if (tabs) {
         return
@@ -53,10 +53,10 @@ export default {
      * 设置当前的tab
      *
      * @param state
-     * @param tabs
+     * @param tab
      */
-    setCurrentTab: (state, tabs) => {
-      state.currentTab = tabs
+    setCurrentTab: (state, tab) => {
+      state.currentTab = tab
     }
   },
   actions: {
@@ -69,7 +69,7 @@ export default {
       commit
     }) => {
       router.push({ name: 'welcome' }).then(r => console.debug(r))
-      commit('setCurrentTab', defaultTab.name)
+      commit('setCurrentTab', defaultTab)
       commit('setDynamicTabs', [defaultTab])
     },
     /**

@@ -32,7 +32,7 @@ export default {
   computed: {
     currentTab: {
       get () {
-        return this.$store.getters['tab/getCurrentTab']
+        return this.$store.getters['tab/getCurrentTab'].name
       },
       set (currentTabValue) {
       }

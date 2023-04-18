@@ -27,7 +27,7 @@
       </div>
       <el-table
         ref="multipleTable"
-        :data="dataPermissionTableData"
+        :data="permissionTableData"
         border
         empty-text="无数据"
         height="500"
@@ -53,35 +53,14 @@
           width="200">
         </el-table-column>
         <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'PERMISSION_CODE')"
           label="数据权限编码"
           prop="permissionCode"
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
-          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'DATA_PERMISSION_TYPE')"
-          label="数据权限类型"
-          prop="dataPermissionType"
-          show-overflow-tooltip>
-        </el-table-column>
-        <el-table-column
-          label="运算符"
-          prop="operator"
-          show-overflow-tooltip>
-        </el-table-column>
-        <el-table-column
-          label="自定义sql"
-          prop="strSql"
-          show-overflow-tooltip
-          width="200">
-        </el-table-column>
-        <el-table-column
           label="权限集"
-          prop="dataPermissions"
-          show-overflow-tooltip>
-        </el-table-column>
-        <el-table-column
-          label="描述"
-          prop="description"
+          prop="permissions"
           show-overflow-tooltip>
         </el-table-column>
         <el-table-column
@@ -97,7 +76,7 @@
             <el-button v-has="['sys:permission:modify']" size="mini" type="text" @click="edit(scope.row)">编辑
             </el-button>
             <el-button v-has="['sys:permission:delete']" size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, dataPermissionTableData,scope.row)">删除
+                       @click.native.prevent="removeItem(scope.$index, permissionTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
@@ -115,56 +94,67 @@
       </div>
     </el-main>
 
-    <el-dialog :title="title" :visible.sync="dataPermissionDialogVisible" width="40vw"
-               @close="closePermissionDialog('dataPermissionRuleForm')">
-      <el-form ref="dataPermissionRuleForm" :model="permission" :rules="dataPermissionRules" size="mini">
+    <el-dialog :title="title" :visible.sync="permissionDialogVisible" width="40vw"
+               @close="closePermissionDialog('permissionRuleForm')">
+      <el-form ref="permissionRuleForm" :model="permission" :rules="permissionRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="数据权限名称" prop="permissionName">
           <el-input v-model="permission.permissionName" autocomplete="off" clearable/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="数据权限编码" prop="permissionCode">
-          <el-input v-model="permission.permissionCode"
-                    autocomplete="off" clearable/>
-        </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="权限类别" prop="dataPermissionType">
-          <el-radio-group v-model="permission.dataPermissionType" @change="handlerPermissionTypeChange">
+          <el-radio-group v-model="permission.permissionCode">
             <el-radio-button
-              v-for="item in this.getDict()('DATA_PERMISSION_TYPE')"
+              v-for="item in this.getDict()('PERMISSION_CODE')"
               :key="item.key"
               :label="item.key">
               {{ item.value }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
-        <el-form-item
-          v-if="permission.dataPermissionType === 'DEPT_AND_LOWER_LEVEL'"
-          :label-width="formLabelWidth"
-          class="dept"
-          label="部门"
-          prop="dept">
+        <el-form-item :label-width="formLabelWidth" label="部门范围" prop="permissions">
           <el-cascader
-            v-model="permission.dataPermissions"
+            v-model="permission.permissions"
             :options="deptOption"
-            :props="{ checkStrictly: true,  emitPath: false , value: 'key', label: 'value' }"
+            :props="{ checkStrictly: true, multiple: true, emitPath: false , value: 'key', label: 'value' }"
             :show-all-levels="false"
             clearable
-            collapse-tags
-            size="mini"
-          ></el-cascader>
-        </el-form-item>
-        <el-form-item :label-width="formLabelWidth" label="描述" prop="description">
-          <el-input v-model="permission.description" autocomplete="off" clearable type="textarea"/>
+            filterable
+          />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetPermissionForm('dataPermissionRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitPermissionForm('dataPermissionRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="resetPermissionForm('permissionRuleForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="submitPermissionForm('permissionRuleForm')">确 定</el-button>
       </div>
+    </el-dialog>
+
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
+               @close="closeInfoDialog">
+      <el-descriptions :column="1" border size="mini">
+        <el-descriptions-item>
+          <template slot="label">
+            权限名称
+          </template>
+          {{ permission.permissionName }}
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            权限编码
+          </template>
+          <el-tag size="small">{{ permission.permissionCode }}</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item>
+          <template slot="label">
+            权限
+          </template>
+          <el-tag size="small">{{ permission.permissions }}</el-tag>
+        </el-descriptions-item>
+      </el-descriptions>
     </el-dialog>
   </el-container>
 </template>
 
 <script>
-import { del, list, modify, save, selectColumn, selectTable } from '@/api/system/permission'
+import { del, list, modify, save } from '@/api/system/permission'
 import { confirmAlert } from '@utils/common'
 import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
@@ -177,7 +167,7 @@ export default {
   data () {
     return {
       // 此页面需要自字典编码
-      dictCode: ['DATA_PERMISSION_TYPE', 'COMPARE'],
+      dictCode: ['PERMISSION_CODE'],
       // 当前操作类型
       dialogType: DIALOG_TYPE.ADD,
       // 弹出框标题
@@ -185,8 +175,7 @@ export default {
       // 单元格选中数据
       multipleSelectionPermissionIds: [],
       // 部门表格数据
-      dataPermissionTableData: [],
-      selectedTable: false,
+      permissionTableData: [],
       searchPermissionForm: {
         permissionName: '',
         permissionCode: '',
@@ -196,44 +185,23 @@ export default {
       total: 0,
       // 标记删除按钮是否可以点击
       checkDeleteItem: true,
-      dataPermissionDialogVisible: false,
+      permissionDialogVisible: false,
       infoDialogVisible: false,
-      dataPermissionDiyDialogVisible: false,
       formLabelWidth: '110px',
       deptOption: [],
-      tableOption: [],
-      columnOption: [],
-      // 自定义sql的表单
-      dataPermissionDiy: {
-        id: null,
-        name: '',
-        tableColumn: '',
-        conditions: '',
-        compare: ''
-      },
       permission: {
-        id: null,
+        id: undefined,
         permissionName: '',
         permissionCode: '',
-        operator: 'OR',
-        dataPermissionType: '',
-        strSql: '',
-        dataPermissions: '',
-        description: '',
-        dataPermissionTableSqlDiyData: []
+        permissions: []
       },
-      dataPermissionInfo: {
-        id: null,
+      permissionInfo: {
+        id: undefined,
         permissionName: '',
         permissionCode: '',
-        operator: 'OR',
-        dataPermissionType: '',
-        strSql: '',
-        dataPermissions: '',
-        description: '',
-        dataPermissionTableSqlDiyData: []
+        permissions: []
       },
-      dataPermissionRules: {
+      permissionRules: {
         permissionName: [
           {
             required: true,
@@ -248,35 +216,13 @@ export default {
             trigger: 'blur'
           }
         ],
-        dataPermissions: [
+        permissions: [
           {
-            required: true,
-            message: '请输入权限集',
-            trigger: 'blur'
+            required: false,
+            message: '请选择部门权限集',
+            trigger: 'change'
           }
         ]
-      },
-      dataPermissionDiyRules: {
-        name: [
-          {
-            required: true,
-            message: '请选择表名',
-            trigger: 'change'
-          }
-        ],
-        tableColumn: [
-          {
-            required: true,
-            message: '请选择字段名',
-            trigger: 'change'
-          }
-        ],
-        compare: [
-          {
-            required: true,
-            message: '请选择比较方法',
-            trigger: 'change'
-          }]
       }
     }
   },
@@ -284,47 +230,20 @@ export default {
     this.reloadList()
   },
   methods: {
-    handlerPermissionTypeChange (val) {
-      this.permission.dataPermissions = []
-    },
-    operatorChange (row, index) {
-    },
     reloadList () {
-      list(this.buildParam()).then((rep) => {
-        if (rep.code === 1) {
-          this.dataPermissionTableData = rep.data.records
-          this.searchPermissionForm.size = rep.data.size
-          this.searchPermissionForm.current = rep.data.current
-          this.total = rep.data.total
+      list(this.buildParam()).then((response) => {
+        if (response.code === 1) {
+          this.permissionTableData = response.data.records
+          this.searchPermissionForm.size = response.data.size
+          this.searchPermissionForm.current = response.data.current
+          this.total = response.data.total
         }
       })
     },
-    selectDept (row) {
+    selectDept () {
       selectDept().then(response => {
         if (response.code === 1 && response.data) {
           this.deptOption = response.data
-          if (!row || !row.dataPermissions) {
-            return
-          }
-          if (row.dataPermissionType === 'DIY_DEPT') {
-            this.permission.dataPermissions = row.dataPermissions.split(',')
-          } else {
-            this.permission.dataPermissions = row.dataPermissions
-          }
-        }
-      })
-    },
-    selectTable () {
-      selectTable().then(rep => {
-        if (rep.code === 1 && rep.data) {
-          this.tableOption = rep.data
-        }
-      })
-    },
-    selectColumn (tableName) {
-      selectColumn(tableName).then(rep => {
-        if (rep.code === 1 && rep.data) {
-          this.columnOption = rep.data
         }
       })
     },
@@ -356,8 +275,8 @@ export default {
       confirmAlert(() => {
         const ids = []
         this.multipleSelectionPermissionIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
-        del(ids).then(rep => {
-          if (rep.code === 1) {
+        del(ids).then(response => {
+          if (response.code === 1) {
             this.reloadList()
             this.$message.success('删除成功')
           }
@@ -373,8 +292,8 @@ export default {
      */
     removeItem (index, rows, row) {
       confirmAlert(() => {
-        del([JSONBigInt.parse(row.id)]).then(rep => {
-          if (rep.code === 1) {
+        del([JSONBigInt.parse(row.id)]).then(response => {
+          if (response.code === 1) {
             rows.splice(index, 1)
             this.reloadList()
             this.$message.success('删除成功')
@@ -383,83 +302,55 @@ export default {
       })
     },
     /**
-     * 删除行
+     * 添加
+     */
+    create () {
+      this.title = '添加数据权限'
+      this.selectDept()
+      this.dialogType = DIALOG_TYPE.ADD
+      this.permissionDialogVisible = true
+    },
+    /**
+     * 修改
      *
-     * @param index
-     * @param rows
      * @param row
      */
-    removeSqlItem (index, rows, row) {
-      confirmAlert(() => {
-        rows.splice(index, 1)
-        rows[0].operator = null
-        this.$message.success('删除成功')
-      })
-    },
-    create () {
-      this.title = '创建数据权限'
-      this.selectDept({})
-      this.dialogType = DIALOG_TYPE.ADD
-      this.dataPermissionDialogVisible = true
-    },
     edit: function (row) {
       this.title = '修改数据权限'
       this.dialogType = DIALOG_TYPE.EDIT
-      this.dataPermissionDialogVisible = true
+      this.permissionDialogVisible = true
       this.$nextTick(() => {
         Object.assign(this.permission, row)
-        this.handlerPermissionTypeChange(row.dataPermissionType)
-        this.selectDept(row)
+        this.selectDept()
+        debugger
+        this.permission.permissions = (row.permissions !== null && row.permissions !== '') ? row.permissions.split(',') : row.permissions
       })
     },
+    /**
+     * 查看详情
+     *
+     * @param row
+     */
     info (row) {
-      this.title = '查看信息'
-      this.selectDept({})
+      this.title = '查看权限信息'
+      this.selectDept()
       this.dialogType = DIALOG_TYPE.SHOW
-      this.infoDialogVisible = true
       this.$nextTick(() => {
         Object.assign(this.permission, row)
+        this.infoDialogVisible = true
       })
     },
-    diySql () {
-      this.title = 'DIY权限'
-      this.dataPermissionDiyDialogVisible = true
-      this.selectTable()
-    },
-    handleTable (val) {
-      this.selectColumn(val)
-    },
+    /**
+     * 关闭添加修改弹出框
+     */
     closePermissionDialog (formName) {
-      this.permission.id = undefined
-      this.permission.dataPermissionTableSqlDiyData = this.dataPermissionInfo.dataPermissionTableSqlDiyData
-      this.$refs[formName].resetFields()
-    },
-    closeInfoDialog () {
-      this.permission = this.dataPermissionInfo
-    },
-    closePermissionDiyDialog (formName) {
       this.$refs[formName].resetFields()
     },
     /**
-     * 提交
-     * @param formName
+     * 关闭详情
      */
-    submitDiyPermissionForm (formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          const temp = {}
-          Object.assign(temp, this.dataPermissionDiy)
-          this.permission.dataPermissionTableSqlDiyData.push(temp)
-          this.dataPermissionDiyDialogVisible = false
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
-    },
-    resetDiyPermissionForm (formName) {
-      this.dataPermissionDiyDialogVisible = false
-      this.$refs[formName].resetFields()
+    closeInfoDialog () {
+      this.permission = this.permissionInfo
     },
     /**
      * 提交
@@ -468,21 +359,6 @@ export default {
     submitPermissionForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          if ((typeof this.permission.dataPermissions) === 'object') {
-            const temp = []
-            this.permission.dataPermissions.forEach(p => {
-              if ((typeof p) === 'object') {
-                p.forEach(a => {
-                  temp.push(a)
-                })
-              } else {
-                temp.push(p)
-              }
-            })
-            this.permission.dataPermissions = temp
-          } else {
-            this.permission.dataPermissions = [this.permission.dataPermissions]
-          }
           this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
         } else {
           console.log('error submit!!')
@@ -491,24 +367,24 @@ export default {
       })
     },
     resetPermissionForm (formName) {
-      this.dataPermissionDialogVisible = false
+      this.permissionDialogVisible = false
       this.$refs[formName].resetFields()
     },
     save () {
       this.permission.id = undefined
-      save(this.permission).then((rep) => {
-        if (rep.code === 1) {
+      save(this.permission).then((response) => {
+        if (response.code === 1) {
           this.$message.success('添加成功')
-          this.dataPermissionDialogVisible = false
+          this.permissionDialogVisible = false
           this.reloadList()
         }
       })
     },
     modify () {
-      modify(this.permission).then((rep) => {
-        if (rep.code === 1) {
+      modify(this.permission).then((response) => {
+        if (response.code === 1) {
           this.$message.success('修改成功')
-          this.dataPermissionDialogVisible = false
+          this.permissionDialogVisible = false
           this.reloadList()
         }
       })

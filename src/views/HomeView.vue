@@ -70,7 +70,7 @@ export default {
         (err) => {
           // 监听错误信息并且发起重连
           console.error('socketErrorMsg : ', err)
-          if (store.state.msg.reConnectTime) {
+          if (store.state && store.state.msg.reConnectTime) {
             clearInterval(store.state.msg.store.state.msg.reConnectTime)
           }
           // 重新连接一次

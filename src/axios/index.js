@@ -51,7 +51,8 @@ request.interceptors.request.use((config) => {
 request.interceptors.response.use((response) => {
   if (response.status && response.status === 200) {
     if (response.headers['content-disposition']) {
-      response.data.originalFileName = decodeURIComponent(response.headers['original-file-name'])
+      response.data.fileName = decodeURIComponent(response.headers['content-disposition'].replaceAll('attachment;filename*=utf-8', ''))
+      response.data.contentType = response.headers['content-type']
       return response
     }
     if (response.data.code === 2 && response.data.message) {

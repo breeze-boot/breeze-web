@@ -110,6 +110,8 @@ export default {
      * 初始化加载表格数据
      */
     reloadList (id) {
+      const currentTab = this.$store.getters['tab/getCurrentTab']
+      id = currentTab.query.id
       list({ id: id }).then((response) => {
         if (response.code === 1) {
           this.dictItemTableData = response.data
