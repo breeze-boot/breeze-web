@@ -11,7 +11,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function list (data) {
   return request({
-    url: servicePath.system + '/jobLog/list',
+    url: servicePath.quartz + '/jLog/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -27,7 +27,7 @@ export function list (data) {
  */
 export function truncate () {
   return request({
-    url: servicePath.system + '/jobLog/truncate',
+    url: servicePath.quartz + '/jLog/truncate',
     method: 'PUT'
   })
 }
@@ -40,7 +40,7 @@ export function truncate () {
  */
 export function del (ids) {
   return request({
-    url: servicePath.system + '/jobLog/delete',
+    url: servicePath.quartz + '/jLog/delete',
     method: 'delete',
     data: ids
   })

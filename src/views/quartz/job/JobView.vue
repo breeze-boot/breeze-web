@@ -245,7 +245,7 @@
 </template>
 
 <script>
-import { del, list, modify, open, runJobNow, save } from '@/api/system/job'
+import { del, list, modify, open, runJobNow, save } from '@/api/quartz/job'
 import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
 import vcrontab from 'vcrontab'
@@ -539,7 +539,7 @@ export default {
     },
     jobLog (row) {
       this.$router.push({
-        name: 'jobLog',
+        name: 'jLog',
         query: {
           jobName: row.jobName
         }

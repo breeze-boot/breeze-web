@@ -11,7 +11,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function list (data) {
   return request({
-    url: servicePath.system + '/job/list',
+    url: servicePath.quartz + '/job/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -28,7 +28,7 @@ export function list (data) {
  */
 export function del (ids) {
   return request({
-    url: servicePath.system + '/job/delete',
+    url: servicePath.quartz + '/job/delete',
     method: 'delete',
     data: ids
   })
@@ -42,7 +42,7 @@ export function del (ids) {
  */
 export function save (data) {
   return request({
-    url: servicePath.system + '/job/create',
+    url: servicePath.quartz + '/job/create',
     method: 'post',
     data: data
   })
@@ -55,7 +55,7 @@ export function save (data) {
  */
 export function modify (data) {
   return request({
-    url: servicePath.system + '/job/modify',
+    url: servicePath.quartz + '/job/modify',
     method: 'put',
     data: data
   })
@@ -69,7 +69,7 @@ export function modify (data) {
  */
 export function runJobNow (id) {
   return request({
-    url: servicePath.system + '/job/runJobNow',
+    url: servicePath.quartz + '/job/runJobNow',
     method: 'get',
     params: {
       jobId: id
@@ -86,7 +86,7 @@ export function runJobNow (id) {
  */
 export function open (jobId, status) {
   return request({
-    url: servicePath.system + '/job/open',
+    url: servicePath.quartz + '/job/open',
     method: 'put',
     params: {
       jobId: jobId,

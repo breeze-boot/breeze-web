@@ -9,6 +9,7 @@ import { reLoginConfirm, showErrorMsg, showWaringMsg } from '@utils/common'
  */
 export const servicePath = {
   system: '/system',
+  quartz: '/quartz',
   flow: '/flow'
 }
 
@@ -86,8 +87,11 @@ request.interceptors.response.use((response) => {
     showErrorMsg(error.response, error.response.data.message)
     return
   } else if (error.response.status === 403) {
-    showErrorMsg(error.response, error.response.data.message)
+    showErrorMsg(error.response, '无权限')
     reLoginConfirm()
+    return
+  } else if (error.response.status === 503) {
+    showErrorMsg(error.response, '服务不存在')
     return
   }
   console.error(error.response.status)

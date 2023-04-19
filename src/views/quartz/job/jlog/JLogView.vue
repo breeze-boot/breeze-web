@@ -26,10 +26,10 @@
       </el-form>
 
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:jobLog:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
+        <el-button v-has="['sys:jLog:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
                    @click="remove">删除
         </el-button>
-        <el-button v-has="['sys:jobLog:truncate']" plain size="mini" type="danger" @click="truncate">清空全表</el-button>
+        <el-button v-has="['sys:jLog:truncate']" plain size="mini" type="danger" @click="truncate">清空全表</el-button>
       </div>
 
       <el-table
@@ -93,7 +93,7 @@
           width="100">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['sys:jobLog:delete']" size="mini" type="text"
+            <el-button v-has="['sys:jLog:delete']" size="mini" type="text"
                        @click.native.prevent="removeItem(scope.$index, jobLogTableData,scope.row)">
               删除
             </el-button>
@@ -118,49 +118,49 @@
           <template slot="label">
             任务名
           </template>
-          {{ jobLog.jobName }}
+          {{ jLog.jobName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             任务组名
           </template>
-          {{ jobLog.jobGroupName }}
+          {{ jLog.jobGroupName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             调用的方法
           </template>
-          {{ jobLog.clazzName }}
+          {{ jLog.clazzName }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             日志信息
           </template>
-          {{ jobLog.jobMessage }}
+          {{ jLog.jobMessage }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             执行开始时间
           </template>
-          {{ jobLog.createTime }}
+          {{ jLog.createTime }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             执行结束时间
           </template>
-          {{ jobLog.endTime }}
+          {{ jLog.endTime }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             异常信息
           </template>
-          {{ jobLog.exceptionInfo }}
+          {{ jLog.exceptionInfo }}
         </el-descriptions-item>
         <el-descriptions-item>
           <template slot="label">
             状态
           </template>
-          {{ this.getDescriptionsDictLabel()(jobLog, 'jobStatus', 'JOB_STATUS') }}
+          {{ this.getDescriptionsDictLabel()(jLog, 'jobStatus', 'JOB_STATUS') }}
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -168,7 +168,7 @@
 </template>
 
 <script>
-import { del, list, truncate } from '@/api/system/jobLog'
+import { del, list, truncate } from '@/api/quartz/jlog'
 import { confirmAlert } from '@utils/common'
 import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
@@ -207,7 +207,7 @@ export default {
       // 表单标题宽度
       formLabelWidth: '80px',
       // 日志数据
-      jobLog: {
+      jLog: {
         id: undefined,
         jobName: '',
         jobGroupName: '',
@@ -340,7 +340,7 @@ export default {
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
       this.$nextTick(() => {
-        Object.assign(this.jobLog, row)
+        Object.assign(this.jLog, row)
       })
     }
   }

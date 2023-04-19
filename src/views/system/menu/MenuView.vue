@@ -464,7 +464,7 @@ export default {
         ],
         permission: [
           {
-            required: true,
+            required: false,
             message: '请输入权限编码',
             trigger: 'blur'
           }
