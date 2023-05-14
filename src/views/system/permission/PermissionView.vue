@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <base-container>
     <el-main>
       <el-form ref="searchForm" :inline="true" :model="searchPermissionForm" class="demo-form-inline"
                label-width="100px"
@@ -30,11 +30,8 @@
         :data="permissionTableData"
         border
         empty-text="无数据"
-        height="500"
-        max-height="700"
         size="mini"
         stripe
-        style="width: 100%"
         @selection-change="permissionHandleSelectionChange">
         <el-table-column
           type="selection"
@@ -130,27 +127,18 @@
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
                @close="closeInfoDialog">
       <el-descriptions :column="1" border size="mini">
-        <el-descriptions-item>
-          <template slot="label">
-            权限名称
-          </template>
+        <el-descriptions-item label="权限名称">
           {{ permission.permissionName }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            权限编码
-          </template>
+        <el-descriptions-item label="权限编码">
           <el-tag size="small">{{ permission.permissionCode }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            权限
-          </template>
+        <el-descriptions-item label="权限">
           <el-tag size="small">{{ permission.permissions }}</el-tag>
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
-  </el-container>
+  </base-container>
 </template>
 
 <script>

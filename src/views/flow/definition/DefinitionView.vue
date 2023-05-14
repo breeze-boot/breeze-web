@@ -24,11 +24,8 @@
         :data="definitionTableData"
         border
         empty-text="无数据"
-        height="500"
-        max-height="700"
         size="mini"
-        stripe
-        style="width: 100%">
+        stripe>
         <el-table-column
           label="ID"
           prop="id"
@@ -129,11 +126,8 @@
         :data="versionDefinitionTableData"
         border
         empty-text="无数据"
-        height="500"
-        max-height="700"
         size="mini"
-        stripe
-        style="width: 100%">
+        stripe>
         <el-table-column
           label="ID"
           prop="id"
@@ -225,18 +219,12 @@
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="80vw"
                @close="closeInfoDialog">
       <el-descriptions :column="24" border direction="vertical" size="mini">
-        <el-descriptions-item>
-          <template slot="label">
-            流程名称
-          </template>
+        <el-descriptions-item label="流程名称" >
           {{ definition.name }}
         </el-descriptions-item>
       </el-descriptions>
       <el-descriptions :column="24" border direction="vertical" size="mini">
-        <el-descriptions-item>
-          <template slot="label">
-            流程图片
-          </template>
+        <el-descriptions-item label="流程图片">
           <el-image :src="definition.imagePng"/>
         </el-descriptions-item>
       </el-descriptions>

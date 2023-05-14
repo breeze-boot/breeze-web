@@ -1,210 +1,183 @@
 <template>
-  <base-main>
-    <template slot="main">
+  <base-container>
+    <el-main>
+      <el-form ref="searchForm" :inline="true" :model="searchFileForm" class="demo-form-inline" label-width="80px"
+               size="mini">
+        <el-row :gutter="24" style="text-align: left;">
+          <el-col :md="24">
+            <el-form-item label="原始名称" prop="originalFileName">
+              <el-input v-model="searchFileForm.originalFileName" clearable placeholder="原始文件名称"/>
+            </el-form-item>
+            <el-form-item label="新名称" prop="newFileName">
+              <el-input v-model="searchFileForm.newFileName" clearable placeholder="新文件名称"/>
+            </el-form-item>
+            <el-form-item label="创建人" prop="createName">
+              <el-input v-model="searchFileForm.createName" clearable placeholder="创建人"/>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="search()">查询</el-button>
+              <el-button type="info" @click="searchReset()">重置</el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <div style="margin-bottom: 10px; text-align: left;">
+        <el-button v-has="['sys:file:upload']" plain size="mini" type="primary" @click="create">新建</el-button>
+        <el-button v-has="['sys:file:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
+                   @click="remove">删除
+        </el-button>
+      </div>
+      <el-table
+        ref="multipleTable"
+        :data="fileTableData"
+        border
+        empty-text="无数据"
+        size="mini"
+        stripe
+        @selection-change="fileHandleSelectionChange">
+        <el-table-column
+          type="selection"
+          width="55">
+        </el-table-column>
+        <el-table-column
+          v-if="false"
+          label="ID"
+          prop="id"
+          width="200">
+        </el-table-column>
+        <el-table-column
+          label="标题"
+          prop="title"
+          show-overflow-tooltip
+          width="200">
+        </el-table-column>
+        <el-table-column
+          label="原始名称"
+          prop="originalFileName"
+          show-overflow-tooltip
+          width="200">
+        </el-table-column>
+        <el-table-column
+          label="新名称"
+          prop="newFileName"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
+          :formatter="(row, column) => this.getTableDictLabel()(row, column, 'OSS_STYLE')"
+          label="存储方式"
+          prop="ossStyle"
+          show-overflow-tooltip/>
+        <el-table-column
+          label="存储路径"
+          prop="path"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
+          label="创建人ID"
+          prop="createBy"
+          show-overflow-tooltip>
+        </el-table-column>
+        <el-table-column
+          label="创建人"
+          prop="createName">
+        </el-table-column>
+        <el-table-column
+          fixed="right"
+          label="操作"
+          width="200">
+          <template slot-scope="scope">
+            <el-button v-has="['sys:file:preview']" size="mini" type="text" @click="preview(scope.row)">预览</el-button>
+            <el-button v-has="['sys:file:download']" size="mini" type="text" @click="download(scope.row)">下载
+            </el-button>
+            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
+            <el-button v-has="['sys:file:modify']" size="mini" type="text" @click="edit(scope.row)">更新</el-button>
+            <el-button v-has="['sys:file:delete']" size="mini" type="text"
+                       @click.native.prevent="removeItem(scope.$index, fileTableData,scope.row)">删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div style="text-align: right;margin-top: 2vh;">
+        <el-pagination
+          :current-page="searchFileForm.current"
+          :page-size="searchFileForm.size"
+          :page-sizes="[10, 20, 50, 100]"
+          :total="total"
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange">
+        </el-pagination>
+      </div>
+    </el-main>
+
+    <el-dialog :title="title" :visible.sync="previewDialogVisible" width="500px"
+               @close="closeUploadDialog">
       <el-main>
-        <el-form ref="searchForm" :inline="true" :model="searchFileForm" class="demo-form-inline" label-width="80px"
-                 size="mini">
-          <el-row :gutter="24" style="text-align: left;">
-            <el-col :md="24">
-              <el-form-item label="原始名称" prop="originalFileName">
-                <el-input v-model="searchFileForm.originalFileName" clearable placeholder="原始文件名称"/>
-              </el-form-item>
-              <el-form-item label="新名称" prop="newFileName">
-                <el-input v-model="searchFileForm.newFileName" clearable placeholder="新文件名称"/>
-              </el-form-item>
-              <el-form-item label="创建人" prop="createName">
-                <el-input v-model="searchFileForm.createName" clearable placeholder="创建人"/>
-              </el-form-item>
-              <el-form-item>
-                <el-button type="primary" @click="search()">查询</el-button>
-                <el-button type="info" @click="searchReset()">重置</el-button>
-              </el-form-item>
-            </el-col>
-          </el-row>
-        </el-form>
-        <div style="margin-bottom: 10px; text-align: left;">
-          <el-button v-has="['sys:file:upload']" plain size="mini" type="primary" @click="create">新建</el-button>
-          <el-button v-has="['sys:file:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
-                     @click="remove">删除
-          </el-button>
-        </div>
-        <el-table
-          ref="multipleTable"
-          :data="fileTableData"
-          border
-          empty-text="无数据"
-          size="mini"
-          stripe
-          style="width: 100%"
-          @selection-change="fileHandleSelectionChange">
-          <el-table-column
-            type="selection"
-            width="55">
-          </el-table-column>
-          <el-table-column
-            v-if="false"
-            label="ID"
-            prop="id"
-            width="200">
-          </el-table-column>
-          <el-table-column
-            label="标题"
-            prop="title"
-            show-overflow-tooltip
-            width="200">
-          </el-table-column>
-          <el-table-column
-            label="原始名称"
-            prop="originalFileName"
-            show-overflow-tooltip
-            width="200">
-          </el-table-column>
-          <el-table-column
-            label="新名称"
-            prop="newFileName"
-            show-overflow-tooltip>
-          </el-table-column>
-          <el-table-column
-            :formatter="(row, column) => this.getTableDictLabel()(row, column, 'OSS_STYLE')"
-            label="存储方式"
-            prop="ossStyle"
-            show-overflow-tooltip/>
-          <el-table-column
-            label="存储路径"
-            prop="path"
-            show-overflow-tooltip>
-          </el-table-column>
-          <el-table-column
-            label="创建人ID"
-            prop="createBy"
-            show-overflow-tooltip>
-          </el-table-column>
-          <el-table-column
-            label="创建人"
-            prop="createName">
-          </el-table-column>
-          <el-table-column
-            fixed="right"
-            label="操作"
-            width="200">
-            <template slot-scope="scope">
-              <el-button v-has="['sys:file:preview']" size="mini" type="text" @click="preview(scope.row)">预览</el-button>
-              <el-button v-has="['sys:file:download']" size="mini" type="text" @click="download(scope.row)">下载
-              </el-button>
-              <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-              <el-button v-has="['sys:file:modify']" size="mini" type="text" @click="edit(scope.row)">更新</el-button>
-              <el-button v-has="['sys:file:delete']" size="mini" type="text"
-                         @click.native.prevent="removeItem(scope.$index, fileTableData,scope.row)">删除
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        <div style="text-align: right;margin-top: 2vh;">
-          <el-pagination
-            :current-page="searchFileForm.current"
-            :page-size="searchFileForm.size"
-            :page-sizes="[10, 20, 50, 100]"
-            :total="total"
-            layout="total, sizes, prev, pager, next, jumper"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange">
-          </el-pagination>
-        </div>
+        <el-image
+          :preview-src-list="[imgUrl]"
+          :src="imgUrl"
+          style="width: 400px;">
+        </el-image>
       </el-main>
+    </el-dialog>
 
-      <el-dialog :title="title" :visible.sync="previewDialogVisible" width="500px"
-                 @close="closeUploadDialog">
-        <el-main>
-          <el-image
-            :preview-src-list="[imgUrl]"
-            :src="imgUrl"
-            style="width: 400px;">
-          </el-image>
-        </el-main>
-      </el-dialog>
+    <el-dialog :title="title" :visible.sync="uploadDialogVisible" width="400px"
+               @close="closeUploadDialog">
+      <el-form ref="uploadFileFrom" :model="file" :rules="fileRules" label-width="0" size="mini">
+        <el-form-item prop="title">
+          <el-input v-model="file.title" placeholder="请输入文件标题"/>
+        </el-form-item>
+        <el-form-item :prop="ossStyle" style="margin-bottom: 20px;">
+          <el-select v-model="file.ossStyle" :disabled="true" placeholder="请选择存储位置">
+            <el-option
+              v-for="item in this.getDict()('OSS_STYLE')"
+              :key="item.key"
+              :label="item.value"
+              :value="item.key">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-upload
+          :http-request="uploadImage"
+          :show-file-list="false"
+          action=""
+          class="upload-demo"
+          drag
+          multiple>
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+        </el-upload>
+      </el-form>
+    </el-dialog>
 
-      <el-dialog :title="title" :visible.sync="uploadDialogVisible" width="400px"
-                 @close="closeUploadDialog">
-        <el-form ref="uploadFileFrom" :model="file" :rules="fileRules" label-width="0" size="mini">
-          <el-form-item prop="title">
-            <el-input v-model="file.title" placeholder="请输入文件标题"/>
-          </el-form-item>
-          <el-form-item :prop="ossStyle" style="margin-bottom: 20px;">
-            <el-select v-model="file.ossStyle" :disabled="true" placeholder="请选择存储位置">
-              <el-option
-                v-for="item in this.getDict()('OSS_STYLE')"
-                :key="item.key"
-                :label="item.value"
-                :value="item.key">
-              </el-option>
-            </el-select>
-          </el-form-item>
-          <el-upload
-            :http-request="uploadImage"
-            :show-file-list="false"
-            action=""
-            class="upload-demo"
-            drag
-            multiple>
-            <i class="el-icon-upload"></i>
-            <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-          </el-upload>
-        </el-form>
-      </el-dialog>
-
-      <el-dialog :title="title" :visible.sync="infoDialogVisible" width="950px"
-                 @close="closeInfoDialog">
-        <el-descriptions :column="2" border size="mini">
-          <el-descriptions-item>
-            <template slot="label">
-              标题
-            </template>
-            {{ file.title }}
-          </el-descriptions-item>
-          <el-descriptions-item>
-            <template slot="label">
-              原始名称
-            </template>
-            {{ file.originalFileName }}
-          </el-descriptions-item>
-          <el-descriptions-item>
-            <template slot="label">
-              新名称
-            </template>
-            <el-tag size="small">
-              {{ file.newFileName }}
-            </el-tag>
-          </el-descriptions-item>
-          <el-descriptions-item>
-            <template slot="label">
-              存储方式
-            </template>
-            <el-tag size="small">
-              {{ this.getDescriptionsDictLabel()(file, 'ossStyle', 'OSS_STYLE') }}
-            </el-tag>
-          </el-descriptions-item>
-          <el-descriptions-item>
-            <template slot="label">
-              存储路径
-            </template>
-            {{ file.path }}
-          </el-descriptions-item>
-          <el-descriptions-item>
-            <template slot="label">
-              创建人ID
-            </template>
-            {{ file.createBy }}
-          </el-descriptions-item>
-          <el-descriptions-item>
-            <template slot="label">
-              创建人
-            </template>
-            {{ file.createName }}
-          </el-descriptions-item>
-        </el-descriptions>
-      </el-dialog>
-    </template>
-  </base-main>
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="950px"
+               @close="closeInfoDialog">
+      <el-descriptions :column="2" border size="mini">
+        <el-descriptions-item label="标题">
+          {{ file.title }}
+        </el-descriptions-item>
+        <el-descriptions-item label="原始名称">
+          {{ file.originalFileName }}
+        </el-descriptions-item>
+        <el-descriptions-item label="新名称">
+          <el-tag size="small">
+            {{ file.newFileName }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="存储方式">
+          <el-tag size="small">
+            {{ this.getDescriptionsDictLabel()(file, 'ossStyle', 'OSS_STYLE') }}
+          </el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="存储路径">
+          {{ file.path }}
+        </el-descriptions-item>
+        <el-descriptions-item label="创建人">
+          {{ file.createName }}
+        </el-descriptions-item>
+      </el-descriptions>
+    </el-dialog>
+  </base-container>
 </template>
 
 <script>

@@ -39,7 +39,6 @@
         height="60vh"
         size="mini"
         stripe
-        style="width: 100%"
         @selection-change="jobLogHandleSelectionChange">
         <el-table-column
           type="selection"
@@ -114,52 +113,28 @@
     </el-main>
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw">
       <el-descriptions :column="1" border size="mini">
-        <el-descriptions-item>
-          <template slot="label">
-            任务名
-          </template>
+        <el-descriptions-item label="任务名">
           {{ jLog.jobName }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            任务组名
-          </template>
+        <el-descriptions-item label="任务组名">
           {{ jLog.jobGroupName }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            调用的方法
-          </template>
+        <el-descriptions-item label="调用的方法">
           {{ jLog.clazzName }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            日志信息
-          </template>
+        <el-descriptions-item label="日志信息">
           {{ jLog.jobMessage }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            执行开始时间
-          </template>
+        <el-descriptions-item label="执行开始时间">
           {{ jLog.createTime }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            执行结束时间
-          </template>
+        <el-descriptions-item label="执行结束时间">
           {{ jLog.endTime }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            异常信息
-          </template>
+        <el-descriptions-item label="异常信息">
           {{ jLog.exceptionInfo }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            状态
-          </template>
+        <el-descriptions-item label="状态">
           {{ this.getDescriptionsDictLabel()(jLog, 'jobStatus', 'JOB_STATUS') }}
         </el-descriptions-item>
       </el-descriptions>

@@ -20,11 +20,8 @@
         :data="instanceTableData"
         border
         empty-text="无数据"
-        height="500"
-        max-height="700"
         size="mini"
-        stripe
-        style="width: 100%">
+        stripe>
         <el-table-column
           type="selection"
           width="55"/>
@@ -97,10 +94,7 @@
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
                @close="closeInfoDialog">
       <el-descriptions :column="2" border size="mini">
-        <el-descriptions-item>
-          <template slot="label">
-            流程实例名称
-          </template>
+        <el-descriptions-item label="流程实例名称">
           {{ instance.instanceName }}
         </el-descriptions-item>
       </el-descriptions>

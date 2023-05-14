@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <base-container>
     <el-main>
       <el-form ref="searchForm" :inline="true" :model="searchDictForm" class="demo-form-inline" label-width="80px"
                size="mini">
@@ -28,7 +28,6 @@
         ref="multipleTable"
         :data="dictTableData"
         border
-        height="500"
         size="mini"
         stripe
         @selection-change="dictHandleSelectionChange">
@@ -120,21 +119,14 @@
 
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw" @close="closeInfoDialog">
       <el-descriptions :column="1" border size="mini">
-        <el-descriptions-item>
-          <template slot="label">
-            字典编码
-          </template>
-          {{ dict.dictCode }}
-        </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            部门名称
-          </template>
+        <el-descriptions-item  label="字典名称">
           <el-tag size="small">{{ dict.dictName }}</el-tag>
         </el-descriptions-item>
-      </el-descriptions>
+        <el-descriptions-item label="字典编码">
+          {{ dict.dictCode }}
+        </el-descriptions-item>  </el-descriptions>
     </el-dialog>
-  </el-container>
+  </base-container>
 </template>
 
 <script>

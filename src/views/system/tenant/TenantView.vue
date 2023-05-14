@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <base-container>
     <el-main>
       <el-form ref="searchForm" :inline="true" :model="searchTenantForm" class="demo-form-inline" label-width="80px"
                size="mini">
@@ -29,11 +29,8 @@
         :data="tenantTableData"
         border
         empty-text="无数据"
-        height="500"
-        max-height="700"
         size="mini"
         stripe
-        style="width: 100%"
         @selection-change="tenantHandleSelectionChange">
         <el-table-column
           type="selection"
@@ -105,28 +102,18 @@
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
                @close="closeInfoDialog">
       <el-descriptions :column="2" border size="mini">
-        <el-descriptions-item>
-          <template slot="label">
-            租户名称
-          </template>
+        <el-descriptions-item label="租户名称">
           {{ tenant.tenantName }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            租户编码
-          </template>
+        <el-descriptions-item label="租户编码">
           <el-tag size="small">{{ tenant.tenantCode }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            描述
-          </template>
+        <el-descriptions-item label="描述">
           {{ tenant.description }}
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
-
-  </el-container>
+  </base-container>
 </template>
 
 <script>

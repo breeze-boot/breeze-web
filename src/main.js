@@ -7,7 +7,7 @@ import svg from '@/assets/icon'
 import { has } from '@/directive/has-permission'
 import { rightMenu } from '@/directive/right-menu'
 import '@/assets/icon-fonts'
-import Main from '@/components/main/Main'
+import BaseContainer from '@/components/main/BaseContainer.vue'
 import ElementUI from 'element-ui'
 import '../theme/index.scss'
 import MsgPlugin from '@/plugin/index'
@@ -16,7 +16,7 @@ import 'animate.css'
 Vue.use(ElementUI, { size: 'small' })
 Vue.use(MsgPlugin)
 Vue.use(ElementUI)
-Vue.component('base-main', Main)
+Vue.component('base-container', BaseContainer)
 
 Vue.config.productionTip = false
 

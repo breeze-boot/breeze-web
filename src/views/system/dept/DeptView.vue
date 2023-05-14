@@ -1,110 +1,101 @@
 <template>
-    <base-main>
-      <template slot="main">
-        <el-main>
-          <el-form ref="searchForm" :inline="true" :model="searchDeptForm" class="demo-form-inline" label-width="80px"
-                   size="mini">
-            <el-row :gutter="24" style="text-align: left;">
-              <el-col :md="24">
-                <el-form-item label="部门名称" prop="deptName">
-                  <el-input v-model="searchDeptForm.deptName" clearable placeholder="部门名称"/>
-                </el-form-item>
-                <el-form-item label="部门编号" prop="deptCode">
-                  <el-input v-model="searchDeptForm.deptCode" clearable placeholder="部门编号"/>
-                </el-form-item>
-                <el-form-item>
-                  <el-button type="primary" @click="search()">查询</el-button>
-                  <el-button type="info" @click="searchReset()">重置</el-button>
-                </el-form-item>
-              </el-col>
-            </el-row>
-          </el-form>
-          <div style="margin-bottom: 10px; text-align: left;">
-            <el-button v-has="['sys:dept:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-          </div>
-          <el-table
-            :data="deptTableData"
-            :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
-            border
-            row-key="id"
-            size="mini"
-            stripe
-            style="width: 100%"
-            @selection-change="deptHandleSelectionChange">
-            <el-table-column
-              v-if="false"
-              label="ID"
-              prop="id"
-              width="200">
-            </el-table-column>
-            <el-table-column
-              label="部门名称"
-              prop="deptName">
-            </el-table-column>
-            <el-table-column
-              label="部门编码"
-              prop="deptCode">
-            </el-table-column>
-            <el-table-column
-              fixed="right"
-              label="操作"
-              width="200">
-              <template slot-scope="scope">
-                <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-                <el-button v-has="['sys:dept:create']" size="mini" type="text" @click="create(scope.row)">新建</el-button>
-                <el-button v-has="['sys:dept:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
-                <el-button v-has="['sys:dept:delete']" size="mini" type="text"
-                           @click.native.prevent="removeItem(deptTableData,scope.row)">删除
-                </el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-main>
+  <base-container>
+    <el-main>
+      <el-form ref="searchForm" :inline="true" :model="searchDeptForm" class="demo-form-inline" label-width="80px"
+               size="mini">
+        <el-row :gutter="24" style="text-align: left;">
+          <el-col :md="24">
+            <el-form-item label="部门名称" prop="deptName">
+              <el-input v-model="searchDeptForm.deptName" clearable placeholder="部门名称"/>
+            </el-form-item>
+            <el-form-item label="部门编号" prop="deptCode">
+              <el-input v-model="searchDeptForm.deptCode" clearable placeholder="部门编号"/>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="search()">查询</el-button>
+              <el-button type="info" @click="searchReset()">重置</el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <div style="margin-bottom: 10px; text-align: left;">
+        <el-button v-has="['sys:dept:create']" plain size="mini" type="primary" @click="create">新建</el-button>
+      </div>
+      <el-table
+        :data="deptTableData"
+        :tree-props="{children: 'children', hasChildren: 'hasChildren'}"
+        border
+        row-key="id"
+        size="mini"
+        stripe
+        @selection-change="deptHandleSelectionChange">
+        <el-table-column
+          v-if="false"
+          label="ID"
+          prop="id"
+          width="200">
+        </el-table-column>
+        <el-table-column
+          label="部门名称"
+          prop="deptName">
+        </el-table-column>
+        <el-table-column
+          label="部门编码"
+          prop="deptCode">
+        </el-table-column>
+        <el-table-column
+          fixed="right"
+          label="操作"
+          width="200">
+          <template slot-scope="scope">
+            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
+            <el-button v-has="['sys:dept:create']" size="mini" type="text" @click="create(scope.row)">新建</el-button>
+            <el-button v-has="['sys:dept:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button v-has="['sys:dept:delete']" size="mini" type="text"
+                       @click.native.prevent="removeItem(deptTableData,scope.row)">删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-main>
 
-        <el-dialog :title="title" :visible.sync="deptDialogVisible" width="600px"
-                   @close="closeDeptDialog('deptRuleForm')">
-          <el-form ref="deptRuleForm" :model="dept" :rules="deptRules" size="mini">
-            <el-form-item :label-width="formLabelWidth" class="parentId" label="上级部门" prop="parentId">
-              <el-cascader
-                v-model="dept.parentId"
-                :options="deptOption"
-                :props="{ checkStrictly: true, emitPath: false , value: 'key', label: 'value' }"
-                :show-all-levels="false"
-                clearable
-                filterable
-              ></el-cascader>
-            </el-form-item>
-            <el-form-item :label-width="formLabelWidth" label="部门名称" prop="deptName">
-              <el-input v-model="dept.deptName" autocomplete="off" clearable/>
-            </el-form-item>
-            <el-form-item :label-width="formLabelWidth" label="部门编码" prop="deptCode">
-              <el-input v-model="dept.deptCode" autocomplete="off" clearable/>
-            </el-form-item>
-          </el-form>
-          <div slot="footer" class="dialog-footer">
-            <el-button size="mini" @click="resetDeptForm('deptRuleForm')">取 消</el-button>
-            <el-button size="mini" type="primary" @click="submitDeptForm('deptRuleForm')">确 定</el-button>
-          </div>
-        </el-dialog>
+    <el-dialog :title="title" :visible.sync="deptDialogVisible" width="600px"
+               @close="closeDeptDialog('deptRuleForm')">
+      <el-form ref="deptRuleForm" :model="dept" :rules="deptRules" size="mini">
+        <el-form-item :label-width="formLabelWidth" class="parentId" label="上级部门" prop="parentId">
+          <el-cascader
+            v-model="dept.parentId"
+            :options="deptOption"
+            :props="{ checkStrictly: true, emitPath: false , value: 'key', label: 'value' }"
+            :show-all-levels="false"
+            clearable
+            filterable
+          ></el-cascader>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="部门名称" prop="deptName">
+          <el-input v-model="dept.deptName" autocomplete="off" clearable/>
+        </el-form-item>
+        <el-form-item :label-width="formLabelWidth" label="部门编码" prop="deptCode">
+          <el-input v-model="dept.deptCode" autocomplete="off" clearable/>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="mini" @click="resetDeptForm('deptRuleForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="submitDeptForm('deptRuleForm')">确 定</el-button>
+      </div>
+    </el-dialog>
 
-        <el-dialog :title="title" :visible.sync="infoDialogVisible" width="600px" @close="closeInfoDialog">
-          <el-descriptions :column="1" border size="mini">
-            <el-descriptions-item>
-              <template slot="label">
-                部门编码
-              </template>
-              {{ dept.deptCode }}
-            </el-descriptions-item>
-            <el-descriptions-item>
-              <template slot="label">
-                部门名称
-              </template>
-              <el-tag size="small">{{ dept.deptName }}</el-tag>
-            </el-descriptions-item>
-          </el-descriptions>
-        </el-dialog>
-      </template>
-    </base-main>
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="600px" @close="closeInfoDialog">
+      <el-descriptions :column="1" border size="mini">
+        <el-descriptions-item label="部门编码">
+          {{ dept.deptCode }}
+        </el-descriptions-item>
+        <el-descriptions-item label="部门名称">
+          <el-tag size="small">{{ dept.deptName }}</el-tag>
+        </el-descriptions-item>
+      </el-descriptions>
+    </el-dialog>
+  </base-container>
 </template>
 
 <script>

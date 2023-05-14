@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <base-container>
     <el-main>
       <div style="margin-bottom: 10px; text-align: left;">
         <el-button v-has="['sys:dict:create']" plain size="mini" type="primary" @click="create">新建</el-button>
@@ -7,7 +7,7 @@
                    @click="remove">删除
         </el-button>
       </div>
-      <el-table ref="multipleDictItemTable" :data="dictItemTableData" border height="400" size="mini" stripe
+      <el-table ref="multipleDictItemTable" :data="dictItemTableData" border  size="mini" stripe
                 style="width: 100%"
                 @selection-change="dictItemHandleSelectionChange">
         <el-table-column type="selection" width="55"></el-table-column>
@@ -40,7 +40,7 @@
         </div>
       </el-dialog>
     </el-main>
-  </el-container>
+  </base-container>
 </template>
 
 <script>

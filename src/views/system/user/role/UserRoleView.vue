@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <base-container>
     <el-main>
       <el-row :gutter="24" style="height: 5.5vh;">
         <el-col :md="22">
@@ -34,11 +34,9 @@
                 ref="multipleRoleTable"
                 :data="roleTableData"
                 border
-                height="500"
                 row-key="id"
                 size="mini"
                 stripe
-                style="width: 100%"
                 @row-click="rowClick"
                 @selection-change="handleSelectionChange">
                 <el-table-column
@@ -83,7 +81,7 @@
         </el-col>
       </el-row>
     </el-main>
-  </el-container>
+  </base-container>
 </template>
 
 <script>

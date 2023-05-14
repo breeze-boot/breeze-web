@@ -1,6 +1,6 @@
 <template>
   <div :style="{ height: cardHeight + 'px' }" class="main">
-    <slot name="main"/>
+    <slot/>
   </div>
 </template>
 
@@ -20,6 +20,12 @@ export default {
       window.onresize = () => {
         this.cardHeight = window.innerHeight - 165
       }
+    })
+  },
+  destroyed () {
+    this.$nextTick(() => {
+      // 监听浏览器高度变化事件清空
+      window.onresize = null
     })
   },
   methods: {}

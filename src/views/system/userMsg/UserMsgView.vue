@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <base-container>
     <el-main>
       <el-form ref="searchForm" :inline="true" :model="searchUserMsgForm" class="demo-form-inline" label-width="90px"
                size="mini">
@@ -31,11 +31,8 @@
         :data="userMsgTableData"
         border
         empty-text="无数据"
-        height="500"
-        max-height="700"
         size="mini"
         stripe
-        style="width: 100%"
         @selection-change="userMsgHandleSelectionChange">
         <el-table-column
           type="selection"
@@ -116,70 +113,42 @@
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
                @close="closeInfoDialog">
       <el-descriptions :column="2" border size="mini">
-        <el-descriptions-item>
-          <template slot="label">
-            消息名称
-          </template>
+        <el-descriptions-item label="消息名称">
           {{ userMsg.msgTitle }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            消息编码
-          </template>
+        <el-descriptions-item label="消息编码">
           <el-tag size="small">{{ userMsg.msgCode }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            消息类型
-          </template>
+        <el-descriptions-item label="消息类型">
           <el-tag size="small">
             {{ this.getDescriptionsDictLabel()(userMsg, 'msgType', 'MSG_TYPE') }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            消息级别
-          </template>
+        <el-descriptions-item label="消息级别">
           <el-tag :type="userMsg.msgLevel" size="small">
             {{ this.getDescriptionsDictLabel()(userMsg, 'msgLevel', 'MSG_LEVEL') }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            内容
-          </template>
+        <el-descriptions-item label="内容">
           {{ userMsg.content }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            消息发送人
-          </template>
+        <el-descriptions-item label="消息发送人">
           {{ userMsg.createName }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            消息接收人
-          </template>
+        <el-descriptions-item label="消息接收人">
           {{ userMsg.username }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            消息发送时间
-          </template>
+        <el-descriptions-item label="消息发送时间">
           {{ userMsg.createTime }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            消息状态
-          </template>
+        <el-descriptions-item label="消息状态">
           <el-tag size="small">
             {{ this.getDescriptionsDictLabel()(userMsg, 'markRead', 'MARK_READ') }}
           </el-tag>
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
-
-  </el-container>
+  </base-container>
 </template>
 
 <script>

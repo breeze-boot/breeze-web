@@ -29,11 +29,8 @@
         :data="categoryTableData"
         border
         empty-text="无数据"
-        height="500"
-        max-height="700"
         size="mini"
         stripe
-        style="width: 100%"
         @selection-change="categoryHandleSelectionChange">
         <el-table-column
           type="selection"
@@ -97,16 +94,10 @@
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
                @close="closeInfoDialog">
       <el-descriptions :column="2" border size="mini">
-        <el-descriptions-item>
-          <template slot="label">
-            流程分类名称
-          </template>
+        <el-descriptions-item label="流程分类名称">
           {{ category.categoryName }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            流程分类编码
-          </template>
+        <el-descriptions-item label="流程分类编码">
           <el-tag size="small">{{ category.categoryCode }}</el-tag>
         </el-descriptions-item>
       </el-descriptions>

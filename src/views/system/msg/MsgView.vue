@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <base-container>
     <el-main>
       <el-form ref="searchForm" :inline="true" :model="searchMsgForm" class="demo-form-inline" label-width="80px"
                size="mini">
@@ -29,11 +29,8 @@
         :data="msgTableData"
         border
         empty-text="无数据"
-        height="500"
-        max-height="700"
         size="mini"
         stripe
-        style="width: 100%"
         @selection-change="msgHandleSelectionChange">
         <el-table-column
           type="selection"
@@ -149,44 +146,26 @@
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
                @close="closeInfoDialog">
       <el-descriptions :column="2" border size="mini">
-        <el-descriptions-item>
-          <template slot="label">
-            消息名称
-          </template>
+        <el-descriptions-item label="消息名称">
           {{ msg.msgTitle }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            消息编码
-          </template>
+        <el-descriptions-item label="消息编码">
           <el-tag size="small">{{ msg.msgCode }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            消息类型
-          </template>
+        <el-descriptions-item label="消息类型">
           <el-tag size="small">
             {{ this.getDescriptionsDictLabel()(msg, 'msgType', 'MSG_TYPE') }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            消息级别
-          </template>
+        <el-descriptions-item label="消息级别">
           <el-tag :type="msg.msgLevel" size="small">
             {{ this.getDescriptionsDictLabel()(msg, 'msgLevel', 'MSG_LEVEL') }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            内容
-          </template>
+        <el-descriptions-item label="内容">
           {{ msg.content }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            创建人
-          </template>
+        <el-descriptions-item label="创建人">
           {{ msg.createName }}
         </el-descriptions-item>
       </el-descriptions>
@@ -312,7 +291,7 @@
         <el-button size="mini" type="primary" @click="sendMsgToUser">确 定</el-button>
       </div>
     </el-dialog>
-  </el-container>
+  </base-container>
 </template>
 
 <script>

@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <base-container>
     <el-main>
       <el-form ref="searchForm" :inline="true" :model="searchRoleForm" class="demo-form-inline" label-width="80px"
                size="mini">
@@ -30,11 +30,9 @@
             ref="multipleTable"
             :data="roleTableData"
             border
-            height="600"
             row-key="id"
             size="mini"
             stripe
-            style="width: 100%"
             @row-click="rowClick"
             @selection-change="roleHandleSelectionChange">
             <el-table-column
@@ -149,21 +147,15 @@
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
                @close="closeInfoDialog">
       <el-descriptions :column="1" border size="mini">
-        <el-descriptions-item>
-          <template slot="label">
-            角色编码
-          </template>
+        <el-descriptions-item label="角色编码">
           {{ role.roleCode }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            角色名称
-          </template>
+        <el-descriptions-item label="角色名称">
           <el-tag size="small">{{ role.roleName }}</el-tag>
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
-  </el-container>
+  </base-container>
 </template>
 
 <script>

@@ -36,11 +36,8 @@
         :data="jobTableData"
         border
         empty-text="无数据"
-        height="500"
-        max-height="700"
         size="mini"
         stripe
-        style="width: 100%"
         @selection-change="jobHandleSelectionChange">
         <el-table-column
           type="selection"
@@ -110,7 +107,8 @@
           label="操作"
           width="270">
           <template slot-scope="scope">
-            <el-button v-has="['sys:job:run']" size="mini" type="text" @click="runJobNow(scope.row)">运行一次</el-button>
+            <el-button v-has="['sys:job:run']" size="mini" type="text" @click="runJobNow(scope.row)">运行一次
+            </el-button>
             <el-button size="mini" type="text" @click="jobLog(scope.row)">查看运行情况</el-button>
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
             <el-button v-has="['sys:job:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
@@ -193,46 +191,25 @@
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
                @close="closeInfoDialog">
       <el-descriptions :column="2" border size="mini">
-        <el-descriptions-item>
-          <template slot="label">
-            任务名
-          </template>
+        <el-descriptions-item label="任务名">
           {{ job.jobName }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            任务组名
-          </template>
+        <el-descriptions-item label="任务组名">
           {{ job.jobGroupName }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            cron
-          </template>
+        <el-descriptions-item label="cron">
           <el-tag size="small">{{ job.cronExpression }}</el-tag>
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            调用方法
-          </template>
+        <el-descriptions-item label="调用方法">
           {{ job.clazzName }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            执行策略
-          </template>
+        <el-descriptions-item label="执行策略">
           {{ this.getDescriptionsDictLabel()(job, 'misfirePolicy', 'MISFIRE_POLICY') }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            并发
-          </template>
+        <el-descriptions-item label="并发">
           {{ this.getDescriptionsDictLabel()(job, 'concurrent', 'CONCURRENT') }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            状态
-          </template>
+        <el-descriptions-item label="状态">
           {{ this.getDescriptionsDictLabel()(job, 'status', 'JOB_STATUS') }}
         </el-descriptions-item>
       </el-descriptions>

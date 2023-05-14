@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <base-container>
     <el-main>
       <el-form ref="searchForm" :inline="true" :model="searchLogForm" class="demo-form-inline" label-width="80px"
                size="mini">
@@ -73,10 +73,8 @@
         ref="multipleTable"
         :data="logTableData"
         border
-        height="70vh"
         size="mini"
         stripe
-        style="width: 100%"
         @selection-change="logHandleSelectionChange">
         <el-table-column
           type="selection"
@@ -158,63 +156,36 @@
     </el-main>
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw">
       <el-descriptions :column="1" border size="mini">
-        <el-descriptions-item>
-          <template slot="label">
-            系统模块
-          </template>
+        <el-descriptions-item label="系统模块">
           {{ log.systemModule }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            日志标题
-          </template>
+        <el-descriptions-item label="日志标题">
           {{ log.logTitle }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            日志类型
-          </template>
+        <el-descriptions-item label="日志类型">
           {{ this.getDescriptionsDictLabel()(log, 'logType', 'LOG_TYPE') }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            操作类型
-          </template>
+        <el-descriptions-item label="操作类型">
           {{ this.getDescriptionsDictLabel()(log, 'doType', 'DO_TYPE') }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            请求类型
-          </template>
+        <el-descriptions-item label="请求类型">
           {{ log.requestType }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            浏览器
-          </template>
+        <el-descriptions-item label="浏览器">
           {{ log.browser }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            IP
-          </template>
+        <el-descriptions-item label="IP">
           {{ log.ip }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            系统
-          </template>
+        <el-descriptions-item label="系统">
           {{ log.system }}
         </el-descriptions-item>
-        <el-descriptions-item>
-          <template slot="label">
-            结果
-          </template>
+        <el-descriptions-item label="执行结果">
           {{ this.getDescriptionsDictLabel()(log, 'result', 'RESULT') }}
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
-  </el-container>
+  </base-container>
 </template>
 
 <script>
