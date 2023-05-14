@@ -121,15 +121,15 @@
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="消息类型" prop="msgType">
           <el-radio-group v-model="msg.msgType">
-            <el-radio-button v-for="item in this.getDict()('MSG_TYPE')" :key="item.value" :label="item.value">
-              {{ item.label }}
+            <el-radio-button v-for="item in this.getDict()('MSG_TYPE')" :key="item.key" :label="item.key">
+              {{ item.value }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="消息等级" prop="msgLevel">
           <el-radio-group v-model="msg.msgLevel">
-            <el-radio-button v-for="item in this.getDict()('MSG_LEVEL')" :key="item.value" :label="item.value">
-              {{ item.label }}
+            <el-radio-button v-for="item in this.getDict()('MSG_LEVEL')" :key="item.key" :label="item.key">
+              {{ item.value }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
