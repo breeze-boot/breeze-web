@@ -18,7 +18,7 @@ export default {
   },
   actions: {},
   getters: {
-    getDict (state) {
+    dict (state) {
       return function (key) {
         let result = new Map()
         state.dict.forEach((v, k) => {
@@ -29,7 +29,7 @@ export default {
         return result
       }
     },
-    getTableDictLabel (state) {
+    column (state) {
       return function (row, column, key) {
         if (!row || !column.property) {
           return
@@ -47,7 +47,7 @@ export default {
         return value
       }
     },
-    getDescriptionsDictLabel (state) {
+    descriptions (state) {
       return function (row, columnName, key) {
         if (!row || !columnName) {
           return

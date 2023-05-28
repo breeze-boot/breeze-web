@@ -172,7 +172,7 @@ export function checkUsername (username, userId) {
 /**
  * 详情
  *
- * @param data
+ * @param userId
  * @returns {AxiosPromise}
  */
 export function info (userId) {

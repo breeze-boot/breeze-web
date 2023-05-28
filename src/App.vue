@@ -13,21 +13,21 @@ export default {
     return {}
   },
   methods: {
-    ...mapMutations('menu', ['setCurrentMenu', 'setMenuIsCollapse']),
+    ...mapMutations('menu', ['setCurrentMenu', 'setMenuCollapse']),
     ...mapMutations('tab', ['setTab']),
     reSize () {
       const width = document.documentElement.clientWidth || document.body.clientWidth
       if (width < 1024) {
         // 设置 VUEX 中的值
-        this.setMenuIsCollapse({
-          collapseWhitespace: 65,
+        this.setMenuCollapse({
+          whitespace: 65,
           fadeIn: 'fadeOut',
           isCollapse: false
         })
       } else {
         // 设置 VUEX 中的值
-        this.setMenuIsCollapse({
-          collapseWhitespace: 200,
+        this.setMenuCollapse({
+          whitespace: 200,
           fadeIn: 'fadeIn',
           isCollapse: true
         })
@@ -52,46 +52,23 @@ export default {
      */
     $route (to, from) {
       const accessToken = localStorage.getItem('access_token')
-      if (to.name !== 'login' && to.name !== 'home' && accessToken) {
-        const params = {
-          name: to.name,
-          title: to.meta.title,
-          hidden: to.meta.hidden,
-          query: this.$route.query,
-          params: this.$route.params
-        }
-        this.setTab(params)
-        this.setCurrentMenu(params)
+      if (to.name === 'login' || to.name === 'layout' || !accessToken) {
+        return
       }
+      const matched = this.$route.matched
+      console.log(matched)
+      const params = {
+        name: to.name,
+        title: to.meta.title,
+        hidden: to.meta.hidden,
+        query: this.$route.query,
+        params: this.$route.params
+      }
+      this.setTab(params)
+      this.setCurrentMenu(params)
     }
   }
 }
 </script>
 <style lang="scss">
-* {
-  padding: 0;
-  margin: 0;
-}
-
-body, html {
-  height: 100%;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 0;
-}
-
-::-webkit-scrollbar {
-  -webkit-appearance: none;
-  width: 5px;
-  height: 5px;
-}
-
-::-webkit-scrollbar-thumb {
-  cursor: pointer;
-  border-radius: 5px;
-  background: rgba(0, 0, 0, 0.1);
-  transition: color 0.2s ease;
-}
 </style>

@@ -90,7 +90,7 @@ const addRoute = (path, menu) => {
   const route = convertRoute(path, menu)
   if (route) {
     store.commit('menu/setKeepAliveMenus', menu)
-    router.addRoute('home', route)
+    router.addRoute('layout', route)
   }
 }
 

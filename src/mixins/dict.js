@@ -11,12 +11,12 @@ const dict = {
     if (this.dictCode.length === 0) {
       return
     }
-    this.$toLoadDict(this.dictCode).then((dict) => {
+    this.$loadDict(this.dictCode).then((dict) => {
       console.debug('加载完成字典', dict)
     })
   },
   methods: {
-    ...mapGetters('dict', ['getDict', 'getDescriptionsDictLabel', 'getTableDictLabel'])
+    ...mapGetters('dict', ['dict', 'descriptions', 'column'])
   }
 }
 

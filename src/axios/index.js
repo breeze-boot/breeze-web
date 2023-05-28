@@ -8,10 +8,19 @@ import { reLoginConfirm, showErrorMsg, showWaringMsg } from '@utils/common'
  * @type {string}
  */
 export const servicePath = {
+  auth: '',
+  system: '',
+  quartz: '',
+  flow: ''
+}
+/*
+ servicePath = {
+  auth: '/auth',
   system: '/system',
   quartz: '/quartz',
   flow: '/flow'
 }
+ */
 
 /**
  * 创建的实例返回一个对象,实例对象
@@ -34,7 +43,7 @@ request.interceptors.request.use((config) => {
   if (authorization) {
     config.headers.Authorization = 'Bearer ' + authorization
   }
-  config.headers.TENANT_ID = localStorage.getItem('TENANT_ID') || ''
+  config.headers.tenantId = localStorage.getItem('X-TENANT-ID') || ''
   return config
 }, (error) => {
   Message.error({ message: error })
@@ -85,6 +94,7 @@ request.interceptors.response.use((response) => {
     Message.error({ message: '请求地址不存在' })
   } else if (error.response.status === 401) {
     showErrorMsg(error.response, error.response.data.message)
+    reLoginConfirm()
     return
   } else if (error.response.status === 403) {
     showErrorMsg(error.response, '无权限')

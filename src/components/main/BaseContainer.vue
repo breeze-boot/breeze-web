@@ -34,7 +34,7 @@ export default {
 
 <style lang="scss" scoped>
 .main {
-  box-shadow: 0 0 5px #d5d5d5;
+  box-shadow: 0 0 3px #d5d5d5;
   padding: 8px 8px;
   border-radius: 2px;
   overflow-y: scroll;

@@ -45,7 +45,7 @@
       :captchaType="'blockPuzzle'"
       :imgSize="{ width: '330px', height: '155px' }"
       :mode="'pop'"
-      @success="success"
+      @success="handleSuccess"
     ></Verify>
   </div>
 </template>
@@ -53,7 +53,7 @@
 <script>
 import Verify from '@/components/verifition/Verify'
 import { selectTenant } from '@/api/system/tenant'
-import { mapActions, mapMutations } from 'vuex'
+import { mapMutations } from 'vuex'
 
 export default {
   name: 'PhoneLogin',
@@ -86,7 +86,7 @@ export default {
         tenantId: [
           {
             required: true,
-            message: '请选择活动租户',
+            message: '请选择租户',
             trigger: 'change'
           }
         ]
@@ -94,18 +94,26 @@ export default {
     }
   },
   mounted () {
-    selectTenant().then(rep => {
-      if (rep.code === 1) {
-        this.tenantOption = rep.data
+    selectTenant().then(response => {
+      if (response.code === 1) {
+        this.tenantOption = response.data
       }
     })
   },
   methods: {
     ...mapMutations('menu', ['setMenus']),
-    ...mapActions('menu', ['loadRoute']),
     ...mapMutations('userInfo', ['setUserInfo']),
-    success () {
-      this.$store.dispatch('userInfo/phoneLogin', this.phoneLogin).then(() => {
+    handleSuccess () {
+      const loginParams = {
+        grantType: 'sms_code',
+        params: {
+          phone: this.phoneLogin.phone.trim(),
+          code: this.phoneLogin.code.trim()
+        }
+      }
+      // 验证码校验通过就去存储当前的租户ID，登录成功后回去再次更新
+      localStorage.setItem('X-TENANT-ID', this.phoneLogin.tenantId)
+      this.$store.dispatch('userInfo/authLogin', loginParams).then(() => {
         this.$router.push({
           path: this.$route.query.redirect || 'welcome'
         }).catch((e) => {

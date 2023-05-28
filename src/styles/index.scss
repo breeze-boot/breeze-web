@@ -1,0 +1,45 @@
+@import "variable.scss";
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+body, html {
+    height: 100%;
+}
+
+.el-dropdown {
+    font-size: 0.5rem;
+
+    i {
+        font-size: 0.5rem;
+    }
+}
+
+.el-dropdown-menu__item {
+    font-size: 0.5rem;
+}
+
+.el-dropdown-link {
+    cursor: pointer;
+    color: #409EFF;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 0;
+}
+
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+    cursor: pointer;
+    border-radius: 5px;
+    background: rgba(0, 0, 0, 0.1);
+    transition: color 0.2s ease;
+}

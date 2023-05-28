@@ -46,7 +46,7 @@
       :captchaType="'blockPuzzle'"
       :imgSize="{ width: '330px', height: '155px' }"
       :mode="'pop'"
-      @success="success"
+      @success="handleSuccess"
     ></Verify>
   </div>
 </template>
@@ -54,7 +54,8 @@
 <script>
 import Verify from '@/components/verifition/Verify'
 import { selectTenant } from '@/api/system/tenant'
-import { mapActions, mapMutations } from 'vuex'
+import { mapMutations } from 'vuex'
+import { encrypt } from '@utils/common'
 
 export default {
   name: 'userLogin',
@@ -87,7 +88,7 @@ export default {
         tenantId: [
           {
             required: true,
-            message: '请选择活动租户',
+            message: '请选择租户',
             trigger: 'change'
           }
         ]
@@ -103,14 +104,20 @@ export default {
   },
   methods: {
     ...mapMutations('menu', ['setMenus']),
-    ...mapActions('menu', ['loadRoute']),
     ...mapMutations('userInfo', ['setUserInfo']),
-    success () {
+    handleSuccess () {
+      const loginParams = {
+        grantType: 'password',
+        params: {
+          username: this.userLogin.username.trim(),
+          password: encrypt(this.userLogin.password.trim(), '1234567890123456')
+        }
+      }
       // 验证码校验通过就去存储当前的租户ID，登录成功后回去再次更新
-      localStorage.setItem('TENANT_ID', this.userLogin.tenantId)
-      this.$store.dispatch('userInfo/login', this.userLogin).then(() => {
+      localStorage.setItem('X-TENANT-ID', this.userLogin.tenantId)
+      this.$store.dispatch('userInfo/oauthLogin', loginParams).then(() => {
         this.$router.push({
-          path: this.$route.query.redirect || 'welcome'
+          path: this.$route.query.redirect || '/welcome'
         }).catch((e) => {
           console.error(e)
         })

@@ -21,7 +21,7 @@ export default {
     setMsg (state, msgData) {
       msgData.forEach(msg => {
         // 去重
-        const result = state.msg.some(ele => ele.msgCode === msg.msgCode)
+        const result = state.msg.some(ele => ele.msgId === msg.msgId)
         if (!result) {
           state.msg.push(msg)
         }
@@ -42,7 +42,7 @@ export default {
      * @param msg
      */
     closeMsgCard (state, msg) {
-      state.msg = state.msg.filter((tempMsg) => tempMsg.msgCode !== msg.msgCode)
+      state.msg = state.msg.filter((tempMsg) => tempMsg.msgId !== msg.msgId)
     },
     /**
      * 标记消息已读
@@ -51,7 +51,7 @@ export default {
      * @param msg
      */
     markReadMsgCard (state, msg) {
-      state.msg = state.msg.filter((tempMsg) => tempMsg.msgCode !== msg.msgCode)
+      state.msg = state.msg.filter((tempMsg) => tempMsg.msgId !== msg.msgId)
     }
   },
   actions: {
@@ -76,7 +76,7 @@ export default {
     },
     closeMsgCard (context, msg) {
       // 更改状态
-      close(msg.msgCode).then(response => {
+      close(msg.msgId).then(response => {
         if (response.code !== 1) {
           return
         }
@@ -85,7 +85,7 @@ export default {
     },
     markReadMsgCard (context, msg) {
       // 更改状态
-      read(msg.msgCode).then(response => {
+      read(msg.msgId).then(response => {
         if (response.code !== 1) {
           return
         }

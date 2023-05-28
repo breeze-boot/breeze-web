@@ -10,21 +10,19 @@ import '@/assets/icon-fonts'
 import BaseContainer from '@/components/main/BaseContainer.vue'
 import ElementUI from 'element-ui'
 import '../theme/index.scss'
-import MsgPlugin from '@/plugin/index'
+import Dict from '@/plugin/dict/index'
 import 'animate.css'
 
 Vue.use(ElementUI, { size: 'small' })
-Vue.use(MsgPlugin)
-Vue.use(ElementUI)
+Vue.use(Dict)
+Vue.use(svg)
 Vue.component('base-container', BaseContainer)
 
 Vue.config.productionTip = false
 
 new Vue({
-  MsgPlugin,
   has,
   rightMenu,
-  svg,
   router,
   store,
   render: h => h(App)

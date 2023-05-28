@@ -8,17 +8,17 @@
 
     <div v-if="'svg' === type" class="icon">
       <!-- 菜单不支持svg图标，因为使用自定义图片菜单折叠不显示图标-->
-      <div v-for="(icon, index) in svgIconsList" :key="index" class="custom-icon" @click="clickIcon(icon)">
-        <custom-icon :icon-name="`${icon}`"/>
+      <div v-for="(icon, index) in svgIconsList" :key="index" class="icon" @click="clickIcon(icon)">
+        <Icon :icon-name="`${icon}`"/>
         <div class="icon_item">
           {{ icon }}
         </div>
       </div>
     </div>
     <div v-if="'iconfont'===type" class="icon">
-      <div v-for="(icon, index) in alIconList" :key="index" class="custom-icon" @click="clickIcon(icon)">
+      <div v-for="(icon, index) in alIconList" :key="index" class="icon" @click="clickIcon(icon)">
         <div class="icon_item">
-          <custom-icon :icon-name="icon"/>
+          <Icon :icon-name="icon"/>
           {{ icon }}
         </div>
       </div>
@@ -104,7 +104,7 @@ export default {
   overflow-y: scroll;
   height: 200px;
 
-  .custom-icon {
+  .icon {
     display: flex;
     width: 200px;
     height: 30px;

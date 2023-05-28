@@ -17,7 +17,6 @@ const rightMenu = Vue.directive('rightMenu', (el) => {
       return
     }
     console.debug('当前的右击的tab', e.target.id)
-    console.debug('e.clientX', e.clientX)
     store.commit('rightMenu/setLeft', e.clientX + 'px')
     store.commit('rightMenu/setClickTabName', e.target.id)
     store.commit('rightMenu/setDisplay', 'block')

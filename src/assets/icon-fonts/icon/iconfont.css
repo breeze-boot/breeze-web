@@ -4,8 +4,14 @@
 }
 
 .iconfont {
+  text-align: center;
+  font-size: 1.3rem;
+  width: 2rem;
+  margin-right: 6px;
+  vertical-align: middle;
+  overflow: hidden;
+  color: #282828 !important;
   font-family: "iconfont", serif !important;
-  font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

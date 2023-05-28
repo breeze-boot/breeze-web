@@ -4,7 +4,7 @@ import menu from '@/store/modules/menu'
 import msg from '@/store/modules/msg'
 import dict from '@/store/modules/dict'
 import userInfo from '@/store/modules/userInfo'
-import tab from '@/store/modules/Tab'
+import tab from '@/store/modules/tab'
 import rightMenu from '@/store/modules/rightMenu'
 import settings from '@/store/modules/settings'
 

@@ -2,8 +2,6 @@ export const ROOT = '1111111111111111111'
 
 export const SECRET = '1234567812345678'
 
-export const IV = '0000000000000000'
-
 export const OSS = {
   LOCAL: 0,
   MINIO: 1

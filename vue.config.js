@@ -45,6 +45,15 @@ module.exports = defineConfig({
       }
     }
   },
+  css: {
+    extract: false,
+    loaderOptions: {
+      scss: {
+        // 全局引入变量和 mixin
+        additionalData: '@import "./src/styles/variable.scss";'
+      }
+    }
+  },
   runtimeCompiler: true,
   parallel: true,
   productionSourceMap: false,

@@ -11,13 +11,12 @@ export default {
   state: {
     menus: [],
     keepAliveMenus: [],
-    menuIsCollapse: {
+    menuCollapse: {
       isCollapse: true,
       fadeIn: 'fadeIn',
-      collapseWhitespace: '200'
+      whitespace: '200'
     },
-    currentMenu: 'welcome',
-    isLoadMenu: false
+    currentMenu: 'welcome'
   },
   mutations: {
     setMenus: (state, menus) => {
@@ -29,13 +28,10 @@ export default {
         state.keepAliveMenus.push(menu.component.substr(menu.component.lastIndexOf('/') + 1))
       }
     },
-    setMenuIsCollapse: (state, menuIsCollapse) => {
-      state.menuIsCollapse.collapseWhitespace = menuIsCollapse.collapseWhitespace
-      state.menuIsCollapse.isCollapse = menuIsCollapse.isCollapse
-      state.menuIsCollapse.fadeIn = menuIsCollapse.fadeIn
-    },
-    isLoadMenu: (state, isLoadMenu) => {
-      state.isLoadMenu = isLoadMenu
+    setMenuCollapse: (state, menuCollapse) => {
+      state.menuCollapse.whitespace = menuCollapse.whitespace
+      state.menuCollapse.isCollapse = menuCollapse.isCollapse
+      state.menuCollapse.fadeIn = menuCollapse.fadeIn
     },
     setCurrentMenu: (state, menu) => {
       if (menu.hidden === 1) {
@@ -56,19 +52,17 @@ export default {
      */
     loadRoute (context) {
       return new Promise((resolve, reject) => {
-        if (context.rootGetters['menu/getMenus'].length === 0 || !context.rootGetters['menu/isLoadMenu']) {
-          listTreeMenu({
-            platformCode: 'managementCenter'
-          }).then(response => {
-            // 动态绑定路由
-            bindRoute(response.data)
-            // 动态绑定菜单
-            bindMenu(response.data)
-            resolve()
-          }).catch(error => {
-            reject(error)
-          })
-        }
+        listTreeMenu({
+          platformCode: 'managementCenter'
+        }).then(response => {
+          // 动态绑定路由
+          bindRoute(response.data)
+          // 动态绑定菜单
+          bindMenu(response.data)
+          resolve()
+        }).catch(error => {
+          reject(error)
+        })
       })
     }
   },
@@ -77,9 +71,6 @@ export default {
       const result = []
       filterTree(state.menus, result, (tree) => tree.hidden === 1)
       return result
-    },
-    isLoadMenu (state) {
-      return state.isLoadMenu
     }
   }
 }

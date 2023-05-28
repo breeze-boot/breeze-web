@@ -2,25 +2,12 @@
 $--color-primary: #1890ff;
 $--color-danger: #ff4d4f;
 
+/* 改变 icon 字体路径变量，必需 */
 $--font-path: '~element-ui/lib/theme-chalk/fonts';
 
 $--fade-linear-transition: opacity 100ms linear !default;
 
-@import "node_modules/element-ui/packages/theme-chalk/src/index";
-
-
-// ali ICON
-.al-icon {
-  color: #eee !important;
-  text-align: center;
-  font-size: 1.3rem;
-  width: 2rem;
-  height: 2rem;
-  margin-right: 6px;
-  vertical-align: middle;
-  fill: currentColor;
-  overflow: hidden;
-}
+@import "~element-ui/packages/theme-chalk/src/index";
 
 .el-select {
   width: 100%;

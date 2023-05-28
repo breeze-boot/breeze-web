@@ -11,7 +11,7 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function list (data) {
   return request({
-    url: servicePath.system + '/userMsg/list',
+    url: servicePath.system + '/msgUser/list',
     method: 'post',
     data: data,
     transformResponse: [(data) => {
@@ -28,7 +28,7 @@ export function list (data) {
  */
 export function del (ids) {
   return request({
-    url: servicePath.system + '/userMsg/delete',
+    url: servicePath.system + '/msgUser/delete',
     method: 'delete',
     data: ids
   })
@@ -37,12 +37,12 @@ export function del (ids) {
 /**
  * 关闭
  *
- * @param msgCode
+ * @param msgId
  * @returns {AxiosPromise}
  */
-export function close (msgCode) {
+export function close (msgId) {
   return request({
-    url: servicePath.system + '/userMsg/close/' + msgCode,
+    url: servicePath.system + '/msgUser/close/' + JSONBigInt.parse(msgId),
     method: 'put'
   })
 }
@@ -50,12 +50,12 @@ export function close (msgCode) {
 /**
  * 标记已读
  *
- * @param msgCode
+ * @param msgId
  * @returns {AxiosPromise}
  */
-export function read (msgCode) {
+export function read (msgId) {
   return request({
-    url: servicePath.system + '/userMsg/read/' + msgCode,
+    url: servicePath.system + '/msgUser/read/' + JSONBigInt.parse(msgId),
     method: 'put'
   })
 }
@@ -67,10 +67,13 @@ export function read (msgCode) {
  */
 export function listMsgByUsername () {
   return request({
-    url: servicePath.system + '/userMsg/listMsgByUsername',
+    url: servicePath.system + '/msgUser/listMsgByUsername',
     method: 'get',
     params: {
       username: JSON.parse(localStorage.getItem('user_info')).username
-    }
+    },
+    transformResponse: [(data) => {
+      return JSONBigInt2Str.parse(data)
+    }]
   })
 }

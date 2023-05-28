@@ -1,6 +1,8 @@
 import Vue from 'vue'
+import router from '@/router/index'
 import { Message } from 'element-ui'
 import store from '@/store'
+import CryptoJS from 'crypto-js'
 
 export const showErrorMsg = (success, msg) => {
   if (success.data.message) {
@@ -30,10 +32,44 @@ export const confirmAlert = (func, msg) => {
   })
 }
 
+/**
+ * 加密
+ *
+ * @param content
+ * @param key
+ * @returns {string}
+ */
+export const encrypt = (content, key) => {
+  const sKey = CryptoJS.enc.Utf8.parse(key)
+  const sContent = CryptoJS.enc.Utf8.parse(content)
+  const encrypted = CryptoJS.AES.encrypt(sContent, sKey, {
+    mode: CryptoJS.mode.ECB,
+    padding: CryptoJS.pad.Pkcs7
+  })
+  return encrypted.toString()
+}
+
+/**
+ * 解密
+ *
+ * @param content
+ * @param key
+ * @returns {*}
+ */
+export const decrypt = (content, key) => {
+  const sKey = CryptoJS.enc.Utf8.parse(key)
+  const decrypt = CryptoJS.AES.decrypt(content, sKey, {
+    mode: CryptoJS.mode.ECB,
+    padding: CryptoJS.pad.Pkcs7
+  })
+  return CryptoJS.enc.Utf8.stringify(decrypt).toString()
+}
+
 export const reLoginConfirm = (msg) => {
   confirmAlert(() => {
     store.dispatch('userInfo/logOut').then(() => {
-      location.href = '#/welcome'
+      router.push({ path: '/login' }).then(r => {
+      })
     })
   }, msg || '登录状态已过期，请重新登录')
 }

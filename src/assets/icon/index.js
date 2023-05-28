@@ -1,7 +1,7 @@
 import Vue from 'vue'
-import CustomIcon from '@/components/icon/CustomIcon'
+import Icon from '@/components/icon/Icon.vue'
 
-Vue.component('custom-icon', CustomIcon)
+Vue.component('Icon', Icon)
 
 const requireAll = requireContext => requireContext.keys().map(requireContext)
 const req = require.context('./svg', false, /\.svg$/)

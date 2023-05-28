@@ -18,33 +18,34 @@ VueRouter.prototype.replace = function replace (location) {
 
 const routes = [
   {
-    path: '/',
-    name: 'login',
-    component: () => import('@/views/LoginView.vue')
-  },
-  {
-    path: '/login',
-    redirect: '/'
-  },
-  {
-    path: '/auth-redirect',
-    component: () => import('@/views/AuthRedirectView.vue'),
+    path: '/login-redirect',
+    component: () => import('@/views/login/AuthRedirectView.vue'),
     hidden: true
   },
   {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/views/login/index.vue')
+  },
+  {
     path: '/home',
-    name: 'home',
-    component: () => import('@/views/HomeView.vue'),
+    redirect: '/'
+  },
+  // 首页，若没有登录前置路由会拦截到登录页
+  {
+    path: '/',
+    name: 'layout',
+    component: () => import('@/layout/index.vue'),
     children: [
       {
         path: '/welcome',
         name: 'welcome',
-        component: () => import('@/views/WelcomeView.vue')
+        component: () => import('@/views/welcome/index.vue')
       },
       {
         path: '/404',
         name: '404',
-        component: () => import('@/views/404/NotFoundView.vue'),
+        component: () => import('@/views/error/NotFound.vue'),
         meta: {
           title: '404',
           hidden: 1
@@ -59,47 +60,49 @@ const router = new VueRouter({
   routes
 })
 
-const whiteList = ['/404', '/auth-redirect']
+const whiteList = ['/404', '/login-redirect', '/login']
 
 router.beforeEach((to, from, next) => {
   NProgress.start()
-  if (whiteList.includes(to.path)) {
-    console.debug(`白名单${whiteList}`)
-    next()
-    return
-  }
-  // 去首页登录页放行
-  if (to.path === '/' || to.path === '/login') {
-    console.debug(`登录页${to.path}`)
-    next()
-    return
-  }
   const accessToken = localStorage.getItem('access_token')
   if (accessToken) {
-    if (store.state.menu.isLoadMenu) {
+    // 有token了，不是去登录页的去执行获取菜单逻辑
+    if (store.getters['menu/getMenus'].length > 0) {
       next()
-      NProgress.done()
       return
     }
-    store.commit('menu/isLoadMenu', true)
     store.dispatch('menu/loadRoute').then(() => {
       console.debug('加载完成路由')
       next({
         ...to,
         replace: true
       })
-      NProgress.done()
     }).catch(err => {
-      store.dispatch('userInfo/logOut').then(() => {
-        console.error(err)
-        next({ path: '/' })
-      })
+      console.error(`加载路由异常${err}`)
+      this.$message.error('加载路由异常')
+      // 异常直接跳转到登录页
+      next({ path: '/login' })
     })
   } else {
-    NProgress.done()
-    console.debug('重定向路由')
-    next('/?redirect=' + to.path)
+    if (whiteList.includes(to.path)) {
+      console.debug(`白名单${whiteList}`)
+      next()
+      return
+    }
+
+    if (to.path === '/') {
+      next({ path: '/login' })
+      return
+    }
+    next(`/login?redirect=${to.fullPath}`)
   }
+})
+
+/**
+ * 全局后置守卫
+ */
+router.afterEach((to, from, next) => {
+  NProgress.done()
 })
 
 export default router
