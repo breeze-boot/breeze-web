@@ -1,4 +1,5 @@
-import { request, servicePath } from '@/axios'
+import { request } from '@/axios'
+import { servicePath } from '@/settings'
 
 /**
  * oauth2.0登录
@@ -7,7 +8,7 @@ import { request, servicePath } from '@/axios'
  * @param grantType 认证类型
  * @returns {AxiosPromise}
  */
-export function oauthLogin (params, grantType) {
+export function login (params, grantType) {
   return request({
     url: servicePath.auth + '/oauth2/token?grant_type=' + grantType,
     method: 'post',
@@ -55,41 +56,5 @@ export function userInfo () {
   return request({
     url: servicePath.auth + '/user/userInfo',
     method: 'get'
-  })
-}
-
-/**
- * 用户密码登录
- *
- * @param data
- * @returns {AxiosPromise}
- */
-export function login (data) {
-  const dataObj = {
-    username: data.username,
-    password: data.password
-  }
-  return request({
-    url: servicePath.system + '/breeze/login',
-    method: 'post',
-    data: dataObj
-  })
-}
-
-/**
- * 手机验证码登录
- *
- * @param {{code, phone: string}} data
- * @returns {AxiosPromise}
- */
-export function sms (data) {
-  const dataObj = {
-    phone: data.phone,
-    code: data.code
-  }
-  return request({
-    url: servicePath.system + '/breeze/sms',
-    method: 'post',
-    data: dataObj
   })
 }

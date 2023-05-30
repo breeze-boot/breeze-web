@@ -12,8 +12,8 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
  */
 export function list (data) {
   return request({
-    url: servicePath.system + '/msgUser/list',
-    method: 'post',
+    url: servicePath.system + '/client',
+    method: 'get',
     data: data,
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)
@@ -29,50 +29,64 @@ export function list (data) {
  */
 export function del (ids) {
   return request({
-    url: servicePath.system + '/msgUser/delete',
+    url: servicePath.system + '/client',
     method: 'delete',
     data: ids
   })
 }
 
 /**
- * 关闭
+ * 新增
  *
- * @param msgId
+ * @param data
  * @returns {AxiosPromise}
  */
-export function close (msgId) {
+export function save (data) {
   return request({
-    url: servicePath.system + '/msgUser/close/' + JSONBigInt.parse(msgId),
-    method: 'put'
+    url: servicePath.system + '/client',
+    method: 'post',
+    data: data
   })
 }
 
 /**
- * 标记已读
+ * 修改
  *
- * @param msgId
+ * @param data
  * @returns {AxiosPromise}
  */
-export function read (msgId) {
+export function modify (data) {
   return request({
-    url: servicePath.system + '/msgUser/read/' + JSONBigInt.parse(msgId),
-    method: 'put'
+    url: servicePath.system + '/client',
+    method: 'put',
+    data: data
   })
 }
 
 /**
- * 获取消息
+ * 重置密钥
  *
+ * @param data
  * @returns {AxiosPromise}
  */
-export function listMsgByUsername () {
+export function resetClientSecret (data) {
   return request({
-    url: servicePath.system + '/msgUser/listMsgByUsername',
+    url: servicePath.system + '/client/resetClientSecret',
+    method: 'put',
+    data: data
+  })
+}
+
+/**
+ * 详情
+ *
+ * @param clientId
+ * @returns {AxiosPromise}
+ */
+export function info (clientId) {
+  return request({
+    url: servicePath.system + '/client/info/' + JSONBigInt.parse(clientId),
     method: 'get',
-    params: {
-      username: JSON.parse(localStorage.getItem('user_info')).username
-    },
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)
     }]

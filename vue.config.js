@@ -5,11 +5,18 @@ function resolve (dir) {
   return path.join(__dirname, dir)
 }
 
-const name = '咸蛋管理平台'
+const name = process.env.VUE_APP_TITLE || '咸蛋管理平台'
 
 module.exports = defineConfig({
   transpileDependencies: true,
   chainWebpack: config => {
+    config
+      .plugin('html')
+      .tap(args => {
+        args[0].title = name
+        return args
+      })
+
     // svg-sprite-loader
     config.module
       .rule('svg')
@@ -28,6 +35,7 @@ module.exports = defineConfig({
       })
       .end()
   },
+  // webpack-dev-server 相关配置
   devServer: {
     port: 8080, // 端口号，被占用自动提升加1
     https: false, // 协议
@@ -56,6 +64,7 @@ module.exports = defineConfig({
   },
   runtimeCompiler: true,
   parallel: true,
+  // 如果不需要生产环境的 source map，可以将其设置为 false 以加速生产环境构建
   productionSourceMap: false,
   configureWebpack: {
     // provide the app's title in webpack's name field, so that

@@ -27,6 +27,7 @@ import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import { mapActions } from 'vuex'
 import Main from '@/layout/main/index.vue'
+import { ws } from '@/settings'
 
 export default {
   name: 'Home',
@@ -49,10 +50,21 @@ export default {
   methods: {
     ...mapActions('msg', ['closeMsgCard', 'markReadMsgCard']),
     /**
+     * 关闭
+     */
+    closeWebsocket () {
+      clearInterval(this.$store.state.msg.reConnectTime)
+      if (this.$store.state.msg.stompClient !== null) {
+        this.$store.state.msg.stompClient.disconnect(() => {
+          console.debug('关闭连接')
+        })
+      }
+    },
+    /**
      * 初始化webSocket
      */
     initWebSocket () {
-      const socket = new SockJS(process.env.VUE_APP_WS_URI + '/ws?tenantId=' + localStorage.getItem('X-TENANT-ID'))
+      const socket = new SockJS(process.env.VUE_APP_SERVICE_URI + ws + '/ws?tenantId=' + localStorage.getItem('X-TENANT-ID'))
       this.$store.state.msg.stompClient = Stomp.over(socket)
       const header = {
         Authorization: localStorage.getItem('access_token'),
@@ -76,17 +88,6 @@ export default {
           }, 60000)
         }
       )
-    },
-    /**
-     * 关闭
-     */
-    closeWebsocket () {
-      clearInterval(this.$store.state.msg.reConnectTime)
-      if (this.$store.state.msg.stompClient !== null) {
-        this.$store.state.msg.stompClient.disconnect(() => {
-          console.debug('关闭连接')
-        })
-      }
     },
     /**
      * 订阅Topic

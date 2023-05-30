@@ -3,7 +3,7 @@
     <div :style="{minWidth: this.menuCollapse.whitespace  + 'px'}" class="logo">
       <img :style="{animationName: this.menuCollapse.fadeIn, animationDuration: 0 + 's'}" alt=""
            src="../../assets/logo.png"/>
-      <span v-show="this.menuCollapse.isCollapse">通用管理系统</span>
+      <span v-show="this.menuCollapse.isCollapse">{{ title }}</span>
     </div>
   </el-container>
 </template>
@@ -16,10 +16,15 @@ export default {
   name: 'Logo',
   components: {},
   data () {
-    return {}
+    return {
+      title: ''
+    }
   },
   computed: {
     ...mapState('menu', ['menuCollapse', 'currentMenu'])
+  },
+  created () {
+    this.title = process.env['VUE_APP_TITLE']
   },
   methods: {}
 }

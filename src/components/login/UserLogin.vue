@@ -115,7 +115,7 @@ export default {
       }
       // 验证码校验通过就去存储当前的租户ID，登录成功后回去再次更新
       localStorage.setItem('X-TENANT-ID', this.userLogin.tenantId)
-      this.$store.dispatch('userInfo/oauthLogin', loginParams).then(() => {
+      this.$store.dispatch('userInfo/authLogin', loginParams).then(() => {
         this.$router.push({
           path: this.$route.query.redirect || '/welcome'
         }).catch((e) => {

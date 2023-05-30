@@ -4,7 +4,11 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "serve:prod": "vue-cli-service serve --model prod",
+    "serve:test": "vue-cli-service serve --model test",
+    "build": "vue-cli-service build --model prod",
+    "build:test": "vue-cli-service build --model test",
+    "build:prod": "vue-cli-service build --model prod",
     "lint": "vue-cli-service lint"
   },
   "keywords": [

@@ -1,5 +1,6 @@
-import { request, servicePath } from '@/axios'
+import { request } from '@/axios'
 import JSONBigInt from 'json-bigint'
+import { servicePath } from '@/settings'
 
 const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
 

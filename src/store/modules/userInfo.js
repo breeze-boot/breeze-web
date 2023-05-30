@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { login, oauthLogin, sms, userInfo } from '@/api/login'
+import { login, userInfo } from '@/api/login'
 
 Vue.use(Vuex)
 
@@ -43,63 +43,13 @@ export default {
      * 登录
      *
      * @param commit
-     * @param userLogin
-     * @returns {Promise<>}
-     * @constructor
-     */
-    login ({ commit }, userLogin) {
-      const loginParam = {
-        username: userLogin.username.trim(),
-        password: userLogin.password.trim()
-      }
-      return new Promise((resolve, reject) => {
-        login(loginParam).then(response => {
-          localStorage.setItem('TENANT_ID', response.data.userInfo.tenantId)
-          commit('setAccessToken', response.data.accessToken)
-          commit('setAuthorities', response.data.userInfo.authorities)
-          commit('setUserInfo', response.data.userInfo)
-          resolve()
-        }).catch(error => {
-          reject(error)
-        })
-      })
-    },
-    /**
-     * 手机登录
-     *
-     * @param commit
-     * @param phoneLogin
-     * @returns {Promise<>}
-     * @constructor
-     */
-    phoneLogin ({ commit }, phoneLogin) {
-      const loginParam = {
-        phone: phoneLogin.phone.trim(),
-        code: phoneLogin.code.trim()
-      }
-      return new Promise((resolve, reject) => {
-        sms(loginParam).then(response => {
-          localStorage.setItem('TENANT_ID', response.data.userInfo.tenantId)
-          commit('setAccessToken', response.data.accessToken)
-          commit('setAuthorities', response.data.userInfo.authorities)
-          commit('setUserInfo', response.data.userInfo)
-          resolve()
-        }).catch(error => {
-          reject(error)
-        })
-      })
-    },
-    /**
-     * 登录
-     *
-     * @param commit
      * @param params
      * @returns {Promise<>}
      * @constructor
      */
-    oauthLogin ({ commit }, params) {
+    authLogin ({ commit }, params) {
       return new Promise((resolve, reject) => {
-        oauthLogin(params.params, params.grantType).then(response => {
+        login(params.params, params.grantType).then(response => {
           commit('setTenantId', response.user_info.tenantId)
           commit('setAccessToken', response.access_token)
           commit('setExpiresIn', response.expires_in)

@@ -3,26 +3,6 @@ import { Message } from 'element-ui'
 import { reLoginConfirm, showErrorMsg, showWaringMsg } from '@utils/common'
 
 /**
- * 服务的路径
- *
- * @type {string}
- */
-export const servicePath = {
-  auth: '',
-  system: '',
-  quartz: '',
-  flow: ''
-}
-/*
- servicePath = {
-  auth: '/auth',
-  system: '/system',
-  quartz: '/quartz',
-  flow: '/flow'
-}
- */
-
-/**
  * 创建的实例返回一个对象,实例对象
  */
 export const request = axios.create({
