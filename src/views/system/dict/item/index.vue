@@ -2,31 +2,31 @@
   <base-container>
     <el-main>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:dict:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:dict:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
-                   @click="remove">删除
+        <el-button v-has="['sys:dict:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
+        <el-button v-has="['sys:dict:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+                   @click="handleRemove">删除
         </el-button>
       </div>
       <el-table ref="dictItemTable" :header-cell-style="{ textAlign: 'center' }" :cell-style="{ textAlign: 'center' }"
                 :data="dictItemTableData" border size="mini" stripe style="width: 100%"
-                @selection-change="dictItemHandleSelectionChange">
+                @selection-change="handleDictItemSelectionChange">
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column v-if="false" label="ID" property="id" width="100"></el-table-column>
         <el-table-column label="字典KEY" property="key"></el-table-column>
         <el-table-column label="字典值" property="value"></el-table-column>
         <el-table-column fixed="right" label="操作" width="100">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, dictItemTableData,scope.row)">删除
+                       @click.native.prevent="handleRemoveItem(scope.$index, dictItemTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
 
       <el-dialog :title="title" :visible.sync="dictItemDialogVisible" width="40vw"
-                 @close="closeDictItemDialog('dictItemRuleForm')">
-        <el-form ref="dictItemRuleForm" :model="dictItem" :rules="dictItemRules" size="mini">
+                 @close="handleCloseDictItemDialog('dictItemForm')">
+        <el-form ref="dictItemForm" :model="dictItem" :rules="dictItemRules" size="mini">
           <el-form-item :label-width="formLabelWidth" label="字典KEY" prop="key">
             <el-input v-model="dictItem.key" autocomplete="off" clearable/>
           </el-form-item>
@@ -35,8 +35,8 @@
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button size="mini" @click="resetDictItemForm('dictItemRuleForm')">取 消</el-button>
-          <el-button size="mini" type="primary" @click="submitDictItemForm('dictItemRuleForm')">确 定</el-button>
+          <el-button size="mini" @click="handleCancelDictItemForm('dictItemForm')">取 消</el-button>
+          <el-button size="mini" type="primary" @click="handleSubmitDictItemForm('dictItemForm')">确 定</el-button>
         </div>
       </el-dialog>
     </el-main>
@@ -59,7 +59,7 @@ export default {
       // 弹出框标题
       title: '',
       // 单元格选中数据
-      multipleSelection: [],
+      selectionDictItemIds: [],
       // 字典项表格数据
       dictItemTableData: [],
       // 字典项查询条件数据
@@ -71,7 +71,7 @@ export default {
       // 分页总数
       total: 0,
       // 标记删除按钮是否可以点击
-      checkDeleteItem: true,
+      checkDelete: true,
       // 字典项添加修改弹出框
       dictItemDialogVisible: false,
       // 表单标题宽度
@@ -150,13 +150,13 @@ export default {
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList(this.buildParam())
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
+    handleSearchReset () {
       this.$refs.restPasswordRuleForm.resetFields()
     },
     /**
@@ -164,17 +164,17 @@ export default {
      *
      * @param val
      */
-    dictItemHandleSelectionChange (val) {
-      this.checkDeleteItem = !val.length
-      this.multipleSelection = val
+    handleDictItemSelectionChange (val) {
+      this.checkDelete = !val.length
+      this.selectionDictItemIds = val
     },
     /**
      * 批量删除
      */
-    remove () {
+    handleRemove () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelection.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        this.selectionDictItemIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then((response) => {
           if (response.code === 1) {
             this.$message.success('删除成功')
@@ -190,7 +190,7 @@ export default {
      * @param rows
      * @param row
      */
-    removeItem (index, rows, row) {
+    handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
           if (response.code === 1) {
@@ -204,7 +204,7 @@ export default {
     /**
      * 创建
      */
-    create () {
+    handleCreate () {
       this.title = '创建字典项'
       this.dialogType = DIALOG_TYPE.ADD
       this.dictItemDialogVisible = true
@@ -213,7 +213,7 @@ export default {
      * 修改
      * @param row
      */
-    edit (row) {
+    handleEdit (row) {
       this.title = '修改字典项'
       this.dialogType = DIALOG_TYPE.SHOW
       this.dictItemDialogVisible = true
@@ -226,7 +226,7 @@ export default {
      *
      * @param formName
      */
-    closeDictItemDialog (formName) {
+    handleCloseDictItemDialog (formName) {
       this.dictItem.id = undefined
       this.$refs[formName].resetFields()
     },
@@ -235,10 +235,10 @@ export default {
      *
      * @param formName
      */
-    submitDictItemForm (formName) {
+    handleSubmitDictItemForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
+          this.dialogType === DIALOG_TYPE.ADD ? this.handleSave() : this.handleModify()
         } else {
           console.log('error submit!!')
           return false
@@ -248,7 +248,7 @@ export default {
     /**
      * 保存请求
      */
-    save () {
+    handleSave () {
       save(this.dictItem).then((rep) => {
         if (rep.code === 1) {
           this.$message.success(rep.message)
@@ -260,7 +260,7 @@ export default {
     /**
      * 修改请求
      */
-    modify () {
+    handleModify () {
       modify(this.dictItem).then((rep) => {
         if (rep.code === 1) {
           this.$message.success(rep.message)
@@ -274,7 +274,7 @@ export default {
      *
      * @param formName
      */
-    resetDictItemForm (formName) {
+    handleCancelDictItemForm (formName) {
       this.dictItemDialogVisible = false
       this.$refs[formName].resetFields()
     }

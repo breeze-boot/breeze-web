@@ -7,14 +7,14 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
 /**
  * 列表
  *
- * @param data
+ * @param params
  * @returns {AxiosPromise}
  */
-export function list (data) {
+export function list (params) {
   return request({
-    url: servicePath.system + '/dict/list',
-    method: 'post',
-    data: data,
+    url: servicePath.system + '/dict',
+    method: 'get',
+    params: params,
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)
     }]
@@ -29,7 +29,7 @@ export function list (data) {
  */
 export function save (data) {
   return request({
-    url: servicePath.system + '/dict/create',
+    url: servicePath.system + '/dict',
     method: 'post',
     data: data
   })
@@ -43,7 +43,7 @@ export function save (data) {
  */
 export function del (ids) {
   return request({
-    url: servicePath.system + '/dict/delete',
+    url: servicePath.system + '/dict',
     method: 'delete',
     data: ids
   })
@@ -57,7 +57,7 @@ export function del (ids) {
  */
 export function modify (data) {
   return request({
-    url: servicePath.system + '/dict/modify',
+    url: servicePath.system + '/dict',
     method: 'put',
     data: data
   })

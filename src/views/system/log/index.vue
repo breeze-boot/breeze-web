@@ -1,15 +1,15 @@
 <template>
   <base-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchLogForm" class="demo-form-inline" label-width="80px"
+      <el-form ref="searchForm" :inline="true" :model="searchLog" class="demo-form-inline" label-width="80px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="系统模块" prop="systemModule">
-              <el-input v-model="searchLogForm.systemModule" clearable placeholder="请输入系统模块"/>
+              <el-input v-model="searchLog.systemModule" clearable placeholder="请输入系统模块"/>
             </el-form-item>
             <el-form-item label="操作类型" prop="doType">
-              <el-select v-model="searchLogForm.doType" placeholder="请选择操作类型">
+              <el-select v-model="searchLog.doType" placeholder="请选择操作类型">
                 <el-option
                   v-for="item in this.dict()('DO_TYPE')"
                   :key="item.key"
@@ -19,7 +19,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="日志类型" prop="logType">
-              <el-select v-model="searchLogForm.logType" placeholder="请选择日志类型">
+              <el-select v-model="searchLog.logType" placeholder="请选择日志类型">
                 <el-option
                   v-for="item in this.dict()('LOG_TYPE')"
                   :key="item.key"
@@ -29,7 +29,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="执行结果" prop="result">
-              <el-select v-model="searchLogForm.result" placeholder="请选择执行结果">
+              <el-select v-model="searchLog.result" placeholder="请选择执行结果">
                 <el-option
                   v-for="item in this.dict()('RESULT')"
                   :key="item.key"
@@ -39,11 +39,11 @@
               </el-select>
             </el-form-item>
             <el-form-item label="操作人员" prop="createBy">
-              <el-input v-model="searchLogForm.createBy" clearable placeholder="操作人员"/>
+              <el-input v-model="searchLog.createBy" clearable placeholder="操作人员"/>
             </el-form-item>
             <el-form-item label="日志时间" prop="searchDate">
               <el-date-picker
-                v-model="searchLogForm.searchDate"
+                v-model="searchLog.searchDate"
                 clearable
                 end-placeholder="结束日期"
                 format="yyyy-MM-dd HH:mm:ss"
@@ -54,19 +54,19 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="searchReset()">重置</el-button>
+              <el-button type="primary" @click="handleSearch()">查询</el-button>
+              <el-button type="info" @click="handleSearchReset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
 
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:log:export']" plain size="mini" type="info" @click="exportInfo">导出</el-button>
-        <el-button v-has="['sys:log:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
-                   @click="remove">删除
+        <el-button v-has="['sys:log:export']" plain size="mini" type="info" @click="handleExportInfo">导出</el-button>
+        <el-button v-has="['sys:log:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+                   @click="handleRemove">删除
         </el-button>
-        <el-button v-has="['sys:log:truncate']" plain size="mini" type="danger" @click="truncate">清空全表</el-button>
+        <el-button v-has="['sys:log:truncate']" plain size="mini" type="danger" @click="handleTruncate">清空全表</el-button>
       </div>
 
       <el-table
@@ -77,7 +77,7 @@
         border
         size="mini"
         stripe
-        @selection-change="logHandleSelectionChange">
+        @selection-change="handleLogSelectionChange">
         <el-table-column
           type="selection"
           width="55">
@@ -136,9 +136,9 @@
           label="操作"
           width="100">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
+            <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
             <el-button v-has="['sys:log:delete']" size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, logTableData,scope.row)">
+                       @click.native.prevent="handleRemoveItem(scope.$index, logTableData,scope.row)">
               删除
             </el-button>
           </template>
@@ -146,8 +146,8 @@
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchLogForm.current"
-          :page-size="searchLogForm.size"
+          :current-page="searchLog.current"
+          :page-size="searchLog.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -209,11 +209,11 @@ export default {
       // 弹出框标题
       title: '',
       // 单元格选中数据
-      multipleSelectionLogId: [],
+      selectionLogIds: [],
       // 日志表格数据
       logTableData: [],
       // 日志查询条件数据
-      searchLogForm: {
+      searchLog: {
         systemModule: '',
         doType: '',
         startDate: '',
@@ -228,7 +228,7 @@ export default {
       // 分页总数
       total: 0,
       // 标记删除按钮是否可以点击
-      checkDeleteItem: true,
+      checkDelete: true,
       // 日志详情弹出框
       infoDialogVisible: false,
       // 表单标题宽度
@@ -260,8 +260,8 @@ export default {
       list(this.buildParam()).then((response) => {
         if (response.code === 1) {
           this.logTableData = response.data.records
-          this.searchLogForm.size = response.data.size
-          this.searchLogForm.current = response.data.current
+          this.searchLog.size = response.data.size
+          this.searchLog.current = response.data.current
           this.total = response.data.total
         }
       })
@@ -272,9 +272,9 @@ export default {
      * @returns {{result: string, logType: string, createBy: string, current: number, size: number, searchDate: string, doType: string, startDate: string, systemModule: string}}
      */
     buildParam () {
-      this.searchLogForm.startDate = this.searchLogForm.searchDate[0]
-      this.searchLogForm.endDate = this.searchLogForm.searchDate[1]
-      return this.searchLogForm
+      this.searchLog.startDate = this.searchLog.searchDate[0]
+      this.searchLog.endDate = this.searchLog.searchDate[1]
+      return this.searchLog
     },
     /**
      * 分页大小切换
@@ -282,7 +282,7 @@ export default {
      * @param size
      */
     handleSizeChange (size) {
-      this.searchLogForm.size = size
+      this.searchLog.size = size
       this.reloadList()
     },
     /**
@@ -291,39 +291,40 @@ export default {
      * @param current
      */
     handleCurrentChange (current) {
-      this.searchLogForm.current = current
+      this.searchLog.current = current
       this.reloadList()
     },
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList()
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
-      this.$refs.searchLogForm.resetFields()
+    handleSearchReset () {
+      this.$refs.searchForm.resetFields()
+      this.reloadList()
     },
     /**
      * 平台表格复选框事件
      *
      * @param val
      */
-    logHandleSelectionChange (val) {
-      this.checkDeleteItem = !val.length
-      this.multipleSelectionLogId = val
+    handleLogSelectionChange (val) {
+      this.checkDelete = !val.length
+      this.selectionLogIds = val
     },
-    exportInfo () {
+    handleExportInfo () {
     },
     /**
      * 批量删除
      */
-    remove () {
+    handleRemove () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelectionLogId.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        this.selectionLogIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then((response) => {
           if (response.code === 1) {
             this.reloadList()
@@ -335,7 +336,7 @@ export default {
     /**
      * 清空
      */
-    truncate () {
+    handleTruncate () {
       confirmAlert(() => {
         truncate().then((response) => {
           this.$message.success('全部清空')
@@ -350,7 +351,7 @@ export default {
      * @param rows
      * @param row
      */
-    removeItem (index, rows, row) {
+    handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
           if (response.code === 1) {
@@ -366,7 +367,7 @@ export default {
      *
      * @param row
      */
-    info (row) {
+    handleInfo (row) {
       this.title = '查看详情信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true

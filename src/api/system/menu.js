@@ -25,14 +25,14 @@ export function listTreeMenu (params) {
 /**
  * 列表
  *
- * @param data
+ * @param params
  * @returns {AxiosPromise}
  */
-export function list (data) {
+export function list (params) {
   return request({
-    url: servicePath.system + '/menu/list',
-    method: 'post',
-    data: data,
+    url: servicePath.system + '/menu',
+    method: 'get',
+    params: params,
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)
     }]
@@ -47,7 +47,7 @@ export function list (data) {
  */
 export function save (data) {
   return request({
-    url: servicePath.system + '/menu/create',
+    url: servicePath.system + '/menu',
     method: 'post',
     data: data
   })
@@ -61,7 +61,7 @@ export function save (data) {
  */
 export function del (id) {
   return request({
-    url: servicePath.system + '/menu/delete',
+    url: servicePath.system + '/menu',
     method: 'delete',
     data: id
   })
@@ -75,7 +75,7 @@ export function del (id) {
  */
 export function modify (data) {
   return request({
-    url: servicePath.system + '/menu/modify',
+    url: servicePath.system + '/menu',
     method: 'put',
     data: data
   })

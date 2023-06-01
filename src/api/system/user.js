@@ -7,14 +7,14 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
 /**
  * 列表
  *
- * @param data
+ * @param params
  * @returns {AxiosPromise}
  */
-export function list (data) {
+export function list (params) {
   return request({
-    url: servicePath.system + '/user/list',
-    method: 'post',
-    data: data,
+    url: servicePath.system + '/user',
+    method: 'get',
+    params: params,
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)
     }]
@@ -29,7 +29,7 @@ export function list (data) {
  */
 export function del (ids) {
   return request({
-    url: servicePath.system + '/user/delete',
+    url: servicePath.system + '/user',
     method: 'delete',
     data: ids
   })
@@ -43,7 +43,7 @@ export function del (ids) {
  */
 export function save (data) {
   return request({
-    url: servicePath.system + '/user/create',
+    url: servicePath.system + '/user',
     method: 'post',
     data: data
   })
@@ -57,7 +57,7 @@ export function save (data) {
  */
 export function modify (data) {
   return request({
-    url: servicePath.system + '/user/modify',
+    url: servicePath.system + '/user',
     method: 'put',
     data: data
   })
@@ -84,7 +84,7 @@ export function exportInfo () {
  */
 export function resetPass (data) {
   return request({
-    url: servicePath.system + '/user/resetPass',
+    url: servicePath.system + '/user/reset',
     method: 'put',
     data: data
   })
@@ -116,7 +116,7 @@ export function open (username, isLock) {
  */
 export function userAddRole (data) {
   return request({
-    url: servicePath.system + '/user/userAddRole',
+    url: servicePath.system + '/user/setRole',
     method: 'put',
     data: data
   })

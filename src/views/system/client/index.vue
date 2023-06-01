@@ -1,27 +1,27 @@
 <template>
   <base-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchClientForm" class="demo-form-inline" label-width="90px"
+      <el-form ref="searchForm" :inline="true" :model="searchClient" class="demo-form-inline" label-width="90px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="客户端Id" prop="clientId">
-              <el-input v-model="searchClientForm.clientId" clearable placeholder="客户端Id"/>
+              <el-input v-model="searchClient.clientId" clearable placeholder="客户端Id"/>
             </el-form-item>
             <el-form-item label="客户端名称" prop="clientName">
-              <el-input v-model="searchClientForm.clientName" clearable placeholder="客户端名称"/>
+              <el-input v-model="searchClient.clientName" clearable placeholder="客户端名称"/>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="searchReset()">重置</el-button>
+              <el-button type="primary" @click="handleSearch()">查询</el-button>
+              <el-button type="info" @click="handleSearchReset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:client:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:client:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
-                   @click="remove">删除
+        <el-button v-has="['sys:client:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
+        <el-button v-has="['sys:client:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+                   @click="handleRemove">删除
         </el-button>
       </div>
       <el-table
@@ -33,7 +33,7 @@
         empty-text="无数据"
         size="mini"
         stripe
-        @selection-change="clientHandleSelectionChange">
+        @selection-change="handleClientSelectionChange">
         <el-table-column
           type="selection"
           width="55">
@@ -288,18 +288,19 @@
             <el-button v-has="['sys:client:resetClientSecret']" size="mini" type="text"
                        @click="handleResetClientSecret(scope.row)">重置密钥
             </el-button>
-            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['sys:client:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
+            <el-button v-has="['sys:client:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
+            </el-button>
             <el-button v-has="['sys:client:delete']" size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, clientTableData,scope.row)">删除
+                       @click.native.prevent="handleRemoveItem(scope.$index, clientTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchClientForm.current"
-          :page-size="searchClientForm.size"
+          :current-page="searchClient.current"
+          :page-size="searchClient.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -310,8 +311,8 @@
     </el-main>
 
     <el-dialog :title="title" :visible.sync="clientDialogVisible" width="40vw"
-               @close="closeClientDialog('clientRuleForm')">
-      <el-form ref="clientRuleForm" :model="client" :rules="clientRules" size="mini">
+               @close="handleCloseClientDialog('clientForm')">
+      <el-form ref="clientForm" :model="client" :rules="clientRules" size="mini">
         <div class="card">
           <span>基础配置</span>
           <el-divider></el-divider>
@@ -496,13 +497,13 @@
 
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetClientForm('clientRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitClientForm('clientRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="handleCancelClientForm('clientForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="handleSubmitClientForm('clientForm')">确 定</el-button>
       </div>
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="60vw"
-               @close="closeInfoDialog">
+               @close="handleCloseInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item label="客户端ID">
           {{ client.clientId }}
@@ -573,8 +574,8 @@
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="resetClientSecretDialogVisible" width="40vw"
-               @close="closeRestClientSecretDialog('resetClientSecretRuleForm')">
-      <el-form ref="resetClientSecretRuleForm" :model="resetClientSecret" :rules="resetClientSecretRules" size="mini">
+               @close="handleCloseRestClientSecretDialog('resetClientSecretForm')">
+      <el-form ref="resetClientSecretForm" :model="resetClientSecret" :rules="resetClientSecretRules" size="mini">
         <el-form-item :label-width="resetClientSecretFormLabelWidth" label="密钥" prop="clientSecret">
           <el-input v-model="resetClientSecret.clientSecret" autocomplete="off" clearable show-password
                     type="password"/>
@@ -585,8 +586,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetClientSecretForm('resetClientSecretRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitRestClientSecretForm('resetClientSecretRuleForm')">确 定
+        <el-button size="mini" @click="handleCancelClientSecretForm('resetClientSecretForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="handleSubmitRestClientSecretForm('resetClientSecretForm')">确 定
         </el-button>
       </div>
     </el-dialog>
@@ -620,20 +621,20 @@ export default {
       // 弹出框标题
       title: '',
       // 单元格选中数据
-      multipleSelectionClientIds: [],
+      selectionClientIds: [],
       // 客户端表格数据
       clientTableData: [],
       // 客户端查询条件数据
-      searchClientForm: {
+      searchClient: {
         clientName: '',
-        clientCode: '',
+        clientId: '',
         current: 1,
         size: 10
       },
       // 分页总数
       total: 0,
       // 标记删除按钮是否可以点击
-      checkDeleteItem: true,
+      checkDelete: true,
       // 客户端添加修改弹出框
       clientDialogVisible: false,
       // 客户端重置secret弹出框
@@ -721,7 +722,7 @@ export default {
                 callback(new Error('请输入密钥'))
               } else {
                 if (this.client.confirmClientSecret !== '') {
-                  this.$refs.clientRuleForm.validateField('confirmClientSecret')
+                  this.$refs.clientForm.validateField('confirmClientSecret')
                 }
                 callback()
               }
@@ -841,7 +842,7 @@ export default {
                 callback(new Error('请输入密钥'))
               } else {
                 if (this.resetClientSecret.confirmClientSecret !== '') {
-                  this.$refs.resetClientSecretRuleForm.validateField('confirmClientSecret')
+                  this.$refs.resetClientSecretForm.validateField('confirmClientSecret')
                 }
                 callback()
               }
@@ -877,18 +878,18 @@ export default {
     reloadList () {
       list(this.buildParam()).then((response) => {
         this.clientTableData = response.data.records
-        this.searchClientForm.size = response.data.size
-        this.searchClientForm.current = response.data.current
+        this.searchClient.size = response.data.size
+        this.searchClient.current = response.data.current
         this.total = response.data.total
       })
     },
     /**
      * 构造查询条件
      *
-     * @returns {{current: number, size: number, clientName: string, clientCode: string}}
+     * @returns {{current: number, clientId: string, size: number, clientName: string}}
      */
     buildParam () {
-      return this.searchClientForm
+      return this.searchClient
     },
     /**
      * 分页大小切换
@@ -896,7 +897,7 @@ export default {
      * @param size
      */
     handleSizeChange (size) {
-      this.searchClientForm.size = size
+      this.searchClient.size = size
       this.reloadList()
     },
     /**
@@ -905,37 +906,38 @@ export default {
      * @param current
      */
     handleCurrentChange (current) {
-      this.searchClientForm.current = current
+      this.searchClient.current = current
       this.reloadList()
     },
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList()
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
+    handleSearchReset () {
       this.$refs.searchForm.resetFields()
+      this.reloadList()
     },
     /**
      * 客户端表格复选框事件
      *
      * @param val
      */
-    clientHandleSelectionChange (val) {
-      this.checkDeleteItem = !val.length
-      this.multipleSelectionClientIds = val
+    handleClientSelectionChange (val) {
+      this.checkDelete = !val.length
+      this.selectionClientIds = val
     },
     /**
      * 批量删除
      */
-    remove () {
+    handleRemove () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelectionClientIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        this.selectionClientIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(response => {
           if (response.code === 1) {
             this.reloadList()
@@ -951,7 +953,7 @@ export default {
      * @param rows
      * @param row
      */
-    removeItem (index, rows, row) {
+    handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
           if (response.code === 1) {
@@ -965,7 +967,7 @@ export default {
     /**
      * 创建
      */
-    create () {
+    handleCreate () {
       this.title = '创建客户端'
       this.dialogType = DIALOG_TYPE.ADD
       this.$nextTick(() => {
@@ -976,12 +978,10 @@ export default {
      * 修改
      * @param row
      */
-    edit (row) {
-      debugger
+    handleEdit (row) {
       this.title = '修改客户端'
       this.dialogType = DIALOG_TYPE.EDIT
       info(row.id).then((response) => {
-        debugger
         if (response.code === 1) {
           this.$nextTick(() => {
             this.client = response.data
@@ -995,7 +995,7 @@ export default {
      *
      * @param row
      */
-    info (row) {
+    handleInfo (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
@@ -1008,14 +1008,14 @@ export default {
      *
      * @param formName
      */
-    closeClientDialog (formName) {
+    handleCloseClientDialog (formName) {
       this.client.id = undefined
       this.client = this.clientInfo
     },
     /**
      * 关闭详情弹出框事件
      */
-    closeInfoDialog () {
+    handleCloseInfoDialog () {
       this.client = this.clientInfo
     },
     /**
@@ -1023,10 +1023,10 @@ export default {
      *
      * @param formName
      */
-    submitClientForm (formName) {
+    handleSubmitClientForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
+          this.dialogType === DIALOG_TYPE.ADD ? this.handleSave() : this.handleModify()
         } else {
           console.log('error submit!!')
           return false
@@ -1036,7 +1036,7 @@ export default {
     /**
      * 保存请求
      */
-    save () {
+    handleSave () {
       this.client.id = undefined
       save(this.client).then((response) => {
         if (response.code === 1) {
@@ -1049,7 +1049,7 @@ export default {
     /**
      * 修改请求
      */
-    modify () {
+    handleModify () {
       this.client.clientSecret = ''
       modify(this.client).then((response) => {
         if (response.code === 1) {
@@ -1064,7 +1064,7 @@ export default {
      *
      * @param formName
      */
-    resetClientForm (formName) {
+    handleCancelClientForm (formName) {
       this.clientDialogVisible = false
       this.$refs[formName].resetFields()
     },
@@ -1083,7 +1083,7 @@ export default {
      *
      * @param formName
      */
-    resetClientSecretForm (formName) {
+    handleCancelClientSecretForm (formName) {
       this.resetClientSecretDialogVisible = false
       this.$refs[formName].resetFields()
     },
@@ -1092,7 +1092,7 @@ export default {
      *
      * @param formName
      */
-    submitRestClientSecretForm (formName) {
+    handleSubmitRestClientSecretForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           resetClientSecret(this.resetClientSecret).then(response => {
@@ -1112,7 +1112,7 @@ export default {
      *
      * @param formName
      */
-    closeRestClientSecretDialog (formName) {
+    handleCloseRestClientSecretDialog (formName) {
       this.resetClientSecret.id = undefined
       this.$refs[formName].resetFields()
     }

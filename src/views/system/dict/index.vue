@@ -1,27 +1,27 @@
 <template>
   <base-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchDictForm" class="demo-form-inline" label-width="80px"
+      <el-form ref="searchForm" :inline="true" :model="searchDict" class="demo-form-inline" label-width="80px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="字典名称" prop="dictName">
-              <el-input v-model="searchDictForm.dictName" clearable placeholder="字典名称"/>
+              <el-input v-model="searchDict.dictName" clearable placeholder="字典名称"/>
             </el-form-item>
             <el-form-item label="字典编码" prop="dictCode">
-              <el-input v-model="searchDictForm.dictCode" clearable placeholder="字典编码"/>
+              <el-input v-model="searchDict.dictCode" clearable placeholder="字典编码"/>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search">查询</el-button>
-              <el-button type="info" @click="searchReset">重置</el-button>
+              <el-button type="primary" @click="handleSearch">查询</el-button>
+              <el-button type="info" @click="handleSearchReset">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:dict:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:dict:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
-                   @click="remove">删除
+        <el-button v-has="['sys:dict:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
+        <el-button v-has="['sys:dict:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+                   @click="handleRemove">删除
         </el-button>
       </div>
       <el-table
@@ -32,7 +32,7 @@
         border
         size="mini"
         stripe
-        @selection-change="dictHandleSelectionChange">
+        @selection-change="handleDictSelectionChange">
         <el-table-column
           type="selection"
           width="55">
@@ -62,7 +62,7 @@
               active-color="#13ce66"
               inactive-color="#ff4949"
               size="mini"
-              @change="open(scope.$index, scope.row)">
+              @change="handleOpen(scope.$index, scope.row)">
             </el-switch>
           </template>
         </el-table-column>
@@ -71,19 +71,20 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['sys:dict:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
-            <el-button v-has="['sys:dict:delete']" size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, dictTableData,scope.row)">删除
+            <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
+            <el-button v-has="['sys:dict:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
             </el-button>
-            <el-button size="mini" type="text" @click="showDictDetail(scope.row)">查看字典项</el-button>
+            <el-button v-has="['sys:dict:delete']" size="mini" type="text"
+                       @click.native.prevent="handleRemoveItem(scope.$index, dictTableData,scope.row)">删除
+            </el-button>
+            <el-button size="mini" type="text" @click="handleShowDictDetail(scope.row)">查看字典项</el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchDictForm.current"
-          :page-size="searchDictForm.size"
+          :current-page="searchDict.current"
+          :page-size="searchDict.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -94,8 +95,8 @@
     </el-main>
 
     <el-dialog :title="title" :visible.sync="dictDialogVisible" width="40vw"
-               @close="closeDictDialog('dictRuleForm')">
-      <el-form ref="dictRuleForm" :model="dict" :rules="dictRules" size="mini">
+               @close="handleCloseDictDialog('dictForm')">
+      <el-form ref="dictForm" :model="dict" :rules="dictRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="字典名称" prop="dictName">
           <el-input v-model="dict.dictName" autocomplete="off" clearable/>
         </el-form-item>
@@ -114,12 +115,12 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetDictForm('dictRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitDictForm('dictRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="handleCancelDictForm('dictForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="handleSubmitDictForm('dictForm')">确 定</el-button>
       </div>
     </el-dialog>
 
-    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw" @close="closeInfoDialog">
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw" @close="handleCloseInfoDialog">
       <el-descriptions :column="1" border size="mini">
         <el-descriptions-item  label="字典名称">
           <el-tag size="small">{{ dict.dictName }}</el-tag>
@@ -147,11 +148,11 @@ export default {
       // 弹出框标题
       title: '',
       // 单元格选中数据
-      multipleSelection: [],
+      selectionDictIds: [],
       // 字典表格数据
       dictTableData: [],
       // 字典查询条件数据
-      searchDictForm: {
+      searchDict: {
         dictName: '',
         dictCode: '',
         current: 1,
@@ -160,7 +161,7 @@ export default {
       // 分页总数
       total: 0,
       // 标记删除按钮是否可以点击
-      checkDeleteItem: true,
+      checkDelete: true,
       // 字典添加修改弹出框
       dictDialogVisible: false,
       // 字典详情弹出框
@@ -222,8 +223,8 @@ export default {
       list(this.buildParam()).then((response) => {
         if (response.code === 1) {
           this.dictTableData = response.data.records
-          this.searchDictForm.size = response.data.size
-          this.searchDictForm.current = response.data.current
+          this.searchDict.size = response.data.size
+          this.searchDict.current = response.data.current
           this.total = response.data.total
         }
       })
@@ -234,7 +235,7 @@ export default {
      * @returns {{current: number, size: number, dictCode: string, dictName: string}}
      */
     buildParam () {
-      return this.searchDictForm
+      return this.searchDict
     },
     /**
      * 分页大小切换
@@ -242,7 +243,7 @@ export default {
      * @param size
      */
     handleSizeChange (size) {
-      this.searchDictForm.size = size
+      this.searchDict.size = size
       this.reloadList()
     },
     /**
@@ -251,37 +252,38 @@ export default {
      * @param current
      */
     handleCurrentChange (current) {
-      this.searchDictForm.current = current
+      this.searchDict.current = current
       this.reloadList()
     },
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList()
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
+    handleSearchReset () {
       this.$refs.searchForm.resetFields()
+      this.reloadList()
     },
     /**
      * 字典表格复选框事件
      *
      * @param val
      */
-    dictHandleSelectionChange (val) {
-      this.checkDeleteItem = !val.length
-      this.multipleSelection = val
+    handleDictSelectionChange (val) {
+      this.checkDelete = !val.length
+      this.selectionDictIds = val
     },
     /**
      * 批量删除
      */
-    remove () {
+    handleRemove () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelection.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        this.selectionDictIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then((response) => {
           if (response.code === 1) {
             this.reloadList()
@@ -297,7 +299,7 @@ export default {
      * @param rows
      * @param row
      */
-    removeItem (index, rows, row) {
+    handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
           if (response.code === 1) {
@@ -311,7 +313,7 @@ export default {
     /**
      * 创建
      */
-    create () {
+    handleCreate () {
       this.title = '创建字典'
       this.dialogType = DIALOG_TYPE.ADD
       this.dictDialogVisible = true
@@ -320,7 +322,7 @@ export default {
      * 修改
      * @param row
      */
-    edit (row) {
+    handleEdit (row) {
       this.title = '修改字典'
       this.dialogType = DIALOG_TYPE.EDIT
       this.dictDialogVisible = true
@@ -333,7 +335,7 @@ export default {
      *
      * @param row
      */
-    info (row) {
+    handleInfo (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
@@ -346,14 +348,14 @@ export default {
      *
      * @param formName
      */
-    closeDictDialog (formName) {
+    handleCloseDictDialog (formName) {
       this.dict.id = undefined
       this.$refs[formName].resetFields()
     },
     /**
      * 关闭详情弹出框事件
      */
-    closeInfoDialog () {
+    handleCloseInfoDialog () {
       this.dict = this.dictInfo
     },
     /**
@@ -361,10 +363,10 @@ export default {
      *
      * @param formName
      */
-    submitDictForm (formName) {
+    handleSubmitDictForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
+          this.dialogType === DIALOG_TYPE.ADD ? this.handleSave() : this.handleModify()
         } else {
           console.log('error submit!!')
           return false
@@ -374,7 +376,7 @@ export default {
     /**
      * 保存请求
      */
-    save () {
+    handleSave () {
       save(this.dict).then((response) => {
         if (response.code === 1) {
           this.$message.success(response.message)
@@ -386,7 +388,7 @@ export default {
     /**
      * 修改请求
      */
-    modify () {
+    handleModify () {
       modify(this.dict).then((response) => {
         if (response.code === 1) {
           this.$message.success(response.message)
@@ -400,9 +402,9 @@ export default {
      *
      * @param formName
      */
-    resetDictForm (formName) {
+    handleCancelDictForm (formName) {
       this.dictDialogVisible = false
-      this.closeDictDialog()
+      this.handleCloseDictDialog()
       this.$refs[formName].resetFields()
     },
     /**
@@ -410,7 +412,7 @@ export default {
      *
      * @param row
      */
-    showDictDetail (row) {
+    handleShowDictDetail (row) {
       this.$router.push({
         name: 'dictItem',
         query: {
@@ -424,7 +426,7 @@ export default {
      * @param index
      * @param row
      */
-    open (index, row) {
+    handleOpen (index, row) {
       open({
         id: row.id,
         isOpen: row.isOpen

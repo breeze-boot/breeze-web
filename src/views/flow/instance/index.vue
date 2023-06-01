@@ -1,16 +1,16 @@
 <template>
   <el-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchInstanceForm" class="demo-form-inline" label-width="100px"
+      <el-form ref="searchForm" :inline="true" :model="searchInstance" class="demo-form-inline" label-width="100px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="流程实例名称" prop="instanceName">
-              <el-input v-model="searchInstanceForm.instanceName" clearable placeholder="流程实例名称"/>
+              <el-input v-model="searchInstance.instanceName" clearable placeholder="流程实例名称"/>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="searchReset()">重置</el-button>
+              <el-button type="primary" @click="handleSearch()">查询</el-button>
+              <el-button type="info" @click="handleSearchReset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
@@ -75,15 +75,15 @@
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
             <el-button v-has="['flow:instance:delete']" size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, instanceTableData,scope.row)">删除
+                       @click.native.prevent="handleRemoveItem(scope.$index, instanceTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchInstanceForm.current"
-          :page-size="searchInstanceForm.size"
+          :current-page="searchInstance.current"
+          :page-size="searchInstance.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -94,7 +94,7 @@
     </el-main>
 
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
-               @close="closeInfoDialog">
+               @close="handleCloseInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item label="流程实例名称">
           {{ instance.instanceName }}
@@ -122,7 +122,7 @@ export default {
       // 流程实例表格数据
       instanceTableData: [],
       // 流程实例查询条件数据
-      searchInstanceForm: {
+      searchInstance: {
         instanceName: '',
         instanceCode: '',
         current: 1,
@@ -131,7 +131,7 @@ export default {
       // 分页总数
       total: 0,
       // 标记删除按钮是否可以点击
-      checkDeleteItem: true,
+      checkDelete: true,
       // 流程实例详情弹出框
       infoDialogVisible: false,
       // 流程实例添加修改数据
@@ -157,8 +157,8 @@ export default {
     reloadList () {
       list(this.buildParam()).then((response) => {
         this.instanceTableData = response.data.records
-        this.searchInstanceForm.size = response.data.size
-        this.searchInstanceForm.current = response.data.current
+        this.searchInstance.size = response.data.size
+        this.searchInstance.current = response.data.current
         this.total = response.data.total
       })
     },
@@ -168,7 +168,7 @@ export default {
      * @returns {{current: number, size: number, instanceName: string, instanceCode: string}}
      */
     buildParam () {
-      return this.searchInstanceForm
+      return this.searchInstance
     },
     /**
      * 分页大小切换
@@ -176,7 +176,7 @@ export default {
      * @param size
      */
     handleSizeChange (size) {
-      this.searchInstanceForm.size = size
+      this.searchInstance.size = size
       this.reloadList()
     },
     /**
@@ -185,25 +185,26 @@ export default {
      * @param current
      */
     handleCurrentChange (current) {
-      this.searchInstanceForm.current = current
+      this.searchInstance.current = current
       this.reloadList()
     },
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList()
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
+    handleSearchReset () {
       this.$refs.searchForm.resetFields()
+      this.reloadList()
     },
     /**
      * 批量删除
      */
-    remove () {
+    handleRemove () {
       confirmAlert(() => {
         const ids = []
         this.multipleSelectionCategoryIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
@@ -222,7 +223,7 @@ export default {
      * @param rows
      * @param row
      */
-    removeItem (index, rows, row) {
+    handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
           if (response.code === 1) {
@@ -249,17 +250,8 @@ export default {
     /**
      * 关闭详情弹出框事件
      */
-    closeInfoDialog () {
+    handleCloseInfoDialog () {
       this.instance = this.instanceInfo
-    },
-    /**
-     * 添加修改弹出框重置
-     *
-     * @param formName
-     */
-    resetCategoryForm (formName) {
-      this.instanceDialogVisible = false
-      this.$refs[formName].resetFields()
     }
   }
 }

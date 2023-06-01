@@ -1,23 +1,23 @@
 <template>
   <el-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchDefinitionForm" class="demo-form-inline"
+      <el-form ref="searchForm" :inline="true" :model="searchDefinition" class="demo-form-inline"
                label-width="100px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="流程名称" prop="repositoryName">
-              <el-input v-model="searchDefinitionForm.name" clearable placeholder="名称"/>
+              <el-input v-model="searchDefinition.name" clearable placeholder="名称"/>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="searchReset()">重置</el-button>
+              <el-button type="primary" @click="handleSearch()">查询</el-button>
+              <el-button type="info" @click="handleSearchReset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['flow:definition:create']" plain size="mini" type="primary" @click="create">新建</el-button>
+        <el-button v-has="['flow:definition:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
       </div>
       <el-table
         ref="definitionTable"
@@ -85,23 +85,23 @@
           label="操作"
           width="240">
           <template slot-scope="scope">
-            <el-button v-has="['flow:instance:start']" size="mini" type="text" @click="startProcess(scope.row)">
+            <el-button v-has="['flow:instance:start']" size="mini" type="text" @click="handleStartProcess(scope.row)">
               开启
             </el-button>
-            <el-button v-has="['flow:designer']" size="mini" type="text" @click="latestProcessDesigner(scope.row)">
+            <el-button v-has="['flow:designer']" size="mini" type="text" @click="handleLatestProcessDesigner(scope.row)">
               设计
             </el-button>
-            <el-button v-has="['flow:definition:info']" size="mini" type="text" @click="viewImage(scope.row)">流程图片
+            <el-button v-has="['flow:definition:info']" size="mini" type="text" @click="handleViewImage(scope.row)">流程图片
             </el-button>
-            <el-button v-has="['flow:definition:info']" size="mini" type="text" @click="viewVersion(scope.row)">查看版本
+            <el-button v-has="['flow:definition:info']" size="mini" type="text" @click="handleViewVersion(scope.row)">查看版本
             </el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchDefinitionForm.current"
-          :page-size="searchDefinitionForm.size"
+          :current-page="searchDefinition.current"
+          :page-size="searchDefinition.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -112,12 +112,12 @@
     </el-main>
 
     <el-dialog :title="title" :visible.sync="definitionDialogVisible" width="40vw"
-               @close="closeDefinitionDialog('definitionRuleForm')">
-      <el-form ref="definitionRuleForm" :model="definition" :rules="definitionRules" size="mini">
+               @close="handleCloseDefinitionDialog('definitionForm')">
+      <el-form ref="definitionForm" :model="definition" :rules="definitionRules" size="mini">
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetDefinitionForm('definitionRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitDefinitionForm('definitionRuleForm')">确 定
+        <el-button size="mini" @click="handleCancelDefinitionForm('definitionForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="handleSubmitDefinitionForm('definitionForm')">确 定
         </el-button>
       </div>
     </el-dialog>
@@ -190,25 +190,25 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
-            <el-button v-has="['flow:definition:info']" size="mini" type="text" @click="viewVersionImage(scope.row)">
+            <el-button v-has="['flow:definition:info']" size="mini" type="text" @click="handleViewVersionImage(scope.row)">
               流程图片
             </el-button>
-            <el-button v-has="['flow:designer']" size="mini" type="text" @click="versionProcessDesigner(scope.row)">
+            <el-button v-has="['flow:designer']" size="mini" type="text" @click="handleVersionProcessDesigner(scope.row)">
               设计
             </el-button>
-            <el-button v-has="['flow:definition:suspended']" size="mini" type="text" @click="isSuspended(scope.row)">
+            <el-button v-has="['flow:definition:suspended']" size="mini" type="text" @click="handleIsSuspended(scope.row)">
               {{ scope.row.suspended ? '激活' : '挂起' }}
             </el-button>
             <el-button v-has="['flow:definition:delete']" size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, definitionTableData,scope.row)">删除
+                       @click.native.prevent="handleRemoveItem(scope.$index, definitionTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchDefinitionForm.current"
-          :page-size="searchDefinitionForm.size"
+          :current-page="searchDefinition.current"
+          :page-size="searchDefinition.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -219,7 +219,7 @@
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="80vw"
-               @close="closeInfoDialog">
+               @close="handleCloseInfoDialog">
       <el-descriptions :column="24" border direction="vertical" size="mini">
         <el-descriptions-item label="流程名称" >
           {{ definition.name }}
@@ -261,7 +261,7 @@ export default {
       // 流程定义版本表格数据
       versionDefinitionTableData: [],
       // 流程查询条件数据
-      searchDefinitionForm: {
+      searchDefinition: {
         name: '',
         current: 1,
         size: 10
@@ -269,7 +269,7 @@ export default {
       // 分页总数
       total: 0,
       // 标记删除按钮是否可以点击
-      checkDeleteItem: true,
+      checkDelete: true,
       // 流程定义添加修改弹出框
       definitionDialogVisible: false,
       // 流程定义版本修改弹出框
@@ -313,8 +313,8 @@ export default {
     reloadList () {
       list(this.buildParam()).then((response) => {
         this.definitionTableData = response.data.records
-        this.searchDefinitionForm.size = response.data.size
-        this.searchDefinitionForm.current = response.data.current
+        this.searchDefinition.size = response.data.size
+        this.searchDefinition.current = response.data.current
         this.total = response.data.total
       })
     },
@@ -324,7 +324,7 @@ export default {
      * @returns {{current: number, size: number, name: string}}
      */
     buildParam () {
-      return this.searchDefinitionForm
+      return this.searchDefinition
     },
     /**
      * 分页大小切换
@@ -332,7 +332,7 @@ export default {
      * @param size
      */
     handleSizeChange (size) {
-      this.searchDefinitionForm.size = size
+      this.searchDefinition.size = size
       this.reloadList()
     },
     /**
@@ -341,20 +341,21 @@ export default {
      * @param current
      */
     handleCurrentChange (current) {
-      this.searchDefinitionForm.current = current
+      this.searchDefinition.current = current
       this.reloadList()
     },
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList()
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
+    handleSearchReset () {
       this.$refs.searchForm.resetFields()
+      this.reloadList()
     },
     /**
      * 删除行
@@ -363,13 +364,13 @@ export default {
      * @param rows
      * @param row
      */
-    removeItem (index, rows, row) {
+    handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del(row.deploymentId).then(response => {
           if (response.code === 1) {
             rows.splice(index, 1)
             this.reloadList()
-            this.viewVersion(this.currentRowData)
+            this.handleViewVersion(this.currentRowData)
             this.$message.success('删除成功')
           }
         })
@@ -378,7 +379,7 @@ export default {
     /**
      * 创建
      */
-    create () {
+    handleCreate () {
       this.$router.push({ name: 'designer' })
     },
     /**
@@ -386,7 +387,7 @@ export default {
      *
      * @param row
      */
-    latestProcessDesigner (row) {
+    handleLatestProcessDesigner (row) {
       this.$nextTick(() => {
         this.$router.push({
           name: 'designer',
@@ -402,7 +403,7 @@ export default {
      *
      * @param row
      */
-    versionProcessDesigner (row) {
+    handleVersionProcessDesigner (row) {
       this.$nextTick(() => {
         this.$router.push({
           name: 'designer',
@@ -418,10 +419,10 @@ export default {
      *
      * @param row
      */
-    isSuspended (row) {
+    handleIsSuspended (row) {
       isSuspended(row.id).then(response => {
         this.reloadList()
-        this.viewVersion(this.currentRowData)
+        this.handleViewVersion(this.currentRowData)
       })
     },
     /**
@@ -429,7 +430,7 @@ export default {
      *
      * @param row
      */
-    viewImage (row) {
+    handleViewImage (row) {
       this.title = '流程图片'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
@@ -445,7 +446,7 @@ export default {
      *
      * @param row
      */
-    viewVersionImage (row) {
+    handleViewVersionImage (row) {
       this.title = '流程图片'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
@@ -461,7 +462,7 @@ export default {
      *
      * @param row
      */
-    viewVersion (row) {
+    handleViewVersion (row) {
       this.currentRowData = row
       this.definitionVersionDialogVisible = true
       const data = {}
@@ -475,7 +476,7 @@ export default {
      *
      * @param row
      */
-    startProcess (row) {
+    handleStartProcess (row) {
       startProcess({
         processKey: row.key,
         tenantId: row.tenantId
@@ -488,14 +489,14 @@ export default {
      *
      * @param formName
      */
-    closeDefinitionDialog (formName) {
+    handleCloseDefinitionDialog (formName) {
       this.definition.id = undefined
       this.$refs[formName].resetFields()
     },
     /**
      * 关闭详情弹出框事件
      */
-    closeInfoDialog () {
+    handleCloseInfoDialog () {
       this.definition = this.definitionInfo
     },
     /**
@@ -503,10 +504,10 @@ export default {
      *
      * @param formName
      */
-    submitDefinitionForm (formName) {
+    handleSubmitDefinitionForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
+          this.dialogType === DIALOG_TYPE.ADD ? this.handleSave() : this.handleModify()
         } else {
           console.log('error submit!!')
           return false
@@ -516,13 +517,13 @@ export default {
     /**
      * 保存请求
      */
-    save () {
+    handleSave () {
       this.definition.id = undefined
     },
     /**
      * 修改请求
      */
-    modify () {
+    handleModify () {
       modify(this.definition).then((response) => {
         if (response.code === 1) {
           this.$message.success('修改成功')
@@ -536,7 +537,7 @@ export default {
      *
      * @param formName
      */
-    resetDefinitionForm (formName) {
+    handleCancelDefinitionForm (formName) {
       this.definitionDialogVisible = false
       this.$refs[formName].resetFields()
     }

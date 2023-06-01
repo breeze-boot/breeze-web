@@ -1,18 +1,18 @@
 <template>
   <base-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchMenuForm" class="demo-form-inline" label-width="80px"
+      <el-form ref="searchForm" :inline="true" :model="searchMenu" class="demo-form-inline" label-width="80px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="菜单名称" prop="title">
-              <el-input v-model="searchMenuForm.title" clearable placeholder="菜单名称"/>
+              <el-input v-model="searchMenu.title" clearable placeholder="菜单名称"/>
             </el-form-item>
             <el-form-item label="路由名称" prop="name">
-              <el-input v-model="searchMenuForm.name" clearable placeholder="路由名称"/>
+              <el-input v-model="searchMenu.name" clearable placeholder="路由名称"/>
             </el-form-item>
             <el-form-item label="平台">
-              <el-select v-model="searchMenuForm.platformId" placeholder="请选择平台">
+              <el-select v-model="searchMenu.platformId" placeholder="请选择平台">
                 <el-option
                   v-for="item in platformOptions"
                   :key="item.key"
@@ -22,14 +22,14 @@
               </el-select>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="searchReset()">重置</el-button>
+              <el-button type="primary" @click="handleSearch()">查询</el-button>
+              <el-button type="info" @click="handleSearchReset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:menu:create']" plain size="mini" type="primary" @click="create">新建</el-button>
+        <el-button v-has="['sys:menu:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
       </div>
       <el-table
         ref="menuTable"
@@ -42,7 +42,7 @@
         row-key="id"
         size="mini"
         stripe
-        @expand-change="menuHandleExpandChange">
+        @expand-change="handleMenuExpandChange">
         <el-table-column
           v-if="false"
           label="ID"
@@ -120,11 +120,11 @@
           label="操作"
           width="180">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['sys:menu:create']" size="mini" type="text" @click="create(scope.row)">新建</el-button>
-            <el-button v-has="['sys:menu:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
+            <el-button v-has="['sys:menu:create']" size="mini" type="text" @click="handleCreate(scope.row)">新建</el-button>
+            <el-button v-has="['sys:menu:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button v-has="['sys:menu:delete']" size="mini" type="text"
-                       @click.native.prevent="delItem(menuTableData,scope.row)">删除
+                       @click.native.prevent="handleDelItem(menuTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
@@ -132,8 +132,8 @@
     </el-main>
 
     <el-dialog :title="title" :visible.sync="menuDialogVisible" width="40vw"
-               @close="closeMenuDialog">
-      <el-form ref="menuRuleForm" :model="menu" :rules="rules" size="mini">
+               @close="handleCloseMenuDialog">
+      <el-form ref="menuForm" :model="menu" :rules="rules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="平台" prop="platformId" style="text-align: left;">
           <el-select v-model="menu.platformId" placeholder="请选择所属的平台">
             <el-option
@@ -212,7 +212,7 @@
 
         <el-form-item v-if="menu.type === 0 || menu.type === 1" :label-width="formLabelWidth" label="组件图标"
                       prop="icon">
-          <el-button plain style="margin:0 10px" type="success" @click="showIconDialog">打开</el-button>
+          <el-button plain style="margin:0 10px" type="success" @click="handleShowIconDialog">打开</el-button>
           <Icon :icon-name="menu.icon"/>
           <span> {{ menu.icon }} </span>
         </el-form-item>
@@ -240,13 +240,13 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetMenuForm">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitForm('menuRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="handleCancelMenuForm">取 消</el-button>
+        <el-button size="mini" type="primary" @click="handleSubmitForm('menuForm')">确 定</el-button>
       </div>
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
-               @close="closeInfoDialog">
+               @close="handleCloseInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item label="平台名称">
           {{ menu.platformName }}
@@ -320,7 +320,7 @@
     <Icon-dialog
       ref="iconDialog"
       type="iconfont"
-      @choiceIcon="choiceIcon"/>
+      @choiceIcon="handleChoiceIcon"/>
   </base-container>
 </template>
 
@@ -347,7 +347,7 @@ export default {
       // 弹出框标题
       title: '',
       // 单元格选中数据
-      multipleSelectionMenuId: [],
+      selectionMenuIds: [],
       // 菜单表格数据
       menuTableData: [],
       // 平台下拉框数据
@@ -355,7 +355,7 @@ export default {
       // 菜单下拉框数据
       menuOption: [],
       // 菜单查询条件数据
-      searchMenuForm: {
+      searchMenu: {
         platformId: ROOT,
         name: '',
         title: ''
@@ -473,19 +473,20 @@ export default {
      * @returns {{name: string, platformId: string, title: string}}
      */
     buildParam () {
-      return this.searchMenuForm
+      return this.searchMenu
     },
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList()
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
+    handleSearchReset () {
       this.$refs.searchForm.resetFields()
+      this.reloadList()
     },
     /**
      * 删除行
@@ -493,11 +494,11 @@ export default {
      * @param rows
      * @param row
      */
-    delItem (rows, row) {
+    handleDelItem (rows, row) {
       confirmAlert(() => {
         del(JSONBigInt.parse(row.id)).then(rep => {
           if (rep.code === 1) {
-            this.deleteTreeTableData(rows, row)
+            this.handleDeleteTreeTableData(rows, row)
           }
         })
       })
@@ -508,7 +509,7 @@ export default {
      * @param rows
      * @param row
      */
-    deleteTreeTableData (rows, row) {
+    handleDeleteTreeTableData (rows, row) {
       for (let index = 0; index < rows.length; index++) {
         if (rows[index].id === row.id) {
           rows.splice(index, 1)
@@ -516,7 +517,7 @@ export default {
         }
         const tempTable = rows[index]
         if (tempTable.children && tempTable.children.length > 0) {
-          this.deleteTreeTableData(tempTable.children, row)
+          this.handleDeleteTreeTableData(tempTable.children, row)
         }
       }
     },
@@ -525,8 +526,8 @@ export default {
      *
      * @param val
      */
-    menuHandleExpandChange (val) {
-      this.multipleSelectionMenuId = val
+    handleMenuExpandChange (val) {
+      this.selectionMenuIds = val
       this.$nextTick(() => {
         this.$refs.menuTable.doLayout()
       })
@@ -534,7 +535,7 @@ export default {
     /**
      * 创建
      */
-    create (row) {
+    handleCreate (row) {
       this.title = '创建菜单'
       this.dialogType = DIALOG_TYPE.ADD
       this.$nextTick(() => {
@@ -554,7 +555,7 @@ export default {
      * 修改
      * @param row
      */
-    edit (row) {
+    handleEdit (row) {
       this.title = '修改菜单'
       this.dialogType = DIALOG_TYPE.EDIT
       this.$nextTick(() => {
@@ -569,7 +570,7 @@ export default {
      * 详情
      * @param row
      */
-    info (row) {
+    handleInfo (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.$nextTick(() => {
@@ -583,7 +584,7 @@ export default {
     /**
      * 关闭菜单添加修改弹出框事件
      */
-    closeMenuDialog () {
+    handleCloseMenuDialog () {
       this.$nextTick(() => {
         Object.assign(this.menu, this.menuInfo)
       })
@@ -591,7 +592,7 @@ export default {
     /**
      * 关闭详情弹出框事件
      */
-    closeInfoDialog () {
+    handleCloseInfoDialog () {
       this.$nextTick(() => {
         Object.assign(this.menu, this.menuInfo)
       })
@@ -600,10 +601,10 @@ export default {
      * 添加修改弹出框提交
      * @param formName
      */
-    submitForm (formName) {
+    handleSubmitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
+          this.dialogType === DIALOG_TYPE.ADD ? this.handleSave() : this.handleModify()
         } else {
           console.log('error submit!!')
         }
@@ -612,7 +613,7 @@ export default {
     /**
      * 保存请求
      */
-    save () {
+    handleSave () {
       save(this.menu).then((rep) => {
         if (rep.code === 1) {
           this.$message.success(rep.message)
@@ -624,7 +625,7 @@ export default {
     /**
      * 修改请求
      */
-    modify () {
+    handleModify () {
       modify(this.menu).then((rep) => {
         if (rep.code === 1) {
           this.$message.success(rep.message)
@@ -636,20 +637,20 @@ export default {
     /**
      * 添加修改弹出框重置
      */
-    resetMenuForm () {
+    handleCancelMenuForm () {
       this.menuDialogVisible = false
     },
     /**
      * 打卡icon选择弹出框
      */
-    showIconDialog () {
+    handleShowIconDialog () {
       this.$refs.iconDialog.showIconDialog({})
     },
     /**
      * 选择icon事件
      * @param val
      */
-    choiceIcon (val) {
+    handleChoiceIcon (val) {
       this.menu.icon = val
     },
     /**

@@ -2,7 +2,7 @@ import store from '@/store'
 import { listDict } from '@/api/system/dict'
 
 const sendMsg = (url, msg) => {
-  store.state.msg.stompClient.send(url, {}, JSON.stringify(msg))
+  store.state.msg.stompClient.send(url, { tenantId: localStorage.getItem('X-TENANT-ID') || '' }, JSON.stringify(msg))
 }
 
 const handleListDict = (dictCodes = []) => {

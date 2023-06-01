@@ -1,28 +1,29 @@
 <template>
   <base-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchPermissionForm" class="demo-form-inline"
+      <el-form ref="searchForm" :inline="true" :model="searchPermission" class="demo-form-inline"
                label-width="100px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
-            <el-form-item label="数据权限名称" prop="dataPermissionName">
-              <el-input v-model="searchPermissionForm.permissionName" clearable placeholder="数据权限名称"/>
+            <el-form-item label="数据权限名称" prop="permissionName">
+              <el-input v-model="searchPermission.permissionName" clearable placeholder="数据权限名称"/>
             </el-form-item>
             <el-form-item label="数据权限编码" prop="permissionCode">
-              <el-input v-model="searchPermissionForm.permissionCode" clearable placeholder="数据权限编码"/>
+              <el-input v-model="searchPermission.permissionCode" clearable placeholder="数据权限编码"/>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="searchReset()">重置</el-button>
+              <el-button type="primary" @click="handleSearch()">查询</el-button>
+              <el-button type="info" @click="handleSearchReset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:permission:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:permission:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
-                   @click="remove">删除
+        <el-button v-has="['sys:permission:create']" plain size="mini" type="primary" @click="handleCreate">新建
+        </el-button>
+        <el-button v-has="['sys:permission:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+                   @click="handleRemove">删除
         </el-button>
       </div>
       <el-table
@@ -34,7 +35,7 @@
         empty-text="无数据"
         size="mini"
         stripe
-        @selection-change="permissionHandleSelectionChange">
+        @selection-change="handlePermissionSelectionChange">
         <el-table-column
           type="selection"
           width="55">
@@ -71,19 +72,19 @@
           label="操作"
           width="150">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['sys:permission:modify']" size="mini" type="text" @click="edit(scope.row)">编辑
+            <el-button size="mini" type="text" @click="handleIinfo(scope.row)">查看</el-button>
+            <el-button v-has="['sys:permission:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
             </el-button>
             <el-button v-has="['sys:permission:delete']" size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, permissionTableData,scope.row)">删除
+                       @click.native.prevent="handleRemoveItem(scope.$index, permissionTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchPermissionForm.current"
-          :page-size="searchPermissionForm.size"
+          :current-page="searchPermission.current"
+          :page-size="searchPermission.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -94,8 +95,8 @@
     </el-main>
 
     <el-dialog :title="title" :visible.sync="permissionDialogVisible" width="40vw"
-               @close="closePermissionDialog('permissionRuleForm')">
-      <el-form ref="permissionRuleForm" :model="permission" :rules="permissionRules" size="mini">
+               @close="handleClosePermissionDialog('permissionForm')">
+      <el-form ref="permissionForm" :model="permission" :rules="permissionRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="数据权限名称" prop="permissionName">
           <el-input v-model="permission.permissionName" autocomplete="off" clearable/>
         </el-form-item>
@@ -121,13 +122,13 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetPermissionForm('permissionRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitPermissionForm('permissionRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="handleCancelPermissionForm('permissionForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="submitPermissionForm('permissionForm')">确 定</el-button>
       </div>
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
-               @close="closeInfoDialog">
+               @close="handleCloseInfoDialog">
       <el-descriptions :column="1" border size="mini">
         <el-descriptions-item label="权限名称">
           {{ permission.permissionName }}
@@ -163,10 +164,10 @@ export default {
       // 弹出框标题
       title: '',
       // 单元格选中数据
-      multipleSelectionPermissionIds: [],
+      selectionPermissionIds: [],
       // 部门表格数据
       permissionTableData: [],
-      searchPermissionForm: {
+      searchPermission: {
         permissionName: '',
         permissionCode: '',
         current: 1,
@@ -174,7 +175,7 @@ export default {
       },
       total: 0,
       // 标记删除按钮是否可以点击
-      checkDeleteItem: true,
+      checkDelete: true,
       permissionDialogVisible: false,
       infoDialogVisible: false,
       formLabelWidth: '110px',
@@ -224,8 +225,8 @@ export default {
       list(this.buildParam()).then((response) => {
         if (response.code === 1) {
           this.permissionTableData = response.data.records
-          this.searchPermissionForm.size = response.data.size
-          this.searchPermissionForm.current = response.data.current
+          this.searchPermission.size = response.data.size
+          this.searchPermission.current = response.data.current
           this.total = response.data.total
         }
       })
@@ -238,33 +239,34 @@ export default {
       })
     },
     buildParam () {
-      return this.searchPermissionForm
+      return this.searchPermission
     },
     handleSizeChange (size) {
-      this.searchPermissionForm.size = size
+      this.searchPermission.size = size
       this.reloadList()
     },
     handleCurrentChange (current) {
-      this.searchPermissionForm.current = current
+      this.searchPermission.current = current
       this.reloadList()
     },
-    search () {
+    handleSearch () {
       this.reloadList()
     },
-    searchReset () {
+    handleSearchReset () {
       this.$refs.searchForm.resetFields()
+      this.reloadList()
     },
-    permissionHandleSelectionChange (val) {
-      this.checkDeleteItem = !val.length
-      this.multipleSelectionPermissionIds = val
+    handlePermissionSelectionChange (val) {
+      this.checkDelete = !val.length
+      this.selectionPermissionIds = val
     },
     /**
      * 批量删除
      */
-    remove () {
+    handleRemove () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelectionPermissionIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        this.selectionPermissionIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(response => {
           if (response.code === 1) {
             this.reloadList()
@@ -280,7 +282,7 @@ export default {
      * @param rows
      * @param row
      */
-    removeItem (index, rows, row) {
+    handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
           if (response.code === 1) {
@@ -294,7 +296,7 @@ export default {
     /**
      * 添加
      */
-    create () {
+    handleCreate () {
       this.title = '添加数据权限'
       this.selectDept()
       this.dialogType = DIALOG_TYPE.ADD
@@ -305,7 +307,7 @@ export default {
      *
      * @param row
      */
-    edit: function (row) {
+    handleEdit (row) {
       this.title = '修改数据权限'
       this.dialogType = DIALOG_TYPE.EDIT
       this.permissionDialogVisible = true
@@ -320,7 +322,7 @@ export default {
      *
      * @param row
      */
-    info (row) {
+    handleIinfo (row) {
       this.title = '查看权限信息'
       this.selectDept()
       this.dialogType = DIALOG_TYPE.SHOW
@@ -332,13 +334,13 @@ export default {
     /**
      * 关闭添加修改弹出框
      */
-    closePermissionDialog (formName) {
+    handleClosePermissionDialog (formName) {
       this.$refs[formName].resetFields()
     },
     /**
      * 关闭详情
      */
-    closeInfoDialog () {
+    handleCloseInfoDialog () {
       this.permission = this.permissionInfo
     },
     /**
@@ -348,18 +350,18 @@ export default {
     submitPermissionForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
+          this.dialogType === DIALOG_TYPE.ADD ? this.handelSave() : this.handleModify()
         } else {
           console.log('error submit!!')
           return false
         }
       })
     },
-    resetPermissionForm (formName) {
+    handleCancelPermissionForm (formName) {
       this.permissionDialogVisible = false
       this.$refs[formName].resetFields()
     },
-    save () {
+    handelSave () {
       this.permission.id = undefined
       save(this.permission).then((response) => {
         if (response.code === 1) {
@@ -369,7 +371,7 @@ export default {
         }
       })
     },
-    modify () {
+    handleModify () {
       modify(this.permission).then((response) => {
         if (response.code === 1) {
           this.$message.success('修改成功')

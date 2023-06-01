@@ -1,33 +1,33 @@
 <template>
   <base-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchUserForm" class="demo-form-inline" label-width="80px"
+      <el-form ref="searchForm" :inline="true" :model="searchUser" class="demo-form-inline" label-width="80px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="用户名称" prop="username">
-              <el-input v-model="searchUserForm.username" clearable placeholder="用户名称"/>
+              <el-input v-model="searchUser.username" clearable placeholder="用户名称"/>
             </el-form-item>
             <el-form-item label="手机号" prop="phone">
-              <el-input v-model="searchUserForm.phone" clearable placeholder="手机号"/>
+              <el-input v-model="searchUser.phone" clearable placeholder="手机号"/>
             </el-form-item>
             <el-form-item label="用户编码" prop="userCode">
-              <el-input v-model="searchUserForm.userCode" clearable placeholder="用户编码"/>
+              <el-input v-model="searchUser.userCode" clearable placeholder="用户编码"/>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search">查询</el-button>
-              <el-button type="info" @click="searchReset">重置</el-button>
+              <el-button type="primary" @click="handleSearch">查询</el-button>
+              <el-button type="info" @click="handleSearchReset">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:user:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:user:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
-                   @click="remove">删除
+        <el-button v-has="['sys:user:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
+        <el-button v-has="['sys:user:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+                   @click="handleRemove">删除
         </el-button>
-        <el-button v-has="['sys:user:export']" plain size="mini" type="info" @click="exportInfo">导出</el-button>
-        <el-button v-has="['sys:user:import']" plain size="mini" @click="importInfo">导入</el-button>
+        <el-button v-has="['sys:user:export']" plain size="mini" type="info" @click="handleExport">导出</el-button>
+        <el-button v-has="['sys:user:import']" plain size="mini" @click="handleImport">导入</el-button>
       </div>
       <el-table
         :header-cell-style="{ textAlign: 'center' }"
@@ -38,7 +38,7 @@
         empty-text="无数据"
         size="mini"
         stripe
-        @selection-change="userHandleSelectionChange">
+        @selection-change="handleUserSelectionChange">
         <el-table-column
           v-if="false"
           label="ID"
@@ -90,14 +90,10 @@
           prop="roleNames"
           show-overflow-tooltip>
           <template slot-scope="scope">
-            <el-tag
-              v-for="item in scope.row.sysRoles"
-              :key="item.id"
-              disable-transitions
-              size="mini"
-              style="margin: 0  5px"
-              type="success">
-              {{ item.roleName }}
+            <el-tag v-for="(roleName, index) in scope.row.roleNames"
+                    :key="index"
+                    style="margin: 0 5px;">
+              {{ roleName }}
             </el-tag>
           </template>
         </el-table-column>
@@ -144,10 +140,11 @@
           label="操作"
           width="220">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['sys:user:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
+            <el-button v-has="['sys:user:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
+            </el-button>
             <el-button v-has="['sys:user:delete']" size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, userTableData,scope.row)">删除
+                       @click.native.prevent="handleRemoveItem(scope.$index, userTableData,scope.row)">删除
             </el-button>
             <el-dropdown size="mini" style="margin-left: 5px;" trigger="click" type="primary">
               <span class="el-dropdown-link">
@@ -155,9 +152,9 @@
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </span>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item v-has="['sys:user:resetPass']" command="1" @click.native="resetPass(scope.row)">重置密码
+                <el-dropdown-item v-has="['sys:user:reset']" command="1" @click.native="handleReset(scope.row)">重置密码
                 </el-dropdown-item>
-                <el-dropdown-item v-has="['sys:user:userSetRole']" command="2" @click.native="goRoleView(scope.row)"
+                <el-dropdown-item v-has="['sys:user:setRole']" command="2" @click.native="goRoleView(scope.row)"
                 >角色分配
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -167,8 +164,8 @@
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchUserForm.current"
-          :page-size="searchUserForm.size"
+          :current-page="searchUser.current"
+          :page-size="searchUser.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -178,9 +175,9 @@
       </div>
     </el-main>
 
-    <el-dialog :title="title" :visible.sync="restPasswordDialogVisible" width="40vw"
-               @close="closeRestPasswordDialog('restPasswordRuleForm')">
-      <el-form ref="restPasswordRuleForm" :model="userPassword" :rules="resetPasswordRules" size="mini">
+    <el-dialog :title="title" :visible.sync="restPassDialogVisible" width="40vw"
+               @close="handleCloseRestPassDialog('restPasswordForm')">
+      <el-form ref="restPasswordForm" :model="userPassword" :rules="resetPasswordRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="密码" prop="password">
           <el-input v-model="userPassword.password" autocomplete="off" clearable show-password type="password"/>
         </el-form-item>
@@ -190,14 +187,14 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="restUserPasswordForm('restPasswordRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitRestPasswordForm('restPasswordRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="handleCancelRestForm('restPasswordForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="handleSubmitResetForm('restPasswordForm')">确 定</el-button>
       </div>
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="userDialogVisible" width="40vw"
-               @close="closeUserDialog('userRuleForm')">
-      <el-form ref="userRuleForm" :model="user" :rules="userRules" size="mini" style="padding-right: 15px;">
+               @close="handleCloseUserDialog('userForm')">
+      <el-form ref="userForm" :model="user" :rules="userRules" size="mini" style="padding-right: 15px;">
         <el-form-item style="text-align: center;">
           <el-upload
             :before-upload="beforeAvatarUpload"
@@ -284,14 +281,14 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetUserForm('userRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitUserForm('userRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="handleResetUserForm('userForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="handleSubmitUserForm('userForm')">确 定</el-button>
       </div>
     </el-dialog>
 
-    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
-               @close="closeUserInfoDialog">
-      <el-descriptions :column="2" border size="mini">
+    <el-dialog :title="title" :visible.sync="infoDialogVisible" width="60vw"
+               @close="handleCloseUserInfoDialog">
+      <el-descriptions :column="1" border size="mini">
         <el-descriptions-item label="用户名">
           {{ user.username }}
         </el-descriptions-item>
@@ -318,8 +315,12 @@
         <el-descriptions-item label="性别">
           {{ this.descriptions()(user, 'sex', 'SEX') }}
         </el-descriptions-item>
-        <el-descriptions-item label="用户角色">
-          {{ user.roleNames.length > 0 ? user.roleNames : '' }}
+        <el-descriptions-item v-if="user.roleNames.length > 0" label="用户角色">
+          <el-tag v-for="(roleName, index) in user.roleNames"
+                  :key="index"
+                  style="margin: 0 5px;">
+            {{ roleName }}
+          </el-tag>
         </el-descriptions-item>
         <el-descriptions-item label="身份证">
           {{ user.idCard }}
@@ -373,11 +374,11 @@ export default {
       // 弹出框标题
       title: '',
       // 单元格选中数据
-      multipleSelectionUserId: [],
+      selectionUserIds: [],
       // 用户表格数据
       userTableData: [],
       // 用户查询条件数据
-      searchUserForm: {
+      searchUser: {
         username: '',
         userCode: '',
         phone: '',
@@ -387,9 +388,9 @@ export default {
       // 分页总数
       total: 0,
       // 标记删除按钮是否可以点击
-      checkDeleteItem: true,
+      checkDelete: true,
       // 重置密码弹出框
-      restPasswordDialogVisible: false,
+      restPassDialogVisible: false,
       // 用户添加修改弹出框
       userDialogVisible: false,
       // 详情弹出框
@@ -493,7 +494,7 @@ export default {
                 callback(new Error('请输入密码'))
               } else {
                 if (this.user.confirmPassword !== '') {
-                  this.$refs.userRuleForm.validateField('confirmPassword')
+                  this.$refs.userForm.validateField('confirmPassword')
                 }
                 callback()
               }
@@ -548,7 +549,7 @@ export default {
                 callback(new Error('请输入密码'))
               } else {
                 if (this.userPassword.confirmPassword !== '') {
-                  this.$refs.restPasswordRuleForm.validateField('confirmPassword')
+                  this.$refs.restPasswordForm.validateField('confirmPassword')
                 }
                 callback()
               }
@@ -591,8 +592,8 @@ export default {
       list(this.buildParam()).then((response) => {
         this.avatarUrl = ''
         this.userTableData = response.data.records
-        this.searchUserForm.size = response.data.size
-        this.searchUserForm.current = response.data.current
+        this.searchUser.size = response.data.size
+        this.searchUser.current = response.data.current
         this.total = response.data.total
       })
     },
@@ -638,7 +639,7 @@ export default {
      */
     buildParam () {
       this.userTableData = []
-      return this.searchUserForm
+      return this.searchUser
     },
     /**
      * 分页大小切换
@@ -646,7 +647,7 @@ export default {
      * @param size
      */
     handleSizeChange (size) {
-      this.searchUserForm.size = size
+      this.searchUser.size = size
       this.reloadList()
     },
     /**
@@ -655,37 +656,38 @@ export default {
      * @param current
      */
     handleCurrentChange (current) {
-      this.searchUserForm.current = current
+      this.searchUser.current = current
       this.reloadList()
     },
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList()
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
+    handleSearchReset () {
       this.$refs.searchForm.resetFields()
+      this.reloadList()
     },
     /**
      * 平台表格复选框事件
      *
      * @param val
      */
-    userHandleSelectionChange (val) {
-      this.checkDeleteItem = !val.length
-      this.multipleSelectionUserId = val
+    handleUserSelectionChange (val) {
+      this.checkDelete = !val.length
+      this.selectionUserIds = val
     },
     /**
      * 批量删除
      */
-    remove () {
+    handleRemove () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelectionUserId.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        this.selectionUserIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(response => {
           if (response.code === 1) {
             this.reloadList()
@@ -701,7 +703,7 @@ export default {
      * @param rows
      * @param row
      */
-    removeItem (index, rows, row) {
+    handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
           if (response.code === 1) {
@@ -715,7 +717,7 @@ export default {
     /**
      *导出
      */
-    exportInfo () {
+    handleExport () {
       exportInfo().then(response => {
         const blob = new Blob([response.data],
           {
@@ -730,21 +732,22 @@ export default {
     /**
      * 导入
      */
-    importInfo () {
+    handleImport () {
     },
     /**
      * 创建
      */
-    create () {
+    handleCreate () {
       this.title = '创建用户'
       this.dialogType = DIALOG_TYPE.ADD
       this.userDialogVisible = true
     },
     /**
      * 修改
+     *
      * @param row
      */
-    edit (row) {
+    handleEdit (row) {
       this.title = '修改用户'
       this.dialogType = DIALOG_TYPE.EDIT
       info(row.id).then(response => {
@@ -762,7 +765,7 @@ export default {
      * 详情
      * @param row
      */
-    info (row) {
+    handleInfo (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       info(row.id).then(response => {
@@ -777,9 +780,10 @@ export default {
     },
     /**
      * 关闭用户添加修改弹出框事件
+     *
      * @param formName
      */
-    closeUserDialog (formName) {
+    handleCloseUserDialog (formName) {
       this.user.id = undefined
       this.$refs[formName].resetFields()
       this.user = this.userInfo
@@ -787,17 +791,17 @@ export default {
     /**
      * 关闭详情弹出框事件
      */
-    closeUserInfoDialog () {
+    handleCloseUserInfoDialog () {
       this.user = this.userInfo
     },
     /**
      * 添加修改弹出框提交
      * @param formName
      */
-    submitUserForm: function (formName) {
+    handleSubmitUserForm: function (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
+          this.dialogType === DIALOG_TYPE.ADD ? this.handleSave() : this.handleModify()
         } else {
           console.log('error submit!!')
           return false
@@ -807,7 +811,7 @@ export default {
     /**
      * 保存请求
      */
-    save () {
+    handleSave () {
       save(this.user).then((response) => {
         if (response.code === 1) {
           this.$message.success({ message: response.message })
@@ -819,7 +823,7 @@ export default {
     /**
      * 修改请求
      */
-    modify () {
+    handleModify () {
       modify(this.user).then((response) => {
         if (response.code === 1) {
           this.$message.success({ message: response.message })
@@ -833,7 +837,7 @@ export default {
      *
      * @param formName
      */
-    resetUserForm (formName) {
+    handleResetUserForm (formName) {
       this.userDialogVisible = false
       this.$refs[formName].resetFields()
     },
@@ -842,8 +846,8 @@ export default {
      *
      * @param row
      */
-    resetPass (row) {
-      this.restPasswordDialogVisible = true
+    handleReset (row) {
+      this.restPassDialogVisible = true
       this.$nextTick(() => {
         Object.assign(this.userPassword, row)
       })
@@ -853,13 +857,13 @@ export default {
      *
      * @param formName
      */
-    submitRestPasswordForm (formName) {
+    handleSubmitResetForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           resetPass(this.userPassword).then(response => {
             if (response.code === 1) {
               this.$message.success({ message: '重置成功' })
-              this.restPasswordDialogVisible = false
+              this.restPassDialogVisible = false
             }
           })
         } else {
@@ -873,8 +877,8 @@ export default {
      *
      * @param formName
      */
-    restUserPasswordForm (formName) {
-      this.restPasswordDialogVisible = false
+    handleCancelRestForm (formName) {
+      this.restPassDialogVisible = false
       this.$refs[formName].resetFields()
     },
     /**
@@ -882,7 +886,7 @@ export default {
      *
      * @param formName
      */
-    closeRestPasswordDialog (formName) {
+    handleCloseRestPassDialog (formName) {
       this.user.id = undefined
       this.$refs[formName].resetFields()
     },

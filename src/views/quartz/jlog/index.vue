@@ -1,13 +1,13 @@
 <template>
   <el-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchJobLogForm" class="demo-form-inline" label-width="80px"
+      <el-form ref="searchForm" :inline="true" :model="searchJobLog" class="demo-form-inline" label-width="80px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="日志时间" prop="searchDate">
               <el-date-picker
-                v-model="searchJobLogForm.searchDate"
+                v-model="searchJobLog.searchDate"
                 clearable
                 end-placeholder="结束日期"
                 format="yyyy-MM-dd HH:mm:ss"
@@ -18,18 +18,18 @@
               </el-date-picker>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="searchReset()">重置</el-button>
+              <el-button type="primary" @click="handleSearch()">查询</el-button>
+              <el-button type="info" @click="handleSearchReset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
 
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:jLog:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
-                   @click="remove">删除
+        <el-button v-has="['sys:jLog:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+                   @click="handleRemove">删除
         </el-button>
-        <el-button v-has="['sys:jLog:truncate']" plain size="mini" type="danger" @click="truncate">清空全表</el-button>
+        <el-button v-has="['sys:jLog:truncate']" plain size="mini" type="danger" @click="handleTruncate">清空全表</el-button>
       </div>
 
       <el-table
@@ -41,7 +41,7 @@
         height="60vh"
         size="mini"
         stripe
-        @selection-change="jobLogHandleSelectionChange">
+        @selection-change="handleJobLogSelectionChange">
         <el-table-column
           type="selection"
           width="55">
@@ -93,9 +93,9 @@
           label="操作"
           width="100">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
+            <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
             <el-button v-has="['sys:jLog:delete']" size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, jobLogTableData,scope.row)">
+                       @click.native.prevent="handleRemoveItem(scope.$index, jobLogTableData,scope.row)">
               删除
             </el-button>
           </template>
@@ -103,8 +103,8 @@
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchJobLogForm.current"
-          :page-size="searchJobLogForm.size"
+          :current-page="searchJobLog.current"
+          :page-size="searchJobLog.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -167,7 +167,7 @@ export default {
       // 日志表格数据
       jobLogTableData: [],
       // 日志查询条件数据
-      searchJobLogForm: {
+      searchJobLog: {
         jobName: this.$route.query.jobName,
         searchDate: '',
         stateDate: '',
@@ -178,7 +178,7 @@ export default {
       // 分页总数
       total: 0,
       // 标记删除按钮是否可以点击
-      checkDeleteItem: true,
+      checkDelete: true,
       // 日志详情弹出框
       infoDialogVisible: false,
       // 表单标题宽度
@@ -208,8 +208,8 @@ export default {
       list(this.buildParam()).then((response) => {
         if (response.code === 1) {
           this.jobLogTableData = response.data.records
-          this.searchJobLogForm.size = response.data.size
-          this.searchJobLogForm.current = response.data.current
+          this.searchJobLog.size = response.data.size
+          this.searchJobLog.current = response.data.current
           this.total = response.data.total
         }
       })
@@ -220,9 +220,9 @@ export default {
      * @returns {{current: number, size: number}}
      */
     buildParam () {
-      this.searchJobLogForm.startDate = this.searchJobLogForm.searchDate[0]
-      this.searchJobLogForm.endDate = this.searchJobLogForm.searchDate[1]
-      return this.searchJobLogForm
+      this.searchJobLog.startDate = this.searchJobLog.searchDate[0]
+      this.searchJobLog.endDate = this.searchJobLog.searchDate[1]
+      return this.searchJobLog
     },
     /**
      * 分页大小切换
@@ -230,7 +230,7 @@ export default {
      * @param size
      */
     handleSizeChange (size) {
-      this.searchJobLogForm.size = size
+      this.searchJobLog.size = size
       this.reloadList()
     },
     /**
@@ -239,34 +239,35 @@ export default {
      * @param current
      */
     handleCurrentChange (current) {
-      this.searchJobLogForm.current = current
+      this.searchJobLog.current = current
       this.reloadList()
     },
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList()
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
-      this.$refs.searchJobLogForm.resetFields()
+    handleSearchReset () {
+      this.$refs.searchJobLog.resetFields()
+      this.reloadList()
     },
     /**
      * 平台表格复选框事件
      *
      * @param val
      */
-    jobLogHandleSelectionChange (val) {
-      this.checkDeleteItem = !val.length
+    handleJobLogSelectionChange (val) {
+      this.checkDelete = !val.length
       this.multipleSelectionJobLogId = val
     },
     /**
      * 批量删除
      */
-    remove () {
+    handleRemove () {
       confirmAlert(() => {
         const ids = []
         this.multipleSelectionJobLogId.map((x) => ids.push(JSONBigInt.parse(x.id)))
@@ -281,7 +282,7 @@ export default {
     /**
      * 清空
      */
-    truncate () {
+    handleTruncate () {
       confirmAlert(() => {
         truncate().then((response) => {
           this.$message.success('全部清空')
@@ -296,7 +297,7 @@ export default {
      * @param rows
      * @param row
      */
-    removeItem (index, rows, row) {
+    handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
           if (response.code === 1) {
@@ -312,7 +313,7 @@ export default {
      *
      * @param row
      */
-    info (row) {
+    handleInfo (row) {
       this.title = '查看详情信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true

@@ -1,27 +1,27 @@
 <template>
   <base-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchTenantForm" class="demo-form-inline" label-width="80px"
+      <el-form ref="searchForm" :inline="true" :model="searchTenant" class="demo-form-inline" label-width="80px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="租户名称" prop="tenantName">
-              <el-input v-model="searchTenantForm.tenantName" clearable placeholder="租户名称"/>
+              <el-input v-model="searchTenant.tenantName" clearable placeholder="租户名称"/>
             </el-form-item>
             <el-form-item label="租户编码" prop="tenantCode">
-              <el-input v-model="searchTenantForm.tenantCode" clearable placeholder="租户编码"/>
+              <el-input v-model="searchTenant.tenantCode" clearable placeholder="租户编码"/>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="searchReset()">重置</el-button>
+              <el-button type="primary" @click="handleSearch()">查询</el-button>
+              <el-button type="info" @click="handleSearchReset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:tenant:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:tenant:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
-                   @click="remove">删除
+        <el-button v-has="['sys:tenant:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
+        <el-button v-has="['sys:tenant:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+                   @click="handleRemove">删除
         </el-button>
       </div>
       <el-table
@@ -33,7 +33,7 @@
         empty-text="无数据"
         size="mini"
         stripe
-        @selection-change="tenantHandleSelectionChange">
+        @selection-change="handleTenantSelectionChange">
         <el-table-column
           type="selection"
           width="55">
@@ -64,18 +64,19 @@
           label="操作"
           width="150">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['sys:tenant:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
+            <el-button v-has="['sys:tenant:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
+            </el-button>
             <el-button v-has="['sys:tenant:delete']" size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, tenantTableData,scope.row)">删除
+                       @click.native.prevent="handleRemoveItem(scope.$index, tenantTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchTenantForm.current"
-          :page-size="searchTenantForm.size"
+          :current-page="searchTenant.current"
+          :page-size="searchTenant.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -86,8 +87,8 @@
     </el-main>
 
     <el-dialog :title="title" :visible.sync="tenantDialogVisible" width="40vw"
-               @close="closeTenantDialog('tenantRuleForm')">
-      <el-form ref="tenantRuleForm" :model="tenant" :rules="tenantRules" size="mini">
+               @close="handleCloseTenantDialog('tenantForm')">
+      <el-form ref="tenantForm" :model="tenant" :rules="tenantRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="租户名称" prop="tenantName">
           <el-input v-model="tenant.tenantName" autocomplete="off" clearable/>
         </el-form-item>
@@ -96,13 +97,13 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetTenantForm('tenantRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitTenantForm('tenantRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="handleCancelTenantForm('tenantForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="handleSubmitTenantForm('tenantForm')">确 定</el-button>
       </div>
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
-               @close="closeInfoDialog">
+               @close="handleCloseInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item label="租户名称">
           {{ tenant.tenantName }}
@@ -133,11 +134,11 @@ export default {
       // 弹出框标题
       title: '',
       // 单元格选中数据
-      multipleSelectionTenantIds: [],
+      selectionTenantIds: [],
       // 租户表格数据
       tenantTableData: [],
       // 租户查询条件数据
-      searchTenantForm: {
+      searchTenant: {
         tenantName: '',
         tenantCode: '',
         current: 1,
@@ -146,7 +147,7 @@ export default {
       // 分页总数
       total: 0,
       // 标记删除按钮是否可以点击
-      checkDeleteItem: true,
+      checkDelete: true,
       // 租户添加修改弹出框
       tenantDialogVisible: false,
       // 用户添加修改弹出框
@@ -209,8 +210,8 @@ export default {
       list(this.buildParam()).then((response) => {
         if (response.code === 1) {
           this.tenantTableData = response.data.records
-          this.searchTenantForm.size = response.data.size
-          this.searchTenantForm.current = response.data.current
+          this.searchTenant.size = response.data.size
+          this.searchTenant.current = response.data.current
           this.total = response.data.total
         }
       })
@@ -221,7 +222,7 @@ export default {
      * @returns {{current: number, tenantName: string, size: number, tenantCode: string}}
      */
     buildParam () {
-      return this.searchTenantForm
+      return this.searchTenant
     },
     /**
      * 分页大小切换
@@ -229,7 +230,7 @@ export default {
      * @param size
      */
     handleSizeChange (size) {
-      this.searchTenantForm.size = size
+      this.searchTenant.size = size
       this.reloadList()
     },
     /**
@@ -238,37 +239,38 @@ export default {
      * @param current
      */
     handleCurrentChange (current) {
-      this.searchTenantForm.current = current
+      this.searchTenant.current = current
       this.reloadList()
     },
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList()
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
+    handleSearchReset () {
       this.$refs.searchForm.resetFields()
+      this.reloadList()
     },
     /**
      * 租户表格复选框事件
      *
      * @param val
      */
-    tenantHandleSelectionChange (val) {
-      this.checkDeleteItem = !val.length
-      this.multipleSelectionTenantIds = val
+    handleTenantSelectionChange (val) {
+      this.checkDelete = !val.length
+      this.selectionTenantIds = val
     },
     /**
      * 批量删除
      */
-    remove () {
+    handleRemove () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelectionTenantIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        this.selectionTenantIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(response => {
           if (response.code === 1) {
             this.reloadList()
@@ -284,7 +286,7 @@ export default {
      * @param rows
      * @param row
      */
-    removeItem (index, rows, row) {
+    handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
           if (response.code === 1) {
@@ -298,7 +300,7 @@ export default {
     /**
      * 创建
      */
-    create () {
+    handleCreate () {
       this.title = '创建租户'
       this.dialogType = DIALOG_TYPE.ADD
       this.tenantDialogVisible = true
@@ -307,7 +309,7 @@ export default {
      * 修改
      * @param row
      */
-    edit (row) {
+    handleEdit (row) {
       this.title = '修改租户'
       this.dialogType = DIALOG_TYPE.EDIT
       this.tenantDialogVisible = true
@@ -320,7 +322,7 @@ export default {
      *
      * @param row
      */
-    info (row) {
+    handleInfo (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
@@ -333,14 +335,14 @@ export default {
      *
      * @param formName
      */
-    closeTenantDialog (formName) {
+    handleCloseTenantDialog (formName) {
       this.tenant.id = undefined
       this.$refs[formName].resetFields()
     },
     /**
      * 关闭详情弹出框事件
      */
-    closeInfoDialog () {
+    handleCloseInfoDialog () {
       this.tenant = this.tenantInfo
     },
     /**
@@ -348,10 +350,10 @@ export default {
      *
      * @param formName
      */
-    submitTenantForm (formName) {
+    handleSubmitTenantForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
+          this.dialogType === DIALOG_TYPE.ADD ? this.handleSave() : this.handleModify()
         } else {
           console.log('error submit!!')
           return false
@@ -361,7 +363,7 @@ export default {
     /**
      * 保存请求
      */
-    save () {
+    handleSave () {
       this.tenant.id = undefined
       save(this.tenant).then((response) => {
         if (response.code === 1) {
@@ -374,7 +376,7 @@ export default {
     /**
      * 修改请求
      */
-    modify () {
+    handleModify () {
       modify(this.tenant).then((response) => {
         if (response.code === 1) {
           this.$message.success('修改成功')
@@ -388,7 +390,7 @@ export default {
      *
      * @param formName
      */
-    resetTenantForm (formName) {
+    handleCancelTenantForm (formName) {
       this.tenantDialogVisible = false
       this.$refs[formName].resetFields()
     }

@@ -1,27 +1,27 @@
 <template>
   <base-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchPostForm" class="demo-form-inline" label-width="80px"
+      <el-form ref="searchForm" :inline="true" :model="searchPost" class="demo-form-inline" label-width="80px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="平台名称" prop="postName">
-              <el-input v-model="searchPostForm.postName" clearable placeholder="岗位名称"/>
+              <el-input v-model="searchPost.postName" clearable placeholder="岗位名称"/>
             </el-form-item>
             <el-form-item label="岗位编码" prop="postCode">
-              <el-input v-model="searchPostForm.postCode" clearable placeholder="岗位编码"/>
+              <el-input v-model="searchPost.postCode" clearable placeholder="岗位编码"/>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="searchReset()">重置</el-button>
+              <el-button type="primary" @click="handleSearch()">查询</el-button>
+              <el-button type="info" @click="handleSearchReset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:post:create']" plain size="mini" type="primary" @click="create">新建</el-button>
+        <el-button v-has="['sys:post:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
         <el-button v-has="['sys:post:delete']"
-                   :disabled="checkDeleteItem" plain size="mini" type="danger" @click="remove">删除
+                   :disabled="checkDelete" plain size="mini" type="danger" @click="handleRemove">删除
         </el-button>
       </div>
       <el-table
@@ -33,7 +33,7 @@
         empty-text="无数据"
         size="mini"
         stripe
-        @selection-change="postHandleSelectionChange">
+        @selection-change="handlePostSelectionChange">
         <el-table-column
           type="selection"
           width="55">
@@ -65,18 +65,19 @@
           label="操作"
           width="150">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['sys:post:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
+            <el-button v-has="['sys:post:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
+            </el-button>
             <el-button v-has="['sys:post:delete']" size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, postTableData,scope.row)">删除
+                       @click.native.prevent="handleRemoveItem(scope.$index, postTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchPostForm.current"
-          :page-size="searchPostForm.size"
+          :current-page="searchPost.current"
+          :page-size="searchPost.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -87,8 +88,8 @@
     </el-main>
 
     <el-dialog :title="title" :visible.sync="postDialogVisible" width="40vw"
-               @close="closePostDialog('postRuleForm')">
-      <el-form ref="postRuleForm" :model="post" :rules="postRules" size="mini">
+               @close="handleClosePostDialog('postForm')">
+      <el-form ref="postForm" :model="post" :rules="postRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="岗位名称" prop="postName">
           <el-input v-model="post.postName" autocomplete="off" clearable/>
         </el-form-item>
@@ -100,13 +101,13 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetPostForm('postRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitPostForm('postRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="handleCancelPostForm('postForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="handleSubmitPostForm('postForm')">确 定</el-button>
       </div>
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
-               @close="closeInfoDialog">
+               @close="handleCloseInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item label="岗位名称">
           {{ post.postName }}
@@ -137,11 +138,11 @@ export default {
       // 弹出框标题
       title: '',
       // 单元格选中数据
-      multipleSelectionPostIds: [],
+      selectionPostIds: [],
       // 岗位表格数据
       postTableData: [],
       // 岗位查询条件数据
-      searchPostForm: {
+      searchPost: {
         postName: '',
         postCode: '',
         current: 1,
@@ -150,7 +151,7 @@ export default {
       // 分页总数
       total: 0,
       // 标记删除按钮是否可以点击
-      checkDeleteItem: true,
+      checkDelete: true,
       // 岗位添加修改弹出框
       postDialogVisible: false,
       // 岗位详情弹出框
@@ -210,8 +211,8 @@ export default {
     reloadList () {
       list(this.buildParam()).then((response) => {
         this.postTableData = response.data.records
-        this.searchPostForm.size = response.data.size
-        this.searchPostForm.current = response.data.current
+        this.searchPost.size = response.data.size
+        this.searchPost.current = response.data.current
         this.total = response.data.total
       })
     },
@@ -221,7 +222,7 @@ export default {
      * @returns {{current: number, size: number, postName: string, postCode: string}}
      */
     buildParam () {
-      return this.searchPostForm
+      return this.searchPost
     },
     /**
      * 分页大小切换
@@ -229,7 +230,7 @@ export default {
      * @param size
      */
     handleSizeChange (size) {
-      this.searchPostForm.size = size
+      this.searchPost.size = size
       this.reloadList()
     },
     /**
@@ -238,37 +239,38 @@ export default {
      * @param current
      */
     handleCurrentChange (current) {
-      this.searchPostForm.current = current
+      this.searchPost.current = current
       this.reloadList()
     },
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList()
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
+    handleSearchReset () {
       this.$refs.searchForm.resetFields()
+      this.reloadList()
     },
     /**
      * 平台表格复选框事件
      *
      * @param val
      */
-    postHandleSelectionChange (val) {
-      this.checkDeleteItem = !val.length
-      this.multipleSelectionPostIds = val
+    handlePostSelectionChange (val) {
+      this.checkDelete = !val.length
+      this.selectionPostIds = val
     },
     /**
      * 批量删除
      */
-    remove () {
+    handleRemove () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelectionPostIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        this.selectionPostIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(response => {
           if (response.code === 1) {
             this.reloadList()
@@ -284,7 +286,7 @@ export default {
      * @param rows
      * @param row
      */
-    removeItem (index, rows, row) {
+    handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
           if (response.code === 1) {
@@ -297,7 +299,7 @@ export default {
     /**
      * 创建
      */
-    create () {
+    handleCreate () {
       this.title = '创建岗位'
       this.dialogType = DIALOG_TYPE.ADD
       this.postDialogVisible = true
@@ -306,7 +308,7 @@ export default {
      * 修改
      * @param row
      */
-    edit (row) {
+    handleEdit (row) {
       this.title = '修改岗位'
       this.dialogType = DIALOG_TYPE.EDIT
       this.postDialogVisible = true
@@ -318,7 +320,7 @@ export default {
      * 详情
      * @param row
      */
-    info (row) {
+    handleInfo (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
@@ -330,24 +332,24 @@ export default {
      * 关闭岗位添加修改弹出框事件
      * @param formName
      */
-    closePostDialog (formName) {
+    handleClosePostDialog (formName) {
       this.post.id = undefined
       this.$refs[formName].resetFields()
     },
     /**
      * 关闭详情弹出框事件
      */
-    closeInfoDialog () {
+    handleCloseInfoDialog () {
       this.post = this.postInfo
     },
     /**
      * 提交
      * @param formName
      */
-    submitPostForm (formName) {
+    handleSubmitPostForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
+          this.dialogType === DIALOG_TYPE.ADD ? this.handleSave() : this.handleModify()
         } else {
           console.log('error submit!!')
           return false
@@ -357,7 +359,7 @@ export default {
     /**
      * 保存请求
      */
-    save () {
+    handleSave () {
       this.post.id = undefined
       save(this.post).then((response) => {
         if (response.code === 1) {
@@ -370,7 +372,7 @@ export default {
     /**
      * 修改请求
      */
-    modify () {
+    handleModify () {
       modify(this.post).then((response) => {
         if (response.code === 1) {
           this.$message.success('修改成功')
@@ -383,7 +385,7 @@ export default {
      * 添加修改弹出框重置
      * @param formName
      */
-    resetPostForm (formName) {
+    handleCancelPostForm (formName) {
       this.postDialogVisible = false
       this.$refs[formName].resetFields()
     }

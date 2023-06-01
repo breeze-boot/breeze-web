@@ -24,14 +24,14 @@ export function startProcess (data) {
 /**
  * 列表
  *
- * @param data
+ * @param params
  * @returns {AxiosPromise}
  */
-export function list (data) {
+export function list (params) {
   return request({
-    url: servicePath.flow + '/instance/list',
-    method: 'post',
-    data: data,
+    url: servicePath.flow + '/instance',
+    method: 'get',
+    params: params,
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)
     }]
@@ -46,7 +46,7 @@ export function list (data) {
  */
 export function del (id) {
   return request({
-    url: servicePath.flow + '/instance/delete',
+    url: servicePath.flow + '/instance',
     method: 'delete',
     params: id
   })

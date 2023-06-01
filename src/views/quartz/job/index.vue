@@ -1,15 +1,15 @@
 <template>
   <el-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchJobForm" class="demo-form-inline" label-width="80px"
+      <el-form ref="searchForm" :inline="true" :model="searchJob" class="demo-form-inline" label-width="80px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="任务名" prop="jobName">
-              <el-input v-model="searchJobForm.jobName" clearable placeholder="任务名称"/>
+              <el-input v-model="searchJob.jobName" clearable placeholder="任务名称"/>
             </el-form-item>
             <el-form-item label="任务组名" prop="jobGroupName">
-              <el-select v-model="searchJobForm.jobGroupName" collapse-tags filterable placeholder="请选择任务组">
+              <el-select v-model="searchJob.jobGroupName" collapse-tags filterable placeholder="请选择任务组">
                 <el-option
                   v-for="item in this.dict()('JOB_GROUP')"
                   :key="item.key"
@@ -19,16 +19,16 @@
               </el-select>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="searchReset()">重置</el-button>
+              <el-button type="primary" @click="handleSearch()">查询</el-button>
+              <el-button type="info" @click="handleSearchReset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:job:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:job:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
-                   @click="remove">删除
+        <el-button v-has="['sys:job:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
+        <el-button v-has="['sys:job:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+                   @click="handleRemove">删除
         </el-button>
       </div>
       <el-table
@@ -40,7 +40,7 @@
         empty-text="无数据"
         size="mini"
         stripe
-        @selection-change="jobHandleSelectionChange">
+        @selection-change="handleJobSelectionChange">
         <el-table-column
           type="selection"
           width="55">
@@ -109,21 +109,21 @@
           label="操作"
           width="270">
           <template slot-scope="scope">
-            <el-button v-has="['sys:job:run']" size="mini" type="text" @click="runJobNow(scope.row)">运行一次
+            <el-button v-has="['sys:job:run']" size="mini" type="text" @click="handleRunJobNow(scope.row)">运行一次
             </el-button>
-            <el-button size="mini" type="text" @click="jobLog(scope.row)">查看运行情况</el-button>
-            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['sys:job:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="handleJobLog(scope.row)">查看运行情况</el-button>
+            <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
+            <el-button v-has="['sys:job:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button v-has="['sys:job:delete']" size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, jobTableData,scope.row)">删除
+                       @click.native.prevent="handleRemoveItem(scope.$index, jobTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchJobForm.current"
-          :page-size="searchJobForm.size"
+          :current-page="searchJob.current"
+          :page-size="searchJob.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -134,9 +134,9 @@
     </el-main>
 
     <el-dialog :title="title" :visible.sync="jobDialogVisible" width="40vw"
-               @close="closeJobDialog('jobRuleForm')">
-      <el-form ref="jobRuleForm" :model="job" :rules="jobRules" size="mini">
-        <el-form-item :label-width="formLabelWidth" label="任务名" prop="jobName">
+               @close="handleCloseJobDialog('jobForm')">
+      <el-form ref="jobForm" :model="job" :rules="jobRules" size="mini">
+        <el-form-item :labelwidth="formLabelWidth" label="任务名" prop="jobName">
           <el-input v-model="job.jobName" autocomplete="off" clearable placeholder="请输入任务名"/>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="任务组名" prop="jobGroupName">
@@ -152,7 +152,7 @@
         <el-form-item :label-width="formLabelWidth" label="cron" prop="cronExpression">
           <el-input v-model="job.cronExpression" autocomplete="off" clearable placeholder="请设置cron表达式"
                     style="width: 500px;"/>
-          <el-button type="primary" @click="showDialog">生成 cron</el-button>
+          <el-button type="primary" @click="handleShowDialog">生成 cron</el-button>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="调用方法" prop="clazzName">
           <el-input v-model="job.clazzName" autocomplete="off" clearable
@@ -185,13 +185,13 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetJobForm('jobRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitJobForm('jobRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="handleResetJobForm('jobForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="handleSubmitJobForm('jobForm')">确 定</el-button>
       </div>
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
-               @close="closeInfoDialog">
+               @close="handleCloseInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item label="任务名">
           {{ job.jobName }}
@@ -218,7 +218,7 @@
     </el-dialog>
 
     <el-dialog :visible.sync="cronDialogVisible" title="生成 cron">
-      <vcrontab :expression="dialogCron" @fill="crontabFill" @hide="cronDialogVisible=false"></vcrontab>
+      <vcrontab :expression="dialogCron" @fill="handleCrontabFill" @hide="cronDialogVisible=false"></vcrontab>
     </el-dialog>
   </el-container>
 </template>
@@ -248,7 +248,7 @@ export default {
       // 任务表格数据
       jobTableData: [],
       // 任务查询条件数据
-      searchJobForm: {
+      searchJob: {
         jobName: '',
         jobGroupName: '',
         current: 1,
@@ -257,7 +257,7 @@ export default {
       // 分页总数
       total: 0,
       // 标记删除按钮是否可以点击
-      checkDeleteItem: true,
+      checkDelete: true,
       // 任务添加修改弹出框
       jobDialogVisible: false,
       // 任务详情弹出框
@@ -334,8 +334,8 @@ export default {
     reloadList () {
       list(this.buildParam()).then((response) => {
         this.jobTableData = response.data.records
-        this.searchJobForm.size = response.data.size
-        this.searchJobForm.current = response.data.current
+        this.searchJob.size = response.data.size
+        this.searchJob.current = response.data.current
         this.total = response.data.total
       })
     },
@@ -345,7 +345,7 @@ export default {
      * @returns {{current: number, size: number, jobName: string, jobGroupName: string}}
      */
     buildParam () {
-      return this.searchJobForm
+      return this.searchJob
     },
     /**
      * 分页大小切换
@@ -353,7 +353,7 @@ export default {
      * @param size
      */
     handleSizeChange (size) {
-      this.searchJobForm.size = size
+      this.searchJob.size = size
       this.reloadList()
     },
     /**
@@ -362,34 +362,35 @@ export default {
      * @param current
      */
     handleCurrentChange (current) {
-      this.searchJobForm.current = current
+      this.searchJob.current = current
       this.reloadList()
     },
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList()
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
+    handleSearchReset () {
       this.$refs.searchForm.resetFields()
+      this.reloadList()
     },
     /**
      * 任务表格复选框事件
      *
      * @param val
      */
-    jobHandleSelectionChange (val) {
-      this.checkDeleteItem = !val.length
+    handleJobSelectionChange (val) {
+      this.checkDelete = !val.length
       this.multipleSelectionJobIds = val
     },
     /**
      * 批量删除
      */
-    remove () {
+    handleRemove () {
       confirmAlert(() => {
         const ids = []
         this.multipleSelectionJobIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
@@ -408,7 +409,7 @@ export default {
      * @param rows
      * @param row
      */
-    removeItem (index, rows, row) {
+    handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
           if (response.code === 1) {
@@ -422,7 +423,7 @@ export default {
     /**
      * 创建
      */
-    create () {
+    handleCreate () {
       this.title = '创建任务'
       this.dialogType = DIALOG_TYPE.ADD
       this.jobDialogVisible = true
@@ -431,7 +432,7 @@ export default {
      * 修改
      * @param row
      */
-    edit (row) {
+    handleEdit (row) {
       this.title = '修改任务'
       this.dialogType = DIALOG_TYPE.EDIT
       this.jobDialogVisible = true
@@ -444,7 +445,7 @@ export default {
      *
      * @param row
      */
-    info (row) {
+    handleInfo (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
@@ -457,14 +458,14 @@ export default {
      *
      * @param formName
      */
-    closeJobDialog (formName) {
+    handleCloseJobDialog (formName) {
       this.job.id = undefined
       this.$refs[formName].resetFields()
     },
     /**
      * 关闭详情弹出框事件
      */
-    closeInfoDialog () {
+    handleCloseInfoDialog () {
       this.job = this.jobInfo
     },
     /**
@@ -472,10 +473,10 @@ export default {
      *
      * @param formName
      */
-    submitJobForm (formName) {
+    handleSubmitJobForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
+          this.dialogType === DIALOG_TYPE.ADD ? this.handleSave() : this.handleModify()
         } else {
           console.log('error submit!!')
           return false
@@ -485,7 +486,7 @@ export default {
     /**
      * 保存请求
      */
-    save () {
+    handleSave () {
       this.job.id = undefined
       save(this.job).then((response) => {
         if (response.code === 1) {
@@ -498,7 +499,7 @@ export default {
     /**
      * 修改请求
      */
-    modify () {
+    handleModify () {
       modify(this.job).then((response) => {
         if (response.code === 1) {
           this.$message.success('修改成功')
@@ -507,7 +508,7 @@ export default {
         }
       })
     },
-    runJobNow (row) {
+    handleRunJobNow (row) {
       confirmAlert(() => {
         runJobNow(row.id).then((response) => {
           if (response.code === 1) {
@@ -516,7 +517,7 @@ export default {
         })
       }, '是否运行一次')
     },
-    jobLog (row) {
+    handleJobLog (row) {
       this.$router.push({
         name: 'jLog',
         query: {
@@ -529,7 +530,7 @@ export default {
      *
      * @param formName
      */
-    resetJobForm (formName) {
+    handleResetJobForm (formName) {
       this.jobDialogVisible = false
       this.$refs[formName].resetFields()
     },
@@ -551,14 +552,14 @@ export default {
      *
      * @param value
      */
-    crontabFill (value) {
+    handleCrontabFill (value) {
       // 确定后回传的值
       this.job.cronExpression = value
     },
     /**
      * 显示 cron dialog
      */
-    showDialog () {
+    handleShowDialog () {
       this.dialogCron = this.job.cronExpression
       this.cronDialogVisible = true
     }

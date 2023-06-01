@@ -9,21 +9,21 @@
       </el-row>
       <el-row :gutter="24">
         <el-col :md="24">
-          <el-form :inline="true" :model="roleSearchForm" class="demo-form-inline" size="mini">
+          <el-form ref="searchForm" :inline="true" :model="roleSearch" class="demo-form-inline" size="mini">
             <el-row :gutter="24">
               <el-col :md="24">
-                <el-form-item label="用户名称">
-                  <el-input v-model="roleSearchForm.username" clearable disabled placeholder="用户名称"/>
+                <el-form-item label="用户名称" prop="username">
+                  <el-input v-model="roleSearch.username" clearable disabled placeholder="用户名称"/>
                 </el-form-item>
-                <el-form-item label="用户角色名称">
-                  <el-input v-model="roleSearchForm.roleName" clearable placeholder="用户角色名称"/>
+                <el-form-item label="用户角色名称" prop="roleName">
+                  <el-input v-model="roleSearch.roleName" clearable placeholder="用户角色名称"/>
                 </el-form-item>
-                <el-form-item label="用户角色编码">
-                  <el-input v-model="roleSearchForm.roleCode" clearable placeholder="用户角色编码"/>
+                <el-form-item label="用户角色编码" prop="roleCode">
+                  <el-input v-model="roleSearch.roleCode" clearable placeholder="用户角色编码"/>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="search()">查询</el-button>
-                  <el-button type="info" @click="searchReset()">重置</el-button>
+                  <el-button type="primary" @click="handleSearch()">查询</el-button>
+                  <el-button type="info" @click="handleSearchReset()">重置</el-button>
                 </el-form-item>
               </el-col>
             </el-row>
@@ -39,7 +39,7 @@
                 row-key="id"
                 size="mini"
                 stripe
-                @row-click="rowClick"
+                @row-click="handleRowClick"
                 @selection-change="handleSelectionChange">
                 <el-table-column
                   type="selection"
@@ -63,8 +63,8 @@
 
               <div style="text-align: right;margin-top: 2vh;">
                 <el-pagination
-                  :current-page="roleSearchForm.current"
-                  :page-size="roleSearchForm.size"
+                  :current-page="roleSearch.current"
+                  :page-size="roleSearch.size"
                   :page-sizes="[10, 20, 50, 100]"
                   :total="total"
                   layout="total, sizes, prev, pager, next, jumper"
@@ -78,8 +78,8 @@
       </el-row>
       <el-row :gutter="24" style="height: 5.5vh;">
         <el-col :md="12" :offset="11">
-          <el-button size="mini" @click="resetUserRoleForm()">取 消</el-button>
-          <el-button size="mini" type="primary" @click="submitUserRoleForm()">确 定</el-button>
+          <el-button size="mini" @click="handleCancelUserRoleForm()">取 消</el-button>
+          <el-button size="mini" type="primary" @click="handleSubmitUserRoleForm()">确 定</el-button>
         </el-col>
       </el-row>
     </el-main>
@@ -95,13 +95,13 @@ export default {
   data () {
     return {
       // 单元格选中数据
-      multipleSelectionUserRoleId: [],
+      selectionUserRoleIds: [],
       // 用户角色表格数据
       roleTableData: [],
       // 当前选择的用户角色数据
       currentRoleId: [],
       // 用户角色查询条件数据
-      roleSearchForm: {
+      roleSearch: {
         userId: this.$route.query.userId,
         username: this.$route.query.username,
         roleName: '',
@@ -124,12 +124,12 @@ export default {
       list(this.buildParam()).then((response) => {
         if (response.code === 1) {
           this.roleTableData = response.data.records
-          this.roleSearchForm.size = response.data.size
-          this.roleSearchForm.current = response.data.current
+          this.roleSearch.size = response.data.size
+          this.roleSearch.current = response.data.current
           this.total = response.data.total
         }
       }).then(() => {
-        listUserRoles(this.roleSearchForm.userId).then((response) => {
+        listUserRoles(this.roleSearch.userId).then((response) => {
           if (response.code === 1) {
             response.data.forEach(roleId => {
               this.roleTableData.forEach(tableDataRow => {
@@ -148,7 +148,7 @@ export default {
      * @param size
      */
     handleSizeChange (size) {
-      this.roleSearchForm.size = size
+      this.roleSearch.size = size
       this.reloadList()
     },
     /**
@@ -157,13 +157,13 @@ export default {
      * @param current
      */
     handleCurrentChange (current) {
-      this.roleSearchForm.current = current
+      this.roleSearch.current = current
       this.reloadList()
     },
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList()
     },
     /**
@@ -172,14 +172,14 @@ export default {
      * @returns {{current: number, size: number, roleCode: string, roleName: string, userId: *, username: *}}
      */
     buildParam () {
-      return this.roleSearchForm
+      return this.roleSearch
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
-      this.roleSearchForm.roleName = ''
-      this.roleSearchForm.roleCode = ''
+    handleSearchReset () {
+      this.$refs.searchForm.resetFields()
+      this.reloadList()
     },
     /**
      * 平台表格复选框事件
@@ -187,13 +187,13 @@ export default {
      * @param val
      */
     handleSelectionChange (val) {
-      this.multipleSelectionUserRoleId = val
+      this.selectionUserRoleIds = val
     },
     /**
      * 添加修改弹出框提交
      */
-    submitUserRoleForm () {
-      if (this.multipleSelectionUserRoleId.length === 0) {
+    handleSubmitUserRoleForm () {
+      if (this.selectionUserRoleIds.length === 0) {
         this.$message.warning('选择用户的用户角色')
         return
       }
@@ -203,7 +203,7 @@ export default {
       }
       const requestParam = {
         username: this.$route.query.username,
-        roleId: this.multipleSelectionUserRoleId.map(role => role.id)
+        roleId: this.selectionUserRoleIds.map(role => role.id)
       }
       userAddRole(requestParam).then(response => {
         if (response.code === 1) {
@@ -214,7 +214,7 @@ export default {
     /**
      * 添加修改弹出框重置
      */
-    resetUserRoleForm () {
+    handleCancelUserRoleForm () {
       this.reloadList()
     },
     /**
@@ -228,7 +228,7 @@ export default {
      * @param column
      * @param event
      */
-    rowClick (row, column, event) {
+    handleRowClick (row, column, event) {
       this.currentRoleId = row.id
     }
   }

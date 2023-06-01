@@ -1,27 +1,27 @@
 <template>
   <base-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchMsgForm" class="demo-form-inline" label-width="80px"
+      <el-form ref="searchForm" :inline="true" :model="searchMsg" class="demo-form-inline" label-width="80px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="消息标题" prop="title">
-              <el-input v-model="searchMsgForm.title" clearable placeholder="消息标题"/>
+              <el-input v-model="searchMsg.title" clearable placeholder="消息标题"/>
             </el-form-item>
             <el-form-item label="消息编码" prop="code">
-              <el-input v-model="searchMsgForm.code" clearable placeholder="消息编码"/>
+              <el-input v-model="searchMsg.code" clearable placeholder="消息编码"/>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="searchReset()">重置</el-button>
+              <el-button type="primary" @click="handleSearch()">查询</el-button>
+              <el-button type="info" @click="handleSearchReset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:msg:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:msg:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
-                   @click="remove">删除
+        <el-button v-has="['sys:msg:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
+        <el-button v-has="['sys:msg:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+                   @click="handleRemove">删除
         </el-button>
       </div>
       <el-table
@@ -33,7 +33,7 @@
         empty-text="无数据"
         size="mini"
         stripe
-        @selection-change="msgHandleSelectionChange">
+        @selection-change="handleMsgSelectionChange">
         <el-table-column
           type="selection"
           width="55">
@@ -80,10 +80,11 @@
           label="操作"
           width="250">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['sys:msg:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
+            <el-button v-has="['sys:msg:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
+            </el-button>
             <el-button v-has="['sys:msg:delete']" size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, msgTableData,scope.row)">删除
+                       @click.native.prevent="handleRemoveItem(scope.$index, msgTableData,scope.row)">删除
             </el-button>
             <el-dropdown size="mini" style="margin-left: 5px;" trigger="click" type="primary">
               <span class="el-dropdown-link">
@@ -91,9 +92,9 @@
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </span>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item command="2" @click.native="sendAll(scope.row)">全部</el-dropdown-item>
-                <el-dropdown-item command="1" @click.native="toAll(scope.row)">指定人</el-dropdown-item>
-                <el-dropdown-item command="1" @click.native="toDeptUser(scope.row)">指定部门</el-dropdown-item>
+                <el-dropdown-item command="2" @click.native="handleSendAll(scope.row)">全部</el-dropdown-item>
+                <el-dropdown-item command="1" @click.native="handleToAll(scope.row)">指定人</el-dropdown-item>
+                <el-dropdown-item command="1" @click.native="handleToDeptUser(scope.row)">指定部门</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </template>
@@ -101,8 +102,8 @@
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchMsgForm.current"
-          :page-size="searchMsgForm.size"
+          :current-page="searchMsg.current"
+          :page-size="searchMsg.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -113,8 +114,8 @@
     </el-main>
 
     <el-dialog :title="title" :visible.sync="msgDialogVisible" width="40vw"
-               @close="closeMsgDialog('msgRuleForm')">
-      <el-form ref="msgRuleForm" :model="msg" :rules="msgRules" size="mini">
+               @close="handleCloseMsgDialog('msgForm')">
+      <el-form ref="msgForm" :model="msg" :rules="msgRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="消息标题" prop="title">
           <el-input v-model="msg.title" autocomplete="off" clearable/>
         </el-form-item>
@@ -140,13 +141,13 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetMsgForm('msgRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitMsgForm('msgRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="handleCancelMsgForm('msgForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="handleSubmitMsgForm('msgForm')">确 定</el-button>
       </div>
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
-               @close="closeInfoDialog">
+               @close="handleCloseInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item label="消息标题">
           {{ msg.title }}
@@ -174,7 +175,7 @@
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="sendDeptMsgDialogVisible" width="1200px"
-               @close="closeSendMsgDialog">
+               @close="handleCloseSendMsgDialog">
       <el-form ref="deptRuleForm" :model="sendMsgData" :rules="sendMsgDataRules" size="mini"
                style="padding-right: 15px;">
         <el-form-item :label-width="formLabelWidth" label="部门"
@@ -246,7 +247,8 @@
               width="120">
               <template slot-scope="scope">
                 <el-button size="mini" type="text"
-                           @click.native.prevent="removeUserItem(scope.$index, sendMsgData.userTableData,scope.row)">删除
+                           @click.native.prevent="handleRemoveUserItem(scope.$index, sendMsgData.userTableData,scope.row)">
+                  删除
                 </el-button>
               </template>
             </el-table-column>
@@ -254,13 +256,13 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="closeSendMsgDialog">取 消</el-button>
-        <el-button size="mini" type="primary" @click="sendMsgToUser">确 定</el-button>
+        <el-button size="mini" @click="handleCloseSendMsgDialog">关 闭</el-button>
+        <el-button size="mini" type="primary" @click="handleSendMsgToUser">确 定</el-button>
       </div>
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="sendUserMsgDialogVisible" width="760px"
-               @close="closeSendMsgDialog">
+               @close="handleCloseSendMsgDialog">
       <el-main>
         <el-transfer
           v-model="sendMsgData.users"
@@ -273,8 +275,8 @@
         </el-transfer>
       </el-main>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="closeSendMsgDialog">取 消</el-button>
-        <el-button size="mini" type="primary" @click="sendMsgToUser">确 定</el-button>
+        <el-button size="mini" @click="handleCloseSendMsgDialog">关 闭</el-button>
+        <el-button size="mini" type="primary" @click="handleSendMsgToUser">确 定</el-button>
       </div>
     </el-dialog>
   </base-container>
@@ -306,7 +308,7 @@ export default {
       // 部门下拉框
       deptOption: [],
       // 消息查询条件数据
-      searchMsgForm: {
+      searchMsg: {
         title: '',
         code: '',
         current: 1,
@@ -315,7 +317,7 @@ export default {
       // 分页总数
       total: 0,
       // 标记删除按钮是否可以点击
-      checkDeleteItem: true,
+      checkDelete: true,
       // 消息添加修改弹出框
       msgDialogVisible: false,
       // 发送消息到用户弹出框
@@ -396,8 +398,8 @@ export default {
     reloadList () {
       list(this.buildParam()).then((response) => {
         this.msgTableData = response.data.records
-        this.searchMsgForm.size = response.data.size
-        this.searchMsgForm.current = response.data.current
+        this.searchMsg.size = response.data.size
+        this.searchMsg.current = response.data.current
         this.total = response.data.total
       })
     },
@@ -421,7 +423,7 @@ export default {
      * @returns {{current: number, size: number, title: string, code: string}}
      */
     buildParam () {
-      return this.searchMsgForm
+      return this.searchMsg
     },
     /**
      * 分页大小切换
@@ -429,7 +431,7 @@ export default {
      * @param size
      */
     handleSizeChange (size) {
-      this.searchMsgForm.size = size
+      this.searchMsg.size = size
       this.reloadList()
     },
     /**
@@ -438,34 +440,35 @@ export default {
      * @param current
      */
     handleCurrentChange (current) {
-      this.searchMsgForm.current = current
+      this.searchMsg.current = current
       this.reloadList()
     },
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList()
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
+    handleSearchReset () {
       this.$refs.searchForm.resetFields()
+      this.reloadList()
     },
     /**
      * 消息表格复选框事件
      *
      * @param val
      */
-    msgHandleSelectionChange (val) {
-      this.checkDeleteItem = !val.length
+    handleMsgSelectionChange (val) {
+      this.checkDelete = !val.length
       this.multipleSelectionMsgIds = val
     },
     /**
      * 批量删除
      */
-    remove () {
+    handleRemove () {
       confirmAlert(() => {
         const ids = []
         this.multipleSelectionMsgIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
@@ -484,7 +487,7 @@ export default {
      * @param rows
      * @param row
      */
-    removeItem (index, rows, row) {
+    handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
           if (response.code === 1) {
@@ -498,7 +501,7 @@ export default {
     /**
      * 创建
      */
-    create () {
+    handleCreate () {
       this.title = '创建消息'
       this.dialogType = DIALOG_TYPE.ADD
       this.msgDialogVisible = true
@@ -507,7 +510,7 @@ export default {
      * 修改
      * @param row
      */
-    edit (row) {
+    handleEdit (row) {
       this.title = '修改消息'
       this.dialogType = DIALOG_TYPE.EDIT
       this.msgDialogVisible = true
@@ -520,7 +523,7 @@ export default {
      *
      * @param row
      */
-    info (row) {
+    handleInfo (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
@@ -533,24 +536,24 @@ export default {
      *
      * @param formName
      */
-    closeMsgDialog (formName) {
+    handleCloseMsgDialog (formName) {
       this.msg.id = undefined
       this.$refs[formName].resetFields()
     },
     /**
      * 关闭详情弹出框事件
      */
-    closeInfoDialog () {
+    handleCloseInfoDialog () {
       this.msg = this.msgInfo
     },
     /**
      * 提交
      * @param formName
      */
-    submitMsgForm (formName) {
+    handleSubmitMsgForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
+          this.dialogType === DIALOG_TYPE.ADD ? this.handleSave() : this.handleModify()
         } else {
           console.log('error submit!!')
           return false
@@ -560,7 +563,7 @@ export default {
     /**
      * 保存请求
      */
-    save () {
+    handleSave () {
       this.msg.id = undefined
       save(this.msg).then((response) => {
         if (response.code === 1) {
@@ -573,7 +576,7 @@ export default {
     /**
      * 修改请求
      */
-    modify () {
+    handleModify () {
       modify(this.msg).then((response) => {
         if (response.code === 1) {
           this.$message.success('修改成功')
@@ -587,7 +590,7 @@ export default {
      *
      * @param formName
      */
-    resetMsgForm (formName) {
+    handleCancelMsgForm (formName) {
       this.msgDialogVisible = false
       this.$refs[formName].resetFields()
     },
@@ -598,7 +601,7 @@ export default {
      * @param rows
      * @param row
      */
-    removeUserItem (index, rows, row) {
+    handleRemoveUserItem (index, rows, row) {
       confirmAlert(() => {
         rows.splice(index, 1)
         this.sendMsgData.users.splice(index, 1)
@@ -609,19 +612,23 @@ export default {
      * 发送给全部请求
      * @param row
      */
-    sendAll (row) {
-      this.$sendMsg('/msg/sendBroadcastMsg', { msgId: row.id })
+    handleSendAll (row) {
+      this.$sendMsg('/msg/sendBroadcastMsg', {
+        tenantId: localStorage.getItem('X-TENANT-ID') || '',
+        msgId: row.id
+      })
     },
     /**
      * 发送给用户请求
      */
-    sendMsgToUser () {
+    handleSendMsgToUser () {
       if (this.sendMsgData.users.length === 0) {
         this.$message.warning('还未选择发送信息的用户')
         return
       }
       this.$sendMsg('/msg/sendMsgToUser',
         {
+          tenantId: localStorage.getItem('X-TENANT-ID') || '',
           msgId: this.sendMsgData.msgId,
           userIds: this.sendMsgData.users
         }
@@ -632,7 +639,7 @@ export default {
      *
      * @param row
      */
-    toAll (row) {
+    handleToAll (row) {
       this.sendUserMsgDialogVisible = true
       this.reloadUserData()
       this.title = '接收人'
@@ -643,21 +650,11 @@ export default {
      *
      * @param row
      */
-    toDeptUser (row) {
+    handleToDeptUser (row) {
       this.sendDeptMsgDialogVisible = true
       this.selectDept()
       this.title = '接收部门'
       this.sendMsgData.msgId = row.id
-    },
-    /**
-     * 部门下拉框
-     */
-    selectDept () {
-      selectDept().then(response => {
-        if (response.code === 1 && response.data) {
-          this.deptOption = response.data
-        }
-      })
     },
     handleChangeDept () {
       this.sendMsgData.users = []
@@ -685,7 +682,7 @@ export default {
     /**
      * 关闭发送消息弹出框事件
      */
-    closeSendMsgDialog () {
+    handleCloseSendMsgDialog () {
       this.sendMsgData = {
         multipleDeptId: [],
         msgId: '',
@@ -696,6 +693,16 @@ export default {
       }
       this.sendUserMsgDialogVisible = false
       this.sendDeptMsgDialogVisible = false
+    },
+    /**
+     * 部门下拉框
+     */
+    selectDept () {
+      selectDept().then(response => {
+        if (response.code === 1 && response.data) {
+          this.deptOption = response.data
+        }
+      })
     }
   }
 }

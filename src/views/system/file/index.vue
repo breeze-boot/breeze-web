@@ -1,30 +1,30 @@
 <template>
   <base-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchFileForm" class="demo-form-inline" label-width="80px"
+      <el-form ref="searchForm" :inline="true" :model="searchFile" class="demo-form-inline" label-width="80px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="原始名称" prop="originalFileName">
-              <el-input v-model="searchFileForm.originalFileName" clearable placeholder="原始文件名称"/>
+              <el-input v-model="searchFile.originalFileName" clearable placeholder="原始文件名称"/>
             </el-form-item>
             <el-form-item label="新名称" prop="newFileName">
-              <el-input v-model="searchFileForm.newFileName" clearable placeholder="新文件名称"/>
+              <el-input v-model="searchFile.newFileName" clearable placeholder="新文件名称"/>
             </el-form-item>
             <el-form-item label="创建人" prop="createName">
-              <el-input v-model="searchFileForm.createName" clearable placeholder="创建人"/>
+              <el-input v-model="searchFile.createName" clearable placeholder="创建人"/>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="searchReset()">重置</el-button>
+              <el-button type="primary" @click="handleSearch()">查询</el-button>
+              <el-button type="info" @click="handleSearchReset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:file:upload']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:file:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
-                   @click="remove">删除
+        <el-button v-has="['sys:file:upload']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
+        <el-button v-has="['sys:file:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+                   @click="handleRemove">删除
         </el-button>
       </div>
       <el-table
@@ -36,7 +36,7 @@
         empty-text="无数据"
         size="mini"
         stripe
-        @selection-change="fileHandleSelectionChange">
+        @selection-change="handleFileSelectionChange">
         <el-table-column
           type="selection"
           width="55">
@@ -88,21 +88,23 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
-            <el-button v-has="['sys:file:preview']" size="mini" type="text" @click="preview(scope.row)">预览</el-button>
-            <el-button v-has="['sys:file:download']" size="mini" type="text" @click="download(scope.row)">下载
+            <el-button v-has="['sys:file:preview']" size="mini" type="text" @click="handlePreview(scope.row)">预览
             </el-button>
-            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['sys:file:modify']" size="mini" type="text" @click="edit(scope.row)">更新</el-button>
+            <el-button v-has="['sys:file:download']" size="mini" type="text" @click="handleDownload(scope.row)">下载
+            </el-button>
+            <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
+            <el-button v-has="['sys:file:modify']" size="mini" type="text" @click="handleEdit(scope.row)">更新
+            </el-button>
             <el-button v-has="['sys:file:delete']" size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, fileTableData,scope.row)">删除
+                       @click.native.prevent="handleRemoveItem(scope.$index, fileTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchFileForm.current"
-          :page-size="searchFileForm.size"
+          :current-page="searchFile.current"
+          :page-size="searchFile.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -113,7 +115,7 @@
     </el-main>
 
     <el-dialog :title="title" :visible.sync="previewDialogVisible" width="500px"
-               @close="closeUploadDialog">
+               @close="handleCloseUploadDialog">
       <el-main>
         <el-image
           :preview-src-list="[imgUrl]"
@@ -124,7 +126,7 @@
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="uploadDialogVisible" width="400px"
-               @close="closeUploadDialog">
+               @close="handleCloseUploadDialog">
       <el-form ref="uploadFileFrom" :model="file" :rules="fileRules" label-width="0" size="mini">
         <el-form-item prop="title">
           <el-input v-model="file.title" placeholder="请输入文件标题"/>
@@ -153,7 +155,7 @@
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="950px"
-               @close="closeInfoDialog">
+               @close="handleCloseInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item label="标题">
           {{ file.title }}
@@ -202,13 +204,13 @@ export default {
       // 弹出框标题
       title: '',
       // 单元格选中数据
-      multipleSelectionFileIds: [],
+      selectionFileIds: [],
       // 文件表格数据
       fileTableData: [],
       // 表格展示图片地址
       imgUrl: '',
       // 文件查询条件数据
-      searchFileForm: {
+      searchFile: {
         originalFileName: '',
         newFileName: '',
         createBy: '',
@@ -218,7 +220,7 @@ export default {
       // 分页总数
       total: 0,
       // 标记删除按钮是否可以点击
-      checkDeleteItem: true,
+      checkDelete: true,
       // 文件上传弹出框
       uploadDialogVisible: false,
       // 图片预览弹出框
@@ -269,8 +271,8 @@ export default {
       list(this.buildParam()).then((response) => {
         if (response.code === 1) {
           this.fileTableData = response.data.records
-          this.searchFileForm.size = response.data.size
-          this.searchFileForm.current = response.data.current
+          this.searchFile.size = response.data.size
+          this.searchFile.current = response.data.current
           this.total = response.data.total
         }
       })
@@ -281,7 +283,7 @@ export default {
      * @returns {{originalFileName: string, createBy: string, size: number, newFileName: string, createName: string}}
      */
     buildParam () {
-      return this.searchFileForm
+      return this.searchFile
     },
     /**
      * 分页大小切换
@@ -289,7 +291,7 @@ export default {
      * @param size
      */
     handleSizeChange (size) {
-      this.searchFileForm.size = size
+      this.searchFile.size = size
       this.reloadList()
     },
     /**
@@ -298,37 +300,38 @@ export default {
      * @param current
      */
     handleCurrentChange (current) {
-      this.searchFileForm.current = current
+      this.searchFile.current = current
       this.reloadList()
     },
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList()
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
+    handleSearchReset () {
       this.$refs.searchForm.resetFields()
+      this.reloadList()
     },
     /**
      * 平台表格复选框事件
      *
      * @param val
      */
-    fileHandleSelectionChange (val) {
-      this.checkDeleteItem = !val.length
-      this.multipleSelectionFileIds = val
+    handleFileSelectionChange (val) {
+      this.checkDelete = !val.length
+      this.selectionFileIds = val
     },
     /**
      * 批量删除
      */
-    remove () {
+    handleRemove () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelectionFileIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        this.selectionFileIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(response => {
           if (response.code === 1) {
             this.reloadList()
@@ -344,7 +347,7 @@ export default {
      * @param rows
      * @param row
      */
-    removeItem (index, rows, row) {
+    handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
           if (response.code === 1) {
@@ -358,7 +361,7 @@ export default {
     /**
      * 创建
      */
-    create () {
+    handleCreate () {
       this.title = '上传文件'
       this.dialogType = DIALOG_TYPE.ADD
       this.uploadDialogVisible = true
@@ -368,7 +371,7 @@ export default {
      *
      * @param row
      */
-    edit (row) {
+    handleEdit (row) {
       this.title = '重新上传文件'
       this.dialogType = DIALOG_TYPE.EDIT
       this.uploadDialogVisible = true
@@ -381,7 +384,7 @@ export default {
      *
      * @param row
      */
-    info (row) {
+    handleInfo (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
@@ -394,7 +397,7 @@ export default {
      *
      * @param row
      */
-    preview (row) {
+    handlePreview (row) {
       preview(row.id).then(rep => {
         if (rep.code === 1) {
           this.previewDialogVisible = true
@@ -422,9 +425,9 @@ export default {
       formData.append('file', param.file)
       formData.append('title', this.file.title)
       formData.append('ossStyle', this.file.ossStyle)
-      this.file.ossStyle === 1 ? this.uploadMinioS3(formData) : this.uploadLocalStorage(formData)
+      this.file.ossStyle === 1 ? this.handleUploadMinioS3(formData) : this.handleUploadLocalStorage(formData)
     },
-    uploadMinioS3 (formData) {
+    handleUploadMinioS3 (formData) {
       uploadMinioS3(formData).then(response => {
         this.uploadDialogVisible = false
         this.reloadList()
@@ -432,7 +435,7 @@ export default {
         console.error('图片上传失败', e)
       })
     },
-    uploadLocalStorage (formData) {
+    handleUploadLocalStorage (formData) {
       uploadMinioS3(formData).then(response => {
         this.uploadDialogVisible = false
         this.reloadList()
@@ -445,7 +448,7 @@ export default {
      *
      * @param row
      */
-    download (row) {
+    handleDownload (row) {
       download(row.id).then(response => {
         const blob = new Blob([response.data], { type: response.data.contentType })
         saveAs(blob, response.data.fileName)
@@ -456,13 +459,13 @@ export default {
     /**
      * 关闭上传弹出框事件
      */
-    closeUploadDialog () {
+    handleCloseUploadDialog () {
       this.file = this.fileInfo
     },
     /**
      * 关闭详情弹出框事件
      */
-    closeInfoDialog () {
+    handleCloseInfoDialog () {
       this.file = this.fileInfo
     }
   }

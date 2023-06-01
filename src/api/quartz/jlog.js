@@ -7,14 +7,14 @@ const JSONBigInt2Str = JSONBigInt({ storeAsString: true })
 /**
  * 列表
  *
- * @param data
+ * @param params
  * @returns {AxiosPromise}
  */
-export function list (data) {
+export function list (params) {
   return request({
-    url: servicePath.quartz + '/jLog/list',
-    method: 'post',
-    data: data,
+    url: servicePath.quartz + '/jLog',
+    method: 'get',
+    params: params,
     transformResponse: [(data) => {
       return JSONBigInt2Str.parse(data)
     }]
@@ -41,7 +41,7 @@ export function truncate () {
  */
 export function del (ids) {
   return request({
-    url: servicePath.quartz + '/jLog/delete',
+    url: servicePath.quartz + '/jLog',
     method: 'delete',
     data: ids
   })

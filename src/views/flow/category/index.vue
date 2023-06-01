@@ -1,27 +1,28 @@
 <template>
   <el-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchCategoryForm" class="demo-form-inline" label-width="100px"
+      <el-form ref="searchForm" :inline="true" :model="searchCategory" class="demo-form-inline" label-width="100px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="流程分类名称" prop="categoryName">
-              <el-input v-model="searchCategoryForm.categoryName" clearable placeholder="流程分类名称"/>
+              <el-input v-model="searchCategory.categoryName" clearable placeholder="流程分类名称"/>
             </el-form-item>
             <el-form-item label="流程分类编码" prop="categoryCode">
-              <el-input v-model="searchCategoryForm.categoryCode" clearable placeholder="流程分类编码"/>
+              <el-input v-model="searchCategory.categoryCode" clearable placeholder="流程分类编码"/>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="searchReset()">重置</el-button>
+              <el-button type="primary" @click="handleSearch()">查询</el-button>
+              <el-button type="info" @click="handleSearchReset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['flow:category:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['flow:category:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
-                   @click="remove">删除
+        <el-button v-has="['flow:category:create']" plain size="mini" type="primary" @click="handleCreate">新建
+        </el-button>
+        <el-button v-has="['flow:category:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+                   @click="handleRemove">删除
         </el-button>
       </div>
       <el-table
@@ -33,7 +34,7 @@
         empty-text="无数据"
         size="mini"
         stripe
-        @selection-change="categoryHandleSelectionChange">
+        @selection-change="handleCategorySelectionChange">
         <el-table-column
           type="selection"
           width="55"/>
@@ -55,19 +56,19 @@
           label="操作"
           width="150">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['flow:category:modify']" size="mini" type="text" @click="edit(scope.row)">编辑
+            <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
+            <el-button v-has="['flow:category:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
             </el-button>
             <el-button v-has="['flow:category:delete']" size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, categoryTableData,scope.row)">删除
+                       @click.native.prevent="handleRemoveItem(scope.$index, categoryTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchCategoryForm.current"
-          :page-size="searchCategoryForm.size"
+          :current-page="searchCategory.current"
+          :page-size="searchCategory.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -78,8 +79,8 @@
     </el-main>
 
     <el-dialog :title="title" :visible.sync="categoryDialogVisible" width="40vw"
-               @close="closeCategoryDialog('categoryRuleForm')">
-      <el-form ref="categoryRuleForm" :model="category" :rules="categoryRules" size="mini">
+               @close="handleCloseCategoryDialog('categoryForm')">
+      <el-form ref="categoryForm" :model="category" :rules="categoryRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="流程分类名称" prop="categoryName">
           <el-input v-model="category.categoryName" autocomplete="off" clearable/>
         </el-form-item>
@@ -88,13 +89,13 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetCategoryForm('categoryRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitCategoryForm('categoryRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="handleCancelCategoryForm('categoryForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="handleSubmitCategoryForm('categoryForm')">确 定</el-button>
       </div>
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
-               @close="closeInfoDialog">
+               @close="handleCloseInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item label="流程分类名称">
           {{ category.categoryName }}
@@ -127,7 +128,7 @@ export default {
       // 流程分类表格数据
       categoryTableData: [],
       // 流程分类查询条件数据
-      searchCategoryForm: {
+      searchCategory: {
         categoryName: '',
         categoryCode: '',
         current: 1,
@@ -136,7 +137,7 @@ export default {
       // 分页总数
       total: 0,
       // 标记删除按钮是否可以点击
-      checkDeleteItem: true,
+      checkDelete: true,
       // 流程分类添加修改弹出框
       categoryDialogVisible: false,
       // 流程分类详情弹出框
@@ -198,8 +199,8 @@ export default {
     reloadList () {
       list(this.buildParam()).then((response) => {
         this.categoryTableData = response.data.records
-        this.searchCategoryForm.size = response.data.size
-        this.searchCategoryForm.current = response.data.current
+        this.searchCategory.size = response.data.size
+        this.searchCategory.current = response.data.current
         this.total = response.data.total
       })
     },
@@ -209,7 +210,7 @@ export default {
      * @returns {{current: number, size: number, categoryName: string, categoryCode: string}}
      */
     buildParam () {
-      return this.searchCategoryForm
+      return this.searchCategory
     },
     /**
      * 分页大小切换
@@ -217,7 +218,7 @@ export default {
      * @param size
      */
     handleSizeChange (size) {
-      this.searchCategoryForm.size = size
+      this.searchCategory.size = size
       this.reloadList()
     },
     /**
@@ -226,34 +227,35 @@ export default {
      * @param current
      */
     handleCurrentChange (current) {
-      this.searchCategoryForm.current = current
+      this.searchCategory.current = current
       this.reloadList()
     },
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList()
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
+    handleSearchReset () {
       this.$refs.searchForm.resetFields()
+      this.reloadList()
     },
     /**
      * 流程分类表格复选框事件
      *
      * @param val
      */
-    categoryHandleSelectionChange (val) {
-      this.checkDeleteItem = !val.length
+    handleCategorySelectionChange (val) {
+      this.checkDelete = !val.length
       this.multipleSelectionCategoryIds = val
     },
     /**
      * 批量删除
      */
-    remove () {
+    handleRemove () {
       confirmAlert(() => {
         const ids = []
         this.multipleSelectionCategoryIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
@@ -272,7 +274,7 @@ export default {
      * @param rows
      * @param row
      */
-    removeItem (index, rows, row) {
+    handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
           if (response.code === 1) {
@@ -286,7 +288,7 @@ export default {
     /**
      * 创建
      */
-    create () {
+    handleCreate () {
       this.title = '创建流程分类'
       this.dialogType = DIALOG_TYPE.ADD
       this.categoryDialogVisible = true
@@ -295,7 +297,7 @@ export default {
      * 修改
      * @param row
      */
-    edit (row) {
+    handleEdit (row) {
       this.title = '修改流程分类'
       this.dialogType = DIALOG_TYPE.EDIT
       this.categoryDialogVisible = true
@@ -308,7 +310,7 @@ export default {
      *
      * @param row
      */
-    info (row) {
+    handleInfo (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
@@ -321,14 +323,14 @@ export default {
      *
      * @param formName
      */
-    closeCategoryDialog (formName) {
+    handleCloseCategoryDialog (formName) {
       this.category.id = undefined
       this.$refs[formName].resetFields()
     },
     /**
      * 关闭详情弹出框事件
      */
-    closeInfoDialog () {
+    handleCloseInfoDialog () {
       this.category = this.categoryInfo
     },
     /**
@@ -336,7 +338,7 @@ export default {
      *
      * @param formName
      */
-    submitCategoryForm (formName) {
+    handleSubmitCategoryForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
@@ -376,7 +378,7 @@ export default {
      *
      * @param formName
      */
-    resetCategoryForm (formName) {
+    handleCancelCategoryForm (formName) {
       this.categoryDialogVisible = false
       this.$refs[formName].resetFields()
     }

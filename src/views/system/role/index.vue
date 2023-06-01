@@ -1,19 +1,19 @@
 <template>
   <base-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchRoleForm" class="demo-form-inline" label-width="80px"
+      <el-form ref="searchForm" :inline="true" :model="searchRole" class="demo-form-inline" label-width="80px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="角色名称" prop="roleName">
-              <el-input v-model="searchRoleForm.roleName" clearable placeholder="角色名称"/>
+              <el-input v-model="searchRole.roleName" clearable placeholder="角色名称"/>
             </el-form-item>
             <el-form-item label="角色编码" prop="roleCode">
-              <el-input v-model="searchRoleForm.roleCode" clearable placeholder="角色编码"/>
+              <el-input v-model="searchRole.roleCode" clearable placeholder="角色编码"/>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="searchReset()">重置</el-button>
+              <el-button type="primary" @click="handleSearch()">查询</el-button>
+              <el-button type="info" @click="handleSearchReset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
@@ -21,9 +21,10 @@
       <el-row :gutter="24">
         <el-col :md="19">
           <div style="margin-bottom: 10px; text-align: left;">
-            <el-button v-has="['sys:role:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-            <el-button v-has="['sys:role:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
-                       @click="remove">删除
+            <el-button v-has="['sys:role:create']" plain size="mini" type="primary" @click="handleCreate">新建
+            </el-button>
+            <el-button v-has="['sys:role:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+                       @click="handleRemove">删除
             </el-button>
           </div>
           <el-table
@@ -35,8 +36,8 @@
             row-key="id"
             size="mini"
             stripe
-            @row-click="rowClick"
-            @selection-change="roleHandleSelectionChange">
+            @row-click="handelRowClick"
+            @selection-change="handleRoleSelectionChange">
             <el-table-column
               type="selection"
               width="55"/>
@@ -59,13 +60,14 @@
               label="操作"
               width="200">
               <template slot-scope="scope">
-                <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-                <el-button v-has="['sys:role:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+                <el-button size="mini" type="text" @click="handeInfo(scope.row)">查看</el-button>
+                <el-button v-has="['sys:role:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
+                </el-button>
                 <el-button v-has="['sys:permission:edit']" size="mini" type="text"
-                           @click="editRolePermission(scope.row)">数据权限
+                           @click="handleEditRolePermission(scope.row)">数据权限
                 </el-button>
                 <el-button v-has="['sys:role:delete']" size="mini" type="text"
-                           @click.native.prevent="removeItem(scope.$index, roleTableData,scope.row)">删除
+                           @click.native.prevent="handleRemoveItem(scope.$index, roleTableData,scope.row)">删除
                 </el-button>
               </template>
             </el-table-column>
@@ -73,8 +75,8 @@
 
           <div style="text-align: right;margin-top: 2vh;">
             <el-pagination
-              :current-page="searchRoleForm.current"
-              :page-size="searchRoleForm.size"
+              :current-page="searchRole.current"
+              :page-size="searchRole.size"
               :page-sizes="[10, 20, 50, 100]"
               :total="total"
               layout="total, sizes, prev, pager, next, jumper"
@@ -93,16 +95,16 @@
                    style="height: 560px; overflow-y:scroll; border: #e1e1e1 1px solid; margin-top:37px;">
           </el-tree>
           <div style="margin-top: 10px; text-align: center; padding: 0 30px;">
-            <el-button plain size="mini" type="primary" @click="submitPermission">提交</el-button>
-            <el-button :disabled="disabled" plain size="mini" type="info" @click="resetPermission">重置</el-button>
+            <el-button plain size="mini" type="primary" @click="handleSubmitPermission">提交</el-button>
+            <el-button :disabled="disabled" plain size="mini" type="info" @click="handleResetPermission">重置</el-button>
           </div>
         </el-col>
       </el-row>
     </el-main>
 
     <el-dialog :title="title" :visible.sync="roleDialogVisible" width="40vw"
-               @close="closeRoleDialog('roleRuleForm')">
-      <el-form ref="roleRuleForm" :model="role" :rules="roleRules" size="mini">
+               @close="handleCloseRoleDialog('roleForm')">
+      <el-form ref="roleForm" :model="role" :rules="roleRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="角色名称" prop="roleName">
           <el-input v-model="role.roleName" autocomplete="off" clearable/>
         </el-form-item>
@@ -120,14 +122,14 @@
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetRoleForm('roleRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitRoleForm('roleRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="handleCancelRoleForm('roleForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="handleSubmitRoleForm('roleForm')">确 定</el-button>
       </div>
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="permissionDialogVisible" width="500px"
-               @close="closePermissionDialog('permissionRuleForm')">
-      <el-form ref="permissionRuleForm" :model="permission" :rules="permissionRule" size="mini">
+               @close="handleClosePermissionDialog('permissionForm')">
+      <el-form ref="permissionForm" :model="permission" :rules="permissionRule" size="mini">
         <el-form-item :label-width="formLabelWidth" label="数据权限" prop="permissionId">
           <el-select v-model="permission.permissionId" collapse-tags filterable multiple placeholder="请选择数据权限">
             <el-option
@@ -140,14 +142,14 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetPermissionRuleForm('permissionRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitPermissionRuleForm('permissionRuleForm')">确 定
+        <el-button size="mini" @click="handleCancelPermissionForm('permissionForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="handleSubmitPermissionForm('permissionForm')">确 定
         </el-button>
       </div>
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
-               @close="closeInfoDialog">
+               @close="handleCloseInfoDialog">
       <el-descriptions :column="1" border size="mini">
         <el-descriptions-item label="角色编码">
           {{ role.roleCode }}
@@ -181,7 +183,7 @@ export default {
       // 是否锁定重置按钮
       disabled: true,
       // 单元格选中数据
-      multipleSelectionRoleIds: [],
+      selectionRoleIds: [],
       // 数据权限下拉框
       permissionOptions: [],
       // 数据权限添加修改数据
@@ -192,7 +194,7 @@ export default {
       // 角色表格数据
       roleTableData: [],
       // 角色查询条件数据
-      searchRoleForm: {
+      searchRole: {
         roleName: '',
         roleCode: '',
         current: 1,
@@ -208,7 +210,7 @@ export default {
         label: 'title'
       },
       // 标记删除按钮是否可以点击
-      checkDeleteItem: true,
+      checkDelete: true,
       // 当前选择的角色
       currentClickRoleId: undefined,
       // 角色添加修改弹出框
@@ -285,8 +287,8 @@ export default {
       list(this.buildParam()).then((rep) => {
         if (rep.code === 1) {
           this.roleTableData = rep.data.records
-          this.searchRoleForm.size = rep.data.size
-          this.searchRoleForm.current = rep.data.current
+          this.searchRole.size = rep.data.size
+          this.searchRole.current = rep.data.current
           this.total = rep.data.total
         }
       })
@@ -322,7 +324,7 @@ export default {
      * @returns {{current: number, size: number, roleCode: string, roleName: string}}
      */
     buildParam () {
-      return this.searchRoleForm
+      return this.searchRole
     },
     /**
      * 分页大小切换
@@ -330,7 +332,7 @@ export default {
      * @param size
      */
     handleSizeChange (size) {
-      this.searchRoleForm.size = size
+      this.searchRole.size = size
       this.reloadList()
     },
     /**
@@ -339,30 +341,31 @@ export default {
      * @param current
      */
     handleCurrentChange (current) {
-      this.searchRoleForm.current = current
+      this.searchRole.current = current
       this.reloadList()
     },
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList()
       this.reloadListTreeMenu()
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
+    handleSearchReset () {
       this.$refs.searchForm.resetFields()
+      this.handleSearch()
     },
     /**
      * 平台表格复选框事件
      *
      * @param val
      */
-    roleHandleSelectionChange (val) {
-      this.checkDeleteItem = !val.length
-      this.multipleSelectionRoleIds = val
+    handleRoleSelectionChange (val) {
+      this.checkDelete = !val.length
+      this.selectionRoleIds = val
     },
     /**
      * 单元格点击事件
@@ -371,17 +374,17 @@ export default {
      * @param column
      * @param event
      */
-    rowClick (row, column, event) {
+    handelRowClick (row, column, event) {
       this.currentClickRoleId = row.id
       this.listRolesPermission(row.id)
     },
     /**
      * 批量删除
      */
-    remove () {
+    handleRemove () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelectionRoleIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        this.selectionRoleIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then((rep) => {
           if (rep.code === 1) {
             this.reloadList()
@@ -397,7 +400,7 @@ export default {
      * @param rows
      * @param row
      */
-    removeItem (index, rows, row) {
+    handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(rep => {
           if (rep.code === 1) {
@@ -411,7 +414,7 @@ export default {
     /**
      * 创建
      */
-    create () {
+    handleCreate () {
       this.title = '创建角色'
       this.dialogType = DIALOG_TYPE.ADD
       this.roleDialogVisible = true
@@ -420,7 +423,7 @@ export default {
      * 修改
      * @param row
      */
-    edit (row) {
+    handleEdit (row) {
       this.title = '修改角色信息'
       this.dialogType = DIALOG_TYPE.EDIT
       this.roleDialogVisible = true
@@ -433,7 +436,7 @@ export default {
      * 详情
      * @param row
      */
-    info (row) {
+    handeInfo (row) {
       this.title = '查看角色信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
@@ -446,14 +449,14 @@ export default {
      *
      * @param formName
      */
-    closeRoleDialog (formName) {
+    handleCloseRoleDialog (formName) {
       this.role.id = undefined
       this.$refs[formName].resetFields()
     },
     /**
      * 关闭详情弹出框事件
      */
-    closeInfoDialog () {
+    handleCloseInfoDialog () {
       this.role = this.roleInfo
     },
     /**
@@ -461,10 +464,10 @@ export default {
      *
      * @param formName
      */
-    submitRoleForm (formName) {
+    handleSubmitRoleForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
+          this.dialogType === DIALOG_TYPE.ADD ? this.handleSave() : this.handleModify()
         } else {
           console.log('error submit!!')
           return false
@@ -474,28 +477,28 @@ export default {
     /**
      * 保存请求
      */
-    save () {
+    handleSave () {
       this.role.roleCode = this.prefix + this.role.roleCode
       save(this.role).then((rep) => {
         if (rep.code === 1) {
           this.$message.success(rep.message)
           this.roleDialogVisible = false
           this.reloadList()
-          this.resetPermission()
+          this.handleResetPermission()
         }
       })
     },
     /**
      * 修改请求
      */
-    modify () {
+    handleModify () {
       this.role.roleCode = this.prefix + this.role.roleCode
       modify(this.role).then((rep) => {
         if (rep.code === 1) {
           this.$message.success(rep.message)
           this.roleDialogVisible = false
           this.reloadList()
-          this.resetPermission()
+          this.handleResetPermission()
         }
       })
     },
@@ -504,14 +507,14 @@ export default {
      *
      * @param formName
      */
-    resetRoleForm (formName) {
+    handleCancelRoleForm (formName) {
       this.roleDialogVisible = false
       this.$refs[formName].resetFields()
     },
     /**
      * 提交角色的权限
      */
-    submitPermission () {
+    handleSubmitPermission () {
       const checkedKeys = this.$refs.roleTree.getCheckedKeys()
       const halfCheckedKeys = this.$refs.roleTree.getHalfCheckedKeys()
       if (halfCheckedKeys.length > 0) {
@@ -539,7 +542,7 @@ export default {
     /**
      * 重置角色权限
      */
-    resetPermission () {
+    handleResetPermission () {
       this.listRolesPermission(this.currentClickRoleId)
     },
     /**
@@ -547,7 +550,7 @@ export default {
      *
      * @param row
      */
-    editRolePermission (row) {
+    handleEditRolePermission (row) {
       this.title = '编辑角色数据权限'
       this.permissionDialogVisible = true
       this.permission.roleId = row.id
@@ -557,7 +560,7 @@ export default {
      *
      * @param formName
      */
-    submitPermissionRuleForm (formName) {
+    handleSubmitPermissionForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           const data = []
@@ -588,7 +591,7 @@ export default {
      *
      * @param formName
      */
-    resetPermissionRuleForm (formName) {
+    handleCancelPermissionForm (formName) {
       this.permissionDialogVisible = false
       this.$refs[formName].resetFields()
     },
@@ -597,7 +600,7 @@ export default {
      *
      * @param formName
      */
-    closePermissionDialog (formName) {
+    handleClosePermissionDialog (formName) {
       this.$refs[formName].resetFields()
     },
     /**

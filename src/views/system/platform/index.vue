@@ -1,27 +1,27 @@
 <template>
   <base-container>
     <el-main>
-      <el-form ref="searchForm" :inline="true" :model="searchPlatformForm" class="demo-form-inline" label-width="80px"
+      <el-form ref="searchForm" :inline="true" :model="searchPlatform" class="demo-form-inline" label-width="80px"
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
             <el-form-item label="平台名称" prop="platformName">
-              <el-input v-model="searchPlatformForm.platformName" clearable placeholder="平台名称"/>
+              <el-input v-model="searchPlatform.platformName" clearable placeholder="平台名称"/>
             </el-form-item>
             <el-form-item label="平台编码" prop="platformCode">
-              <el-input v-model="searchPlatformForm.platformCode" clearable placeholder="平台编码"/>
+              <el-input v-model="searchPlatform.platformCode" clearable placeholder="平台编码"/>
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="search()">查询</el-button>
-              <el-button type="info" @click="searchReset()">重置</el-button>
+              <el-button type="primary" @click="handleSearch()">查询</el-button>
+              <el-button type="info" @click="handleSearchReset()">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:platform:create']" plain size="mini" type="primary" @click="create">新建</el-button>
-        <el-button v-has="['sys:platform:delete']" :disabled="checkDeleteItem" plain size="mini" type="danger"
-                   @click="remove">删除
+        <el-button v-has="['sys:platform:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
+        <el-button v-has="['sys:platform:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+                   @click="handleRemove">删除
         </el-button>
       </div>
       <el-table
@@ -33,7 +33,7 @@
         empty-text="无数据"
         size="mini"
         stripe
-        @selection-change="platformHandleSelectionChange">
+        @selection-change="handlePlatformSelectionChange">
         <el-table-column
           type="selection"
           width="55">
@@ -65,18 +65,18 @@
           label="操作"
           width="150">
           <template slot-scope="scope">
-            <el-button size="mini" type="text" @click="info(scope.row)">查看</el-button>
-            <el-button v-has="['sys:platform:modify']" size="mini" type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
+            <el-button v-has="['sys:platform:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑</el-button>
             <el-button v-has="['sys:platform:delete']" size="mini" type="text"
-                       @click.native.prevent="removeItem(scope.$index, platformTableData,scope.row)">删除
+                       @click.native.prevent="handleRemoveItem(scope.$index, platformTableData,scope.row)">删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
       <div style="text-align: right;margin-top: 2vh;">
         <el-pagination
-          :current-page="searchPlatformForm.current"
-          :page-size="searchPlatformForm.size"
+          :current-page="searchPlatform.current"
+          :page-size="searchPlatform.size"
           :page-sizes="[10, 20, 50, 100]"
           :total="total"
           layout="total, sizes, prev, pager, next, jumper"
@@ -87,8 +87,8 @@
     </el-main>
 
     <el-dialog :title="title" :visible.sync="platformDialogVisible" width="40vw"
-               @close="closePlatformDialog('platformRuleForm')">
-      <el-form ref="platformRuleForm" :model="platform" :rules="platformRules" size="mini">
+               @close="handleClosePlatformDialog('platformForm')">
+      <el-form ref="platformForm" :model="platform" :rules="platformRules" size="mini">
         <el-form-item :label-width="formLabelWidth" label="平台名称" prop="platformName">
           <el-input v-model="platform.platformName" autocomplete="off" clearable/>
         </el-form-item>
@@ -100,13 +100,13 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button size="mini" @click="resetPlatformForm('platformRuleForm')">取 消</el-button>
-        <el-button size="mini" type="primary" @click="submitPlatformForm('platformRuleForm')">确 定</el-button>
+        <el-button size="mini" @click="handleCancelPlatformForm('platformForm')">取 消</el-button>
+        <el-button size="mini" type="primary" @click="handleSubmitPlatformForm('platformForm')">确 定</el-button>
       </div>
     </el-dialog>
 
     <el-dialog :title="title" :visible.sync="infoDialogVisible" width="40vw"
-               @close="closeInfoDialog">
+               @close="handleCloseInfoDialog">
       <el-descriptions :column="2" border size="mini">
         <el-descriptions-item label="平台名称">
           {{ platform.platformName }}
@@ -138,11 +138,11 @@ export default {
       // 弹出框标题
       title: '',
       // 单元格选中数据
-      multipleSelectionPlatformIds: [],
+      selectionPlatformIds: [],
       // 平台表格数据
       platformTableData: [],
       // 平台查询条件数据
-      searchPlatformForm: {
+      searchPlatform: {
         platformName: '',
         platformCode: '',
         current: 1,
@@ -151,7 +151,7 @@ export default {
       // 分页总数
       total: 0,
       // 标记删除按钮是否可以点击
-      checkDeleteItem: true,
+      checkDelete: true,
       // 平台添加修改弹出框
       platformDialogVisible: false,
       // 平台详情弹出框
@@ -213,8 +213,8 @@ export default {
     reloadList () {
       list(this.buildParam()).then((response) => {
         this.platformTableData = response.data.records
-        this.searchPlatformForm.size = response.data.size
-        this.searchPlatformForm.current = response.data.current
+        this.searchPlatform.size = response.data.size
+        this.searchPlatform.current = response.data.current
         this.total = response.data.total
       })
     },
@@ -224,7 +224,7 @@ export default {
      * @returns {{current: number, size: number, platformName: string, platformCode: string}}
      */
     buildParam () {
-      return this.searchPlatformForm
+      return this.searchPlatform
     },
     /**
      * 分页大小切换
@@ -232,7 +232,7 @@ export default {
      * @param size
      */
     handleSizeChange (size) {
-      this.searchPlatformForm.size = size
+      this.searchPlatform.size = size
       this.reloadList()
     },
     /**
@@ -241,37 +241,38 @@ export default {
      * @param current
      */
     handleCurrentChange (current) {
-      this.searchPlatformForm.current = current
+      this.searchPlatform.current = current
       this.reloadList()
     },
     /**
      * 查询按钮
      */
-    search () {
+    handleSearch () {
       this.reloadList()
     },
     /**
      * 查询重置按钮
      */
-    searchReset () {
+    handleSearchReset () {
       this.$refs.searchForm.resetFields()
+      this.reloadList()
     },
     /**
      * 平台表格复选框事件
      *
      * @param val
      */
-    platformHandleSelectionChange (val) {
-      this.checkDeleteItem = !val.length
-      this.multipleSelectionPlatformIds = val
+    handlePlatformSelectionChange (val) {
+      this.checkDelete = !val.length
+      this.selectionPlatformIds = val
     },
     /**
      * 批量删除
      */
-    remove () {
+    handleRemove () {
       confirmAlert(() => {
         const ids = []
-        this.multipleSelectionPlatformIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
+        this.selectionPlatformIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(response => {
           if (response.code === 1) {
             this.reloadList()
@@ -287,7 +288,7 @@ export default {
      * @param rows
      * @param row
      */
-    removeItem (index, rows, row) {
+    handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
           if (response.code === 1) {
@@ -301,7 +302,7 @@ export default {
     /**
      * 创建
      */
-    create () {
+    handleCreate () {
       this.title = '创建平台'
       this.dialogType = DIALOG_TYPE.ADD
       this.platformDialogVisible = true
@@ -310,7 +311,7 @@ export default {
      * 修改
      * @param row
      */
-    edit (row) {
+    handleEdit (row) {
       this.title = '修改平台'
       this.dialogType = DIALOG_TYPE.EDIT
       this.platformDialogVisible = true
@@ -323,7 +324,7 @@ export default {
      *
      * @param row
      */
-    info (row) {
+    handleInfo (row) {
       this.title = '查看信息'
       this.dialogType = DIALOG_TYPE.SHOW
       this.infoDialogVisible = true
@@ -336,14 +337,14 @@ export default {
      *
      * @param formName
      */
-    closePlatformDialog (formName) {
+    handleClosePlatformDialog (formName) {
       this.platform.id = undefined
       this.$refs[formName].resetFields()
     },
     /**
      * 关闭详情弹出框事件
      */
-    closeInfoDialog () {
+    handleCloseInfoDialog () {
       this.platform = this.platformInfo
     },
     /**
@@ -351,10 +352,10 @@ export default {
      *
      * @param formName
      */
-    submitPlatformForm (formName) {
+    handleSubmitPlatformForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.dialogType === DIALOG_TYPE.ADD ? this.save() : this.modify()
+          this.dialogType === DIALOG_TYPE.ADD ? this.handleSave() : this.handleModify()
         } else {
           console.log('error submit!!')
           return false
@@ -364,7 +365,7 @@ export default {
     /**
      * 保存请求
      */
-    save () {
+    handleSave () {
       this.platform.id = undefined
       save(this.platform).then((response) => {
         if (response.code === 1) {
@@ -377,7 +378,7 @@ export default {
     /**
      * 修改请求
      */
-    modify () {
+    handleModify () {
       modify(this.platform).then((response) => {
         if (response.code === 1) {
           this.$message.success('修改成功')
@@ -391,7 +392,7 @@ export default {
      *
      * @param formName
      */
-    resetPlatformForm (formName) {
+    handleCancelPlatformForm (formName) {
       this.platformDialogVisible = false
       this.$refs[formName].resetFields()
     }
