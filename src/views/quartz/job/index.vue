@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <base-container>
     <el-main>
       <el-form ref="searchForm" :inline="true" :model="searchJob" class="demo-form-inline" label-width="80px"
                size="mini">
@@ -220,7 +220,7 @@
     <el-dialog :visible.sync="cronDialogVisible" title="生成 cron">
       <vcrontab :expression="dialogCron" @fill="handleCrontabFill" @hide="cronDialogVisible=false"></vcrontab>
     </el-dialog>
-  </el-container>
+  </base-container>
 </template>
 
 <script>

@@ -29,7 +29,7 @@ export function list (params) {
  */
 export function del (ids) {
   return request({
-    url: servicePath.system + '/file/delete',
+    url: servicePath.system + '/file',
     method: 'delete',
     data: ids
   })

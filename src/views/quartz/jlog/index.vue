@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <base-container>
     <el-main>
       <el-form ref="searchForm" :inline="true" :model="searchJobLog" class="demo-form-inline" label-width="80px"
                size="mini">
@@ -141,7 +141,7 @@
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
-  </el-container>
+  </base-container>
 </template>
 
 <script>

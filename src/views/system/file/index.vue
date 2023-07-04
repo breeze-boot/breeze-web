@@ -5,11 +5,11 @@
                size="mini">
         <el-row :gutter="24" style="text-align: left;">
           <el-col :md="24">
-            <el-form-item label="原始名称" prop="originalFileName">
-              <el-input v-model="searchFile.originalFileName" clearable placeholder="原始文件名称"/>
+            <el-form-item label="文件名" prop="fileName">
+              <el-input v-model="searchFile.fileName" clearable placeholder="文件名"/>
             </el-form-item>
-            <el-form-item label="新名称" prop="newFileName">
-              <el-input v-model="searchFile.newFileName" clearable placeholder="新文件名称"/>
+            <el-form-item label="业务类型" prop="bizType">
+              <el-input v-model="searchFile.bizType" clearable placeholder="业务类型"/>
             </el-form-item>
             <el-form-item label="创建人" prop="createName">
               <el-input v-model="searchFile.createName" clearable placeholder="创建人"/>
@@ -54,34 +54,68 @@
           width="200">
         </el-table-column>
         <el-table-column
-          label="原始名称"
-          prop="originalFileName"
+          label="桶"
+          prop="bucket"
           show-overflow-tooltip
           width="200">
         </el-table-column>
         <el-table-column
-          label="新名称"
-          prop="newFileName"
-          show-overflow-tooltip>
+          label="对象名称"
+          prop="objectName"
+          show-overflow-tooltip
+          width="200">
+        </el-table-column>
+        <el-table-column
+          label="存储的路径"
+          prop="path"
+          show-overflow-tooltip
+          width="200">
+        </el-table-column>
+        <el-table-column
+          label="文件名称"
+          prop="fileName"
+          show-overflow-tooltip
+          width="200">
+        </el-table-column>
+        <el-table-column
+          label="文件扩展名"
+          prop="fileFormat"
+          show-overflow-tooltip
+          width="200">
+        </el-table-column>
+        <el-table-column
+          label="上传格式"
+          prop="contentType"
+          show-overflow-tooltip
+          width="200">
+        </el-table-column>
+        <el-table-column
+          label="业务ID"
+          prop="bizId"
+          show-overflow-tooltip
+          width="200">
+        </el-table-column>
+        <el-table-column
+          label="业务类型"
+          prop="bizType"
+          show-overflow-tooltip
+          width="200">
         </el-table-column>
         <el-table-column
           :formatter="(row, column) => this.column()(row, column, 'OSS_STYLE')"
           label="存储方式"
-          prop="ossStyle"
+          prop="storeType"
           show-overflow-tooltip/>
-        <el-table-column
-          label="存储路径"
-          prop="path"
-          show-overflow-tooltip>
-        </el-table-column>
         <el-table-column
           label="创建人ID"
           prop="createBy"
-          show-overflow-tooltip>
+          show-overflow-tooltip
+          width="200">
         </el-table-column>
         <el-table-column
           label="创建人"
-          prop="createName">
+          prop="createName"
+          width="200">
         </el-table-column>
         <el-table-column
           fixed="right"
@@ -131,8 +165,8 @@
         <el-form-item prop="title">
           <el-input v-model="file.title" placeholder="请输入文件标题"/>
         </el-form-item>
-        <el-form-item prop="ossStyle" style="margin-bottom: 20px;">
-          <el-select v-model="file.ossStyle" :disabled="true" placeholder="请选择存储位置">
+        <el-form-item prop="storeType" style="margin-bottom: 20px;">
+          <el-select v-model="file.storeType" :disabled="true" placeholder="请选择存储位置">
             <el-option
               v-for="item in this.dict()('OSS_STYLE')"
               :key="item.key"
@@ -160,24 +194,39 @@
         <el-descriptions-item label="标题">
           {{ file.title }}
         </el-descriptions-item>
-        <el-descriptions-item label="原始名称">
-          {{ file.originalFileName }}
-        </el-descriptions-item>
-        <el-descriptions-item label="新名称">
+        <el-descriptions-item label="文件名称">
           <el-tag size="small">
-            {{ file.newFileName }}
+            {{ file.fileName }}
           </el-tag>
         </el-descriptions-item>
-        <el-descriptions-item label="存储方式">
-          <el-tag size="small">
-            {{ this.descriptions()(file, 'ossStyle', 'OSS_STYLE') }}
-          </el-tag>
+        <el-descriptions-item label="桶">
+          {{ file.bucket }}
         </el-descriptions-item>
-        <el-descriptions-item label="存储路径">
+        <el-descriptions-item label="对象名称">
+          {{ file.objectName }}
+        </el-descriptions-item>
+        <el-descriptions-item label="存储的路径">
           {{ file.path }}
+        </el-descriptions-item>
+        <el-descriptions-item label="上传格式">
+          {{ file.contentType }}
+        </el-descriptions-item>
+        <el-descriptions-item label="文件扩展名">
+          {{ file.fileFormat }}
+        </el-descriptions-item>
+        <el-descriptions-item label="业务ID">
+          {{ file.bizId }}
+        </el-descriptions-item>
+        <el-descriptions-item label="业务类型">
+          {{ file.bizType }}
         </el-descriptions-item>
         <el-descriptions-item label="创建人">
           {{ file.createName }}
+        </el-descriptions-item>
+        <el-descriptions-item label="存储方式">
+          <el-tag size="small">
+            {{ this.descriptions()(file, 'storeType', 'OSS_STYLE') }}
+          </el-tag>
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
@@ -211,9 +260,8 @@ export default {
       imgUrl: '',
       // 文件查询条件数据
       searchFile: {
-        originalFileName: '',
-        newFileName: '',
-        createBy: '',
+        fileName: '',
+        bizType: '',
         createName: '',
         size: 10
       },
@@ -233,13 +281,13 @@ export default {
       file: {
         id: null,
         title: '',
-        ossStyle: '1'
+        storeType: '1'
       },
       // 文件详情数据
       fileInfo: {
         id: null,
         title: '',
-        ossStyle: ''
+        storeType: ''
       },
       // 文件添加修改表单规则
       fileRules: {
@@ -250,7 +298,7 @@ export default {
             trigger: 'blur'
           }
         ],
-        ossStyle: [
+        storeType: [
           {
             required: true,
             message: '请选择存储位置',
@@ -280,7 +328,7 @@ export default {
     /**
      * 构造查询条件
      *
-     * @returns {{originalFileName: string, createBy: string, size: number, newFileName: string, createName: string}}
+     * @returns {{fileName: string, bizType: string, size: number, createName: string}}
      */
     buildParam () {
       return this.searchFile
@@ -417,15 +465,15 @@ export default {
         param.file = null
         return
       }
-      if (!this.file.ossStyle) {
+      if (!this.file.storeType) {
         this.$refs.uploadFileFrom.validate()
         param.file = null
         return
       }
       formData.append('file', param.file)
       formData.append('title', this.file.title)
-      formData.append('ossStyle', this.file.ossStyle)
-      this.file.ossStyle === 1 ? this.handleUploadMinioS3(formData) : this.handleUploadLocalStorage(formData)
+      formData.append('storeType', this.file.storeType)
+      this.file.storeType === 1 ? this.handleUploadMinioS3(formData) : this.handleUploadLocalStorage(formData)
     },
     handleUploadMinioS3 (formData) {
       uploadMinioS3(formData).then(response => {

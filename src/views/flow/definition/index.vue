@@ -1,5 +1,5 @@
 <template>
-  <el-container>
+  <base-container>
     <el-main>
       <el-form ref="searchForm" :inline="true" :model="searchDefinition" class="demo-form-inline"
                label-width="100px"
@@ -231,7 +231,7 @@
         </el-descriptions-item>
       </el-descriptions>
     </el-dialog>
-  </el-container>
+  </base-container>
 </template>
 
 <script>

@@ -1,7 +1,7 @@
 <template>
-  <el-container>
+  <base-container>
     欢迎
-  </el-container>
+  </base-container>
 </template>
 
 <script>
