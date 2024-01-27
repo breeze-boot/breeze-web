@@ -169,9 +169,9 @@
           <el-select v-model="file.storeType" :disabled="true" placeholder="请选择存储位置">
             <el-option
               v-for="item in this.dict()('OSS_STYLE')"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key">
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
@@ -317,7 +317,7 @@ export default {
      */
     reloadList () {
       list(this.buildParam()).then((response) => {
-        if (response.code === 1) {
+        if (response.data) {
           this.fileTableData = response.data.records
           this.searchFile.size = response.data.size
           this.searchFile.current = response.data.current
@@ -381,10 +381,8 @@ export default {
         const ids = []
         this.selectionFileIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(response => {
-          if (response.code === 1) {
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -398,11 +396,9 @@ export default {
     handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
-          if (response.code === 1) {
-            rows.splice(index, 1)
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          rows.splice(index, 1)
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -446,10 +442,10 @@ export default {
      * @param row
      */
     handlePreview (row) {
-      preview(row.id).then(rep => {
-        if (rep.code === 1) {
+      preview(row.id).then((response) => {
+        if (response.data) {
           this.previewDialogVisible = true
-          this.imgUrl = rep.data
+          this.imgUrl = response.data
         }
       })
     },

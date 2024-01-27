@@ -15,9 +15,9 @@
               <el-select v-model="searchMenu.platformId" placeholder="请选择平台">
                 <el-option
                   v-for="item in platformOptions"
-                  :key="item.key"
-                  :label="item.value"
-                  :value="item.key">
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -29,7 +29,7 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:menu:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
+        <el-button v-has="['auth:menu:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
       </div>
       <el-table
         ref="menuTable"
@@ -121,9 +121,9 @@
           width="180">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
-            <el-button v-has="['sys:menu:create']" size="mini" type="text" @click="handleCreate(scope.row)">新建</el-button>
-            <el-button v-has="['sys:menu:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑</el-button>
-            <el-button v-has="['sys:menu:delete']" size="mini" type="text"
+            <el-button v-has="['auth:menu:create']" size="mini" type="text" @click="handleCreate(scope.row)">新建</el-button>
+            <el-button v-has="['auth:menu:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑</el-button>
+            <el-button v-has="['auth:menu:delete']" size="mini" type="text"
                        @click.native.prevent="handleDelItem(menuTableData,scope.row)">删除
             </el-button>
           </template>
@@ -138,9 +138,9 @@
           <el-select v-model="menu.platformId" placeholder="请选择所属的平台">
             <el-option
               v-for="item in platformOptions"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key">
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
@@ -151,9 +151,9 @@
                           @click="menu.type === 2 ? menu.href = 0 : menu.href = 1">
             <el-radio-button
               v-for="item in this.dict()('MENU_TYPE')"
-              :key="item.key"
-              :label="Number(item.key)">
-              {{ item.value }}
+              :key="item.value"
+              :label="Number(item.value)">
+              {{ item.label }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
@@ -162,9 +162,9 @@
           <el-radio-group v-model="menu.href">
             <el-radio-button
               v-for="item in this.dict()('HREF')"
-              :key="item.key"
-              :label="item.key">
-              {{ item.value }}
+              :key="item.value"
+              :label="item.value">
+              {{ item.label }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
@@ -173,9 +173,9 @@
           <el-radio-group v-model="menu.keepAlive">
             <el-radio-button
               v-for="item in this.dict()('KEEPALIVE')"
-              :key="item.key"
-              :label="item.key">
-              {{ item.value }}
+              :key="item.value"
+              :label="item.value">
+              {{ item.label }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
@@ -184,9 +184,9 @@
           <el-radio-group v-model="menu.hidden">
             <el-radio-button
               v-for="item in this.dict()('HIDDEN')"
-              :key="item.key"
-              :label="item.key">
-              {{ item.value }}
+              :key="item.value"
+              :label="item.value">
+              {{ item.label }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
@@ -195,7 +195,7 @@
           <el-cascader
             v-model="menu.parentId"
             :options="menuOption"
-            :props="{ checkStrictly: true, emitPath: false , value: 'key', label: 'value' }"
+            :props="{ checkStrictly: true, emitPath: false , value: 'value', label: 'label' }"
             :show-all-levels="false"
             clearable
             filterable
@@ -276,7 +276,7 @@
           <el-cascader
             v-model="menu.parentId"
             :options="menuOption"
-            :props="{ checkStrictly: true, emitPath: false , value: 'key', label: 'value' }"
+              :props="{ checkStrictly: true, emitPath: false , value: 'value', label: 'label' }"
             :show-all-levels="false"
             clearable
             disabled
@@ -325,7 +325,7 @@
 </template>
 
 <script>
-import { del, list, modify, save, selectMenu, selectPlatform } from '@/api/system/menu'
+import { del, list, modify, save, selectMenu, selectPlatform } from '@/api/auth/menu'
 import { confirmAlert } from '@utils/common'
 import { DIALOG_TYPE, ROOT } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
@@ -461,10 +461,8 @@ export default {
      * 初始化加载表格数据
      */
     reloadList () {
-      list(this.buildParam()).then((rep) => {
-        if (rep.code === 1) {
-          this.menuTableData = rep.data
-        }
+      list(this.buildParam()).then((response) => {
+        this.menuTableData = response.data
       })
     },
     /**
@@ -496,10 +494,8 @@ export default {
      */
     handleDelItem (rows, row) {
       confirmAlert(() => {
-        del(JSONBigInt.parse(row.id)).then(rep => {
-          if (rep.code === 1) {
-            this.handleDeleteTreeTableData(rows, row)
-          }
+        del(JSONBigInt.parse(row.id)).then(response => {
+          this.handleDeleteTreeTableData(rows, row)
         })
       })
     },
@@ -614,24 +610,20 @@ export default {
      * 保存请求
      */
     handleSave () {
-      save(this.menu).then((rep) => {
-        if (rep.code === 1) {
-          this.$message.success(rep.message)
-          this.menuDialogVisible = false
-          this.reloadList()
-        }
+      save(this.menu).then((response) => {
+        this.$message.success(response.message)
+        this.menuDialogVisible = false
+        this.reloadList()
       })
     },
     /**
      * 修改请求
      */
     handleModify () {
-      modify(this.menu).then((rep) => {
-        if (rep.code === 1) {
-          this.$message.success(rep.message)
-          this.menuDialogVisible = false
-          this.reloadList()
-        }
+      modify(this.menu).then((response) => {
+        this.$message.success(response.message)
+        this.menuDialogVisible = false
+        this.reloadList()
       })
     },
     /**
@@ -657,10 +649,8 @@ export default {
      * 平台下拉框
      */
     selectPlatform () {
-      selectPlatform().then((rep) => {
-        if (rep.code === 1) {
-          this.platformOptions = rep.data
-        }
+      selectPlatform().then((response) => {
+        this.platformOptions = response.data
       }).catch((e) => {
         console.error(e)
       })
@@ -672,10 +662,10 @@ export default {
      */
     selectMenu (id) {
       selectMenu(id || 0).then(response => {
-        if (response.code === 1 && response.data) {
+        if (response.data) {
           this.menuOption = [{
-            key: ROOT,
-            value: '根节点',
+            value: ROOT,
+            label: '根节点',
             children: response.data
           }]
         }

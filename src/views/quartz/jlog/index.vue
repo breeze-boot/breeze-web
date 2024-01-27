@@ -206,7 +206,7 @@ export default {
      */
     reloadList () {
       list(this.buildParam()).then((response) => {
-        if (response.code === 1) {
+        if (response.data) {
           this.jobLogTableData = response.data.records
           this.searchJobLog.size = response.data.size
           this.searchJobLog.current = response.data.current
@@ -272,10 +272,8 @@ export default {
         const ids = []
         this.multipleSelectionJobLogId.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then((response) => {
-          if (response.code === 1) {
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -300,11 +298,9 @@ export default {
     handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
-          if (response.code === 1) {
-            rows.splice(index, 1)
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          rows.splice(index, 1)
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },

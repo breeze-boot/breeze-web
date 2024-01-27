@@ -22,12 +22,12 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:user:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
-        <el-button v-has="['sys:user:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+        <el-button v-has="['auth:user:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
+        <el-button v-has="['auth:user:delete']" :disabled="checkDelete" plain size="mini" type="danger"
                    @click="handleRemove">删除
         </el-button>
-        <el-button v-has="['sys:user:export']" plain size="mini" type="info" @click="handleExport">导出</el-button>
-        <el-button v-has="['sys:user:import']" plain size="mini" @click="handleImport">导入</el-button>
+        <el-button v-has="['auth:user:export']" plain size="mini" type="info" @click="handleExport">导出</el-button>
+        <el-button v-has="['auth:user:import']" plain size="mini" @click="handleImport">导入</el-button>
       </div>
       <el-table
         :header-cell-style="{ textAlign: 'center' }"
@@ -141,9 +141,9 @@
           width="220">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
-            <el-button v-has="['sys:user:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
+            <el-button v-has="['auth:user:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
             </el-button>
-            <el-button v-has="['sys:user:delete']" size="mini" type="text"
+            <el-button v-has="['auth:user:delete']" size="mini" type="text"
                        @click.native.prevent="handleRemoveItem(scope.$index, userTableData,scope.row)">删除
             </el-button>
             <el-dropdown size="mini" style="margin-left: 5px;" trigger="click" type="primary">
@@ -152,9 +152,9 @@
                 <i class="el-icon-arrow-down el-icon--right"></i>
               </span>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item v-has="['sys:user:reset']" command="1" @click.native="handleReset(scope.row)">重置密码
+                <el-dropdown-item v-has="['auth:user:reset']" command="1" @click.native="handleReset(scope.row)">重置密码
                 </el-dropdown-item>
-                <el-dropdown-item v-has="['sys:user:setRole']" command="2" @click.native="goRoleView(scope.row)"
+                <el-dropdown-item v-has="['auth:user:setRole']" command="2" @click.native="goRoleView(scope.row)"
                 >角色分配
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -235,7 +235,7 @@
           <el-cascader
             v-model="user.deptId"
             :options="deptOption"
-            :props="{ checkStrictly: true, emitPath: false , value: 'key', label: 'value' }"
+            :props="{ checkStrictly: true, emitPath: false , value: 'value', label: 'label' }"
             :show-all-levels="false"
             clearable
             filterable
@@ -245,9 +245,9 @@
           <el-select v-model="user.postId" collapse-tags filterable placeholder="请选择岗位">
             <el-option
               v-for="item in postOption"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key">
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
@@ -255,9 +255,9 @@
           <el-select v-model="user.roleIds" collapse-tags filterable multiple placeholder="请选择用户角色">
             <el-option
               v-for="item in roleOption"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key">
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
@@ -350,11 +350,11 @@ import {
   save,
   selectPost,
   selectRole
-} from '@/api/system/user'
+} from '@/api/auth/user'
 import { confirmAlert } from '@utils/common'
 import { DIALOG_TYPE, OSS } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
-import { selectDept } from '@/api/system/dept'
+import { selectDept } from '@/api/auth/dept'
 import { saveAs } from 'file-saver'
 import { uploadMinioS3 } from '@/api/system/file'
 import { dict } from '@/mixins'
@@ -602,7 +602,7 @@ export default {
      */
     selectDept () {
       selectDept().then(response => {
-        if (response.code === 1 && response.data) {
+        if (response.data) {
           this.deptOption = response.data
         }
       })
@@ -612,7 +612,7 @@ export default {
      */
     selectPost (postId) {
       selectPost().then(response => {
-        if (response.code === 1) {
+        if (response.data) {
           this.postOption = response.data
           if (this.dialogType === DIALOG_TYPE.ADD) {
             return
@@ -627,7 +627,7 @@ export default {
      */
     selectRole () {
       selectRole().then(response => {
-        if (response.code === 1) {
+        if (response.data) {
           this.roleOption = response.data
         }
       })
@@ -689,10 +689,8 @@ export default {
         const ids = []
         this.selectionUserIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(response => {
-          if (response.code === 1) {
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -706,11 +704,9 @@ export default {
     handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
-          if (response.code === 1) {
-            rows.splice(index, 1)
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          rows.splice(index, 1)
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -813,11 +809,9 @@ export default {
      */
     handleSave () {
       save(this.user).then((response) => {
-        if (response.code === 1) {
-          this.$message.success({ message: response.message })
-          this.userDialogVisible = false
-          this.reloadList()
-        }
+        this.$message.success({ message: response.message })
+        this.userDialogVisible = false
+        this.reloadList()
       })
     },
     /**
@@ -825,11 +819,9 @@ export default {
      */
     handleModify () {
       modify(this.user).then((response) => {
-        if (response.code === 1) {
-          this.$message.success({ message: response.message })
-          this.userDialogVisible = false
-          this.reloadList()
-        }
+        this.$message.success({ message: response.message })
+        this.userDialogVisible = false
+        this.reloadList()
       })
     },
     /**
@@ -861,10 +853,8 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           resetPass(this.userPassword).then(response => {
-            if (response.code === 1) {
-              this.$message.success({ message: '重置成功' })
-              this.restPassDialogVisible = false
-            }
+            this.$message.success({ message: '重置成功' })
+            this.restPassDialogVisible = false
           })
         } else {
           console.log('error submit!!')
@@ -892,9 +882,7 @@ export default {
     },
     handleOpen (index, row) {
       open(row.username, row.isLock).then((response) => {
-        if (response.code === 1) {
-          this.$message.success(response.message)
-        }
+        this.$message.success(response.message)
       })
     },
     /**
@@ -908,7 +896,7 @@ export default {
       formData.append('title', '用户头像')
       formData.append('ossStyle', OSS.LOCAL)
       uploadMinioS3(formData).then(response => {
-        if (response.code === 1 && response.data) {
+        if (response.data) {
           this.$message({
             message: '图片上传成功',
             type: 'success'

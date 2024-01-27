@@ -19,7 +19,7 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:dept:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
+        <el-button v-has="['auth:dept:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
       </div>
       <el-table
         ref="deptTable"
@@ -52,11 +52,11 @@
           width="200">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
-            <el-button v-has="['sys:dept:create']" size="mini" type="text" @click="handleCreate(scope.row)">新建
+            <el-button v-has="['auth:dept:create']" size="mini" type="text" @click="handleCreate(scope.row)">新建
             </el-button>
-            <el-button v-has="['sys:dept:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
+            <el-button v-has="['auth:dept:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
             </el-button>
-            <el-button v-has="['sys:dept:delete']" size="mini" type="text"
+            <el-button v-has="['auth:dept:delete']" size="mini" type="text"
                        @click.native.prevent="handleRemoveItem(deptTableData,scope.row)">删除
             </el-button>
           </template>
@@ -71,7 +71,7 @@
           <el-cascader
             v-model="dept.parentId"
             :options="deptOption"
-            :props="{ checkStrictly: true, emitPath: false , value: 'key', label: 'value' }"
+            :props="{ checkStrictly: true, emitPath: false , value: 'value', label: 'label' }"
             :show-all-levels="false"
             clearable
             filterable
@@ -104,7 +104,7 @@
 </template>
 
 <script>
-import { checkDeptCode, del, list, modify, save, selectDept } from '@/api/system/dept'
+import { checkDeptCode, del, list, modify, save, selectDept } from '@/api/auth/dept'
 import { confirmAlert } from '@utils/common'
 import { DIALOG_TYPE, ROOT } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
@@ -185,9 +185,9 @@ export default {
      * 初始化加载表格数据
      */
     reloadList () {
-      list(this.buildParam()).then((rep) => {
-        if (rep.code === 1) {
-          this.deptTableData = rep.data
+      list(this.buildParam()).then((response) => {
+        if (response.data) {
+          this.deptTableData = response.data
         }
       })
     },
@@ -228,10 +228,8 @@ export default {
      */
     handleRemoveItem (rows, row) {
       confirmAlert(() => {
-        del(JSONBigInt.parse(row.id)).then(rep => {
-          if (rep.code === 1) {
-            this.handleDeleteTreeTableData(rows, row)
-          }
+        del(JSONBigInt.parse(row.id)).then(response => {
+          this.handleDeleteTreeTableData(rows, row)
         })
       })
     },
@@ -329,24 +327,20 @@ export default {
      * 保存请求
      */
     handleSave () {
-      save(this.dept).then((rep) => {
-        if (rep.code === 1) {
-          this.$message.success(rep.message)
-          this.deptDialogVisible = false
-          this.reloadList()
-        }
+      save(this.dept).then((response) => {
+        this.$message.success(response.message)
+        this.deptDialogVisible = false
+        this.reloadList()
       })
     },
     /**
      * 修改请求
      */
     handleModify () {
-      modify(this.dept).then((rep) => {
-        if (rep.code === 1) {
-          this.$message.success(rep.message)
-          this.deptDialogVisible = false
-          this.reloadList()
-        }
+      modify(this.dept).then((response) => {
+        this.$message.success(response.message)
+        this.deptDialogVisible = false
+        this.reloadList()
       })
     },
     /**
@@ -365,10 +359,10 @@ export default {
      */
     selectDept (id) {
       selectDept(id).then(response => {
-        if (response.code === 1 && response.data) {
+        if (response.data) {
           this.deptOption = [{
-            key: ROOT,
-            value: '根节点',
+            value: ROOT,
+            label: '根节点',
             children: response.data
           }]
         }

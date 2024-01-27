@@ -367,12 +367,10 @@ export default {
     handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del(row.deploymentId).then(response => {
-          if (response.code === 1) {
-            rows.splice(index, 1)
-            this.reloadList()
-            this.handleViewVersion(this.currentRowData)
-            this.$message.success('删除成功')
-          }
+          rows.splice(index, 1)
+          this.reloadList()
+          this.handleViewVersion(this.currentRowData)
+          this.$message.success('删除成功')
         })
       })
     },
@@ -525,11 +523,9 @@ export default {
      */
     handleModify () {
       modify(this.definition).then((response) => {
-        if (response.code === 1) {
-          this.$message.success('修改成功')
-          this.definitionDialogVisible = false
-          this.reloadList()
-        }
+        this.$message.success('修改成功')
+        this.definitionDialogVisible = false
+        this.reloadList()
       })
     },
     /**

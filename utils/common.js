@@ -1,24 +1,7 @@
 import Vue from 'vue'
 import router from '@/router/index'
-import { Message } from 'element-ui'
 import store from '@/store'
 import CryptoJS from 'crypto-js'
-
-export const showErrorMsg = (success, msg) => {
-  if (success.data.message) {
-    Message.error({ message: success.data.message })
-  } else {
-    Message.error({ message: msg })
-  }
-}
-
-export const showWaringMsg = (success, msg) => {
-  if (success.data.message) {
-    Message.warning({ message: success.data.message })
-  } else {
-    Message.warning({ message: msg })
-  }
-}
 
 export const confirmAlert = (func, msg) => {
   Vue.prototype.$confirm(msg || '是否删除', '提示', {

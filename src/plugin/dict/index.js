@@ -17,16 +17,16 @@ const handleListDict = (dictCodes = []) => {
     })
     if (noFindDictCodes.length > 0) {
       listDict(noFindDictCodes).then(response => {
-        if (response.code === 0 || !response.data) {
+        if (!response.data) {
           return
         }
-        for (const [key, value] of Object.entries(response.data)) {
-          const dict = {
-            key: key,
-            value: value
+        for (const [dictCode, value] of Object.entries(response.data)) {
+          const _dict = {
+            dictCode: dictCode,
+            dict: value
           }
-          store.commit('dict/setDict', dict)
-          findDict.push(dict)
+          store.commit('dict/setDict', _dict)
+          findDict.push(_dict)
         }
         resolve(findDict)
       })

@@ -12,9 +12,9 @@
               <el-select v-model="searchJob.jobGroupName" collapse-tags filterable placeholder="请选择任务组">
                 <el-option
                   v-for="item in this.dict()('JOB_GROUP')"
-                  :key="item.key"
-                  :label="item.value"
-                  :value="item.key">
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -143,9 +143,9 @@
           <el-select v-model="job.jobGroupName" collapse-tags filterable placeholder="请选择任务组">
             <el-option
               v-for="item in this.dict()('JOB_GROUP')"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key">
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
@@ -395,10 +395,8 @@ export default {
         const ids = []
         this.multipleSelectionJobIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(response => {
-          if (response.code === 1) {
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -412,11 +410,9 @@ export default {
     handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
-          if (response.code === 1) {
-            rows.splice(index, 1)
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          rows.splice(index, 1)
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -489,11 +485,9 @@ export default {
     handleSave () {
       this.job.id = undefined
       save(this.job).then((response) => {
-        if (response.code === 1) {
-          this.$message.success('添加成功')
-          this.jobDialogVisible = false
-          this.reloadList()
-        }
+        this.$message.success('添加成功')
+        this.jobDialogVisible = false
+        this.reloadList()
       })
     },
     /**
@@ -501,19 +495,15 @@ export default {
      */
     handleModify () {
       modify(this.job).then((response) => {
-        if (response.code === 1) {
-          this.$message.success('修改成功')
-          this.jobDialogVisible = false
-          this.reloadList()
-        }
+        this.$message.success('修改成功')
+        this.jobDialogVisible = false
+        this.reloadList()
       })
     },
     handleRunJobNow (row) {
       confirmAlert(() => {
         runJobNow(row.id).then((response) => {
-          if (response.code === 1) {
-            this.$message.success('运行成功')
-          }
+          this.$message.success('运行成功')
         })
       }, '是否运行一次')
     },
@@ -542,9 +532,7 @@ export default {
      */
     handleOpen (index, row) {
       open(row.id, row.status).then((response) => {
-        if (response.code === 1) {
-          this.$message.success(response.message)
-        }
+        this.$message.success(response.message)
       })
     },
     /**

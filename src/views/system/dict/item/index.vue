@@ -113,7 +113,7 @@ export default {
       const currentTab = this.$store.getters['tab/getCurrentTab']
       id = currentTab.query.id
       list({ id: id }).then((response) => {
-        if (response.code === 1) {
+        if (response.data) {
           this.dictItemTableData = response.data
           this.total = response.data.total
         }
@@ -176,10 +176,8 @@ export default {
         const ids = []
         this.selectionDictItemIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then((response) => {
-          if (response.code === 1) {
-            this.$message.success('删除成功')
-            this.reloadList(this.buildParam())
-          }
+          this.$message.success('删除成功')
+          this.reloadList(this.buildParam())
         })
       })
     },
@@ -193,11 +191,9 @@ export default {
     handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
-          if (response.code === 1) {
-            rows.splice(index, 1)
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          rows.splice(index, 1)
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -249,24 +245,20 @@ export default {
      * 保存请求
      */
     handleSave () {
-      save(this.dictItem).then((rep) => {
-        if (rep.code === 1) {
-          this.$message.success(rep.message)
-          this.dictItemDialogVisible = false
-          this.reloadList(this.buildParam())
-        }
+      save(this.dictItem).then((response) => {
+        this.$message.success(response.message)
+        this.dictItemDialogVisible = false
+        this.reloadList(this.buildParam())
       })
     },
     /**
      * 修改请求
      */
     handleModify () {
-      modify(this.dictItem).then((rep) => {
-        if (rep.code === 1) {
-          this.$message.success(rep.message)
-          this.dictItemDialogVisible = false
-          this.reloadList(this.buildParam())
-        }
+      modify(this.dictItem).then((response) => {
+        this.$message.success(response.message)
+        this.dictItemDialogVisible = false
+        this.reloadList(this.buildParam())
       })
     },
     /**

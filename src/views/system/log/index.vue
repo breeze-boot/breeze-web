@@ -12,9 +12,9 @@
               <el-select v-model="searchLog.doType" placeholder="请选择操作类型">
                 <el-option
                   v-for="item in this.dict()('DO_TYPE')"
-                  :key="item.key"
-                  :label="item.value"
-                  :value="item.key">
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -22,9 +22,9 @@
               <el-select v-model="searchLog.logType" placeholder="请选择日志类型">
                 <el-option
                   v-for="item in this.dict()('LOG_TYPE')"
-                  :key="item.key"
-                  :label="item.value"
-                  :value="item.key">
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -32,9 +32,9 @@
               <el-select v-model="searchLog.result" placeholder="请选择执行结果">
                 <el-option
                   v-for="item in this.dict()('RESULT')"
-                  :key="item.key"
-                  :label="item.value"
-                  :value="item.key">
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
                 </el-option>
               </el-select>
             </el-form-item>
@@ -258,7 +258,7 @@ export default {
      */
     reloadList () {
       list(this.buildParam()).then((response) => {
-        if (response.code === 1) {
+        if (response.data) {
           this.logTableData = response.data.records
           this.searchLog.size = response.data.size
           this.searchLog.current = response.data.current
@@ -326,10 +326,8 @@ export default {
         const ids = []
         this.selectionLogIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then((response) => {
-          if (response.code === 1) {
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -354,11 +352,9 @@ export default {
     handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
-          if (response.code === 1) {
-            rows.splice(index, 1)
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          rows.splice(index, 1)
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },

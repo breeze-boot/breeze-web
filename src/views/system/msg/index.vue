@@ -125,14 +125,14 @@
         <el-form-item :label-width="formLabelWidth" label="消息类型" prop="type">
           <el-radio-group v-model="msg.type">
             <el-radio-button v-for="item in this.dict()('MSG_TYPE')" :key="item.key" :label="item.key">
-              {{ item.value }}
+              {{ item.label }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
         <el-form-item :label-width="formLabelWidth" label="消息等级" prop="level">
           <el-radio-group v-model="msg.level">
             <el-radio-button v-for="item in this.dict()('MSG_LEVEL')" :key="item.key" :label="item.key">
-              {{ item.value }}
+              {{ item.label }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
@@ -183,7 +183,7 @@
           <el-cascader
             v-model="sendMsgData.multipleDeptId"
             :options="deptOption"
-            :props="{ checkStrictly: true, multiple: true, emitPath: false , value: 'key', label: 'value' }"
+            :props="{ checkStrictly: true, multiple: true, emitPath: false , value: 'value', label: 'label' }"
             :show-all-levels="false"
             collapse-tags
             @change="handleChangeDept"/>
@@ -287,7 +287,7 @@ import { del, list, listUserByDeptId, modify, save, selectUser } from '@/api/sys
 import { confirmAlert } from '@utils/common'
 import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
-import { selectDept } from '@/api/system/dept'
+import { selectDept } from '@/api/auth/dept'
 import { dict } from '@/mixins'
 
 export default {
@@ -473,10 +473,8 @@ export default {
         const ids = []
         this.multipleSelectionMsgIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(response => {
-          if (response.code === 1) {
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -490,11 +488,9 @@ export default {
     handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
-          if (response.code === 1) {
-            rows.splice(index, 1)
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          rows.splice(index, 1)
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -566,11 +562,9 @@ export default {
     handleSave () {
       this.msg.id = undefined
       save(this.msg).then((response) => {
-        if (response.code === 1) {
-          this.$message.success('添加成功')
-          this.msgDialogVisible = false
-          this.reloadList()
-        }
+        this.$message.success('添加成功')
+        this.msgDialogVisible = false
+        this.reloadList()
       })
     },
     /**
@@ -578,11 +572,9 @@ export default {
      */
     handleModify () {
       modify(this.msg).then((response) => {
-        if (response.code === 1) {
-          this.$message.success('修改成功')
-          this.msgDialogVisible = false
-          this.reloadList()
-        }
+        this.$message.success('修改成功')
+        this.msgDialogVisible = false
+        this.reloadList()
       })
     },
     /**
@@ -669,7 +661,7 @@ export default {
         deptIds.push(JSONBigInt.parse(id))
       })
       listUserByDeptId(this.sendMsgData.multipleDeptId).then((response) => {
-        if (response.code === 1) {
+        if (response.data) {
           this.sendMsgData.userTableData = response.data
           const userIds = []
           this.sendMsgData.userTableData.forEach(row => {
@@ -699,7 +691,7 @@ export default {
      */
     selectDept () {
       selectDept().then(response => {
-        if (response.code === 1 && response.data) {
+        if (response.data) {
           this.deptOption = response.data
         }
       })

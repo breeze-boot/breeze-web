@@ -60,7 +60,7 @@ export default {
         // 若去后台重新加载，清空本地的缓存
         context.state.msg = []
         listMsgByUsername().then(response => {
-          if (response.code !== 1) {
+          if (!response.data) {
             return
           }
           context.commit('setMsg', response.data)
@@ -77,7 +77,7 @@ export default {
     closeMsgCard (context, msg) {
       // 更改状态
       close(msg.msgId).then(response => {
-        if (response.code !== 1) {
+        if (!response.data) {
           return
         }
         context.commit('closeMsgCard', msg)
@@ -86,7 +86,7 @@ export default {
     markReadMsgCard (context, msg) {
       // 更改状态
       read(msg.msgId).then(response => {
-        if (response.code !== 1) {
+        if (!response.data) {
           return
         }
         context.commit('markReadMsgCard', msg)

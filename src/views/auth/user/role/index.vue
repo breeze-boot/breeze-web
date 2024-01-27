@@ -87,8 +87,8 @@
 </template>
 
 <script>
-import { list, listUserRoles } from '@/api/system/role'
-import { userAddRole } from '@/api/system/user'
+import { list, listUserRoles } from '@/api/auth/role'
+import { userAddRole } from '@/api/auth/user'
 
 export default {
   name: 'Role',
@@ -122,7 +122,7 @@ export default {
      */
     reloadList () {
       list(this.buildParam()).then((response) => {
-        if (response.code === 1) {
+        if (response.data) {
           this.roleTableData = response.data.records
           this.roleSearch.size = response.data.size
           this.roleSearch.current = response.data.current
@@ -130,7 +130,7 @@ export default {
         }
       }).then(() => {
         listUserRoles(this.roleSearch.userId).then((response) => {
-          if (response.code === 1) {
+          if (response.data) {
             response.data.forEach(roleId => {
               this.roleTableData.forEach(tableDataRow => {
                 if (tableDataRow.id === roleId) {
@@ -206,9 +206,7 @@ export default {
         roleId: this.selectionUserRoleIds.map(role => role.id)
       }
       userAddRole(requestParam).then(response => {
-        if (response.code === 1) {
-          this.$message.success('分配成功')
-        }
+        this.$message.success('分配成功')
       })
     },
     /**

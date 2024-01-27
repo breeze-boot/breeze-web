@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { Message } from 'element-ui'
-import { reLoginConfirm, showErrorMsg, showWaringMsg } from '@utils/common'
+import { reLoginConfirm } from '@utils/common'
 
 /**
  * 创建的实例返回一个对象,实例对象
@@ -45,18 +45,12 @@ request.interceptors.response.use((response) => {
       response.data.contentType = response.headers['content-type']
       return response
     }
-    if (response.data.code === 2 && response.data.message) {
+    if (response.data.code === '0001' && response.data.message) {
       // 业务逻辑验证警告
-      showWaringMsg(response, response.data.message)
-    } else if (response.data.code === 0 && response.data.message) {
-      // 业务错误失败
-      showErrorMsg(response, '系统异常')
-      setTimeout(() => {
-      }, 2000)
-      return Promise.reject(response)
-    } else if (response.data.code === 500) {
+      Message.warning({ message: response.data.message })
+    } else if (response.data.code === '0002') {
       // 系统错误
-      showErrorMsg(response, '服务异常')
+      Message.warning({ message: response.data.message || '服务异常' })
       setTimeout(() => {
       }, 2000)
       return Promise.reject(response)
@@ -73,15 +67,15 @@ request.interceptors.response.use((response) => {
   } else if (error.response.status === 404) {
     Message.error({ message: '请求地址不存在' })
   } else if (error.response.status === 401) {
-    showErrorMsg(error.response, error.response.data.message)
+    Message.error({ message: 'token过期' })
     reLoginConfirm()
     return
   } else if (error.response.status === 403) {
-    showErrorMsg(error.response, '无权限')
+    Message.error({ message: error.data.message || '无权限' })
     reLoginConfirm()
     return
   } else if (error.response.status === 503) {
-    showErrorMsg(error.response, '服务不存在')
+    Message.error({ message: error.data.message || '服务不存在' })
     return
   }
   console.error(error.response.status)

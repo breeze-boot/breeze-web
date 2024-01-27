@@ -19,8 +19,8 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:client:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
-        <el-button v-has="['sys:client:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+        <el-button v-has="['auth:client:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
+        <el-button v-has="['auth:client:delete']" :disabled="checkDelete" plain size="mini" type="danger"
                    @click="handleRemove">删除
         </el-button>
       </div>
@@ -285,13 +285,13 @@
           label="操作"
           width="200">
           <template slot-scope="scope">
-            <el-button v-has="['sys:client:resetClientSecret']" size="mini" type="text"
+            <el-button v-has="['auth:client:resetClientSecret']" size="mini" type="text"
                        @click="handleResetClientSecret(scope.row)">重置密钥
             </el-button>
             <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
-            <el-button v-has="['sys:client:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
+            <el-button v-has="['auth:client:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
             </el-button>
-            <el-button v-has="['sys:client:delete']" size="mini" type="text"
+            <el-button v-has="['auth:client:delete']" size="mini" type="text"
                        @click.native.prevent="handleRemoveItem(scope.$index, clientTableData,scope.row)">删除
             </el-button>
           </template>
@@ -347,8 +347,8 @@
               <el-option
                 v-for="(item, index) in this.dict()('REDIRECT_URIS')"
                 :key="index"
-                :label="item.value"
-                :value="item.key">
+                :label="item.label"
+                :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
@@ -358,8 +358,8 @@
               <el-option
                 v-for="(item, index) in this.dict()('SCOPES')"
                 :key="index"
-                :label="item.value"
-                :value="item.key">
+                :label="item.label"
+                :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
@@ -369,8 +369,8 @@
               <el-option
                 v-for="(item, index) in this.dict()('AUTHORIZATION_GRANT_TYPES')"
                 :key="index"
-                :label="item.value"
-                :value="item.key">
+                :label="item.label"
+                :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
@@ -381,8 +381,8 @@
               <el-option
                 v-for="(item, index) in this.dict()('CLIENT_AUTHENTICATION_METHODS')"
                 :key="index"
-                :label="item.value"
-                :value="item.key">
+                :label="item.label"
+                :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
@@ -433,8 +433,8 @@
               <el-option
                 v-for="(item, index)  in this.dict()('TOKEN_ENDPOINT_AUTHENTICATION_SIGNING_ALGORITHM')"
                 :key="index"
-                :label="item.value"
-                :value="item.key">
+                :label="item.label"
+                :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
@@ -448,8 +448,8 @@
               <el-option
                 v-for="(item, index) in this.dict()('ID_TOKEN_SIGNATURE_ALGORITHM')"
                 :key="index"
-                :label="item.value"
-                :value="item.key">
+                :label="item.label"
+                :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
@@ -459,8 +459,8 @@
               <el-option
                 v-for="(item, index)  in this.dict()('ACCESS_TOKEN_FORMAT')"
                 :key="index"
-                :label="item.value"
-                :value="item.key">
+                :label="item.label"
+                :value="item.value">
               </el-option>
             </el-select>
           </el-form-item>
@@ -595,7 +595,7 @@
 </template>
 
 <script>
-import { del, info, list, modify, resetClientSecret, save } from '@/api/system/client'
+import { del, info, list, modify, resetClientSecret, save } from '@/api/auth/client'
 import { confirmAlert } from '@utils/common'
 import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
@@ -939,10 +939,8 @@ export default {
         const ids = []
         this.selectionClientIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(response => {
-          if (response.code === 1) {
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -956,11 +954,9 @@ export default {
     handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
-          if (response.code === 1) {
-            rows.splice(index, 1)
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          rows.splice(index, 1)
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -982,7 +978,7 @@ export default {
       this.title = '修改客户端'
       this.dialogType = DIALOG_TYPE.EDIT
       info(row.id).then((response) => {
-        if (response.code === 1) {
+        if (response.data) {
           this.$nextTick(() => {
             this.client = response.data
             this.clientDialogVisible = true
@@ -1039,11 +1035,9 @@ export default {
     handleSave () {
       this.client.id = undefined
       save(this.client).then((response) => {
-        if (response.code === 1) {
-          this.$message.success('添加成功')
-          this.clientDialogVisible = false
-          this.reloadList()
-        }
+        this.$message.success('添加成功')
+        this.clientDialogVisible = false
+        this.reloadList()
       })
     },
     /**
@@ -1052,11 +1046,9 @@ export default {
     handleModify () {
       this.client.clientSecret = ''
       modify(this.client).then((response) => {
-        if (response.code === 1) {
-          this.$message.success('修改成功')
-          this.clientDialogVisible = false
-          this.reloadList()
-        }
+        this.$message.success('修改成功')
+        this.clientDialogVisible = false
+        this.reloadList()
       })
     },
     /**
@@ -1096,10 +1088,8 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           resetClientSecret(this.resetClientSecret).then(response => {
-            if (response.code === 1) {
-              this.$message.success({ message: '重置成功' })
-              this.resetClientSecretDialogVisible = false
-            }
+            this.$message.success({ message: '重置成功' })
+            this.resetClientSecretDialogVisible = false
           })
         } else {
           console.log('error submit!!')

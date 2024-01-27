@@ -228,12 +228,12 @@ export default {
      * 初始化加载表格数据
      */
     reloadList () {
-      list(this.buildParam()).then((rep) => {
-        if (rep.code === 1) {
-          this.userMsgTableData = rep.data.records
-          this.searchUserMsg.size = rep.data.size
-          this.searchUserMsg.current = rep.data.current
-          this.total = rep.data.total
+      list(this.buildParam()).then((response) => {
+        if (response.data) {
+          this.userMsgTableData = response.data.records
+          this.searchUserMsg.size = response.data.size
+          this.searchUserMsg.current = response.data.current
+          this.total = response.data.total
         }
       })
     },
@@ -292,11 +292,9 @@ export default {
       confirmAlert(() => {
         const ids = []
         this.selectionUserMsgIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
-        del(ids).then(rep => {
-          if (rep.code === 1) {
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+        del(ids).then(response => {
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -309,12 +307,10 @@ export default {
      */
     handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
-        del([JSONBigInt.parse(row.id)]).then(rep => {
-          if (rep.code === 1) {
-            rows.splice(index, 1)
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+        del([JSONBigInt.parse(row.id)]).then(response => {
+          rows.splice(index, 1)
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },

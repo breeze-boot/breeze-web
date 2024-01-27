@@ -221,7 +221,7 @@ export default {
      */
     reloadList () {
       list(this.buildParam()).then((response) => {
-        if (response.code === 1) {
+        if (response.data) {
           this.dictTableData = response.data.records
           this.searchDict.size = response.data.size
           this.searchDict.current = response.data.current
@@ -285,10 +285,8 @@ export default {
         const ids = []
         this.selectionDictIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then((response) => {
-          if (response.code === 1) {
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -302,11 +300,9 @@ export default {
     handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
-          if (response.code === 1) {
-            rows.splice(index, 1)
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          rows.splice(index, 1)
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -378,11 +374,9 @@ export default {
      */
     handleSave () {
       save(this.dict).then((response) => {
-        if (response.code === 1) {
-          this.$message.success(response.message)
-          this.dictDialogVisible = false
-          this.reloadList()
-        }
+        this.$message.success(response.message)
+        this.dictDialogVisible = false
+        this.reloadList()
       })
     },
     /**
@@ -390,11 +384,9 @@ export default {
      */
     handleModify () {
       modify(this.dict).then((response) => {
-        if (response.code === 1) {
-          this.$message.success(response.message)
-          this.dictDialogVisible = false
-          this.reloadList()
-        }
+        this.$message.success(response.message)
+        this.dictDialogVisible = false
+        this.reloadList()
       })
     },
     /**

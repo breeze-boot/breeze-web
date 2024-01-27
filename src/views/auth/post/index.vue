@@ -19,8 +19,8 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:post:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
-        <el-button v-has="['sys:post:delete']"
+        <el-button v-has="['auth:post:create']" plain size="mini" type="primary" @click="handleCreate">新建</el-button>
+        <el-button v-has="['auth:post:delete']"
                    :disabled="checkDelete" plain size="mini" type="danger" @click="handleRemove">删除
         </el-button>
       </div>
@@ -66,9 +66,9 @@
           width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="handleInfo(scope.row)">查看</el-button>
-            <el-button v-has="['sys:post:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
+            <el-button v-has="['auth:post:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
             </el-button>
-            <el-button v-has="['sys:post:delete']" size="mini" type="text"
+            <el-button v-has="['auth:post:delete']" size="mini" type="text"
                        @click.native.prevent="handleRemoveItem(scope.$index, postTableData,scope.row)">删除
             </el-button>
           </template>
@@ -124,7 +124,7 @@
 </template>
 
 <script>
-import { checkPostCode, del, list, modify, save } from '@/api/system/post'
+import { checkPostCode, del, list, modify, save } from '@/api/auth/post'
 import { confirmAlert } from '@utils/common'
 import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
@@ -272,10 +272,8 @@ export default {
         const ids = []
         this.selectionPostIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(response => {
-          if (response.code === 1) {
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -289,10 +287,8 @@ export default {
     handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
-          if (response.code === 1) {
-            rows.splice(index, 1)
-            this.$message.success('删除成功')
-          }
+          rows.splice(index, 1)
+          this.$message.success('删除成功')
         })
       })
     },
@@ -362,11 +358,9 @@ export default {
     handleSave () {
       this.post.id = undefined
       save(this.post).then((response) => {
-        if (response.code === 1) {
-          this.$message.success('添加成功')
-          this.postDialogVisible = false
-          this.reloadList()
-        }
+        this.$message.success('添加成功')
+        this.postDialogVisible = false
+        this.reloadList()
       })
     },
     /**
@@ -374,11 +368,9 @@ export default {
      */
     handleModify () {
       modify(this.post).then((response) => {
-        if (response.code === 1) {
-          this.$message.success('修改成功')
-          this.postDialogVisible = false
-          this.reloadList()
-        }
+        this.$message.success('修改成功')
+        this.postDialogVisible = false
+        this.reloadList()
       })
     },
     /**

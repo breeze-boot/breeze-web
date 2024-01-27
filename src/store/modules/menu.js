@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { filterTree } from '@utils/common'
-import { listTreeMenu } from '@/api/system/menu'
+import { listTreeMenu } from '@/api/auth/menu'
 import { bindMenu, bindRoute } from '@/router/remote-dy-route'
 
 Vue.use(Vuex)
@@ -53,7 +53,7 @@ export default {
     loadRoute (context) {
       return new Promise((resolve, reject) => {
         listTreeMenu({
-          platformCode: 'managementCenter'
+          platformCode: 'pc'
         }).then(response => {
           // 动态绑定路由
           bindRoute(response.data)

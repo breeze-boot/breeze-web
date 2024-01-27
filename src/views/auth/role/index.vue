@@ -21,9 +21,9 @@
       <el-row :gutter="24">
         <el-col :md="19">
           <div style="margin-bottom: 10px; text-align: left;">
-            <el-button v-has="['sys:role:create']" plain size="mini" type="primary" @click="handleCreate">新建
+            <el-button v-has="['auth:role:create']" plain size="mini" type="primary" @click="handleCreate">新建
             </el-button>
-            <el-button v-has="['sys:role:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+            <el-button v-has="['auth:role:delete']" :disabled="checkDelete" plain size="mini" type="danger"
                        @click="handleRemove">删除
             </el-button>
           </div>
@@ -61,12 +61,12 @@
               width="200">
               <template slot-scope="scope">
                 <el-button size="mini" type="text" @click="handeInfo(scope.row)">查看</el-button>
-                <el-button v-has="['sys:role:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
+                <el-button v-has="['auth:role:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
                 </el-button>
-                <el-button v-has="['sys:permission:edit']" size="mini" type="text"
+                <el-button v-has="['auth:permission:edit']" size="mini" type="text"
                            @click="handleEditRolePermission(scope.row)">数据权限
                 </el-button>
-                <el-button v-has="['sys:role:delete']" size="mini" type="text"
+                <el-button v-has="['auth:role:delete']" size="mini" type="text"
                            @click.native.prevent="handleRemoveItem(scope.$index, roleTableData,scope.row)">删除
                 </el-button>
               </template>
@@ -134,9 +134,9 @@
           <el-select v-model="permission.permissionId" collapse-tags filterable multiple placeholder="请选择数据权限">
             <el-option
               v-for="item in permissionOptions"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key">
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
@@ -163,12 +163,12 @@
 </template>
 
 <script>
-import { checkRoleCode, del, list, listRolesPermission, modify, modifyPermission, save } from '@/api/system/role'
-import { listTreePermission } from '@/api/system/menu'
+import { checkRoleCode, del, list, listRolesPermission, modify, modifyPermission, save } from '@/api/auth/role'
+import { listTreePermission } from '@/api/auth/menu'
 import { confirmAlert, reLoginConfirm } from '@utils/common'
 import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
-import { editRolePermission, selectPermission } from '@/api/system/permission'
+import { editRolePermission, selectPermission } from '@/api/auth/permission'
 
 export default {
   name: 'Role',
@@ -284,12 +284,12 @@ export default {
      * 初始化加载表格数据
      */
     reloadList () {
-      list(this.buildParam()).then((rep) => {
-        if (rep.code === 1) {
-          this.roleTableData = rep.data.records
-          this.searchRole.size = rep.data.size
-          this.searchRole.current = rep.data.current
-          this.total = rep.data.total
+      list(this.buildParam()).then((response) => {
+        if (response.data) {
+          this.roleTableData = response.data.records
+          this.searchRole.size = response.data.size
+          this.searchRole.current = response.data.current
+          this.total = response.data.total
         }
       })
     },
@@ -297,8 +297,8 @@ export default {
      * 初始化加载树形数据
      */
     reloadListTreeMenu () {
-      listTreePermission().then((rep) => {
-        this.roleTreeData = rep.data
+      listTreePermission().then((response) => {
+        this.roleTreeData = response.data
       })
     },
     /**
@@ -308,10 +308,10 @@ export default {
       if (!roleId) {
         return
       }
-      listRolesPermission(roleId).then((rep) => {
+      listRolesPermission(roleId).then((response) => {
         this.$nextTick(() => {
           this.$refs.roleTree.setCheckedKeys([])
-          rep.data.forEach(data => {
+          response.data.forEach(data => {
             this.$refs.roleTree.setChecked(data.menuId, true, false)
           })
         })
@@ -385,11 +385,9 @@ export default {
       confirmAlert(() => {
         const ids = []
         this.selectionRoleIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
-        del(ids).then((rep) => {
-          if (rep.code === 1) {
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+        del(ids).then((response) => {
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -402,12 +400,10 @@ export default {
      */
     handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
-        del([JSONBigInt.parse(row.id)]).then(rep => {
-          if (rep.code === 1) {
-            rows.splice(index, 1)
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+        del([JSONBigInt.parse(row.id)]).then(response => {
+          rows.splice(index, 1)
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -479,13 +475,11 @@ export default {
      */
     handleSave () {
       this.role.roleCode = this.prefix + this.role.roleCode
-      save(this.role).then((rep) => {
-        if (rep.code === 1) {
-          this.$message.success(rep.message)
-          this.roleDialogVisible = false
-          this.reloadList()
-          this.handleResetPermission()
-        }
+      save(this.role).then((response) => {
+        this.$message.success(response.message)
+        this.roleDialogVisible = false
+        this.reloadList()
+        this.handleResetPermission()
       })
     },
     /**
@@ -493,13 +487,11 @@ export default {
      */
     handleModify () {
       this.role.roleCode = this.prefix + this.role.roleCode
-      modify(this.role).then((rep) => {
-        if (rep.code === 1) {
-          this.$message.success(rep.message)
-          this.roleDialogVisible = false
-          this.reloadList()
-          this.handleResetPermission()
-        }
+      modify(this.role).then((response) => {
+        this.$message.success(response.message)
+        this.roleDialogVisible = false
+        this.reloadList()
+        this.handleResetPermission()
       })
     },
     /**
@@ -531,12 +523,10 @@ export default {
       modifyPermission({
         roleId: this.currentClickRoleId,
         permissionIds: checkedKeys
-      }).then(rep => {
-        if (rep.code === 1) {
-          this.$message.success(rep.message)
-          this.listRolesPermission(this.currentClickRoleId)
-          reLoginConfirm('请重新登录')
-        }
+      }).then((response) => {
+        this.$message.success(response.message)
+        this.listRolesPermission(this.currentClickRoleId)
+        reLoginConfirm('请重新登录')
       })
     },
     /**
@@ -570,15 +560,13 @@ export default {
               roleId: JSONBigInt.parse(this.permission.roleId)
             })
           })
-          editRolePermission(data).then(rep => {
-            if (rep.code === 1 && !rep.data) {
-              this.$message({
-                message: '数据权限编辑成功',
-                type: 'success'
-              })
-              this.permissionDialogVisible = false
-              this.reloadList()
-            }
+          editRolePermission(data).then(response => {
+            this.$message({
+              message: '数据权限编辑成功',
+              type: 'success'
+            })
+            this.permissionDialogVisible = false
+            this.reloadList()
           })
         } else {
           console.log('error submit!!')
@@ -607,9 +595,9 @@ export default {
      * 数据权限下拉框
      */
     selectDataPermission () {
-      selectPermission().then(rep => {
-        if (rep.code === 1) {
-          this.permissionOptions = rep.data
+      selectPermission().then(response => {
+        if (response.data) {
+          this.permissionOptions = response.data
         }
       })
     }

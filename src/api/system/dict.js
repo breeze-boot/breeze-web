@@ -85,7 +85,7 @@ export function open (data) {
  */
 export function listDict (dictCodes) {
   return request({
-    url: servicePath.system + '/dict/listDict',
+    url: servicePath.system + '/dict/v1/listDict',
     method: 'post',
     data: dictCodes
   })

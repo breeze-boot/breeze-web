@@ -20,9 +20,9 @@
         </el-row>
       </el-form>
       <div style="margin-bottom: 10px; text-align: left;">
-        <el-button v-has="['sys:permission:create']" plain size="mini" type="primary" @click="handleCreate">新建
+        <el-button v-has="['auth:permission:create']" plain size="mini" type="primary" @click="handleCreate">新建
         </el-button>
-        <el-button v-has="['sys:permission:delete']" :disabled="checkDelete" plain size="mini" type="danger"
+        <el-button v-has="['auth:permission:delete']" :disabled="checkDelete" plain size="mini" type="danger"
                    @click="handleRemove">删除
         </el-button>
       </div>
@@ -73,9 +73,9 @@
           width="150">
           <template slot-scope="scope">
             <el-button size="mini" type="text" @click="handleIinfo(scope.row)">查看</el-button>
-            <el-button v-has="['sys:permission:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
+            <el-button v-has="['auth:permission:modify']" size="mini" type="text" @click="handleEdit(scope.row)">编辑
             </el-button>
-            <el-button v-has="['sys:permission:delete']" size="mini" type="text"
+            <el-button v-has="['auth:permission:delete']" size="mini" type="text"
                        @click.native.prevent="handleRemoveItem(scope.$index, permissionTableData,scope.row)">删除
             </el-button>
           </template>
@@ -104,9 +104,9 @@
           <el-radio-group v-model="permission.permissionCode">
             <el-radio-button
               v-for="item in this.dict()('PERMISSION_CODE')"
-              :key="item.key"
-              :label="item.key">
-              {{ item.value }}
+              :key="item.value"
+              :label="item.value">
+              {{ item.label }}
             </el-radio-button>
           </el-radio-group>
         </el-form-item>
@@ -114,7 +114,7 @@
           <el-cascader
             v-model="permission.permissions"
             :options="deptOption"
-            :props="{ checkStrictly: true, multiple: true, emitPath: false , value: 'key', label: 'value' }"
+            :props="{ checkStrictly: true, multiple: true, emitPath: false , value: 'value', label: 'label' }"
             :show-all-levels="false"
             clearable
             filterable
@@ -145,11 +145,11 @@
 </template>
 
 <script>
-import { del, list, modify, save } from '@/api/system/permission'
+import { del, list, modify, save } from '@/api/auth/permission'
 import { confirmAlert } from '@utils/common'
 import { DIALOG_TYPE } from '@/const/constant'
 import JSONBigInt from 'json-bigint'
-import { selectDept } from '@/api/system/dept'
+import { selectDept } from '@/api/auth/dept'
 import { dict } from '@/mixins'
 
 export default {
@@ -223,7 +223,7 @@ export default {
   methods: {
     reloadList () {
       list(this.buildParam()).then((response) => {
-        if (response.code === 1) {
+        if (response.data) {
           this.permissionTableData = response.data.records
           this.searchPermission.size = response.data.size
           this.searchPermission.current = response.data.current
@@ -233,7 +233,7 @@ export default {
     },
     selectDept () {
       selectDept().then(response => {
-        if (response.code === 1 && response.data) {
+        if (response.data) {
           this.deptOption = response.data
         }
       })
@@ -268,10 +268,8 @@ export default {
         const ids = []
         this.selectionPermissionIds.map((x) => ids.push(JSONBigInt.parse(x.id)))
         del(ids).then(response => {
-          if (response.code === 1) {
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -285,11 +283,9 @@ export default {
     handleRemoveItem (index, rows, row) {
       confirmAlert(() => {
         del([JSONBigInt.parse(row.id)]).then(response => {
-          if (response.code === 1) {
-            rows.splice(index, 1)
-            this.reloadList()
-            this.$message.success('删除成功')
-          }
+          rows.splice(index, 1)
+          this.reloadList()
+          this.$message.success('删除成功')
         })
       })
     },
@@ -364,20 +360,16 @@ export default {
     handelSave () {
       this.permission.id = undefined
       save(this.permission).then((response) => {
-        if (response.code === 1) {
-          this.$message.success('添加成功')
-          this.permissionDialogVisible = false
-          this.reloadList()
-        }
+        this.$message.success('添加成功')
+        this.permissionDialogVisible = false
+        this.reloadList()
       })
     },
     handleModify () {
       modify(this.permission).then((response) => {
-        if (response.code === 1) {
-          this.$message.success('修改成功')
-          this.permissionDialogVisible = false
-          this.reloadList()
-        }
+        this.$message.success('修改成功')
+        this.permissionDialogVisible = false
+        this.reloadList()
       })
     }
   }

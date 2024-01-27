@@ -27,9 +27,9 @@
         <el-select v-model="phoneLogin.tenantId" :popper-append-to-body="false" placeholder="请选择租户">
           <el-option
             v-for="item in tenantOption"
-            :key="item.key"
-            :label="item.value"
-            :value="item.key">
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
           </el-option>
         </el-select>
       </el-form-item>
@@ -52,7 +52,7 @@
 
 <script>
 import Verify from '@/components/verifition/Verify'
-import { selectTenant } from '@/api/system/tenant'
+import { selectTenant } from '@/api/auth/tenant'
 import { mapMutations } from 'vuex'
 
 export default {
@@ -95,7 +95,7 @@ export default {
   },
   mounted () {
     selectTenant().then(response => {
-      if (response.code === 1) {
+      if (response.data) {
         this.tenantOption = response.data
       }
     })
